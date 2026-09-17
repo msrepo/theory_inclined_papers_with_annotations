@@ -96,6 +96,15 @@ scalars and inline lists — anything more structured belongs in the body.
 
 Then `make fetch` to pull the PDF, and `make` to render.
 
+A note on `pdf_url`: prefer an arXiv PDF link over an OpenReview one. OpenReview's
+`/pdf?id=...` endpoint refuses non-browser requests with a 403, so `make fetch` cannot
+retrieve it; arXiv serves it without complaint. Keep the venue page in `url` and the
+fetchable PDF in `pdf_url` — they do not have to point at the same host.
+
+It is also worth opening the notes with a short `## Links` section listing the venue page,
+the preprint and any project page, so the Markdown source is useful on its own and not
+only once rendered.
+
 ### Writing the body
 
 Plain Markdown, plus:
@@ -111,6 +120,6 @@ left empty.
 
 ## Papers
 
-| Year | Paper | Topic |
-|---|---|---|
-| 2026 | Betser, Gofer, Levi & Gilboa — *InfoNCE Induces Gaussian Distribution* (ICLR) | why contrastive representations come out approximately Gaussian |
+| Year | Paper | Notes | Topic |
+|---|---|---|---|
+| 2026 | Betser, Gofer, Levi & Gilboa, *InfoNCE Induces Gaussian Distribution*, ICLR (Oral) — [OpenReview](https://openreview.net/forum?id=BlSH7gNQSq) · [arXiv:2602.24012](https://arxiv.org/abs/2602.24012) · [project page](https://rbetser.github.io/InfoNCE-induces-Gaussian-distribution/) | [read online](https://msrepo.github.io/theory_inclined_papers_with_annotations/2026-betser-infonce-gaussian/) · [source](papers/2026-betser-infonce-gaussian/notes.md) | why contrastive representations come out approximately Gaussian |

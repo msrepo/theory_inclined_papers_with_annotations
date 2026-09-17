@@ -19,6 +19,13 @@ tags: [todo]
 status: reading
 ---
 
+## Links
+
+- **[Venue page](TODO)** — official page, reviews and discussion.
+- **[Preprint](TODO)** — prefer an arXiv link; `make fetch` uses `pdf_url`.
+
+TODO authors, *TODO title*, TODO venue and year.
+
 ## In one paragraph
 
 TODO: what the paper claims, in plain language.

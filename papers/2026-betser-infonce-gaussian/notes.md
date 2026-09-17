@@ -1,13 +1,25 @@
 ---
 title: "InfoNCE Induces Gaussian Distribution"
 authors: "Roy Betser, Eyal Gofer, Meir Yossef Levi, Guy Gilboa (Technion)"
-venue: "ICLR"
+venue: "ICLR (Oral)"
 year: 2026
-url: ""
-pdf_url: ""
+url: "https://openreview.net/forum?id=BlSH7gNQSq"
+pdf_url: "https://arxiv.org/pdf/2602.24012"
 tags: [contrastive-learning, infonce, self-supervised, high-dimensional-probability, theory]
 status: read
 ---
+
+## Links
+
+- **[OpenReview forum](https://openreview.net/forum?id=BlSH7gNQSq)** — the ICLR 2026 venue
+  page, with the reviews and discussion.
+- **[arXiv:2602.24012](https://arxiv.org/abs/2602.24012)** — preprint. `make fetch` pulls
+  the PDF from here, because the OpenReview PDF endpoint refuses non-browser requests.
+- **[Project page](https://rbetser.github.io/InfoNCE-induces-Gaussian-distribution/)** —
+  the authors' own summary.
+
+Roy Betser, Eyal Gofer, Meir Yossef Levi and Guy Gilboa, *InfoNCE Induces Gaussian
+Distribution*, ICLR 2026 (Oral). Technion — Israel Institute of Technology.
 
 ## In one paragraph
 
