@@ -1,0 +1,14 @@
+# Paper PDFs are never committed: they are fetched from the URL in each
+# notes.md front matter with `make fetch`, or dropped in by hand.
+papers/**/*.pdf
+papers/**/*.djvu
+papers/**/supplement/
+
+# Rendered output
+build/
+
+# OS / editor noise
+.DS_Store
+*.swp
+.venv/
+__pycache__/
