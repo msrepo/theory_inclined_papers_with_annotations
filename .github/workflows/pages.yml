@@ -37,6 +37,17 @@ jobs:
       - name: Render notes
         run: make
 
+      # Catches assets pointing at a filesystem path rather than a URL or a
+      # relative path -- e.g. Debian pandoc's /usr/share/javascript/katex/,
+      # which resolves locally but 404s once the site is served from Pages.
+      - name: Check for non-portable asset paths
+        run: |
+          if grep -rhoE '(src|href)="/[^/][^"]*"' build --include='*.html'; then
+            echo "::error::built HTML references an absolute filesystem path"
+            exit 1
+          fi
+          echo "all asset paths are relative or absolute URLs"
+
       - uses: actions/configure-pages@v5
 
       - uses: actions/upload-pages-artifact@v3

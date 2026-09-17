@@ -13,6 +13,11 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
+
+# Pin the KaTeX CDN explicitly. Bare `--katex` uses whatever the local pandoc
+# build was configured with, and Debian's package points at the filesystem path
+# /usr/share/javascript/katex/ -- which 404s once the site is served elsewhere.
+KATEX_CDN = "https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/"
 PAPERS = ROOT / "papers"
 BUILD = ROOT / "build"
 STYLE = ROOT / "tools" / "style.css"
@@ -107,7 +112,7 @@ def render_one(notes: Path, meta: dict) -> None:
         "--from", "markdown+tex_math_dollars+tex_math_single_backslash",
         "--to", "html5",
         "--standalone",
-        "--katex",
+        f"--katex={KATEX_CDN}",
         "--toc", "--toc-depth=2",
         "--css", "../style.css",
         # pagetitle sets <title> without emitting pandoc's own title block,
