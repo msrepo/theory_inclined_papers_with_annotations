@@ -1,0 +1,54 @@
+name: Build and deploy notes to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'papers/**'
+      - 'tools/**'
+      - 'Makefile'
+      - '.github/workflows/pages.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Let a running deploy finish rather than cancelling it, but only queue one.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install pandoc
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends pandoc
+          pandoc --version | head -1
+
+      # No `make fetch` here on purpose: paper PDFs stay out of the published
+      # site. Pages that have a pdf_url link out to the publisher instead.
+      - name: Render notes
+        run: make
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: build
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

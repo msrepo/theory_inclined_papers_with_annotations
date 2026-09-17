@@ -6,6 +6,7 @@ papers/**/supplement/
 
 # Rendered output
 build/
+.build-stamp
 
 # OS / editor noise
 .DS_Store

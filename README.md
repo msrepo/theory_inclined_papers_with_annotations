@@ -1,5 +1,7 @@
 # Theory-inclined papers, with annotations
 
+**Rendered notes: <https://msrepo.github.io/theory_inclined_papers_with_annotations/>**
+
 Close readings of theory-heavy machine learning papers. One folder per paper, each with a
 plain-language annotation in Markdown (LaTeX maths included) that can be rendered to a
 styled HTML page with `make`.
@@ -40,6 +42,16 @@ redistributed. Dropping a file in as `papers/<slug>/paper.pdf` by hand works equ
 
 Maths is rendered with KaTeX loaded from a CDN, so the built pages need a network
 connection the first time they are opened.
+
+## Publishing
+
+Every push to `main` that touches `papers/`, `tools/` or the `Makefile` triggers
+`.github/workflows/pages.yml`, which runs `make` and deploys `build/` to GitHub Pages.
+
+The workflow deliberately does **not** run `make fetch`, so no paper PDF is ever published
+to the site. A paper whose front matter carries a `pdf_url` gets a link out to the
+publisher instead; locally, `make fetch` still puts `paper.pdf` beside the notes and the
+local render links to it directly.
 
 ## Usage
 

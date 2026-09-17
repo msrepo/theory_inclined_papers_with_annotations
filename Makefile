@@ -14,7 +14,7 @@ PORT   ?= 8000
 
 TOOLS := tools
 NOTES := $(wildcard papers/*/notes.md)
-STAMP := build/.stamp
+STAMP := .build-stamp
 
 .DEFAULT_GOAL := html
 .PHONY: html new fetch serve open list check clean help
@@ -23,7 +23,7 @@ html: $(STAMP)
 
 $(STAMP): $(NOTES) $(TOOLS)/build.py $(TOOLS)/style.css
 	@$(PYTHON) $(TOOLS)/build.py
-	@mkdir -p build && touch $@
+	@touch $@
 
 new:
 	@test -n "$(SLUG)" || { echo "usage: make new SLUG=2026-lastname-topic"; exit 1; }
@@ -49,7 +49,7 @@ check:
 	  e = build.discover(); print('pandoc ok; %d note(s) parse' % len(e))"
 
 clean:
-	@rm -rf build
+	@rm -rf build $(STAMP)
 	@echo "removed build/"
 
 help:
