@@ -3,11 +3,11 @@ name: Build and deploy notes to GitHub Pages
 on:
   push:
     branches: [main]
-    paths:
-      - 'papers/**'
-      - 'tools/**'
-      - 'Makefile'
-      - '.github/workflows/pages.yml'
+    # Deny-list rather than allow-list: an allow-list has to be updated every
+    # time a content root is added, and silently stops deploying when it is not.
+    paths-ignore:
+      - 'README.md'
+      - '.gitignore'
   workflow_dispatch:
 
 permissions:
