@@ -20,24 +20,31 @@ papers did not read a theorem and derive a method. They tried a Gaussian, it cal
 and they published. Betser et al. explain *why* the trick works — and, more usefully, when it
 should be expected to stop working.
 
-This page collects the landscape, then looks closely at three representative papers.
+The starting point for this page is the authors' own survey of that literature, given in their
+ICLR 2026 rebuttal: Betser, Gofer, Levi & Gilboa, *Response (1)*, OpenReview note
+[`zB9oh3CoAg`](https://openreview.net/forum?id=BlSH7gNQSq&noteId=zB9oh3CoAg) on the
+[submission forum](https://openreview.net/forum?id=BlSH7gNQSq). Their paragraph there groups
+the applied work into five families and supplies the references numbered below. This page keeps
+their taxonomy and adds close reads of three of the papers.
 
 ## The landscape
 
 Five clusters of applied work, each leaning on approximate Gaussianity of the embedding space.
+Bracketed numbers are the reference numbering from the rebuttal note, listed in full under
+*Sources*.
 
 | Area | What is modelled as Gaussian | Examples |
 |---|---|---|
-| Uncertainty and Bayesian modelling | Laplace posteriors over CLIP heads; Gaussian variational parameters in adapters | Baumann et al. 2024; Morales-Álvarez et al. 2024 |
-| Probabilistic embeddings and prompt learning | CLIP features or prompts as Gaussians in latent space | Venkataramanan et al. 2025; Lu et al. 2022 |
-| Classification and class-incremental learning | per-class features as Gaussian, for replay, generative classifiers, prototype rules | Z. Huang et al. 2024 |
-| Test-time adaptation and calibration | Gaussian priors over class prototypes or feature clusters | Zhou et al. 2025 |
-| Segmentation, detection, dense prediction | modality- or prompt-specific embeddings as Gaussian latent variables | C. Huang et al. 2024; Jia et al. 2025 |
+| Uncertainty and Bayesian modelling | Laplace posteriors over CLIP heads; Gaussian variational parameters in adapters | Baumann et al. 2024 **[2]**; Morales-Álvarez et al. **[3]** |
+| Probabilistic embeddings and prompt learning | CLIP features or prompts as Gaussians in latent space | Venkataramanan et al. 2025 **[4]**; Lu et al. 2022 **[5]** |
+| Classification and class-incremental learning | per-class features as Gaussian, for replay, generative classifiers, prototype rules | Z. Huang et al. 2024 **[6]** |
+| Test-time adaptation and calibration | Gaussian priors over class prototypes or feature clusters | Zhou et al. 2025 **[7]** |
+| Segmentation, detection, dense prediction | modality- or prompt-specific embeddings as Gaussian latent variables | C. Huang et al. 2024 **[8]**; Jia et al. 2025 **[9]** |
 
 Two adjacent results are worth naming because they close the loop in the other direction.
-Eftekhari & Papyan (ICML 2025) show that *deliberately* Gaussianizing representations improves
+Eftekhari & Papyan **[1]** show that *deliberately* Gaussianizing representations improves
 downstream performance — so Gaussianity is not merely a convenient fiction but correlated with
-quality. And Betser et al.'s *Whitened CLIP as a Likelihood Surrogate* (ICML 2025) uses the
+quality. And Betser et al.'s *Whitened CLIP as a Likelihood Surrogate* **[10]** uses the
 assumption directly: whiten CLIP features and the Gaussian density becomes a usable likelihood
 for images and captions.
 
@@ -75,7 +82,7 @@ uncertainty. Huang models <b>each modality's feature distribution</b> and gets a
 minimise between them.</figcaption>
 </figure>
 
-## Zhou et al. 2025 — Bayesian Class Adaptation (CVPR)
+## Zhou et al. 2025 — Bayesian Class Adaptation (CVPR) [7]
 
 **The observation.** CLIP zero-shot classification is usually written as a softmax over cosine
 similarities. Zhou et al. re-derive it from Bayes' theorem with $M$ class embeddings
@@ -119,7 +126,7 @@ headline selling points — high inference rate, low memory — are not engineer
 happen to coexist with the Gaussian assumption; they are *purchased* by it. Drop Gaussianity
 and you are back to storing a cache of embeddings, which is what TDA does.
 
-## Venkataramanan et al. 2025 — GroVE (UAI)
+## Venkataramanan et al. 2025 — GroVE (UAI) [4]
 
 **The problem.** A frozen VLM gives one point per input, but the image–text relationship is
 genuinely one-to-many: an image matches many captions and vice versa. Deterministic embeddings
@@ -161,7 +168,7 @@ cross-modal retrieval, VQA and active learning on frozen CLIP and BLIP. That is 
 real empirical support for approximate Gaussianity of the embedding space — arrived at
 independently of any theory, which is what makes it worth citing in that direction.
 
-## C. Huang et al. 2024 — Multimodal Representation Distribution Learning (IJCAI)
+## C. Huang et al. 2024 — Multimodal Representation Distribution Learning (IJCAI) [8]
 
 **The problem.** Medical image segmentation is starved of pixel-level labels, so text
 annotations are used as a cheaper auxiliary signal. But the standard fusions are crude:
@@ -271,3 +278,30 @@ shaped version of the statement than has been proved. That gap is the interestin
 - The theory and the applications do not yet meet cleanly. Marginal, low-dimensional-projection
   Gaussianity is what is proved; class-conditional and high-dimensional joint Gaussianity is
   what is used.
+
+## Sources
+
+The reference list as given in the authors' rebuttal note
+[`zB9oh3CoAg`](https://openreview.net/forum?id=BlSH7gNQSq&noteId=zB9oh3CoAg), preserving its
+numbering. The three marked ▸ are read in detail above.
+
+1. D. Eftekhari and V. Papyan. *On the Importance of Gaussianizing Representations.* ICML 2025.
+2. Anton Baumann et al. *Post-hoc Probabilistic Vision–Language Models.* arXiv:2412.06014, 2024.
+3. Pablo Morales-Álvarez et al. *BayesAdapter: enhanced uncertainty estimation in CLIP few-shot
+   adaptation.* arXiv:2412.09718.
+4. ▸ Aishwarya Venkataramanan et al. *Probabilistic Embeddings for Frozen Vision-Language
+   Models: Uncertainty Quantification with Gaussian Process Latent Variable Models.* UAI 2025.
+   [arXiv:2505.05163](https://arxiv.org/abs/2505.05163)
+5. Yuning Lu et al. *Prompt Distribution Learning.* CVPR 2022.
+6. Zitong Huang et al. *Learning Prompt with Distribution-Based Feature Replay for Few-Shot
+   Class-Incremental Learning.* arXiv:2401.01598.
+7. ▸ L. Zhou et al. *Bayesian Test-Time Adaptation for Vision-Language Models.* CVPR 2025.
+   [arXiv:2503.09248](https://arxiv.org/abs/2503.09248)
+8. ▸ C. Huang et al. *Multimodal Representation Distribution Learning for Medical Image
+   Segmentation.* IJCAI 2024.
+9. M. Jia et al. *Orchestrating the Symphony of Prompt Distribution Learning for Human-Object
+   Interaction Detection.* AAAI 2025.
+10. R. Betser et al. *Whitened CLIP as a Likelihood Surrogate of Images and Captions.* ICML 2025.
+
+The paper this page hangs off is annotated separately:
+[InfoNCE Induces Gaussian Distribution](../2026-betser-infonce-gaussian/index.html).
