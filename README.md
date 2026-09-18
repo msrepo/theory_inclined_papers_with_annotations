@@ -122,4 +122,5 @@ left empty.
 
 | Year | Paper | Notes | Topic |
 |---|---|---|---|
+| 2026 | Zhang, Cui, Li & Wang, *Difficult Examples Hurt Unsupervised Contrastive Learning*, ICLR — [OpenReview](https://openreview.net/forum?id=5LMdnUdAoy) · [arXiv:2501.01317](https://arxiv.org/abs/2501.01317) | [read online](https://msrepo.github.io/theory_inclined_papers_with_annotations/2026-zhang-difficult-examples/) · [source](papers/2026-zhang-difficult-examples/notes.md) | why deleting boundary examples improves contrastive learning |
 | 2026 | Betser, Gofer, Levi & Gilboa, *InfoNCE Induces Gaussian Distribution*, ICLR (Oral) — [OpenReview](https://openreview.net/forum?id=BlSH7gNQSq) · [arXiv:2602.24012](https://arxiv.org/abs/2602.24012) · [project page](https://rbetser.github.io/InfoNCE-induces-Gaussian-distribution/) | [read online](https://msrepo.github.io/theory_inclined_papers_with_annotations/2026-betser-infonce-gaussian/) · [source](papers/2026-betser-infonce-gaussian/notes.md) | why contrastive representations come out approximately Gaussian |
