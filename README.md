@@ -19,6 +19,7 @@ inequality comes from, what an assumption is buying — are written down explici
 │   └── <slug>/
 │       ├── notes.md          the annotation; YAML front matter + body
 │       ├── figures/          optional; self-contained themed SVGs
+│       ├── code/             optional; runnable checks, see `make verify`
 │       └── paper.pdf         gitignored, fetched or dropped in by hand
 ├── foundations/
 │   └── <slug>/notes.md       background maths the annotations lean on
@@ -68,6 +69,7 @@ make new SLUG=2026-lastname-topic # scaffold a new paper folder
 make fetch                        # download any missing PDFs
 make list                         # list the papers in the repo
 make check                        # verify pandoc is present and notes parse
+make verify                       # run every papers/*/code/*.py
 make clean                        # remove build/
 ```
 
@@ -124,6 +126,14 @@ Plain Markdown, plus:
 - display maths between double dollars on their own lines
 - tables for symbol glossaries, which are worth including early in every annotation
 
+### Code
+
+Where a paper makes a claim worth checking, `papers/<slug>/code/` holds a small self-contained
+script that checks it, with a `__main__` printing exactly the numbers quoted in the notes.
+`make verify` runs them all, so a claim in the prose cannot quietly drift from the code that
+produced it. Standard library and numpy only — these are meant to be read and poked at, not
+reproduced at scale.
+
 A loose section order that has worked so far: *In one paragraph* → *The spine of the
 argument* → *Setup and notation* → the results, in the paper's own order → *Questions and
 doubts* → *Takeaways*. The doubts section is the point of the exercise; it should not be
@@ -150,6 +160,9 @@ Themes that cut across several papers.
 
 | Year | Paper | Notes | Topic |
 |---|---|---|---|
+| 2026 | Li, Jiang, Ye, He, Li, Xiao, Cheng & Chen, *Path-Decoupled Hyperbolic Flow Matching for Few-Shot Adaptation*, ICML — [arXiv:2602.20479](https://arxiv.org/abs/2602.20479) | [read online](https://msrepo.github.io/theory_inclined_papers_with_annotations/2026-li-hyperbolic-flow-matching/) · [source](papers/2026-li-hyperbolic-flow-matching/notes.md) · [code](papers/2026-li-hyperbolic-flow-matching/code/) | transporting CLIP features to text prototypes on the Lorentz manifold |
+| 2026 | Rezk, Lee, Gouk, Hospedales & Kim, *Weight Space Learning for Certifiable Few-shot Transfer Learning*, ICML — [arXiv:2502.06970](https://arxiv.org/abs/2502.06970) (earlier version) | [read online](https://msrepo.github.io/theory_inclined_papers_with_annotations/2026-rezk-steel-certifiable-fewshot/) · [source](papers/2026-rezk-steel-certifiable-fewshot/notes.md) · [code](papers/2026-rezk-steel-certifiable-fewshot/code/) | non-vacuous few-shot certificates from a finite hypothesis class |
 | 2026 | Zhang, Cui, Li & Wang, *Difficult Examples Hurt Unsupervised Contrastive Learning*, ICLR — [OpenReview](https://openreview.net/forum?id=5LMdnUdAoy) · [arXiv:2501.01317](https://arxiv.org/abs/2501.01317) | [read online](https://msrepo.github.io/theory_inclined_papers_with_annotations/2026-zhang-difficult-examples/) · [source](papers/2026-zhang-difficult-examples/notes.md) | why deleting boundary examples improves contrastive learning |
 | 2026 | Betser, Gofer, Levi & Gilboa, *InfoNCE Induces Gaussian Distribution*, ICLR (Oral) — [OpenReview](https://openreview.net/forum?id=BlSH7gNQSq) · [arXiv:2602.24012](https://arxiv.org/abs/2602.24012) · [project page](https://rbetser.github.io/InfoNCE-induces-Gaussian-distribution/) | [read online](https://msrepo.github.io/theory_inclined_papers_with_annotations/2026-betser-infonce-gaussian/) · [source](papers/2026-betser-infonce-gaussian/notes.md) | why contrastive representations come out approximately Gaussian |
 | 2021 | HaoChen, Wei, Gaidon & Ma, *Provable Guarantees for Self-Supervised Deep Learning with Spectral Contrastive Loss*, NeurIPS (Oral) — [arXiv:2106.04156](https://arxiv.org/abs/2106.04156) | [read online](https://msrepo.github.io/theory_inclined_papers_with_annotations/2021-haochen-spectral-contrastive/) · [source](papers/2021-haochen-spectral-contrastive/notes.md) | contrastive learning is spectral clustering of the augmentation graph |
+| 2018 | Jacot, Gabriel & Hongler, *Neural Tangent Kernel: Convergence and Generalization in Neural Networks*, NeurIPS — [arXiv:1806.07572](https://arxiv.org/abs/1806.07572) | [read online](https://msrepo.github.io/theory_inclined_papers_with_annotations/2018-jacot-neural-tangent-kernel/) · [source](papers/2018-jacot-neural-tangent-kernel/notes.md) · [code](papers/2018-jacot-neural-tangent-kernel/code/) | wide networks train as kernel regression in function space |

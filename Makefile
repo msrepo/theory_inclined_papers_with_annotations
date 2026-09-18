@@ -7,6 +7,7 @@
 #   make open                           render, then open build/index.html
 #   make list                           list the papers in the repo
 #   make check                          verify pandoc and that notes parse
+#   make verify                         run every papers/*/code/*.py
 #   make clean                          remove build/
 
 PYTHON ?= python3
@@ -16,10 +17,11 @@ TOOLS := tools
 ROOTS := papers foundations topics
 NOTES := $(foreach r,$(ROOTS),$(wildcard $(r)/*/notes.md))
 FIGS  := $(foreach r,$(ROOTS),$(wildcard $(r)/*/figures/*))
+CODE  := $(foreach r,$(ROOTS),$(wildcard $(r)/*/code/*.py))
 STAMP := .build-stamp
 
 .DEFAULT_GOAL := html
-.PHONY: html new fetch serve open list check clean help
+.PHONY: html new fetch serve open list check verify clean help
 
 html: $(STAMP)
 
@@ -49,6 +51,13 @@ check:
 	@command -v pandoc >/dev/null || { echo "pandoc missing: brew install pandoc"; exit 1; }
 	@$(PYTHON) -c "import sys; sys.path.insert(0,'$(TOOLS)'); import build; \
 	  e = build.discover(); print('pandoc ok; %d note(s) parse' % len(e))"
+
+verify:
+	@test -n "$(CODE)" || { echo "no code to run"; exit 0; }
+	@for f in $(CODE); do \
+	  echo "=== $$f ==="; $(PYTHON) $$f || exit 1; echo; \
+	done
+	@echo "all code ran"
 
 clean:
 	@rm -rf build $(STAMP)
