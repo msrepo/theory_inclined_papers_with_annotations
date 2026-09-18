@@ -17,6 +17,9 @@ status: read
   the PDF from here, because the OpenReview PDF endpoint refuses non-browser requests.
 - **[Inequalities and concentration](../inequalities-and-concentration/index.html)** — background page collecting the tools
   these proofs run on (Cheeger, Donsker–Varadhan, Rademacher, Davis–Kahan and the rest).
+- **[Applications of Gaussianity](../gaussianity-in-practice/index.html)** — the applied work
+  that already assumes this result, in uncertainty estimation, test-time adaptation and dense
+  prediction.
 - **[Project page](https://rbetser.github.io/InfoNCE-induces-Gaussian-distribution/)** —
   the authors' own summary.
 

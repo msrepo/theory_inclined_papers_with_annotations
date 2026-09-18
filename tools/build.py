@@ -19,9 +19,16 @@ ROOT = Path(__file__).resolve().parent.parent
 # /usr/share/javascript/katex/ -- which 404s once the site is served elsewhere.
 KATEX_CDN = "https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/"
 PAPERS = ROOT / "papers"
-# Background pages that are not about one paper. Same format and same pipeline;
-# they are discovered separately only so the index can list them on their own.
-FOUNDATIONS = ROOT / "foundations"
+# Pages that are not annotations of one paper. Same front matter and same
+# pipeline; separate roots only so the index can group them. Order here is the
+# order they appear on the index page.
+COLLECTIONS = [
+    (ROOT / "foundations", "foundations"),   # background: the maths the papers run on
+    (ROOT / "topics", "topic"),              # themes spanning several papers
+    (PAPERS, "paper"),                       # one paper each
+]
+NON_PAPER_KINDS = {"foundations", "topic"}
+SECTION_TITLES = {"foundations": "Foundations", "topic": "Topics"}
 BUILD = ROOT / "build"
 STYLE = ROOT / "tools" / "style.css"
 
@@ -59,7 +66,7 @@ def discover() -> list[tuple[Path, dict]]:
     """All pages, from both source roots. Slugs must be unique across roots:
     everything renders into a flat build/<slug>/ so cross-links stay ../<slug>/."""
     found = []
-    for root, kind in ((FOUNDATIONS, "foundations"), (PAPERS, "paper")):
+    for root, kind in COLLECTIONS:
         for notes in sorted(root.glob("*/notes.md")):
             meta, _ = parse_front_matter(notes.read_text(encoding="utf-8"))
             meta.setdefault("title", notes.parent.name)
@@ -156,15 +163,17 @@ def _entry_html(meta: dict) -> str:
 def render_index(entries: list[tuple[Path, dict]]) -> None:
     rows = []
 
-    found = [m for _, m in entries if m.get("kind") == "foundations"]
-    if found:
-        rows.append("<h2>Foundations</h2><ul class='papers'>")
-        rows += [_entry_html(m) for m in sorted(found, key=lambda m: str(m["title"]).lower())]
+    for kind, heading in SECTION_TITLES.items():
+        group = [m for _, m in entries if m.get("kind") == kind]
+        if not group:
+            continue
+        rows.append(f"<h2>{html.escape(heading)}</h2><ul class='papers'>")
+        rows += [_entry_html(m) for m in sorted(group, key=lambda m: str(m["title"]).lower())]
         rows.append("</ul>")
 
     by_year: dict[str, list[dict]] = {}
     for _, meta in entries:
-        if meta.get("kind") == "foundations":
+        if meta.get("kind") in NON_PAPER_KINDS:
             continue
         by_year.setdefault(str(meta.get("year", "undated")), []).append(meta)
 
@@ -181,7 +190,7 @@ def render_index(entries: list[tuple[Path, dict]]) -> None:
 <link rel="stylesheet" href="style.css"></head>
 <body><main>
 <header class="paper-head"><h1>Theory-inclined papers, with annotations</h1>
-<p class="meta">{len([m for _, m in entries if m.get("kind") != "foundations"])} paper(s), {len([m for _, m in entries if m.get("kind") == "foundations"])} background page(s)</p></header>
+<p class="meta">{len([m for _, m in entries if m.get("kind") not in NON_PAPER_KINDS])} paper(s), {len([m for _, m in entries if m.get("kind") in NON_PAPER_KINDS])} background page(s)</p></header>
 {"".join(rows)}
 </main></body></html>
 """

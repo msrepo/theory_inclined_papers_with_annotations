@@ -21,7 +21,9 @@ inequality comes from, what an assumption is buying — are written down explici
 │       ├── figures/          optional; self-contained themed SVGs
 │       └── paper.pdf         gitignored, fetched or dropped in by hand
 ├── foundations/
-│   └── <slug>/notes.md       background pages not about one paper
+│   └── <slug>/notes.md       background maths the annotations lean on
+├── topics/
+│   └── <slug>/notes.md       themes spanning several papers
 ├── tools/
 │   ├── build.py              notes.md -> build/<slug>/index.html, plus the index page
 │   ├── new_paper.py          scaffolds a new papers/<slug>/notes.md
@@ -78,9 +80,11 @@ stylesheet has changed.
 make new SLUG=2027-lastname-topic
 ```
 
-Background pages live under `foundations/<slug>/notes.md` instead, with the same front matter
-minus `year`, `url` and `pdf_url`. Both roots render into a flat `build/<slug>/`, so slugs must
-be unique across them and cross-links are always `../<slug>/index.html`.
+Pages that are not about one paper live under `foundations/<slug>/notes.md` (background maths)
+or `topics/<slug>/notes.md` (themes spanning several papers), with the same front matter minus
+`year`, `url` and `pdf_url`. All roots render into a flat `build/<slug>/`, so slugs must be
+unique across them and cross-links are always `../<slug>/index.html`. To add another
+collection, append it to `COLLECTIONS` in `tools/build.py` and `ROOTS` in the `Makefile`.
 
 Then fill in the front matter at the top of the new `notes.md`:
 
@@ -133,6 +137,14 @@ inside one paper's notes.
 | Page | Covers |
 |---|---|
 | *Inequalities and concentration: a working toolbox* — [read online](https://msrepo.github.io/theory_inclined_papers_with_annotations/inequalities-and-concentration/) · [source](foundations/inequalities-and-concentration/notes.md) | Cheeger and higher-order Cheeger, Markov/Chebyshev/Hoeffding, McDiarmid, Rademacher, KL chain rule, Donsker–Varadhan, HGR, Weyl, Davis–Kahan, Wigner, spherical CLT |
+
+## Topics
+
+Themes that cut across several papers.
+
+| Page | Covers |
+|---|---|
+| *Applications of Gaussianity: uncertainty, dense prediction, test-time adaptation* — [read online](https://msrepo.github.io/theory_inclined_papers_with_annotations/gaussianity-in-practice/) · [source](topics/gaussianity-in-practice/notes.md) | the applied literature that assumes CLIP features are Gaussian, with close reads of Zhou et al. 2025 (CVPR), Venkataramanan et al. 2025 (UAI) and C. Huang et al. 2024 (IJCAI) |
 
 ## Papers
 

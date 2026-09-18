@@ -1,0 +1,27 @@
+<svg viewBox="0 0 900 260" xmlns="http://www.w3.org/2000/svg" role="img">
+<title>Where each method places its Gaussian assumption</title>
+<desc>A pipeline runs from an image and text pair through a frozen CLIP encoder to an
+embedding in R to the power D and then to a downstream decision. Three boxes hang off the
+embedding stage, showing that the three papers put their Gaussian at different points: Zhou
+places it on the class-conditional distribution for test-time adaptation, Venkataramanan
+places a Gaussian process on the map from a low-dimensional latent to the embedding for
+post-hoc uncertainty, and Huang places Gaussians on each modality's feature set in the joint
+space for dense prediction.</desc>
+<style>
+  text{font-family:ui-sans-serif,-apple-system,"Segoe UI",sans-serif;font-weight:400}
+  .lab{font-size:12px;fill:#57564f} .hd{font-size:13px;font-weight:500;fill:#1a1a19}
+  .bx{fill:#f5f4f0;stroke:#c3c2b7;stroke-width:0.5}
+  .gb{fill:#eaf1fa;stroke:#2f6fb5;stroke-width:0.5}
+  .gt{font-size:12px;font-weight:500;fill:#1f4e82}
+  .ar{fill:none;stroke:#8a8880;stroke-width:1.2}
+  .ld{fill:none;stroke:#2f6fb5;stroke-width:0.5;stroke-dasharray:3 3}
+  @media (prefers-color-scheme: dark){
+    .lab{fill:#b6b4ab} .hd{fill:#eceae3}
+    .bx{fill:#211f1e;stroke:#4a4844} .gb{fill:#16293d;stroke:#7fb2e8}
+    .gt{fill:#a8cbf0} .ar{stroke:#85837b} .ld{stroke:#7fb2e8}
+  }
+</style>
+<defs><marker id="a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+<text class="hd" x="30" y="24">One embedding space, three places to put a Gaussian</text>
+<rect x="30" y="46" width="112" height="50" rx="6" class="bx"/><text class="lab" x="86.0" y="68" text-anchor="middle">image / text</text><text class="lab" x="86.0" y="82" text-anchor="middle">pair</text><path d="M148 71 L186 71" class="ar" marker-end="url(#a)"/><rect x="192" y="46" width="120" height="50" rx="6" class="bx"/><text class="lab" x="252.0" y="68" text-anchor="middle">frozen CLIP</text><text class="lab" x="252.0" y="82" text-anchor="middle">encoder</text><path d="M318 71 L356 71" class="ar" marker-end="url(#a)"/><rect x="362" y="46" width="130" height="50" rx="6" class="bx"/><text class="lab" x="427.0" y="68" text-anchor="middle">embedding</text><text class="lab" x="427.0" y="82" text-anchor="middle">z &#8712; &#8477;<tspan font-size="9" dy="-4">D</tspan></text><path d="M498 71 L536 71" class="ar" marker-end="url(#a)"/><rect x="542" y="46" width="140" height="50" rx="6" class="bx"/><text class="lab" x="612.0" y="68" text-anchor="middle">downstream</text><text class="lab" x="612.0" y="82" text-anchor="middle">decision</text><rect x="30" y="126" width="265" height="64" rx="6" class="gb"/><text class="gt" x="162.5" y="154" text-anchor="middle">Gaussian / vMF on the</text><text class="gt" x="162.5" y="170" text-anchor="middle">class-conditional p(z | class)</text><path d="M427 96 L427 116 L162 116 L162 126" class="ld"/><text class="lab" x="30" y="208">Zhou 2025 &#8212; test-time adaptation</text><text class="lab" x="30" y="225">running mean of one prototype per class</text><rect x="317" y="126" width="265" height="64" rx="6" class="gb"/><text class="gt" x="449.5" y="154" text-anchor="middle">Gaussian process on the map</text><text class="gt" x="449.5" y="170" text-anchor="middle">latent x &#8594; embedding z</text><path d="M427 96 L427 116 L449 116 L449 126" class="ld"/><text class="lab" x="317" y="208">Venkataramanan 2025 &#8212; uncertainty</text><text class="lab" x="317" y="225">post-hoc, frozen encoder, GPLVM + ELBO</text><rect x="604" y="126" width="265" height="64" rx="6" class="gb"/><text class="gt" x="736.5" y="154" text-anchor="middle">Gaussians on each modality's</text><text class="gt" x="736.5" y="170" text-anchor="middle">feature set, p and q in H</text><path d="M427 96 L427 116 L736 116 L736 126" class="ld"/><text class="lab" x="604" y="208">Huang 2024 &#8212; dense prediction</text><text class="lab" x="604" y="225">closed-form KL + reparameterised sampling</text>
+</svg>

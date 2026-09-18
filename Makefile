@@ -13,8 +13,9 @@ PYTHON ?= python3
 PORT   ?= 8000
 
 TOOLS := tools
-NOTES := $(wildcard papers/*/notes.md) $(wildcard foundations/*/notes.md)
-FIGS  := $(wildcard papers/*/figures/*) $(wildcard foundations/*/figures/*)
+ROOTS := papers foundations topics
+NOTES := $(foreach r,$(ROOTS),$(wildcard $(r)/*/notes.md))
+FIGS  := $(foreach r,$(ROOTS),$(wildcard $(r)/*/figures/*))
 STAMP := .build-stamp
 
 .DEFAULT_GOAL := html
