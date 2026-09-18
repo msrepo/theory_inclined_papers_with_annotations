@@ -79,6 +79,13 @@ def render_one(notes: Path, meta: dict) -> None:
     out_dir = BUILD / slug
     out_dir.mkdir(parents=True, exist_ok=True)
 
+    # Per-paper figures are published beside the page so notes.md can reference
+    # them at figures/<name>. They are self-contained themed SVGs rather than
+    # inline markup, so the Markdown source stays readable on GitHub too.
+    figures = notes.parent / "figures"
+    if figures.is_dir():
+        shutil.copytree(figures, out_dir / "figures", dirs_exist_ok=True)
+
     links = []
     pdf = notes.parent / "paper.pdf"
     if pdf.exists():

@@ -14,6 +14,7 @@ PORT   ?= 8000
 
 TOOLS := tools
 NOTES := $(wildcard papers/*/notes.md)
+FIGS  := $(wildcard papers/*/figures/*)
 STAMP := .build-stamp
 
 .DEFAULT_GOAL := html
@@ -21,7 +22,7 @@ STAMP := .build-stamp
 
 html: $(STAMP)
 
-$(STAMP): $(NOTES) $(TOOLS)/build.py $(TOOLS)/style.css
+$(STAMP): $(NOTES) $(FIGS) $(TOOLS)/build.py $(TOOLS)/style.css
 	@$(PYTHON) $(TOOLS)/build.py
 	@touch $@
 

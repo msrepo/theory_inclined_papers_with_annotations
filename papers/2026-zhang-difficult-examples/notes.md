@@ -15,6 +15,9 @@ status: read
   page, with the reviews and discussion.
 - **[arXiv:2501.01317](https://arxiv.org/abs/2501.01317)** — preprint. `make fetch` pulls
   the PDF from here.
+- **[HaoChen et al. 2021](../2021-haochen-spectral-contrastive/index.html)** — the notes on
+  the paper this one builds on; the spectral contrastive loss, the augmentation graph and the
+  `4δ/(1−λ) + 8δ` bound all come from there.
 
 Yi-Ge Zhang, Jingyi Cui, Qiran Li and Yisen Wang, *Difficult Examples Hurt Unsupervised
 Contrastive Learning: A Theoretical Perspective*, ICLR 2026. Full subtitle omitted from
@@ -311,6 +314,53 @@ $\mathcal{E}_T \le 4[1 - (n_d/n)^2 + (\gamma/\beta)^2 (n_d/n)^2]\delta/(1-\lambd
 The bracket exceeds 1, so a residual penalty survives — but it shrinks like $O((n_d/n)^2)$
 against the $O(1/n)$ of doing nothing, so temperature scaling still wins when
 $n_d \lesssim n^{1/2}$.
+
+## What the spectrum actually looks like
+
+The bounds are all functions of $\lambda_{k+1}$, so it is worth seeing the spectrum this
+construction produces. Below is their similarity graph built numerically with $r+1 = 3$
+classes of $n = 8$ samples, $n_d = 2$ difficult examples per class, using the Table 10
+values at 30% mixing ($\alpha = 0.387$, $\beta = 0.208$, $\gamma = 0.241$).
+
+<figure>
+<img src="figures/difficult_examples_spectrum.svg" alt="Left: a stem plot of the twelve largest eigenvalues, with one at 1.0, two at 0.29, and the rest at a flat floor of 0.087. Right: a zoom on that floor showing that the difficult-example case lifts two eigenvalues to 0.096 and 0.093 while the clean case leaves all of them at 0.087.">
+<figcaption><b>Left:</b> the spectrum stratifies exactly as the closed forms predict — one trivial
+eigenvalue at 1, then $r = 2$ class modes at $[(1-\alpha)+n(\alpha-\beta)]/c_2 = 0.29061$,
+then a flat bulk floor at $(1-\alpha)/c_2 = 0.08711$. <b>Right:</b> a zoom on that floor.
+Difficult examples lift exactly $n_d = 2$ eigenvalues off it, to 0.09559 and 0.09347, while
+the clean graph leaves every one at 0.08711. Each index-matched difficult group is a bridge
+spanning all classes, and "which difficult group am I in?" becomes a slow mode that averaging
+no longer kills.</figcaption>
+</figure>
+
+Three things follow, and they are the paper's three claims:
+
+1. **There are exactly $r+1$ large eigenvalues, matching $r+1$ classes** — one trivial plus
+   $r$ informative — and then a cliff. Above the cliff is class structure, below it is
+   within-class noise.
+2. **Difficult examples inject exactly $n_d$ extra slow modes.** This is why the dimension
+   condition in Theorem 3.4 reads $r+1 \le k < n_d + r + 1$: with $r = 2, n_d = 2$ that is
+   $k \in \{3,4\}$, precisely the $k$ for which $\lambda_{k+1}$ lands on one of the lifted
+   modes instead of the floor. The condition is not a technicality; it is the range of
+   feature dimensions where the bridges bind.
+3. **The gap closes from both sides.** The floor modes rose ($0.08711 \to 0.09559$) *and* the
+   class modes fell ($0.29061 \to 0.28881$). So $1 - \lambda_{k+1}$ shrinks from 0.91289 to
+   0.90441 and $4\delta/(1-\lambda_{k+1})$ grows. That is Theorem 3.4.
+
+Why the bound has this shape: $1-\lambda_{k+1}$ is the gap between what a rank-$k$
+approximation keeps and what it discards. A large gap means the $k$ retained directions are
+decisively more informative than the dropped ones — class signal inside, noise outside, clean
+cut, and a linear probe finds the classes. A small gap means the $(k{+}1)$-th mode is nearly
+as important as the $k$-th, the truncation is arbitrary, and the representation mixes class
+signal with bridge structure.
+
+Which recovers the intuition in graph terms: **a difficult example is an edge between two
+clusters, and adding inter-cluster edges is exactly what makes a graph hard to partition.**
+Supervised learning has labels and can use boundary points to sharpen a decision surface;
+unsupervised spectral clustering has none, sees a bridge, and merges across it. For the
+underlying spectral-graph background, see the
+[*reading a graph spectrum*](../2021-haochen-spectral-contrastive/index.html) section of the
+HaoChen notes.
 
 ## Results at a glance
 
