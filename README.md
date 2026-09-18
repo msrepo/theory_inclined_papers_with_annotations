@@ -18,7 +18,10 @@ inequality comes from, what an assumption is buying — are written down explici
 ├── papers/
 │   └── <slug>/
 │       ├── notes.md          the annotation; YAML front matter + body
+│       ├── figures/          optional; self-contained themed SVGs
 │       └── paper.pdf         gitignored, fetched or dropped in by hand
+├── foundations/
+│   └── <slug>/notes.md       background pages not about one paper
 ├── tools/
 │   ├── build.py              notes.md -> build/<slug>/index.html, plus the index page
 │   ├── new_paper.py          scaffolds a new papers/<slug>/notes.md
@@ -75,6 +78,10 @@ stylesheet has changed.
 make new SLUG=2027-lastname-topic
 ```
 
+Background pages live under `foundations/<slug>/notes.md` instead, with the same front matter
+minus `year`, `url` and `pdf_url`. Both roots render into a flat `build/<slug>/`, so slugs must
+be unique across them and cross-links are always `../<slug>/index.html`.
+
 Then fill in the front matter at the top of the new `notes.md`:
 
 ```yaml
@@ -117,6 +124,15 @@ A loose section order that has worked so far: *In one paragraph* → *The spine 
 argument* → *Setup and notation* → the results, in the paper's own order → *Questions and
 doubts* → *Takeaways*. The doubts section is the point of the exercise; it should not be
 left empty.
+
+## Foundations
+
+Background pages that several annotations lean on, kept separate so they are not buried
+inside one paper's notes.
+
+| Page | Covers |
+|---|---|
+| *Inequalities and concentration: a working toolbox* — [read online](https://msrepo.github.io/theory_inclined_papers_with_annotations/inequalities-and-concentration/) · [source](foundations/inequalities-and-concentration/notes.md) | Cheeger and higher-order Cheeger, Markov/Chebyshev/Hoeffding, McDiarmid, Rademacher, KL chain rule, Donsker–Varadhan, HGR, Weyl, Davis–Kahan, Wigner, spherical CLT |
 
 ## Papers
 

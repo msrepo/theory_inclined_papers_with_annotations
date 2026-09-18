@@ -15,6 +15,8 @@ status: read
   page, with the reviews and discussion.
 - **[arXiv:2602.24012](https://arxiv.org/abs/2602.24012)** — preprint. `make fetch` pulls
   the PDF from here, because the OpenReview PDF endpoint refuses non-browser requests.
+- **[Inequalities and concentration](../inequalities-and-concentration/index.html)** — background page collecting the tools
+  these proofs run on (Cheeger, Donsker–Varadhan, Rademacher, Davis–Kahan and the rest).
 - **[Project page](https://rbetser.github.io/InfoNCE-induces-Gaussian-distribution/)** —
   the authors' own summary.
 

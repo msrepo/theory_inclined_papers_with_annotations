@@ -14,6 +14,8 @@ status: read
 - **[arXiv:2106.04156](https://arxiv.org/abs/2106.04156)** — preprint. `make fetch` pulls
   the PDF from here.
 - **[NeurIPS 2021 proceedings](https://papers.nips.cc/paper/2021/hash/27debb435021eb68b3965290b5e24c49-Abstract.html)**
+- **[Inequalities and concentration](../inequalities-and-concentration/index.html)** — background page collecting the tools
+  these proofs run on (Cheeger, Donsker–Varadhan, Rademacher, Davis–Kahan and the rest).
 
 Jeff Z. HaoChen, Colin Wei, Adrien Gaidon and Tengyu Ma, *Provable Guarantees for
 Self-Supervised Deep Learning with Spectral Contrastive Loss*, NeurIPS 2021.
@@ -360,7 +362,8 @@ raises $\alpha$ irreducibly.
 the previous section, large is good, and $k$ buys you a larger index. The *square* is a
 Cheeger-type artefact — conductance controls spectral gaps only up to squaring, so the
 quadratic dependence is the usual price of going from combinatorics to spectra, not a
-statement about the data.
+statement about the data. The [foundations page](../inequalities-and-concentration/index.html#cheegers-inequality)
+checks numerically just how loose that direction is.
 
 **Why $k \ge 2r$ and not $k \ge r$.** Two dimensions are spent on overhead. One goes to the
 trivial eigenvector $\lambda_1 = 1$, which carries no information. The rest is the analysis

@@ -19,6 +19,9 @@ ROOT = Path(__file__).resolve().parent.parent
 # /usr/share/javascript/katex/ -- which 404s once the site is served elsewhere.
 KATEX_CDN = "https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/"
 PAPERS = ROOT / "papers"
+# Background pages that are not about one paper. Same format and same pipeline;
+# they are discovered separately only so the index can list them on their own.
+FOUNDATIONS = ROOT / "foundations"
 BUILD = ROOT / "build"
 STYLE = ROOT / "tools" / "style.css"
 
@@ -53,12 +56,16 @@ def parse_front_matter(text: str) -> tuple[dict, str]:
 
 
 def discover() -> list[tuple[Path, dict]]:
+    """All pages, from both source roots. Slugs must be unique across roots:
+    everything renders into a flat build/<slug>/ so cross-links stay ../<slug>/."""
     found = []
-    for notes in sorted(PAPERS.glob("*/notes.md")):
-        meta, _ = parse_front_matter(notes.read_text(encoding="utf-8"))
-        meta.setdefault("title", notes.parent.name)
-        meta["slug"] = notes.parent.name
-        found.append((notes, meta))
+    for root, kind in ((FOUNDATIONS, "foundations"), (PAPERS, "paper")):
+        for notes in sorted(root.glob("*/notes.md")):
+            meta, _ = parse_front_matter(notes.read_text(encoding="utf-8"))
+            meta.setdefault("title", notes.parent.name)
+            meta["slug"] = notes.parent.name
+            meta["kind"] = kind
+            found.append((notes, meta))
     return found
 
 
@@ -134,23 +141,37 @@ def render_one(notes: Path, meta: dict) -> None:
     print(f"  built  {slug}")
 
 
+def _entry_html(meta: dict) -> str:
+    status = meta.get("status", "")
+    badge = (f'<span class="status status-{html.escape(status)}">{html.escape(status)}</span>'
+             if status else "")
+    return (
+        f'<li><a class="title" href="{html.escape(meta["slug"])}/index.html">'
+        f'{html.escape(str(meta["title"]))}</a>{badge}'
+        f'<div class="meta">{meta_line(meta)}</div>'
+        f'<div class="tags">{tag_html(meta)}</div></li>'
+    )
+
+
 def render_index(entries: list[tuple[Path, dict]]) -> None:
+    rows = []
+
+    found = [m for _, m in entries if m.get("kind") == "foundations"]
+    if found:
+        rows.append("<h2>Foundations</h2><ul class='papers'>")
+        rows += [_entry_html(m) for m in sorted(found, key=lambda m: str(m["title"]).lower())]
+        rows.append("</ul>")
+
     by_year: dict[str, list[dict]] = {}
     for _, meta in entries:
+        if meta.get("kind") == "foundations":
+            continue
         by_year.setdefault(str(meta.get("year", "undated")), []).append(meta)
 
-    rows = []
     for year in sorted(by_year, reverse=True):
         rows.append(f"<h2>{html.escape(year)}</h2><ul class='papers'>")
         for meta in sorted(by_year[year], key=lambda m: str(m["title"]).lower()):
-            status = meta.get("status", "")
-            badge = f'<span class="status status-{html.escape(status)}">{html.escape(status)}</span>' if status else ""
-            rows.append(
-                f'<li><a class="title" href="{html.escape(meta["slug"])}/index.html">'
-                f'{html.escape(str(meta["title"]))}</a>{badge}'
-                f'<div class="meta">{meta_line(meta)}</div>'
-                f'<div class="tags">{tag_html(meta)}</div></li>'
-            )
+            rows.append(_entry_html(meta))
         rows.append("</ul>")
 
     doc = f"""<!DOCTYPE html>
@@ -160,7 +181,7 @@ def render_index(entries: list[tuple[Path, dict]]) -> None:
 <link rel="stylesheet" href="style.css"></head>
 <body><main>
 <header class="paper-head"><h1>Theory-inclined papers, with annotations</h1>
-<p class="meta">{len(entries)} paper(s)</p></header>
+<p class="meta">{len([m for _, m in entries if m.get("kind") != "foundations"])} paper(s), {len([m for _, m in entries if m.get("kind") == "foundations"])} background page(s)</p></header>
 {"".join(rows)}
 </main></body></html>
 """
@@ -173,7 +194,7 @@ def main() -> int:
         sys.exit("pandoc not found. Install it: brew install pandoc")
     entries = discover()
     if not entries:
-        sys.exit("No papers/<slug>/notes.md found. Scaffold one with: make new SLUG=my-paper")
+        sys.exit("No <slug>/notes.md found under papers/ or foundations/. Scaffold one with: make new SLUG=my-paper")
     BUILD.mkdir(exist_ok=True)
     shutil.copy2(STYLE, BUILD / "style.css")
     for notes, meta in entries:

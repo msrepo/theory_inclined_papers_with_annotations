@@ -13,8 +13,8 @@ PYTHON ?= python3
 PORT   ?= 8000
 
 TOOLS := tools
-NOTES := $(wildcard papers/*/notes.md)
-FIGS  := $(wildcard papers/*/figures/*)
+NOTES := $(wildcard papers/*/notes.md) $(wildcard foundations/*/notes.md)
+FIGS  := $(wildcard papers/*/figures/*) $(wildcard foundations/*/figures/*)
 STAMP := .build-stamp
 
 .DEFAULT_GOAL := html
