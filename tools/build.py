@@ -133,12 +133,14 @@ def render_one(notes: Path, meta: dict, entries: list) -> None:
     # before-body opens the two-column layout and emits the shared nav;
     # after-body closes it. Pandoc drops the TOC and content in between, so
     # they land inside <main>.
-    before = (sidebar_html(entries, slug, depth=1)
-              + '<main>' + header)
+    head_file = out_dir / ".head.html"
+    head_file.write_text(HEAD_SCRIPT, encoding="utf-8")
     header_file = out_dir / ".header.html"
-    header_file.write_text(f'<div class="layout">{before}', encoding="utf-8")
+    header_file.write_text(
+        TOGGLE_BUTTON + '<div class="layout">'
+        + sidebar_html(entries, slug, depth=1) + "<main>" + header, encoding="utf-8")
     after_file = out_dir / ".after.html"
-    after_file.write_text("</main></div>", encoding="utf-8")
+    after_file.write_text("</main></div>" + TOGGLE_SCRIPT, encoding="utf-8")
 
     # Feed pandoc the body only. Left in place, the front matter's `title`
     # would make pandoc emit its own title block on top of the header above.
@@ -157,11 +159,13 @@ def render_one(notes: Path, meta: dict, entries: list) -> None:
         # pagetitle sets <title> without emitting pandoc's own title block,
         # which would duplicate the header we inject below.
         "--metadata", f"pagetitle={meta['title']}",
+        "--include-in-header", str(head_file),
         "--include-before-body", str(header_file),
         "--include-after-body", str(after_file),
         "--output", str(out_dir / "index.html"),
     ]
     subprocess.run(cmd, check=True)
+    head_file.unlink()
     header_file.unlink()
     after_file.unlink()
     body_file.unlink()
@@ -192,10 +196,43 @@ def _grouped(entries: list[tuple[Path, dict]]) -> list[tuple[str, list[tuple[str
     return out
 
 
+BURGER = ('<svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">'
+          '<path d="M2 4h12M2 8h12M2 12h12" stroke="currentColor" stroke-width="1.5" '
+          'stroke-linecap="round" fill="none"/></svg>')
+
+# Applied before first paint so a collapsed sidebar never flashes open. Defaults
+# to collapsed on narrow viewports, expanded otherwise, then remembers the
+# choice. Wrapped in try/catch because localStorage throws in private mode.
+HEAD_SCRIPT = """<script>
+(function(){try{
+  var v=localStorage.getItem('sidebar-collapsed');
+  if(v===null)v=window.matchMedia('(max-width: 66rem)').matches?'1':'0';
+  if(v==='1')document.documentElement.classList.add('nav-collapsed');
+}catch(e){}})();
+</script>"""
+
+TOGGLE_SCRIPT = """<script>
+(function(){
+  var b=document.querySelector('.nav-toggle');if(!b)return;
+  function sync(){b.setAttribute('aria-expanded',
+    String(!document.documentElement.classList.contains('nav-collapsed')));}
+  sync();
+  b.addEventListener('click',function(){
+    var c=document.documentElement.classList.toggle('nav-collapsed');
+    try{localStorage.setItem('sidebar-collapsed',c?'1':'0');}catch(e){}
+    sync();
+  });
+})();
+</script>"""
+
+TOGGLE_BUTTON = ('<button class="nav-toggle" type="button" aria-controls="site-nav" '
+                 f'aria-expanded="true" aria-label="Show or hide the contents sidebar">{BURGER}</button>')
+
+
 def sidebar_html(entries: list[tuple[Path, dict]], current: str | None, depth: int) -> str:
     """Nav shared by every page. `depth` is how many levels up the site root is."""
     up = "../"*depth
-    parts = [f'<nav class="sidebar"><details open><summary>Contents</summary>',
+    parts = [f'<nav class="sidebar" id="site-nav">',
              f'<a class="nav-home" href="{up}index.html">All notes</a>']
     for cat, subs in _grouped(entries):
         parts.append(f'<div class="nav-cat">{html.escape(cat)}</div>')
@@ -209,7 +246,7 @@ def sidebar_html(entries: list[tuple[Path, dict]], current: str | None, depth: i
                 parts.append(f'<li><a href="{up}{html.escape(m["slug"])}/index.html"{cur}>'
                              f'{html.escape(str(short))}</a></li>')
             parts.append("</ul>")
-    parts.append("</details></nav>")
+    parts.append("</nav>")
     return "".join(parts)
 
 
@@ -242,14 +279,15 @@ def render_index(entries: list[tuple[Path, dict]]) -> None:
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Theory-inclined papers, with annotations</title>
-<link rel="stylesheet" href="style.css"></head>
-<body><div class="layout">
+<link rel="stylesheet" href="style.css">
+{HEAD_SCRIPT}</head>
+<body>{TOGGLE_BUTTON}<div class="layout">
 {sidebar_html(entries, None, depth=0)}
 <main>
 <header class="paper-head"><h1>Theory-inclined papers, with annotations</h1>
 <p class="meta">{n_paper} paper(s), {n_other} background page(s)</p></header>
 {"".join(rows)}
-</main></div></body></html>
+</main></div>{TOGGLE_SCRIPT}</body></html>
 """
     (BUILD / "index.html").write_text(doc, encoding="utf-8")
     print(f"  built  index.html ({len(entries)} page(s))")
