@@ -18,6 +18,8 @@ status: read
 - **[HaoChen et al. 2021](../2021-haochen-spectral-contrastive/index.html)** — the notes on
   the paper this one builds on; the spectral contrastive loss, the augmentation graph and the
   `4δ/(1−λ) + 8δ` bound all come from there.
+- **[Wang & Isola 2020](../2020-wang-isola-alignment-uniformity/index.html)** — where the alignment / uniformity decomposition of the
+  contrastive loss comes from.
 - **[Inequalities and concentration](../inequalities-and-concentration/index.html)** — background page collecting the tools
   these proofs run on (Cheeger, Donsker–Varadhan, Rademacher, Davis–Kahan and the rest).
 

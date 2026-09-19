@@ -20,6 +20,8 @@ status: read
 - **[Applications of Gaussianity](../gaussianity-in-practice/index.html)** — the applied work
   that already assumes this result, in uncertainty estimation, test-time adaptation and dense
   prediction.
+- **[Wang & Isola 2020](../2020-wang-isola-alignment-uniformity/index.html)** — where the alignment / uniformity decomposition of the
+  contrastive loss comes from.
 - **[Project page](https://rbetser.github.io/InfoNCE-induces-Gaussian-distribution/)** —
   the authors' own summary.
 
