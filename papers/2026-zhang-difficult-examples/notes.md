@@ -7,6 +7,9 @@ url: "https://openreview.net/forum?id=5LMdnUdAoy"
 pdf_url: "https://arxiv.org/pdf/2501.01317"
 tags: [contrastive-learning, spectral-contrastive-loss, augmentation-graph, generalization-bounds, hard-examples, theory]
 status: read
+category: "Contrastive learning"
+subcategory: "Theory"
+short_title: "Zhang 2026 — difficult examples"
 ---
 
 ## Links

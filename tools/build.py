@@ -28,7 +28,18 @@ COLLECTIONS = [
     (PAPERS, "paper"),                       # one paper each
 ]
 NON_PAPER_KINDS = {"foundations", "topic"}
-SECTION_TITLES = {"foundations": "Foundations", "topic": "Topics"}
+
+# Sidebar taxonomy. Each page picks a `category` (and optionally a
+# `subcategory`) in its front matter; this list fixes the display order and is
+# the only place to edit when adding a section. Anything uncategorised is
+# collected under "Unsorted" at the end rather than silently disappearing.
+CATEGORIES: list[tuple[str, list[str]]] = [
+    ("Foundations", []),
+    ("NTK & function space", ["Theory", "Applications"]),
+    ("Contrastive learning", ["Theory", "Applications"]),
+    ("Misc", []),
+]
+UNSORTED = "Unsorted"
 BUILD = ROOT / "build"
 STYLE = ROOT / "tools" / "style.css"
 
@@ -88,7 +99,7 @@ def tag_html(meta: dict) -> str:
     return "".join(f'<span class="tag">{html.escape(t)}</span>' for t in tags)
 
 
-def render_one(notes: Path, meta: dict) -> None:
+def render_one(notes: Path, meta: dict, entries: list) -> None:
     slug = meta["slug"]
     out_dir = BUILD / slug
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -119,8 +130,15 @@ def render_one(notes: Path, meta: dict) -> None:
         f'<p class="links">{" &middot; ".join(links)}</p>'
         "</header>"
     )
+    # before-body opens the two-column layout and emits the shared nav;
+    # after-body closes it. Pandoc drops the TOC and content in between, so
+    # they land inside <main>.
+    before = (sidebar_html(entries, slug, depth=1)
+              + '<main>' + header)
     header_file = out_dir / ".header.html"
-    header_file.write_text(header, encoding="utf-8")
+    header_file.write_text(f'<div class="layout">{before}', encoding="utf-8")
+    after_file = out_dir / ".after.html"
+    after_file.write_text("</main></div>", encoding="utf-8")
 
     # Feed pandoc the body only. Left in place, the front matter's `title`
     # would make pandoc emit its own title block on top of the header above.
@@ -140,12 +158,59 @@ def render_one(notes: Path, meta: dict) -> None:
         # which would duplicate the header we inject below.
         "--metadata", f"pagetitle={meta['title']}",
         "--include-before-body", str(header_file),
+        "--include-after-body", str(after_file),
         "--output", str(out_dir / "index.html"),
     ]
     subprocess.run(cmd, check=True)
     header_file.unlink()
+    after_file.unlink()
     body_file.unlink()
     print(f"  built  {slug}")
+
+
+def _grouped(entries: list[tuple[Path, dict]]) -> list[tuple[str, list[tuple[str, list[dict]]]]]:
+    """[(category, [(subcategory_or_empty, [meta, ...]), ...]), ...] in display order."""
+    by_cat: dict[str, dict[str, list[dict]]] = {}
+    for _, m in entries:
+        by_cat.setdefault(m.get("category") or UNSORTED, {}).setdefault(
+            m.get("subcategory") or "", []).append(m)
+
+    def sort_key(m: dict) -> tuple:
+        # newest first, then by title; undated pages (foundations, topics) lead
+        return (-int(m["year"]) if str(m.get("year", "")).isdigit() else -9999,
+                str(m["title"]).lower())
+
+    order = [c for c, _ in CATEGORIES] + [UNSORTED]
+    out = []
+    for cat in order:
+        if cat not in by_cat:
+            continue
+        subs = dict(CATEGORIES).get(cat, [])
+        seen = by_cat[cat]
+        keys = [k for k in subs if k in seen] + [k for k in seen if k not in subs]
+        out.append((cat, [(k, sorted(seen[k], key=sort_key)) for k in keys]))
+    return out
+
+
+def sidebar_html(entries: list[tuple[Path, dict]], current: str | None, depth: int) -> str:
+    """Nav shared by every page. `depth` is how many levels up the site root is."""
+    up = "../"*depth
+    parts = [f'<nav class="sidebar"><details open><summary>Contents</summary>',
+             f'<a class="nav-home" href="{up}index.html">All notes</a>']
+    for cat, subs in _grouped(entries):
+        parts.append(f'<div class="nav-cat">{html.escape(cat)}</div>')
+        for sub, metas in subs:
+            if sub:
+                parts.append(f'<div class="nav-sub">{html.escape(sub)}</div>')
+            parts.append("<ul>")
+            for m in metas:
+                cur = ' aria-current="page"' if m["slug"] == current else ""
+                short = m.get("short_title") or m["title"]
+                parts.append(f'<li><a href="{up}{html.escape(m["slug"])}/index.html"{cur}>'
+                             f'{html.escape(str(short))}</a></li>')
+            parts.append("</ul>")
+    parts.append("</details></nav>")
+    return "".join(parts)
 
 
 def _entry_html(meta: dict) -> str:
@@ -162,40 +227,32 @@ def _entry_html(meta: dict) -> str:
 
 def render_index(entries: list[tuple[Path, dict]]) -> None:
     rows = []
+    for cat, subs in _grouped(entries):
+        rows.append(f"<h2>{html.escape(cat)}</h2>")
+        for sub, metas in subs:
+            if sub:
+                rows.append(f"<h3>{html.escape(sub)}</h3>")
+            rows.append("<ul class='papers'>")
+            rows += [_entry_html(m) for m in metas]
+            rows.append("</ul>")
 
-    for kind, heading in SECTION_TITLES.items():
-        group = [m for _, m in entries if m.get("kind") == kind]
-        if not group:
-            continue
-        rows.append(f"<h2>{html.escape(heading)}</h2><ul class='papers'>")
-        rows += [_entry_html(m) for m in sorted(group, key=lambda m: str(m["title"]).lower())]
-        rows.append("</ul>")
-
-    by_year: dict[str, list[dict]] = {}
-    for _, meta in entries:
-        if meta.get("kind") in NON_PAPER_KINDS:
-            continue
-        by_year.setdefault(str(meta.get("year", "undated")), []).append(meta)
-
-    for year in sorted(by_year, reverse=True):
-        rows.append(f"<h2>{html.escape(year)}</h2><ul class='papers'>")
-        for meta in sorted(by_year[year], key=lambda m: str(m["title"]).lower()):
-            rows.append(_entry_html(meta))
-        rows.append("</ul>")
-
+    n_paper = len([m for _, m in entries if m.get("kind") not in NON_PAPER_KINDS])
+    n_other = len(entries) - n_paper
     doc = f"""<!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Theory-inclined papers, with annotations</title>
 <link rel="stylesheet" href="style.css"></head>
-<body><main>
+<body><div class="layout">
+{sidebar_html(entries, None, depth=0)}
+<main>
 <header class="paper-head"><h1>Theory-inclined papers, with annotations</h1>
-<p class="meta">{len([m for _, m in entries if m.get("kind") not in NON_PAPER_KINDS])} paper(s), {len([m for _, m in entries if m.get("kind") in NON_PAPER_KINDS])} background page(s)</p></header>
+<p class="meta">{n_paper} paper(s), {n_other} background page(s)</p></header>
 {"".join(rows)}
-</main></body></html>
+</main></div></body></html>
 """
     (BUILD / "index.html").write_text(doc, encoding="utf-8")
-    print(f"  built  index.html ({len(entries)} paper(s))")
+    print(f"  built  index.html ({len(entries)} page(s))")
 
 
 def main() -> int:
@@ -207,7 +264,7 @@ def main() -> int:
     BUILD.mkdir(exist_ok=True)
     shutil.copy2(STYLE, BUILD / "style.css")
     for notes, meta in entries:
-        render_one(notes, meta)
+        render_one(notes, meta, entries)
     render_index(entries)
     print(f"\nOpen {BUILD / 'index.html'}")
     return 0

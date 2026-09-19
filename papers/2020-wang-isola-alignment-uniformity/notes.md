@@ -7,6 +7,9 @@ url: "https://arxiv.org/abs/2005.10242"
 pdf_url: "https://arxiv.org/pdf/2005.10242"
 tags: [contrastive-learning, infonce, hypersphere, potential-theory, alignment, uniformity, theory]
 status: read
+category: "Contrastive learning"
+subcategory: "Theory"
+short_title: "Wang & Isola 2020 — alignment / uniformity"
 ---
 
 ## Links

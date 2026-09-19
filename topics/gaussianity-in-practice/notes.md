@@ -4,6 +4,9 @@ authors: "Topic notes"
 venue: "Topics"
 tags: [gaussianity, clip, uncertainty, test-time-adaptation, segmentation, probabilistic-embeddings, survey]
 status: living
+category: "Contrastive learning"
+subcategory: "Applications"
+short_title: "Gaussianity in practice"
 ---
 
 ## Why this page exists

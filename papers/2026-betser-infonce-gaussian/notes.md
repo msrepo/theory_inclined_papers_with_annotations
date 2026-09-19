@@ -7,6 +7,9 @@ url: "https://openreview.net/forum?id=BlSH7gNQSq"
 pdf_url: "https://arxiv.org/pdf/2602.24012"
 tags: [contrastive-learning, infonce, self-supervised, high-dimensional-probability, theory]
 status: read
+category: "Contrastive learning"
+subcategory: "Theory"
+short_title: "Betser 2026 — InfoNCE induces Gaussian"
 ---
 
 ## Links

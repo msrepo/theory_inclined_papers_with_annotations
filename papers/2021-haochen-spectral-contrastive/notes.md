@@ -7,6 +7,9 @@ url: "https://arxiv.org/abs/2106.04156"
 pdf_url: "https://arxiv.org/pdf/2106.04156"
 tags: [contrastive-learning, spectral-contrastive-loss, augmentation-graph, spectral-graph-theory, generalization-bounds, theory]
 status: read
+category: "Contrastive learning"
+subcategory: "Theory"
+short_title: "HaoChen 2021 — spectral contrastive"
 ---
 
 ## Links

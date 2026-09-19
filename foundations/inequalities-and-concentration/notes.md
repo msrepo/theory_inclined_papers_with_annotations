@@ -4,6 +4,8 @@ authors: "Background notes"
 venue: "Foundations"
 tags: [concentration, spectral-graph-theory, information-theory, cheeger, background]
 status: living
+category: "Foundations"
+short_title: "Inequalities & concentration"
 ---
 
 Background for the annotations in this repo. Every paper here is ultimately a chain of

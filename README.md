@@ -82,6 +82,12 @@ stylesheet has changed.
 make new SLUG=2027-lastname-topic
 ```
 
+Every page declares a `category` (and optionally a `subcategory`) in its front matter, which
+drives the sidebar shown on every page. The taxonomy and its display order live in `CATEGORIES`
+in `tools/build.py` — the one place to edit when adding a section. A `short_title` keeps the
+sidebar readable when the real title is long. Anything uncategorised lands under *Unsorted*
+rather than vanishing.
+
 Pages that are not about one paper live under `foundations/<slug>/notes.md` (background maths)
 or `topics/<slug>/notes.md` (themes spanning several papers), with the same front matter minus
 `year`, `url` and `pdf_url`. All roots render into a flat `build/<slug>/`, so slugs must be
@@ -165,5 +171,6 @@ Themes that cut across several papers.
 | 2026 | Zhang, Cui, Li & Wang, *Difficult Examples Hurt Unsupervised Contrastive Learning*, ICLR — [OpenReview](https://openreview.net/forum?id=5LMdnUdAoy) · [arXiv:2501.01317](https://arxiv.org/abs/2501.01317) | [read online](https://msrepo.github.io/theory_inclined_papers_with_annotations/2026-zhang-difficult-examples/) · [source](papers/2026-zhang-difficult-examples/notes.md) | why deleting boundary examples improves contrastive learning |
 | 2026 | Betser, Gofer, Levi & Gilboa, *InfoNCE Induces Gaussian Distribution*, ICLR (Oral) — [OpenReview](https://openreview.net/forum?id=BlSH7gNQSq) · [arXiv:2602.24012](https://arxiv.org/abs/2602.24012) · [project page](https://rbetser.github.io/InfoNCE-induces-Gaussian-distribution/) | [read online](https://msrepo.github.io/theory_inclined_papers_with_annotations/2026-betser-infonce-gaussian/) · [source](papers/2026-betser-infonce-gaussian/notes.md) | why contrastive representations come out approximately Gaussian |
 | 2021 | HaoChen, Wei, Gaidon & Ma, *Provable Guarantees for Self-Supervised Deep Learning with Spectral Contrastive Loss*, NeurIPS (Oral) — [arXiv:2106.04156](https://arxiv.org/abs/2106.04156) | [read online](https://msrepo.github.io/theory_inclined_papers_with_annotations/2021-haochen-spectral-contrastive/) · [source](papers/2021-haochen-spectral-contrastive/notes.md) | contrastive learning is spectral clustering of the augmentation graph |
+| 2020 | Fort, Dziugaite, Paul, Kharaghani, Roy & Ganguli, *Deep Learning versus Kernel Learning*, NeurIPS — [arXiv:2010.15110](https://arxiv.org/abs/2010.15110) | [read online](https://msrepo.github.io/theory_inclined_papers_with_annotations/2020-fort-deep-vs-kernel/) · [source](papers/2020-fort-deep-vs-kernel/notes.md) · [code](papers/2020-fort-deep-vs-kernel/code/) | how far real training departs from the NTK limit, and when |
 | 2020 | Wang & Isola, *Understanding Contrastive Representation Learning through Alignment and Uniformity on the Hypersphere*, ICML — [arXiv:2005.10242](https://arxiv.org/abs/2005.10242) | [read online](https://msrepo.github.io/theory_inclined_papers_with_annotations/2020-wang-isola-alignment-uniformity/) · [source](papers/2020-wang-isola-alignment-uniformity/notes.md) · [code](papers/2020-wang-isola-alignment-uniformity/code/) | the decomposition of InfoNCE into alignment plus a potential-theory energy |
 | 2018 | Jacot, Gabriel & Hongler, *Neural Tangent Kernel: Convergence and Generalization in Neural Networks*, NeurIPS — [arXiv:1806.07572](https://arxiv.org/abs/1806.07572) | [read online](https://msrepo.github.io/theory_inclined_papers_with_annotations/2018-jacot-neural-tangent-kernel/) · [source](papers/2018-jacot-neural-tangent-kernel/notes.md) · [code](papers/2018-jacot-neural-tangent-kernel/code/) | wide networks train as kernel regression in function space |

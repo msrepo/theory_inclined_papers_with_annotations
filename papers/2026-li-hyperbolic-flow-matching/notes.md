@@ -7,6 +7,8 @@ url: "https://arxiv.org/abs/2602.20479"
 pdf_url: "https://arxiv.org/pdf/2602.20479"
 tags: [few-shot, hyperbolic-geometry, flow-matching, clip, lorentz-model, cross-modal]
 status: read
+category: "Misc"
+short_title: "Li 2026 — hyperbolic flow matching"
 ---
 
 ## Links

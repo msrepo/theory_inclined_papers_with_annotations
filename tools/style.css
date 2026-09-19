@@ -25,17 +25,78 @@ html { -webkit-text-size-adjust: 100%; }
 
 body {
   margin: 0;
-  padding: 2.5rem 1.25rem 6rem;
+  padding: 2.5rem 1.5rem 6rem;
   background: var(--bg);
   color: var(--ink);
   font: 400 17px/1.7 ui-serif, Georgia, "Iowan Old Style", serif;
 }
 
-main, body > header, body > h1, body > h2, body > p, body > ul,
-body > ol, body > table, body > pre, body > blockquote, body > div, body > nav {
-  max-width: var(--measure);
-  margin-left: auto;
-  margin-right: auto;
+.layout {
+  display: grid;
+  grid-template-columns: 15rem minmax(0, var(--measure));
+  gap: 3.5rem;
+  justify-content: center;
+  align-items: start;
+}
+main { max-width: var(--measure); min-width: 0; }
+
+.sidebar {
+  position: sticky;
+  top: 2.5rem;
+  align-self: start;
+  max-height: calc(100vh - 5rem);
+  overflow-y: auto;
+  font: 400 14px/1.5 ui-sans-serif, -apple-system, "Segoe UI", sans-serif;
+  padding-right: .5rem;
+}
+.sidebar summary {
+  cursor: pointer;
+  font-weight: 500;
+  padding: .35rem 0;
+  color: var(--ink-soft);
+}
+.sidebar a { color: var(--ink-soft); text-decoration: none; display: block; padding: 3px 0 3px 10px; border-left: 2px solid transparent; }
+.sidebar a:hover { color: var(--accent); }
+.sidebar a[aria-current="page"] {
+  color: var(--accent);
+  font-weight: 500;
+  border-left-color: var(--accent);
+  background: var(--surface);
+}
+.nav-home {
+  margin-bottom: 1rem;
+  padding-left: 0 !important;
+  border-left: 0 !important;
+  font-weight: 500;
+}
+.nav-cat {
+  margin: 1.1rem 0 .3rem;
+  font-weight: 500;
+  font-size: 13px;
+  letter-spacing: .02em;
+  color: var(--ink);
+}
+.nav-sub {
+  margin: .5rem 0 .15rem 10px;
+  font-size: 12px;
+  color: var(--ink-faint);
+}
+.sidebar ul { list-style: none; padding: 0; margin: 0 0 0 10px; }
+
+/* Single column once there is no room for a side rail. */
+@media (max-width: 62rem) {
+  .layout { grid-template-columns: minmax(0, 1fr); gap: 1.5rem; }
+  .sidebar {
+    position: static;
+    max-height: none;
+    border: 0.5px solid var(--rule);
+    border-radius: 10px;
+    padding: .4rem 1rem .8rem;
+    background: var(--surface);
+  }
+}
+@media (min-width: 62.01rem) {
+  .sidebar summary { display: none; }
 }
 
 h1, h2, h3, h4 {

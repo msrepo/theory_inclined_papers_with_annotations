@@ -7,6 +7,9 @@ url: "https://arxiv.org/abs/1806.07572"
 pdf_url: "https://arxiv.org/pdf/1806.07572"
 tags: [function-space, neural-tangent-kernel, kernel-methods, infinite-width, gaussian-process, theory]
 status: read
+category: "NTK & function space"
+subcategory: "Theory"
+short_title: "Jacot 2018 — NTK"
 ---
 
 ## Links
@@ -17,6 +20,8 @@ status: read
   background page; the CLT and concentration tools used here live there.
 - **[Runnable code](https://github.com/msrepo/theory_inclined_papers_with_annotations/blob/main/papers/2018-jacot-neural-tangent-kernel/code/ntk.py)** — the NTK in numpy,
   with both theorems checked numerically. `make verify` runs it.
+- **[Fort et al. 2020](../2020-fort-deep-vs-kernel/index.html)** — measures how far real
+  training departs from this limit, and when. The short answer: the first two to three epochs.
 
 ## In one paragraph
 
