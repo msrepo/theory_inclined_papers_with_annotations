@@ -37,11 +37,13 @@ body {
      property appears in a grid track function, which silently collapses this to
      a single column and puts the nav on top. Plain units only here; the content
      width is capped on <main> instead. */
-  grid-template-columns: 15rem minmax(0, 1fr);
+  /* Left-anchored, not centred: on a wide screen a centred assembly pushes the
+     rail into the middle of the window and starts headings hundreds of pixels
+     in. The text column is capped by the track itself (plain units, no var --
+     see the note above) so prose stays readable without centring the block. */
+  grid-template-columns: 15rem minmax(0, 46rem);
   gap: 3.5rem;
   align-items: start;
-  max-width: 64.5rem;
-  margin: 0 auto;
 }
 main { max-width: var(--measure); min-width: 0; }
 
@@ -49,9 +51,8 @@ main { max-width: var(--measure); min-width: 0; }
    allowed to use most of the window. Class lives on <html> so an inline head
    script can set it before first paint, with no flash of the wrong state. */
 html.nav-collapsed .layout {
-  grid-template-columns: minmax(0, 1fr);
+  grid-template-columns: minmax(0, 78rem);
   gap: 0;
-  max-width: 78rem;
 }
 html.nav-collapsed .sidebar { display: none; }
 html.nav-collapsed main { max-width: none; }
