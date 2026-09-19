@@ -33,10 +33,15 @@ body {
 
 .layout {
   display: grid;
-  grid-template-columns: 15rem minmax(0, var(--measure));
+  /* No var() inside minmax(): Safari drops the whole declaration when a custom
+     property appears in a grid track function, which silently collapses this to
+     a single column and puts the nav on top. Plain units only here; the content
+     width is capped on <main> instead. */
+  grid-template-columns: 15rem minmax(0, 1fr);
   gap: 3.5rem;
-  justify-content: center;
   align-items: start;
+  max-width: 64.5rem;
+  margin: 0 auto;
 }
 main { max-width: var(--measure); min-width: 0; }
 
@@ -50,11 +55,15 @@ main { max-width: var(--measure); min-width: 0; }
   padding-right: .5rem;
 }
 .sidebar summary {
+  display: block;
   cursor: pointer;
   font-weight: 500;
   padding: .35rem 0;
   color: var(--ink-soft);
 }
+.sidebar summary::-webkit-details-marker { display: none; }
+.sidebar summary::before { content: "\25BE  "; }
+.sidebar details:not([open]) summary::before { content: "\25B8  "; }
 .sidebar a { color: var(--ink-soft); text-decoration: none; display: block; padding: 3px 0 3px 10px; border-left: 2px solid transparent; }
 .sidebar a:hover { color: var(--accent); }
 .sidebar a[aria-current="page"] {
@@ -84,7 +93,7 @@ main { max-width: var(--measure); min-width: 0; }
 .sidebar ul { list-style: none; padding: 0; margin: 0 0 0 10px; }
 
 /* Single column once there is no room for a side rail. */
-@media (max-width: 62rem) {
+@media (max-width: 66rem) {
   .layout { grid-template-columns: minmax(0, 1fr); gap: 1.5rem; }
   .sidebar {
     position: static;
@@ -95,7 +104,7 @@ main { max-width: var(--measure); min-width: 0; }
     background: var(--surface);
   }
 }
-@media (min-width: 62.01rem) {
+@media (min-width: 66.01rem) {
   .sidebar summary { display: none; }
 }
 
