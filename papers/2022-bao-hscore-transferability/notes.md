@@ -259,6 +259,82 @@ function of the **partition** the labels induce, not of the labels themselves. P
 class names leaves it unchanged; there is no notion of label ordering or of distance between
 classes anywhere in it.
 
+<img src="figures/mahalanobis.svg" alt="Two panels. On the left, a correlated elliptical point cloud with one- and two-sigma contours and two marked points A and B joined to the centre by lines of equal length, both on a dashed circle: A points along the ellipse's long axis, B across it. On the right the same cloud after whitening is round, and the same two points now sit on dashed circles of clearly different radii, B roughly twice as far from the centre as A.">
+
+### Why a denominator with no labels in it measures within-class tightness
+
+The obvious objection to reading $\operatorname{cov}(f(X))$ as "within-class spread" is that it
+never sees a label — it is the scatter of *all* the features about *one* global mean. The
+resolution is the **law of total covariance**:
+
+$$
+\underbrace{\operatorname{cov}(f(X))}_{S_T}
+= \underbrace{\mathbb{E}_Y\big[\operatorname{cov}(f(X)\mid Y)\big]}_{S_W}
++ \underbrace{\operatorname{cov}\big(\mathbb{E}[f(X)\mid Y]\big)}_{S_B}.
+$$
+
+$S_T$ needs no labels to *compute*, but it still *decomposes* into a within-class part and a
+between-class part. So with $S_B$ held fixed — which is exactly what the ratio does — a larger
+$S_T$ **is** a larger $S_W$. The denominator penalises within-class spread without ever being
+told which class anything belongs to.
+
+That is not just a hand-wave about monotonicity; the ranking is literally identical. Writing
+$\lambda_i$ for the generalised eigenvalues of $(S_B, S_W)$ — the Fisher ratios — simultaneous
+diagonalisation gives
+
+$$
+\mathcal{H}(f) = \operatorname{tr}(S_T^{-1}S_B) = \sum_i \frac{\lambda_i}{1+\lambda_i},
+$$
+
+each term strictly increasing in $\lambda_i$. Dividing by *total* scatter and dividing by
+*within-class* scatter therefore order features the same way. The label-free form is simply the
+convenient one to compute, and it bounds the score into $[0,\min(k,\lvert\mathcal{Y}\rvert-1))$
+as a free side effect.
+
+The picture also corrects the "small $\operatorname{tr}(\operatorname{cov} f)$" reading. What
+costs you is spread **along the direction that separates the classes**, not spread as such:
+
+<img src="figures/between_vs_within.svg" alt="Three scatter panels, each with two class clouds whose centroids sit at the same two points joined by a horizontal line. Panel A has tight round clouds and the highest H-score. Panel B has wide round clouds and a visibly lower score. Panel C has clouds stretched vertically, across the horizontal direction separating the centroids, and carries exactly the same total within-class variance as B, yet its score returns to panel A's value.">
+
+Panels B and C carry **identical** total within-class variance ($\operatorname{tr}(S_W)=0.90$)
+and the centroids never move, yet C scores $0.917$ against B's $0.690$ — the same as the
+far tighter panel A. C's extra variance is all *across* the separating direction, where it is
+free.
+
+### What breaks if you drop the denominator
+
+Suppose you scored with $\operatorname{tr}(S_B)$ alone — the plain Euclidean spread of the class
+centroids. Four things go wrong, in increasing order of seriousness.
+
+1. **Scale.** $f\mapsto cf$ sends $\operatorname{tr}(S_B)\mapsto c^2\operatorname{tr}(S_B)$.
+   Multiplying a feature by 100 multiplies its score by $10{,}000$ ($0.0123 \to 122.7$ in the
+   code) while $\mathcal{H}$ does not move. Since different pre-trained encoders emit wildly
+   different activation scales, and *comparing encoders is the entire purpose*, this alone
+   disqualifies it.
+2. **Redundancy.** Duplicating a feature raises $\operatorname{tr}(S_B)$ ($0.00455\to0.00679$
+   in the code) though it adds no new separating direction. You would be rewarded for padding
+   your feature vector with copies.
+3. **The operational meaning evaporates.** Theorem 1 derives $E_f^k = c\,\mathcal{H}(f)$ under
+   $\operatorname{cov}(f(X))=I$. Strip the normalisation and you are no longer computing an
+   error exponent, so the one thing that distinguishes H-score from an arbitrary heuristic is
+   gone.
+4. **It stops being a projection.** This is the deepest one. In Eq. 3 the quantity is
+   $\lVert\tilde B\Phi(\Phi^\top\Phi)^{-1/2}\rVert_F^2$, and $(\Phi^\top\Phi)^{-1/2}$ is
+   precisely what **orthonormalises** the basis of $\Phi$. Without it you have
+   $\lVert\tilde B\Phi\rVert_F^2$, which depends on how you happened to parameterise $\Phi$
+   rather than on the subspace it spans. The Pythagoras decomposition that made the whole
+   derivation work no longer holds.
+
+Measured, on 40 random features ranked against the true optimal log-loss (Spearman, $-1$ is
+perfect), as the per-coordinate scales are spread more widely. Both $\mathcal{H}$ and the
+log-loss are provably invariant to that rescaling — a linear head absorbs it — so only the
+$\operatorname{tr}(S_B)$ column *can* move:
+
+| scale spread | ×1 | ×3 | ×30 |
+|---|---|---|---|
+| Spearman($\mathcal{H}$, log-loss) | −0.965 | −0.965 | −0.965 |
+| Spearman($\operatorname{tr}S_B$, log-loss) | −0.860 | −0.701 | **−0.389** |
+
 ### What "feature redundancy" actually means
 
 The paper glosses $\operatorname{tr}(\operatorname{cov}(f(X)))$ as "feature redundancy", which
@@ -382,10 +458,10 @@ trained linear head actually reaches (Spearman; $-1$ is perfect):
 
 | $\varepsilon$ | 0.05 | 0.2 | 0.5 | 1.0 | 2.0 |
 |---|---|---|---|---|---|
-| $\lVert\tilde B\rVert_F^2$ | 0.0017 | 0.0350 | 0.2220 | 0.4923 | 0.7820 |
-| Spearman | −0.952 | −0.977 | −0.975 | −0.992 | −0.992 |
+| $\lVert\tilde B\rVert_F^2$ | 0.0016 | 0.0297 | 0.2012 | 0.4466 | 0.8371 |
+| Spearman | −0.977 | −0.993 | −0.994 | −0.997 | −0.988 |
 
-I expected this to decay as the dependence grew and it does not — if anything it tightens,
+(These shifted slightly when the log-loss solver was fixed to whiten before descending; the conclusion did not.) I expected this to decay as the dependence grew and it does not — if anything it tightens,
 because at tiny $\varepsilon$ the log-loss differences between features are themselves tiny and
 the ranking is resolution-limited. So the local assumption buys the *derivation*, not the
 *ranking*. That is more than the paper claims; it is also a benign setting (random Gaussian

@@ -99,10 +99,17 @@ def h_sample(Z, y, ny):
     return float(np.trace(np.linalg.solve(S_T, S_B)))
 
 
-def optimal_logloss(F, joint, steps=3000, lr=0.5):
-    """min_theta E[-log softmax(theta_y . f(x))], exactly (no sampling)."""
+def optimal_logloss(F, joint, steps=4000, lr=0.5):
+    """min_theta E[-log softmax(theta_y . f(x))], exactly (no sampling).
+
+    The features are whitened first. A linear head can absorb any invertible
+    linear map of f, so this leaves the optimum untouched -- but without it,
+    fixed-step gradient descent silently fails to converge on badly scaled
+    features and reports a loss that depends on the scaling, which it must not.
+    """
     px = joint.sum(axis=0)
     Fc = center(F, px)
+    Fc = Fc @ inv_sqrt(Fc.T @ (px[:, None] * Fc))
     ny, k = joint.shape[0], Fc.shape[1]
     th = np.zeros((ny, k))
     for _ in range(steps):
@@ -270,6 +277,81 @@ def nearest_neighbour_reading(rng):
     print("      labels themselves: no ordering, no distance between classes.\n")
 
 
+def within_class_scatter(F, joint):
+    """S_W = E_Y[cov(f(X)|Y)] -- the average within-class scatter."""
+    px, py = joint.sum(axis=0), joint.sum(axis=1)
+    Fc = center(F, px)
+    S_W = np.zeros((Fc.shape[1],) * 2)
+    for y in range(len(py)):
+        pxy = joint[y] / py[y]                              # P(x | Y=y)
+        mu = pxy @ Fc
+        D = Fc - mu
+        S_W += py[y] * (D.T @ (pxy[:, None] * D))
+    return S_W
+
+
+def why_the_denominator(rng):
+    print("6. The denominator has no labels in it. Why does it mean 'within-class'?\n")
+    nx, ny, k = 60, 5, 4
+    joint = make_joint(nx, ny, 0.5, rng)
+    px, py = joint.sum(axis=0), joint.sum(axis=1)
+    F = center(rng.standard_normal((nx, k)), px)
+
+    S_T = F.T @ (px[:, None] * F)
+    cond = (joint / py[:, None]) @ F
+    S_B = cond.T @ (py[:, None] * cond)
+    S_W = within_class_scatter(F, joint)
+
+    print("   Law of total covariance:  cov(f(X)) = E[cov(f|Y)] + cov(E[f|Y])")
+    print(f"     max |S_T - (S_W + S_B)|                      "
+          f"{np.abs(S_T - (S_W + S_B)).max():.2e}")
+    print("   -> S_T needs no labels to COMPUTE, but it still DECOMPOSES into a")
+    print("      within-class part plus a between-class part. Holding S_B fixed,")
+    print("      a bigger S_T is a bigger S_W. That is the whole answer.\n")
+
+    lam = np.linalg.eigvals(np.linalg.solve(S_W, S_B)).real   # Fisher ratios
+    print("   And H is a monotone function of the Fisher ratios lambda_i,")
+    print("   the generalised eigenvalues of (S_B, S_W):   H = sum_i l/(1+l)")
+    print(f"     tr(S_T^-1 S_B)                               {h_score(F, joint):.10f}")
+    print(f"     sum_i lambda_i / (1 + lambda_i)              "
+          f"{np.sum(lam / (1 + lam)):.10f}")
+    print("   -> so dividing by TOTAL scatter and dividing by WITHIN-class scatter")
+    print("      rank features identically. The label-free form is the convenient one.\n")
+
+    print("   Now drop the denominator and score with tr(S_B) alone:\n")
+    print(f"     H(f)                                         {h_score(F, joint):.6f}")
+    print(f"     H(100 f)                                     {h_score(100*F, joint):.6f}")
+    tr_sb = lambda M: float(np.trace(
+        ((joint / py[:, None]) @ center(M, px)).T
+        @ (py[:, None] * ((joint / py[:, None]) @ center(M, px)))))
+    print(f"     tr(S_B) for f                                {tr_sb(F):.6f}")
+    print(f"     tr(S_B) for 100 f                            {tr_sb(100*F):.6f}")
+    print("   -> a 10,000x swing from rescaling alone. Since different pre-trained")
+    print("      encoders emit wildly different activation scales, and comparing")
+    print("      encoders is the whole point, this alone is disqualifying.\n")
+
+    # Ranking quality when features carry different scales, as real encoders do.
+    # Both H and the optimal log-loss are PROVABLY invariant to rescaling (a linear
+    # head absorbs it), so H's column cannot move; tr(S_B) has no such protection.
+    print("   Ranking 40 random features against the true optimal log-loss, with")
+    print("   the features on different per-coordinate scales (as real encoders are).")
+    print("   H and the log-loss are both invariant to that rescaling, so only the")
+    print("   tr(S_B) column can move -- and it does:\n")
+    print(f"   {'scale spread':>14}  {'Spearman(H, ll)':>17}  {'Spearman(tr S_B, ll)':>22}")
+    base = [center(rng.standard_normal((nx, k)), px) for _ in range(40)]
+    for spread in (1.0, 3.0, 30.0):
+        hs, sb, ll = [], [], []
+        for G0 in base:
+            G = G0 * rng.uniform(1.0, spread, size=(1, k))   # per-coordinate rescale
+            hs.append(h_score(G, joint)); sb.append(tr_sb(G))
+            ll.append(optimal_logloss(G, joint))
+        print(f"   {spread:>14.0f}  {spearman(hs, ll):>17.3f}  {spearman(sb, ll):>22.3f}")
+    print("\n   Dropping the denominator also breaks the Eq 3 geometry:")
+    print("   (Phi^T Phi)^{-1/2} is what ORTHONORMALISES the basis, so without it")
+    print("   you are not projecting onto the subspace at all -- you are reading off")
+    print("   an arbitrary parametrisation of it.\n")
+
+
 if __name__ == "__main__":
     rng = np.random.default_rng(0)
     print("H-score (Bao et al. 2022), checked on a discrete joint")
@@ -279,3 +361,4 @@ if __name__ == "__main__":
     sample_estimator(rng)
     locality(rng)
     nearest_neighbour_reading(rng)
+    why_the_denominator(rng)
