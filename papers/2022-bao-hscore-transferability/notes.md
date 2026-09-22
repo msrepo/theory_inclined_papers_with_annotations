@@ -86,7 +86,8 @@ $$
 
 The left side is "fit a $k$-dimensional feature extractor and a softmax head by minimising
 log-loss". The right side is "find the best rank-$k$ approximation to $\tilde B$". By
-Eckart–Young the optimal factors are the top-$k$ singular vectors, so **training is computing a
+[Eckart–Young](../eckart-young-lowrank-svd/index.html) the optimal factors are the top-$k$
+singular vectors, so **training is computing a
 truncated SVD of the dependence matrix**, with $\Phi$ spanning the feature subspace and $\Psi$
 the label subspace. This is what the paper means by "the modal decomposition of $\tilde B$".
 
@@ -195,7 +196,7 @@ contributes $N_y$ identical copies of $\mu_y$, the ordinary covariance sum rewei
 class by its size automatically — the class-proportion weighting in step 5 above falls out for
 free rather than being coded by hand.
 
-**This is the multi-class Fisher discriminant ratio.** The paper never says so, but
+**This is the multi-class Fisher discriminant ratio** ([background](../lda-fisher-discriminant/index.html)). The paper never says so, but
 $\operatorname{tr}(S_T^{-1}S_B)$ is LDA's criterion (classic LDA uses $S_W$, and
 $S_T=S_W+S_B$, so they are monotonically related). The contribution is not a new statistic —
 it is an information-theoretic derivation of a familiar one, plus the operational meaning below.
@@ -204,6 +205,59 @@ For the Taskonomy pixel-to-pixel tasks, $\mathcal{Y}$ is made finite by **cluste
 values into a palette of 16 colours**, computing a per-pixel H-score and averaging. Supplement
 S3.2 checks the sensitivity: $N=16$ balances recoverability against cost, $N=5$ destroys the
 structure.
+
+### No head is ever trained
+
+Worth stating flatly, because the derivation can suggest otherwise: computing $\mathcal{H}(f)$
+involves **no gradient step of any kind**. A head *is* optimised — but in closed form, by Eq. 2,
+and then it cancels out of Eq. 3. So $\mathcal{H}(f)$ answers *"what log-loss would the best
+linear head reach, if I trained one?"* without ever constructing it. The authors' whole
+implementation is ten lines of numpy with no optimiser, learning rate or epoch count:
+
+```python
+def getDiffNN(f, Z):
+    Covf = getCov(f)                          # labels not used
+    g = np.zeros_like(f)
+    for z in set(Z):
+        g[Z==z] = np.mean(f[Z==z, :], axis=0)  # the only use of labels
+    return np.trace(np.dot(np.linalg.pinv(Covf, rcond=1e-15), getCov(g)))
+```
+
+What it needs: a frozen source encoder, target inputs, and **target labels**. What it does not
+need: the transfer network, an optimiser, or the source labels (those are baked into the frozen
+weights). The networks trained in the paper's experiments exist only to produce ground truth to
+validate the score against. Note also that H-score does not hand you a model — it scores a
+representation, so to deploy you still train the head. It is a selection criterion.
+
+### The nearest-neighbour reading
+
+The paper compresses this into one sentence — "a high H-score implies the inter-class variance
+is large, while feature redundancy is small" — and moves on. The classifier it has in mind is
+**nearest class mean**: compute a centroid $\mu_y$ per class and assign $x$ to
+$\arg\min_y\lVert f(x)-\mu_y\rVert$. That works exactly when two things hold: the centroids are
+far apart (or no distance rule can separate them), *and* the within-class clouds are tight
+relative to that separation (or points wander into a neighbour's territory anyway). Those are
+the numerator and the denominator. $\mathcal{H}$ is the **signal-to-noise ratio of a
+nearest-centroid classifier**: centroid separation, measured in units of the feature's own
+spread.
+
+That reading is exact, not metaphorical. Expanding
+$\Sigma_B=\sum_y P(y)(\mu_y-\mu)(\mu_y-\mu)^\top$ and using cyclicity of the trace,
+
+$$
+\mathcal{H}(f) = \operatorname{tr}(\Sigma_T^{-1}\Sigma_B)
+= \sum_y P(y)\,(\mu_y-\mu)^\top\Sigma_T^{-1}(\mu_y-\mu),
+$$
+
+so **H-score is the average squared Mahalanobis distance from each class centroid to the global
+mean.** This is what $\Sigma_T^{-1}$ is for: it converts Euclidean distance into Mahalanobis
+distance, and a nearest-neighbour rule in the whitened space is precisely what the score
+measures. The authors' function being named `getDiffNN` suggests this is how they thought of it.
+
+One consequence of the label entering *only* through the grouping in step 4: $\mathcal{H}$ is a
+function of the **partition** the labels induce, not of the labels themselves. Permuting the
+class names leaves it unchanged; there is no notion of label ordering or of distance between
+classes anywhere in it.
 
 ### What "feature redundancy" actually means
 
@@ -295,6 +349,11 @@ random invertible $A$. Adding an exactly duplicated feature moves the raw betwee
 from $0.004553$ to $0.006787$ while H-score does not move at all ($0.005098$, pseudo-inverse) —
 the duplicate adds no subspace.
 
+**The nearest-neighbour identity.** The Mahalanobis form above is exact:
+$\operatorname{tr}(S_T^{-1}S_B)$ and $\sum_y P(y)(\mu_y-\mu)^\top S_T^{-1}(\mu_y-\mu)$ both
+give $0.0073296924$, and permuting the class names returns the same value again — confirming
+that only the partition matters.
+
 **A hazard the paper does not mention.** With a *near*-duplicate and a plain inverse, the
 picture reverses:
 
@@ -343,7 +402,15 @@ features on a random joint), and says nothing about learned features on real dat
   transformations." With nonlinear fine-tuning they retreat to *relative* comparison, which the
   experiments support but which is an empirical claim.
 - **No conditioning or regularisation analysis**, despite $\operatorname{cov}^{-1}$ at $k=2048$.
-  The table above shows the failure mode is real and not exotic.
+  The paper says nothing about it; the reference implementation *does* reach for
+  `np.linalg.pinv`, with `rcond` at $10^{-15}$, $10^{-10}$ or $10^{-9}$ depending on the script
+  (all three verified in the repo). But that only discards singular values which are zero to
+  machine precision, so it guards against exact singularity and not against the near-duplicate
+  amplification in the table above — where the condition number reaches $10^4$–$10^{14}$ while
+  no singular value falls below the cutoff. My own numbers bear this out: at noise scales
+  $10^{-2}$ and $10^{-4}$ the pseudo-inverse and the plain solve return *identical* inflated
+  values. So the gap is real in both the paper and the code, and the code's `pinv` should not
+  be read as having addressed it.
 - **$\lvert\mathcal{X}\rvert$ finite is assumed throughout** and is false for images. It is
   harmless because $\tilde B$ is eliminated, but it means the derivation never formally covers
   the setting it is applied to.

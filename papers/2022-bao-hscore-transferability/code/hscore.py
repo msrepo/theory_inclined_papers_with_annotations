@@ -244,6 +244,32 @@ def locality(rng):
     print("   paper claims, and less than it would need for real learned features.\n")
 
 
+def nearest_neighbour_reading(rng):
+    print("5. The nearest-neighbour reading, made exact\n")
+    print("   H = tr(S_T^-1 S_B) = sum_y P(y) (mu_y - mu)^T S_T^-1 (mu_y - mu),")
+    print("   i.e. the average squared MAHALANOBIS distance from each class")
+    print("   centroid to the global mean. That is the signal-to-noise ratio a")
+    print("   nearest-class-mean classifier runs on.\n")
+    nx, ny, k = 60, 5, 4
+    joint = make_joint(nx, ny, 0.4, rng)
+    px, py = joint.sum(axis=0), joint.sum(axis=1)
+    F = center(rng.standard_normal((nx, k)), px)
+
+    S_T = F.T @ (px[:, None] * F)
+    mu = (joint / py[:, None]) @ F                          # rows: mu_y - mu
+    maha = sum(py[y] * (mu[y] @ np.linalg.solve(S_T, mu[y])) for y in range(ny))
+    print(f"   tr(S_T^-1 S_B)                                 {h_score(F, joint):.10f}")
+    print(f"   sum_y P(y) * squared Mahalanobis distance      {maha:.10f}")
+
+    # The label enters ONLY by grouping, so only the partition matters:
+    # renaming the classes must leave H untouched.
+    perm = rng.permutation(ny)
+    print(f"   H after permuting the class NAMES              "
+          f"{h_score(F, joint[perm]):.10f}")
+    print("   -> H is a function of the partition the labels induce, not of the")
+    print("      labels themselves: no ordering, no distance between classes.\n")
+
+
 if __name__ == "__main__":
     rng = np.random.default_rng(0)
     print("H-score (Bao et al. 2022), checked on a discrete joint")
@@ -252,3 +278,4 @@ if __name__ == "__main__":
     invariance_and_redundancy(rng)
     sample_estimator(rng)
     locality(rng)
+    nearest_neighbour_reading(rng)
