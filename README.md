@@ -153,6 +153,13 @@ inside one paper's notes.
 | Page | Covers |
 |---|---|
 | *Inequalities and concentration: a working toolbox* — [read online](https://msrepo.github.io/theory_inclined_papers_with_annotations/inequalities-and-concentration/) · [source](foundations/inequalities-and-concentration/notes.md) | Cheeger and higher-order Cheeger, Markov/Chebyshev/Hoeffding, McDiarmid, Rademacher, KL chain rule, Donsker–Varadhan, HGR, Weyl, Davis–Kahan, Wigner, spherical CLT |
+| *Linear (Fisher) Discriminant Analysis* — [read online](https://msrepo.github.io/theory_inclined_papers_with_annotations/lda-fisher-discriminant/) · [source](foundations/lda-fisher-discriminant/notes.md) | between/within-class scatter matrices, Fisher's criterion as a generalised eigenproblem $S_w^{-1}S_b$, the $g-1$ rank cap, and the PCA+LDA fix for small-sample singular $S_w$ |
+
+**Linear algebra**
+
+| Page | Covers |
+|---|---|
+| *Eckart–Young–Mirsky and low-rank approximation via truncated SVD* — [read online](https://msrepo.github.io/theory_inclined_papers_with_annotations/eckart-young-lowrank-svd/) · [source](foundations/eckart-young-lowrank-svd/notes.md) | Frobenius and spectral matrix norms, the Eckart–Young–Mirsky theorem (truncated SVD is the provably-best rank-$k$ approximation in both norms), the 2-norm proof, and an image-compression example |
 
 ## Topics
 
