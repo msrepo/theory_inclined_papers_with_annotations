@@ -17,6 +17,9 @@ status: read
   journal reference, though the paper is laid out as a conference submission.
 - **[Supplementary material and code](http://yangli-feasibility.com/home/ttl.html)** — the
   authors' page. S1 derives Eq. 4, S2 is the error-exponent argument.
+- **[Authors' reference implementation](https://github.com/YaojieBao/An-Information-theoretic-Metric-of-Transferability/blob/master/3D_scene_understanding/H-score_1st_order.py)**
+  (`getDiffNN`, the repo's H-score) — the same function, sometimes renamed `getHscore`, recurs
+  across the repo's other scripts with looser `rcond` (1e-9, 1e-10 instead of 1e-15).
 - **[Runnable code](https://github.com/msrepo/theory_inclined_papers_with_annotations/blob/main/papers/2022-bao-hscore-transferability/code/hscore.py)** —
   Equations 2, 3 and 4 checked to machine precision on a discrete joint where $\tilde B$ can
   actually be built, plus the invariance, redundancy and locality questions. `make verify`
@@ -180,6 +183,18 @@ derivation scaffolding, never an implementation. What you run instead:
 6. H = tr(S_T^-1 S_B)
 ```
 
+**How $\mathbb{E}[f(X)\mid Y]$ turns into a covariance matrix, concretely.**
+$\mathbb{E}[f(X)\mid Y=y]$ is just the class-$y$ mean feature vector $\mu_y$; it is a function
+of $y$. $\operatorname{cov}(\mathbb{E}[f(X)\mid Y])$ then treats $Y$ itself as random and asks
+how much *that function's output*, $\mu_Y$, varies — which is exactly $S_B$ above, the
+between-class scatter. The [authors' own code](https://github.com/YaojieBao/An-Information-theoretic-Metric-of-Transferability/blob/master/3D_scene_understanding/H-score_1st_order.py)
+computes it without ever writing the $(m_y/m)$ weights explicitly: replace every sample's
+feature vector with its own class mean (`g[Z==z] = mean(f[Z==z])`), then take the *plain,
+unweighted* sample covariance of that array. Because a class with $N_y$ members now
+contributes $N_y$ identical copies of $\mu_y$, the ordinary covariance sum reweights each
+class by its size automatically — the class-proportion weighting in step 5 above falls out for
+free rather than being coded by hand.
+
 **This is the multi-class Fisher discriminant ratio.** The paper never says so, but
 $\operatorname{tr}(S_T^{-1}S_B)$ is LDA's criterion (classic LDA uses $S_W$, and
 $S_T=S_W+S_B$, so they are monotonically related). The contribution is not a new statistic —
@@ -292,7 +307,16 @@ picture reverses:
 against a true value of $0.005098$. As $\operatorname{cov}(f(X))$ becomes ill-conditioned, the
 inverse **amplifies** a direction carrying almost no signal, and the score inflates. At the
 $k=2048$ features the paper uses on Taskonomy, with finite samples, this is a live concern and
-there is no discussion of regularisation or pseudo-inversion anywhere in the paper.
+there is no discussion of regularisation or pseudo-inversion anywhere in the *paper*.
+
+The authors' own *code* does reach for `np.linalg.pinv` rather than a plain solve — but with
+`rcond` set to $10^{-15}$, $10^{-10}$ or $10^{-9}$ depending on the script. That tolerance only
+discards singular values of $\operatorname{cov}(f(X))$ that are zero to within machine
+precision; it does nothing for the near-duplicate regime in the table above, where the
+condition number is large ($10^4$–$10^{14}$) but no singular value is actually below the
+cutoff. So the pseudo-inverse in the reference implementation is a numerical-stability guard
+against exact singularity, not a regulariser against the amplification this table shows — the
+hazard survives in the code exactly as it does in the paper's math.
 
 **Does the local assumption bind?** Ranking 40 random features by H-score against the log-loss a
 trained linear head actually reaches (Spearman; $-1$ is perfect):
