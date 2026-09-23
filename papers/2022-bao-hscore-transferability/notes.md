@@ -20,6 +20,9 @@ status: read
 - **[Authors' reference implementation](https://github.com/YaojieBao/An-Information-theoretic-Metric-of-Transferability/blob/master/3D_scene_understanding/H-score_1st_order.py)**
   (`getDiffNN`, the repo's H-score) — the same function, sometimes renamed `getHscore`, recurs
   across the repo's other scripts with looser `rcond` (1e-9, 1e-10 instead of 1e-15).
+- **[Nguyen 2020 — LEEP](../2020-nguyen-leep/index.html)** — the competing transferability
+  measure, which evaluates one hand-built head exactly rather than approximating the best
+  one. The comparison is worked through there.
 - **[Runnable code](https://github.com/msrepo/theory_inclined_papers_with_annotations/blob/main/papers/2022-bao-hscore-transferability/code/hscore.py)** —
   Equations 2, 3 and 4 checked to machine precision on a discrete joint where $\tilde B$ can
   actually be built, plus the invariance, redundancy and locality questions, the six equivalent
