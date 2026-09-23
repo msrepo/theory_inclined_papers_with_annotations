@@ -21,6 +21,8 @@ status: read
   [Nguyen 2020 — LEEP](../2020-nguyen-leep/index.html),
   [Bao 2022 — H-score](../2022-bao-hscore-transferability/index.html),
   and the label-free [Diniz 2026 — PAS](../2026-diniz-pas/index.html).
+- **[Chaves 2023 — medical TE](../2023-chaves-medical-transferability/index.html)** —
+  evaluates this score on medical targets, including out-of-distribution ones.
 - **[Claßen 2026 — TE robustness](../2026-classen-te-robustness/index.html)** — benchmarks
   LogME among others on medical targets.
 - **[Runnable code](https://github.com/msrepo/theory_inclined_papers_with_annotations/blob/main/papers/2021-you-logme/code/logme.py)** —

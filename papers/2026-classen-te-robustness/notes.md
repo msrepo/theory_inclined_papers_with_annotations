@@ -20,6 +20,9 @@ status: read
   [Tran 2019 — NCE](../2019-tran-nce-hardness/index.html),
   [Nguyen 2020 — LEEP](../2020-nguyen-leep/index.html),
   [Bao 2022 — H-score](../2022-bao-hscore-transferability/index.html).
+- **[Chaves 2023 — medical TE](../2023-chaves-medical-transferability/index.html)** —
+  the study this one follows up, and whose open question about the evaluation metric it
+  takes up directly.
 - **[Runnable code](https://github.com/msrepo/theory_inclined_papers_with_annotations/blob/main/papers/2026-classen-te-robustness/code/robustness.py)** —
   not a reproduction, which is not possible here, but the mechanisms: where the rank
   correlations disagree, how stability falls with subset size, and the sharp $n\approx k$
