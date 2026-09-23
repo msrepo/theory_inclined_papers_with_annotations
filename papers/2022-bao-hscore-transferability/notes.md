@@ -36,6 +36,8 @@ status: read
 - **[Claßen 2026 — TE robustness](../2026-classen-te-robustness/index.html)** — benchmarks
   this measure against the others on medical imaging targets, and finds the rankings move
   under nothing but a change of random seed.
+- **[Shao 2022 — SFDA](../2022-shao-sfda/index.html)** — the measure that imitates
+  fine-tuning dynamics rather than scoring a static representation.
 - **[Runnable code](https://github.com/msrepo/theory_inclined_papers_with_annotations/blob/main/papers/2022-bao-hscore-transferability/code/hscore.py)** —
   Equations 2, 3 and 4 checked to machine precision on a discrete joint where $\tilde B$ can
   actually be built, plus the invariance, redundancy and locality questions, the six equivalent

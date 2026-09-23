@@ -23,6 +23,8 @@ status: read
 - **[Chaves 2023 — medical TE](../2023-chaves-medical-transferability/index.html)** —
   the study this one follows up, and whose open question about the evaluation metric it
   takes up directly.
+- **[Shao 2022 — SFDA](../2022-shao-sfda/index.html)** — the measure that imitates
+  fine-tuning dynamics rather than scoring a static representation.
 - **[Runnable code](https://github.com/msrepo/theory_inclined_papers_with_annotations/blob/main/papers/2026-classen-te-robustness/code/robustness.py)** —
   not a reproduction, which is not possible here, but the mechanisms: where the rank
   correlations disagree, how stability falls with subset size, and the sharp $n\approx k$

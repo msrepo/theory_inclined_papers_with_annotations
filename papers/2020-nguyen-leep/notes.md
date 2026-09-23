@@ -32,6 +32,8 @@ status: read
 - **[Claßen 2026 — TE robustness](../2026-classen-te-robustness/index.html)** — benchmarks
   this measure against the others on medical imaging targets, and finds the rankings move
   under nothing but a change of random seed.
+- **[Shao 2022 — SFDA](../2022-shao-sfda/index.html)** — the measure that imitates
+  fine-tuning dynamics rather than scoring a static representation.
 - **[Runnable code](https://github.com/msrepo/theory_inclined_papers_with_annotations/blob/main/papers/2020-nguyen-leep/code/leep.py)** —
   the two exact limits, where Property 1's slack actually goes, Property 2 across six regimes
   together with why the obvious derivation misses it, and the temperature sensitivity.

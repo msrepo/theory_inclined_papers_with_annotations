@@ -25,6 +25,8 @@ status: read
   evaluates this score on medical targets, including out-of-distribution ones.
 - **[Claßen 2026 — TE robustness](../2026-classen-te-robustness/index.html)** — benchmarks
   LogME among others on medical targets.
+- **[Shao 2022 — SFDA](../2022-shao-sfda/index.html)** — the measure that imitates
+  fine-tuning dynamics rather than scoring a static representation.
 - **[Runnable code](https://github.com/msrepo/theory_inclined_papers_with_annotations/blob/main/papers/2021-you-logme/code/logme.py)** —
   Eq. 2 against an independent derivation, the fixed point against a grid search, $\gamma$
   spanning $[0,D]$, and the $D>n$ table that is the whole argument for the method.

@@ -24,6 +24,8 @@ status: read
 - **[Claßen 2026 — TE robustness](../2026-classen-te-robustness/index.html)** — the direct
   follow-up, which takes up this paper's own call for robustness work and separates the
   evaluation-metric question this one leaves open.
+- **[Shao 2022 — SFDA](../2022-shao-sfda/index.html)** — the measure that imitates
+  fine-tuning dynamics rather than scoring a static representation.
 - **[Runnable code](https://github.com/msrepo/theory_inclined_papers_with_annotations/blob/main/papers/2023-chaves-medical-transferability/code/power.py)** —
   not a reproduction, which is impossible here, but the statistical resolution of their Table 2:
   what a rank correlation over ten architectures can and cannot detect. `make verify` runs it.
