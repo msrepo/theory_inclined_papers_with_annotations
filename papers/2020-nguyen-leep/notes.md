@@ -24,6 +24,9 @@ status: read
   one is competing with, and the more interesting comparison. Read that first.
 - **[Diniz 2026 — PAS](../2026-diniz-pas/index.html)** — the unsupervised counterpart:
   scores a source/backbone pair without any target labels, which this measure requires.
+- **[You 2021 — LogME](../2021-you-logme/index.html)** — the Bayesian-evidence measure,
+  which needs only a feature extractor and so also covers regression and contrastive or
+  language-model sources.
 - **[Claßen 2026 — TE robustness](../2026-classen-te-robustness/index.html)** — benchmarks
   this measure against the others on medical imaging targets, and finds the rankings move
   under nothing but a change of random seed.

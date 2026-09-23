@@ -19,6 +19,9 @@ status: read
   [Bao 2022 — H-score](../2022-bao-hscore-transferability/index.html),
   [Nguyen 2020 — LEEP](../2020-nguyen-leep/index.html),
   [Tran 2019 — NCE](../2019-tran-nce-hardness/index.html) — all three need target labels.
+- **[You 2021 — LogME](../2021-you-logme/index.html)** — the Bayesian-evidence measure,
+  which needs only a feature extractor and so also covers regression and contrastive or
+  language-model sources.
 - **[Claßen 2026 — TE robustness](../2026-classen-te-robustness/index.html)** — on how
   fragile rankings from measures of this kind are under resampling.
 - **[Runnable code](https://github.com/msrepo/theory_inclined_papers_with_annotations/blob/main/papers/2026-diniz-pas/code/pas.py)** —
