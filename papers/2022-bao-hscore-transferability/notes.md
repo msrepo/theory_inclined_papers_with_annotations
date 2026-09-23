@@ -420,7 +420,7 @@ $$
 \mathcal{H}(f) = \lVert G^\top Q\rVert_F^2 = \sum_i \cos^2\theta_i ,
 $$
 
-where $\theta_i$ are the **principal angles** between $\operatorname{span}(\text{centred features})$
+where $\theta_i$ are the **[principal angles](../principal-angles-subspaces/index.html)** between $\operatorname{span}(\text{centred features})$
 and $\operatorname{span}(\text{class indicators})$ — because the singular values of a product of
 two orthonormal bases are the cosines of the principal angles between their spans.
 

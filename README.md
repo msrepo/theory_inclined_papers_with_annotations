@@ -160,6 +160,7 @@ inside one paper's notes.
 | Page | Covers |
 |---|---|
 | *Eckart–Young–Mirsky and low-rank approximation via truncated SVD* — [read online](https://msrepo.github.io/theory_inclined_papers_with_annotations/eckart-young-lowrank-svd/) · [source](foundations/eckart-young-lowrank-svd/notes.md) | Frobenius and spectral matrix norms, the Eckart–Young–Mirsky theorem (truncated SVD is the provably-best rank-$k$ approximation in both norms), the 2-norm proof, and an image-compression example |
+| *Principal angles between subspaces* — [read online](https://msrepo.github.io/theory_inclined_papers_with_annotations/principal-angles-subspaces/) · [source](foundations/principal-angles-subspaces/notes.md) · [code](foundations/principal-angles-subspaces/code/) | the SVD characterisation, the projector and distance identities, why `arccos` destroys small angles and the sine fix, and the equivalence with canonical correlations |
 
 ## Topics
 
