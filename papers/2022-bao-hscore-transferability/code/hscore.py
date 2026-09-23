@@ -352,6 +352,92 @@ def why_the_denominator(rng):
     print("   an arbitrary parametrisation of it.\n")
 
 
+def mgs(Z):
+    """Modified Gram-Schmidt, in whatever dtype Z carries -- numpy's linalg.qr
+    refuses longdouble, and the reference column below needs 128-bit."""
+    Q = Z.copy()
+    for j in range(Q.shape[1]):
+        for i in range(j):
+            Q[:, j] -= (Q[:, i] @ Q[:, j]) * Q[:, i]
+        Q[:, j] /= np.sqrt(Q[:, j] @ Q[:, j])
+    return Q
+
+
+def equivalent_forms(rng):
+    print("7. Six ways to write the same number, without the k x k matmul\n")
+    m, k, C = 6000, 12, 5
+    y = rng.integers(0, C, m)
+    Z = (rng.standard_normal((C, k))[y] * 0.6 + rng.standard_normal((m, k))) \
+        @ rng.standard_normal((k, k))
+    Z = Z - Z.mean(0)
+    cnt = np.bincount(y, minlength=C); pr = cnt / m
+    mu = np.stack([Z[y == c].mean(0) for c in range(C)])
+
+    S_T = Z.T @ Z / m
+    S_B = (mu * pr[:, None]).T @ mu
+    naive = float(np.trace(np.linalg.inv(S_T) @ S_B))
+
+    forms = {
+        "0  naive  tr(inv(S_T) @ S_B)": naive,
+        "1  <inv(S_T), S_B>_F   elementwise": float((np.linalg.inv(S_T) * S_B).sum()),
+        "2  sum_y p_y * Mahalanobis^2": float(sum(
+            pr[c] * mu[c] @ np.linalg.solve(S_T, mu[c]) for c in range(C))),
+        "3  Cholesky + triangular solve": float((np.linalg.solve(
+            np.linalg.cholesky(S_T), (np.sqrt(pr)[:, None] * mu).T) ** 2).sum()),
+        "4  tr(M S_T^-1 M^T),  C x C": float(np.trace(
+            (np.sqrt(pr)[:, None] * mu) @ np.linalg.solve(
+                S_T, (np.sqrt(pr)[:, None] * mu).T))),
+    }
+    Q = np.linalg.qr(Z)[0]
+    S = np.stack([Q[y == c].sum(0) for c in range(C)])
+    forms["5  QR group-sums, no k x k at all"] = float(((S ** 2).sum(1) / cnt).sum())
+
+    G = np.zeros((m, C)); G[np.arange(m), y] = 1.0
+    G /= np.sqrt(cnt)
+    cos = np.linalg.svd(G.T @ Q, compute_uv=False)
+    forms["6  sum cos^2(principal angle)"] = float((cos ** 2).sum())
+
+    for nm, v in forms.items():
+        print(f"   {nm:<36} {v:.12f}   diff {abs(v - naive):.1e}")
+    print(f"\n   principal-angle cosines: {np.round(cos, 4)}")
+    print("   Z is centred so 1 is orthogonal to span(Z) while 1 lies in span(G):")
+    print(f"   one angle is always 90 degrees, hence rank(S_B) = C-1 = {C-1} and")
+    print(f"   H < min(k, C-1) = {min(k, C-1)}. Those cosines are the canonical")
+    print("   correlations between feature space and label indicators -- the same")
+    print("   HGR quantities the paper says are the singular values of Btilde.\n")
+
+
+def conditioning(rng):
+    print("8. Why the QR form is worth preferring: cond(S_T) = cond(Z)^2\n")
+    m, k, C = 4000, 8, 4
+    print(f"   {'noise':>7}  {'cond(Z)':>9}  {'cond(S_T)':>10}"
+          f"  {'naive inv':>24}  {'QR route':>24}")
+    for tol in (1e-1, 1e-3, 1e-5, 1e-7, 1e-8):
+        y = rng.integers(0, C, m)
+        base = rng.standard_normal((C, k - 1))[y] * 0.7 + rng.standard_normal((m, k - 1))
+        Z = np.hstack([base, base[:, :1] + tol * rng.standard_normal((m, 1))])
+        Z = Z - Z.mean(0)
+        cnt = np.bincount(y, minlength=C); pr = cnt / m
+        mu = np.stack([Z[y == c].mean(0) for c in range(C)])
+
+        S_T = Z.T @ Z / m
+        S_B = (mu * pr[:, None]).T @ mu
+        naive = float(np.trace(np.linalg.inv(S_T) @ S_B))
+        Q = np.linalg.qr(Z)[0]
+        S = np.stack([Q[y == c].sum(0) for c in range(C)])
+        qr = float(((S ** 2).sum(1) / cnt).sum())
+        Ql = mgs(Z.astype(np.longdouble))
+        Sl = np.stack([Ql[y == c].sum(0) for c in range(C)])
+        truth = float(((Sl ** 2).sum(1) / cnt).sum())
+
+        print(f"   {tol:>7.0e}  {np.linalg.cond(Z):>9.1e}  {np.linalg.cond(S_T):>10.1e}"
+              f"  {naive:>14.10f} ({abs(naive-truth):>5.0e})"
+              f"  {qr:>14.10f} ({abs(qr-truth):>5.0e})")
+    print("\n   Reference is modified Gram-Schmidt in 128-bit. Forming Z^T Z squares")
+    print("   the conditioning; the QR route never forms it and stays accurate where")
+    print("   the textbook expression has lost three decimal places.\n")
+
+
 if __name__ == "__main__":
     rng = np.random.default_rng(0)
     print("H-score (Bao et al. 2022), checked on a discrete joint")
@@ -362,3 +448,5 @@ if __name__ == "__main__":
     locality(rng)
     nearest_neighbour_reading(rng)
     why_the_denominator(rng)
+    equivalent_forms(rng)
+    conditioning(rng)

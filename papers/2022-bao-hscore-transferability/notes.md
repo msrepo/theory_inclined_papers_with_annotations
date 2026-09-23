@@ -22,8 +22,8 @@ status: read
   across the repo's other scripts with looser `rcond` (1e-9, 1e-10 instead of 1e-15).
 - **[Runnable code](https://github.com/msrepo/theory_inclined_papers_with_annotations/blob/main/papers/2022-bao-hscore-transferability/code/hscore.py)** —
   Equations 2, 3 and 4 checked to machine precision on a discrete joint where $\tilde B$ can
-  actually be built, plus the invariance, redundancy and locality questions. `make verify`
-  runs it.
+  actually be built, plus the invariance, redundancy and locality questions, the six equivalent
+  forms of the score, and the conditioning comparison. `make verify` runs it.
 
 ## In one paragraph
 
@@ -357,6 +357,103 @@ paper's sentence, and it is the mechanism behind the connection to the max-relev
 min-redundancy feature-selection literature it cites: the trade-off is automatic rather than
 hand-designed.
 
+## Equivalent forms, and the one worth actually using
+
+Written as $\operatorname{tr}(\Sigma_T^{-1}\Sigma_B)$, Eq. 4 invites you to build two $k\times k$
+matrices, invert one, multiply them, and then throw away all but the $k$ diagonal entries. None
+of that is necessary. Six equivalent expressions, checked against each other to $10^{-14}$:
+
+**1. It is a Frobenius inner product.** For symmetric $A,B$,
+$\operatorname{tr}(AB)=\sum_i\sum_j A_{ij}B_{ji}=\sum_{ij}A_{ij}B_{ij}$, so
+
+$$
+\mathcal{H}(f) = \langle \Sigma_T^{-1},\, \Sigma_B\rangle_F
+= \sum_{ij} (\Sigma_T^{-1})_{ij}(\Sigma_B)_{ij}.
+$$
+
+An elementwise multiply and a sum, $O(k^2)$, no matrix product.
+
+**2. It is a sum of quadratic forms.** $\Sigma_B$ is not generic — it is a sum of
+$\lvert\mathcal{Y}\rvert$ rank-one terms, $\Sigma_B=\sum_y p_y d_yd_y^\top$ with
+$d_y=\mu_y-\mu$. Using $\operatorname{tr}(Muv^\top)=v^\top Mu$,
+
+$$
+\mathcal{H}(f) = \sum_y p_y\, d_y^\top \Sigma_T^{-1} d_y ,
+$$
+
+which is $\lvert\mathcal{Y}\rvert$ solves against a *vector*. This is the Mahalanobis reading
+above, now as an algorithm.
+
+**3. Cholesky, so no inverse is ever formed.** With $\Sigma_T=LL^\top$,
+$d_y^\top\Sigma_T^{-1}d_y=\lVert L^{-1}d_y\rVert^2$, so $\mathcal{H}=\sum_y p_y\lVert v_y\rVert^2$
+where $Lv_y=d_y$ by forward substitution. Each class contributes a plain squared Euclidean norm.
+
+**4. Flip the trace to the small side.** With $M\in\mathbb{R}^{\lvert\mathcal{Y}\rvert\times k}$
+holding rows $\sqrt{p_y}\,d_y^\top$ we have $\Sigma_B=M^\top M$, and cyclicity gives
+$\operatorname{tr}(M\Sigma_T^{-1}M^\top)$ — a $\lvert\mathcal{Y}\rvert\times\lvert\mathcal{Y}\rvert$
+trace. For Taskonomy that is $16\times16$ rather than $2048\times2048$.
+
+**5. No $k\times k$ matrix at all.** Take the centred data $Z\in\mathbb{R}^{m\times k}$ and a thin
+QR, $Z=QR$. Row $i$ is $z_i=R^\top q_i$, so $d_y=R^\top\bar u_y$ with $\bar u_y$ the class-$y$
+mean of the rows of $Q$; and since $R(R^\top R)^{-1}R^\top=I$ for square invertible $R$,
+
+$$
+d_y^\top\Sigma_T^{-1}d_y = \bar u_y^\top R\;m(R^\top R)^{-1}\,R^\top\bar u_y = m\lVert\bar u_y\rVert^2 ,
+$$
+
+and everything collapses to
+
+$$
+\boxed{\;\mathcal{H}(f) = \sum_y \frac{\lVert s_y\rVert^2}{m_y},
+\qquad s_y = \sum_{i\,\in\,\text{class } y} q_i \;}
+$$
+
+Group-sum the rows of $Q$ by class, take squared norms, divide by class counts. $\Sigma_T$ and
+$\Sigma_B$ are never built; $R$ is computed and discarded.
+
+**6. What it really is: principal angles.** Let $G\in\mathbb{R}^{m\times\lvert\mathcal{Y}\rvert}$
+be the class-indicator matrix with $G_{iy}=1/\sqrt{m_y}$ when $y_i=y$; its columns are
+disjointly supported unit vectors, so $G^\top G=I$. Then $(G^\top Q)_{y\cdot}=s_y^\top/\sqrt{m_y}$
+and
+
+$$
+\mathcal{H}(f) = \lVert G^\top Q\rVert_F^2 = \sum_i \cos^2\theta_i ,
+$$
+
+where $\theta_i$ are the **principal angles** between $\operatorname{span}(\text{centred features})$
+and $\operatorname{span}(\text{class indicators})$ — because the singular values of a product of
+two orthonormal bases are the cosines of the principal angles between their spans.
+
+This form explains, in one line each, things asserted separately above. Invariance to invertible
+maps of $f$: those change the *basis* of $\operatorname{span}(Z)$, not the subspace. Invariance
+to permuting class names: permutes the columns of $G$, not its span. The bound
+$\mathcal{H}<\min(k,\lvert\mathcal{Y}\rvert-1)$: $Z$ is centred so $\mathbf 1\perp\operatorname{span}(Z)$
+while $\mathbf 1\in\operatorname{span}(G)$, forcing one angle to be exactly $90^\circ$ — the
+single zero in the measured cosines $[0.789,\,0.711,\,0.626,\,0.513,\,0]$, and the reason
+$\operatorname{rank}(\Sigma_B)=\lvert\mathcal{Y}\rvert-1$. And those cosines are the **canonical
+correlations** between feature space and label indicators, which closes the loop with the
+paper's own remark that $\tilde B$'s singular values are HGR maximal correlations: H-score is
+the sum of their squares, arrived at from the other end.
+
+### Why form 5 is the one to use
+
+It is not asymptotically cheaper — $O(mk^2)$ dominates either way, exactly as the paper says.
+The gain is **numerical**. Forming $\Sigma_T=Z^\top Z$ squares the condition number, whereas QR
+works at $\operatorname{cond}(Z)$. Against a 128-bit modified-Gram–Schmidt reference, on features
+made progressively more collinear:
+
+| noise | $\operatorname{cond}(Z)$ | $\operatorname{cond}(\Sigma_T)$ | error, naive $\operatorname{tr}(\Sigma_T^{-1}\Sigma_B)$ | error, QR form |
+|---|---|---|---|---|
+| 1e−3 | 2.5e3 | 6.3e6 | 2e−10 | 7e−15 |
+| 1e−5 | 3.1e5 | 9.7e10 | 2e−06 | 3e−12 |
+| 1e−7 | 2.6e7 | 6.5e14 | 5e−03 | 7e−11 |
+| 1e−8 | 2.2e8 | 3.5e15 | **6e−03** | 4e−11 |
+
+Three decimal places lost by the textbook expression where the QR form is still exact to ten.
+That is precisely the near-duplicate hazard documented above, and it is largely an artefact of
+*how* the quantity is computed rather than of the quantity itself. At $k=2048$ on real encoder
+features I would compute H-score as form 5 and not form 0.
+
 ## Supplement S2: why H-score is an *asymptotic* error probability
 
 Consider a binary test on $m$ i.i.d. samples, $H_0: x^m\sim P_1$ versus $H_1: x^m\sim P_2$.
@@ -486,7 +583,11 @@ features on a random joint), and says nothing about learned features on real dat
   no singular value falls below the cutoff. My own numbers bear this out: at noise scales
   $10^{-2}$ and $10^{-4}$ the pseudo-inverse and the plain solve return *identical* inflated
   values. So the gap is real in both the paper and the code, and the code's `pinv` should not
-  be read as having addressed it.
+  be read as having addressed it. The honest qualifier, from the equivalent forms above: much
+  of this is an artefact of *how* the score is computed rather than of the score itself.
+  Computing it as a QR of the centred features instead of an inverse of their covariance keeps
+  ten correct digits where the textbook expression has lost three, because it never squares the
+  condition number. The metric is better behaved than the formula the paper writes down.
 - **$\lvert\mathcal{X}\rvert$ finite is assumed throughout** and is false for images. It is
   harmless because $\tilde B$ is eliminated, but it means the derivation never formally covers
   the setting it is applied to.
