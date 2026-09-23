@@ -23,6 +23,8 @@ status: read
 - **[Nguyen 2020 — LEEP](../2020-nguyen-leep/index.html)** — the competing transferability
   measure, which evaluates one hand-built head exactly rather than approximating the best
   one. The comparison is worked through there.
+- **[Tran 2019 — NCE](../2019-tran-nce-hardness/index.html)** — the third transferability
+  measure, which needs no model at all, only two label sequences.
 - **[Runnable code](https://github.com/msrepo/theory_inclined_papers_with_annotations/blob/main/papers/2022-bao-hscore-transferability/code/hscore.py)** —
   Equations 2, 3 and 4 checked to machine precision on a discrete joint where $\tilde B$ can
   actually be built, plus the invariance, redundancy and locality questions, the six equivalent

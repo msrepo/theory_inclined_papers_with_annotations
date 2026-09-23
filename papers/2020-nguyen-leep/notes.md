@@ -16,6 +16,9 @@ status: read
 - **[arXiv:2002.12462](https://arxiv.org/abs/2002.12462)** — preprint. ICML 2020, PMLR 119.
   The supplementary material carrying the proofs of Properties 1 and 2 is **not** in the
   conference PDF, which ends at the references; see the caveat under Property 2.
+- **[Tran 2019 — NCE](../2019-tran-nce-hardness/index.html)** — the predecessor this
+  measure generalises, and the source of Property 2. Its proof turns on the empirical
+  conditional being *hard*, which is exactly why the same step does not close here.
 - **[Bao 2022 — H-score](../2022-bao-hscore-transferability/index.html)** — the measure this
   one is competing with, and the more interesting comparison. Read that first.
 - **[Runnable code](https://github.com/msrepo/theory_inclined_papers_with_annotations/blob/main/papers/2020-nguyen-leep/code/leep.py)** —
@@ -156,6 +159,11 @@ data, so it dominates any other conditional, $\hat P$ included. The code confirm
 $\frac1n\sum\log\hat P(y_i\mid z_i) < \mathrm{NCE}$ in every case tried. So this route yields a
 strictly *weaker* bound than Property 2 claims, and the supplement must argue differently. The
 supplement is not in the conference PDF, so I cannot check it.
+
+Where the step *does* close is [Tran et al.](../2019-tran-nce-hardness/index.html), whose
+Theorem 1 this is modelled on: there $\hat P$ is the hard empirical conditional, and
+$\frac1n\sum_i\log\hat P(y_i\mid z_i) = -H(Y\mid Z)$ exactly. Moving to soft assignments is
+what breaks the inheritance.
 
 ## The two exact limits, which say what LEEP is measured against
 
