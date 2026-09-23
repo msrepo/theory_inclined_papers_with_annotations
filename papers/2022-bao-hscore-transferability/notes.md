@@ -26,6 +26,8 @@ status: read
   one. The comparison is worked through there.
 - **[Tran 2019 — NCE](../2019-tran-nce-hardness/index.html)** — the third transferability
   measure, which needs no model at all, only two label sequences.
+- **[Diniz 2026 — PAS](../2026-diniz-pas/index.html)** — the unsupervised counterpart:
+  scores a source/backbone pair without any target labels, which this measure requires.
 - **[Claßen 2026 — TE robustness](../2026-classen-te-robustness/index.html)** — benchmarks
   this measure against the others on medical imaging targets, and finds the rankings move
   under nothing but a change of random seed.

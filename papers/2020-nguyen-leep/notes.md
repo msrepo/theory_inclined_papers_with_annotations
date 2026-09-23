@@ -22,6 +22,8 @@ status: read
   conditional being *hard*, which is exactly why the same step does not close here.
 - **[Bao 2022 — H-score](../2022-bao-hscore-transferability/index.html)** — the measure this
   one is competing with, and the more interesting comparison. Read that first.
+- **[Diniz 2026 — PAS](../2026-diniz-pas/index.html)** — the unsupervised counterpart:
+  scores a source/backbone pair without any target labels, which this measure requires.
 - **[Claßen 2026 — TE robustness](../2026-classen-te-robustness/index.html)** — benchmarks
   this measure against the others on medical imaging targets, and finds the rankings move
   under nothing but a change of random seed.
