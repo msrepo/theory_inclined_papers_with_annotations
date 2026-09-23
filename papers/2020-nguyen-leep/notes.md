@@ -1,6 +1,7 @@
 ---
 title: "LEEP: A New Measure to Evaluate Transferability of Learned Representations"
 category: "Transferability"
+subcategory: "Theory"
 short_title: "Nguyen 2020 — LEEP"
 authors: "Cuong V. Nguyen, Tal Hassner, Matthias Seeger, Cedric Archambeau (Amazon Web Services, Facebook AI)"
 venue: "ICML"
@@ -21,6 +22,9 @@ status: read
   conditional being *hard*, which is exactly why the same step does not close here.
 - **[Bao 2022 — H-score](../2022-bao-hscore-transferability/index.html)** — the measure this
   one is competing with, and the more interesting comparison. Read that first.
+- **[Claßen 2026 — TE robustness](../2026-classen-te-robustness/index.html)** — benchmarks
+  this measure against the others on medical imaging targets, and finds the rankings move
+  under nothing but a change of random seed.
 - **[Runnable code](https://github.com/msrepo/theory_inclined_papers_with_annotations/blob/main/papers/2020-nguyen-leep/code/leep.py)** —
   the two exact limits, where Property 1's slack actually goes, Property 2 across six regimes
   together with why the obvious derivation misses it, and the temperature sensitivity.

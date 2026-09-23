@@ -1,6 +1,7 @@
 ---
 title: "An Information-Theoretic Approach to Transferability in Task Transfer Learning"
 category: "Transferability"
+subcategory: "Theory"
 short_title: "Bao 2022 — H-score"
 authors: "Yajie Bao, Yang Li, Shao-Lun Huang, Lin Zhang, Lizhong Zheng, Amir Zamir, Leonidas Guibas (Tsinghua-Berkeley Shenzhen, MIT, Stanford, UC Berkeley)"
 venue: "arXiv"
@@ -25,6 +26,9 @@ status: read
   one. The comparison is worked through there.
 - **[Tran 2019 — NCE](../2019-tran-nce-hardness/index.html)** — the third transferability
   measure, which needs no model at all, only two label sequences.
+- **[Claßen 2026 — TE robustness](../2026-classen-te-robustness/index.html)** — benchmarks
+  this measure against the others on medical imaging targets, and finds the rankings move
+  under nothing but a change of random seed.
 - **[Runnable code](https://github.com/msrepo/theory_inclined_papers_with_annotations/blob/main/papers/2022-bao-hscore-transferability/code/hscore.py)** —
   Equations 2, 3 and 4 checked to machine precision on a discrete joint where $\tilde B$ can
   actually be built, plus the invariance, redundancy and locality questions, the six equivalent

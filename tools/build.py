@@ -38,7 +38,7 @@ CATEGORIES: list[tuple[str, list[str]]] = [
     ("NTK & function space", ["Theory", "Applications"]),
     ("Contrastive learning", ["Theory", "Applications"]),
     ("Gradient estimation", ["Theory"]),
-    ("Transferability", []),
+    ("Transferability", ["Theory", "Applications"]),
     ("Misc", []),
 ]
 UNSORTED = "Unsorted"

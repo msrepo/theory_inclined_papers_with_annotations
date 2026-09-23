@@ -1,6 +1,7 @@
 ---
 title: "Transferability and Hardness of Supervised Classification Tasks"
 category: "Transferability"
+subcategory: "Theory"
 short_title: "Tran 2019 — NCE"
 authors: "Anh T. Tran, Cuong V. Nguyen, Tal Hassner (VinAI Research, Amazon Web Services, Facebook AI)"
 venue: "ICCV"
@@ -20,6 +21,9 @@ status: read
   replaces the ground-truth source labels here with a source model's soft predictions.
 - **[Bao 2022 — H-score](../2022-bao-hscore-transferability/index.html)** — the third member
   of the set, approaching the same question from feature-space geometry.
+- **[Claßen 2026 — TE robustness](../2026-classen-te-robustness/index.html)** — benchmarks
+  this measure against the others on medical imaging targets, and finds the rankings move
+  under nothing but a change of random seed.
 - **[Runnable code](https://github.com/msrepo/theory_inclined_papers_with_annotations/blob/main/papers/2019-tran-nce-hardness/code/nce.py)** —
   the identity Theorem 1 turns on, the theorem itself, the hardness bound, what $H(Y\mid Z)$
   measures on constructed cases, and a source-selection setting where dropping the
