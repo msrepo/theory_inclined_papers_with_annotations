@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Subspaces, Hands On</title>
+<style>
+:root{
+  --bg:#fbfaf7; --surface:#ffffff; --ink:#1c1d21; --muted:#5b5f68; --line:#e2dfd8; --soft:#f2f0ea;
+  --col:#2f6fb5; --null:#c2571a; --proj:#0f7a5a; --c3:#7c3aed; --radius:12px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#131417; --surface:#1b1d21; --ink:#ebebed; --muted:#a3a6ae; --line:#2e3138; --soft:#23262b;
+    --col:#7fb2e8; --null:#f0a070; --proj:#4cc79a; --c3:#b48cff;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#131417; --surface:#1b1d21; --ink:#ebebed; --muted:#a3a6ae; --line:#2e3138; --soft:#23262b;
+  --col:#7fb2e8; --null:#f0a070; --proj:#4cc79a; --c3:#b48cff;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,sans-serif;}
+main{max-width:900px;margin:0 auto;padding:40px 16px 80px}
+h1{font-size:2.1rem;line-height:1.2;margin:0 0 .4rem;letter-spacing:-.01em}
+h2{font-size:1.4rem;margin:3rem 0 .6rem;padding-top:.5rem;border-top:1px solid var(--line)}
+p{margin:.6rem 0}
+a{color:var(--col)}
+.lede{color:var(--muted);font-size:1.08rem;margin-bottom:1.4rem}
+nav.toc{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:12px 18px;font-size:.93rem}
+nav.toc ol{margin:.3rem 0;padding-left:1.2rem}
+nav.toc a{color:var(--ink);text-decoration:none;border-bottom:1px dotted var(--muted)}
+.widget{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:14px;margin:1rem 0 1.2rem}
+.controls{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;margin:.2rem 0 .6rem;font-size:.9rem}
+.controls label{display:flex;align-items:center;gap:6px;color:var(--muted)}
+button,select{font:inherit;font-size:.88rem;color:var(--ink);background:var(--soft);border:1px solid var(--line);border-radius:8px;padding:5px 11px;cursor:pointer}
+input[type=range]{accent-color:var(--col);width:120px}
+.readout{font-size:.9rem;color:var(--muted);margin-top:.5rem;font-variant-numeric:tabular-nums}
+.readout b{color:var(--ink)}
+.callout{border-left:3px solid var(--proj);background:var(--soft);padding:10px 14px;border-radius:0 8px 8px 0;margin:1rem 0;font-size:.95rem}
+canvas{display:block;width:100%;touch-action:none;border-radius:8px}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.pair .cap{font-size:.82rem;color:var(--muted);margin:0 0 4px}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:.82rem;color:var(--muted);margin-top:.4rem}
+.legend span::before{content:"";display:inline-block;width:14px;height:3px;margin-right:6px;vertical-align:3px;background:var(--c)}
+.kbd{font-family:ui-monospace,Menlo,monospace;font-size:.85em;background:var(--soft);padding:1px 5px;border-radius:4px}
+@media (max-width:640px){ h1{font-size:1.7rem} .pair{grid-template-columns:1fr} input[type=range]{width:96px} }
+</style>
+</head>
+<body>
+<main>
+
+<h1>Subspaces, Hands On</h1>
+<p class="lede"><a href="../index.html">← text notes</a> · Foundations › Linear algebra. Four widgets for column space, null space and the residual space: what a matrix can reach, what it cannot see, and what is left over when you fit.</p>
+
+<nav class="toc"><b>Contents</b>
+<ol>
+  <li><a href="#s1">What a 2 × 2 matrix does to the plane</a></li>
+  <li><a href="#s2">Least squares is a right angle</a></li>
+  <li><a href="#s3">Many solutions, and the one gradient descent picks</a></li>
+  <li><a href="#s4">Principal subspace vs. residual subspace</a></li>
+</ol></nav>
+
+<!-- ============================================================ -->
+<h2 id="s1">1. What a 2 × 2 matrix does to the plane</h2>
+<p>The matrix <b>A</b> has two columns, <b>a₁</b> and <b>a₂</b>. Multiplying, <b>Ax = x₁a₁ + x₂a₂</b>, is "walk x₁ steps along a₁, then x₂ steps along a₂". So the set of outputs A can produce, the <b>column space</b>, is everything you can reach by combining the columns.</p>
+<p>Drag the arrow tips of a₁ and a₂ on the right, and the input vector x on the left. While the columns point different ways, the grid is stretched but still covers the whole plane: the column space is all of ℝ² and only x = 0 maps to 0. Drag one column until it lines up with the other (it snaps). The grid flattens onto a line. That line is the column space, and a whole line of inputs, the <b>null space</b>, now lands on 0. Drag x along the orange line and watch Ax <i>not move</i>.</p>
+
+<div class="widget">
+  <div class="controls">
+    <button id="m1Sing">Make singular</button>
+    <button id="m1Reset">↻ Reset</button>
+  </div>
+  <div class="pair">
+    <div><p class="cap">input space: where x lives</p><canvas id="m1In" height="320"></canvas></div>
+    <div><p class="cap">output space: where Ax lives</p><canvas id="m1Out" height="320"></canvas></div>
+  </div>
+  <div class="legend">
+    <span style="--c:var(--col)">column / row space</span>
+    <span style="--c:var(--null)">null / left null space</span>
+    <span style="--c:var(--ink)">x and Ax</span>
+  </div>
+  <div class="readout" id="m1Read"></div>
+</div>
+<div class="callout">Things to try. Make it singular, then drag x <i>across</i> the orange line: Ax slides along the blue line. Drag it <i>along</i> the orange line: Ax stays put. Every input splits into a part A sees (row space) and a part it cannot (null space), and those two lines are always at right angles.</div>
+
+<!-- ============================================================ -->
+<h2 id="s2">2. Least squares is a right angle</h2>
+<p>Fit a straight line y = c₀ + c₁t through three points at t = 0, 1, 2. Stack the three heights into one vector <b>b</b> ∈ ℝ³. The design matrix has columns <b>a₁ = (1, 1, 1)</b> (the intercept) and <b>a₂ = (0, 1, 2)</b> (the slope), so every straight line you could draw is a point <b>Ax</b> on the plane they span. The best fit <b>p</b> is the point of that plane closest to b, and the miss <b>r = b − p</b> meets the plane at a right angle.</p>
+<p>Drag the points on the right (or use the sliders) and the 3-D picture on the left follows. Drag on the left to rotate. Notice that r only ever points one way, along ±(1, −2, 1): with three points and two columns the residual space is one-dimensional. Switch to <b>fit a constant</b> and the column space shrinks to the line through (1, 1, 1) while the residual space grows to a plane. The residual is then just the data with its mean subtracted: <b>centring is projecting onto a residual space</b>.</p>
+
+<div class="widget">
+  <div class="controls">
+    <label>Model <select id="lsMode"><option value="line">fit a line (2 columns)</option><option value="const">fit a constant (1 column)</option></select></label>
+    <label>b₁ <input id="lsB1" type="range" min="-0.5" max="4" step="0.05" value="1"></label>
+    <label>b₂ <input id="lsB2" type="range" min="-0.5" max="4" step="0.05" value="3"></label>
+    <label>b₃ <input id="lsB3" type="range" min="-0.5" max="4" step="0.05" value="2"></label>
+    <button id="lsView">↻ View</button>
+  </div>
+  <div class="pair">
+    <div><p class="cap">output space ℝ³ (drag to rotate)</p><canvas id="lsCanvas" height="340"></canvas></div>
+    <div><p class="cap">the same numbers as a fit (drag the points)</p><canvas id="lsFit" height="340"></canvas></div>
+  </div>
+  <div class="legend">
+    <span style="--c:var(--col)">column space and its columns</span>
+    <span style="--c:var(--ink)">data b</span>
+    <span style="--c:var(--proj)">fit p = Ax̂</span>
+    <span style="--c:var(--null)">residual r = b − p</span>
+  </div>
+  <div class="readout" id="lsRead"></div>
+</div>
+<div class="callout">The normal equations <span class="kbd">AᵀA x̂ = Aᵀb</span> are the right angle written in algebra: they say <span class="kbd">Aᵀ(b − Ax̂) = 0</span>, i.e. r is perpendicular to every column. The readout checks that, and checks Pythagoras, ‖b‖² = ‖p‖² + ‖r‖², for whatever b you set.</div>
+
+<!-- ============================================================ -->
+<h2 id="s3">3. Many solutions, and the one gradient descent picks</h2>
+<p>One equation in two unknowns, <b>a·x = β</b>, has a whole line of solutions: any one solution plus anything from the null space (the dashed orange line through 0, all x with a·x = 0). Gradient descent on ½(a·x − β)² takes steps along <b>a</b> only, because the gradient is (a·x − β)·a. So it moves perpendicular to the solution line and the null-space coordinate of x never changes.</p>
+<p>Drag the start point, then press <b>Run</b>. From 0 it lands on the blue dot, the <b>minimum-norm</b> solution A⁺β. From anywhere else it lands exactly one null-space offset away from it, the offset it started with.</p>
+
+<div class="widget">
+  <div class="controls">
+    <label>direction of a <input id="gdAng" type="range" min="0" max="179" step="any" value="63.4349"></label>
+    <label>β <input id="gdBeta" type="range" min="-4" max="5" step="0.1" value="4"></label>
+    <button id="gdStep">Step</button>
+    <button id="gdRun">Run</button>
+    <button id="gdZero">Start at 0</button>
+    <button id="gdReset">↻ Reset</button>
+  </div>
+  <canvas id="gdCanvas" height="380"></canvas>
+  <div class="legend">
+    <span style="--c:var(--null)">solution line and null space</span>
+    <span style="--c:var(--col)">row space; minimum-norm solution</span>
+    <span style="--c:var(--proj)">gradient-descent path</span>
+  </div>
+  <div class="readout" id="gdRead"></div>
+</div>
+<div class="callout">This is the mechanism behind two statements in the paper notes. In the NTK notes, "Δ⁰ never moves": the part of the error in the kernel's null space is never trained. And in overparameterised regression, gradient descent from zero initialisation returns the minimum-norm interpolant, not just <i>an</i> interpolant.</div>
+
+<!-- ============================================================ -->
+<h2 id="s4">4. Principal subspace vs. residual subspace</h2>
+<p>Training features rarely fill their space. Fit PCA and keep the top direction: that line is the <b>principal subspace</b>, and the direction perpendicular to it is the <b>residual subspace</b>. Every feature splits into a principal part and a residual part. Out-of-distribution detectors based on residuals score only the second part, on the bet that new kinds of input show up in directions the training data never used.</p>
+<p>Drag the test point. The shaded region is what each score accepts at its 99th training percentile. Compare shapes: distance to the mean accepts a disc; the residual norm accepts a band along the data (anything along the principal line passes, however far out); full Mahalanobis accepts an ellipse.</p>
+
+<div class="widget">
+  <div class="controls">
+    <label>Score <select id="ocScore">
+      <option value="resid">residual norm ‖(I − vvᵀ)(x − μ)‖</option>
+      <option value="dist">distance to mean ‖x − μ‖</option>
+      <option value="maha">full Mahalanobis</option>
+    </select></label>
+    <label>cloud angle <input id="ocAng" type="range" min="0" max="179" value="28"></label>
+    <label>thickness <input id="ocThick" type="range" min="4" max="60" value="14"></label>
+  </div>
+  <canvas id="ocCanvas" height="380"></canvas>
+  <div class="legend">
+    <span style="--c:var(--col)">principal subspace</span>
+    <span style="--c:var(--null)">residual subspace; residual of the test point</span>
+    <span style="--c:var(--proj)">accepted region</span>
+  </div>
+  <div class="readout" id="ocRead"></div>
+</div>
+<div class="callout">In 2-D with one principal direction the residual space is a single line, so "residual norm" and "residual Mahalanobis" rank points identically. In a 768-dimensional feature space the residual space has hundreds of directions with very different variances, and that is where MaRS's reweighting of the residual by its own covariance starts to matter.</div>
+
+<p class="readout" style="margin-top:2.5rem">Everything here is computed in the browser. The numbers quoted in the text notes come from <span class="kbd">code/subspaces.py</span>.</p>
+</main>
+
+<script>
+(() => {
+// ------------------------------------------------------------ utilities
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+function mulberry(seed){ return () => { seed|=0; seed=seed+0x6D2B79F5|0; let t=Math.imul(seed^seed>>>15,1|seed); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+function gauss(r){ let u=0,v=0; while(u===0) u=r(); v=r(); return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v); }
+function setupCanvas(cv){
+  if (!cv.dataset.h) cv.dataset.h = cv.getAttribute('height');
+  const dpr = window.devicePixelRatio||1, w = cv.clientWidth, h = +cv.dataset.h;
+  cv.style.height = h+'px'; cv.width = Math.round(w*dpr); cv.height = Math.round(h*dpr);
+  const ctx = cv.getContext('2d'); ctx.setTransform(dpr,0,0,dpr,0,0); return {ctx,w,h};
+}
+// equal-aspect world frame centred on (cx, cy) showing at least `half` units each side
+function frame(w, h, half, cx=0, cy=0){
+  const s = Math.min(w, h) / (2*half);
+  return { s, X: x => w/2 + (x-cx)*s, Y: y => h/2 - (y-cy)*s, ix: px => (px-w/2)/s + cx, iy: py => -(py-h/2)/s + cy,
+           x0: cx - w/(2*s), x1: cx + w/(2*s), y0: cy - h/(2*s), y1: cy + h/(2*s) };
+}
+const redrawers = [];
+window.addEventListener('resize', () => redrawers.forEach(f => f()));
+if (window.matchMedia) matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change', () => redrawers.forEach(f => f()));
+
+const dot2 = (a,b) => a[0]*b[0]+a[1]*b[1];
+const nrm2 = a => Math.hypot(a[0], a[1]);
+const fx = (v, d=2) => (Math.abs(v) < 5e-13 ? 0 : v).toFixed(d);
+const vec = (v, d=2) => '(' + v.map(t => fx(t, d)).join(', ') + ')';
+
+function arrow(ctx, x1, y1, x2, y2, col, lw=2, head=9){
+  const dx=x2-x1, dy=y2-y1, L=Math.hypot(dx,dy); if (L < 1) return;
+  const ux=dx/L, uy=dy/L, bx=x2-head*ux, by=y2-head*uy;
+  ctx.strokeStyle=col; ctx.fillStyle=col; ctx.lineWidth=lw;
+  ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(bx,by); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(x2,y2); ctx.lineTo(bx-0.42*head*uy, by+0.42*head*ux); ctx.lineTo(bx+0.42*head*uy, by-0.42*head*ux); ctx.closePath(); ctx.fill();
+}
+function seg(ctx, x1, y1, x2, y2, col, lw=1.2, dash=null){
+  ctx.strokeStyle=col; ctx.lineWidth=lw; ctx.setLineDash(dash||[]);
+  ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke(); ctx.setLineDash([]);
+}
+function disc(ctx, x, y, r, col, ring=null){
+  ctx.fillStyle=col; ctx.beginPath(); ctx.arc(x,y,r,0,7); ctx.fill();
+  if (ring){ ctx.strokeStyle=ring; ctx.lineWidth=1.5; ctx.stroke(); }
+}
+function label(ctx, s, x, y, col, align='left', size=12){
+  ctx.font = size+'px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif'; ctx.fillStyle=col; ctx.textAlign=align; ctx.fillText(s, x, y); ctx.textAlign='left';
+}
+// infinite line through the origin (or point p) along direction d, clipped to the frame
+function worldLine(ctx, F, d, col, lw, dash, p=[0,0]){
+  const L = 4*Math.max(F.x1-F.x0, F.y1-F.y0), n = nrm2(d); if (n < 1e-12) return;
+  const u = [d[0]/n, d[1]/n];
+  seg(ctx, F.X(p[0]-L*u[0]), F.Y(p[1]-L*u[1]), F.X(p[0]+L*u[0]), F.Y(p[1]+L*u[1]), col, lw, dash);
+}
+function axes(ctx, F, w, h){
+  ctx.strokeStyle=css('--line'); ctx.lineWidth=1;
+  for (let g=Math.ceil(F.x0); g<=F.x1; g++){ ctx.beginPath(); ctx.moveTo(F.X(g),0); ctx.lineTo(F.X(g),h); ctx.stroke(); }
+  for (let g=Math.ceil(F.y0); g<=F.y1; g++){ ctx.beginPath(); ctx.moveTo(0,F.Y(g)); ctx.lineTo(w,F.Y(g)); ctx.stroke(); }
+  seg(ctx, 0, F.Y(0), w, F.Y(0), css('--muted'), 0.8); seg(ctx, F.X(0), 0, F.X(0), h, css('--muted'), 0.8);
+}
+// pointer dragging: pick(px, py) returns a handle id or null; move(id, px, py) applies it
+function draggable(cv, pick, move, end){
+  let active = null;
+  const pos = e => { const r = cv.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; };
+  cv.addEventListener('pointerdown', e => { const [x,y]=pos(e); active = pick(x,y); if (active!==null){ cv.setPointerCapture(e.pointerId); e.preventDefault(); } });
+  cv.addEventListener('pointermove', e => {
+    const [x,y]=pos(e);
+    if (active!==null) move(active, x, y); else cv.style.cursor = pick(x,y)!==null ? 'grab' : 'default';
+  });
+  const stop = () => { if (active!==null && end) end(active); active = null; };
+  cv.addEventListener('pointerup', stop); cv.addEventListener('pointercancel', stop);
+}
+
+// ================================================================ widget 1
+(() => {
+  const cin = document.getElementById('m1In'), cout = document.getElementById('m1Out'), read = document.getElementById('m1Read');
+  const HALF = 3.2, SNAP = Math.sin(3 * Math.PI/180);
+  let a1, a2, x;
+  function reset(){ a1=[1.6,0.5]; a2=[0.4,1.3]; x=[1.0,0.8]; draw(); }
+  const Ax = v => [a1[0]*v[0]+a2[0]*v[1], a1[1]*v[0]+a2[1]*v[1]];
+  function structure(){
+    const n1=nrm2(a1), n2=nrm2(a2), det=a1[0]*a2[1]-a1[1]*a2[0];
+    if (n1 < 0.05 && n2 < 0.05) return {rank:0, det};
+    if (n1 > 1e-9 && n2 > 1e-9 && Math.abs(det)/(n1*n2) > 1e-9) return {rank:2, det};
+    const r1=[a1[0],a2[0]], r2=[a1[1],a2[1]];               // rows of A
+    const row = nrm2(r1) >= nrm2(r2) ? r1 : r2, rn = nrm2(row);
+    const cdir = n1 >= n2 ? a1 : a2, cn = nrm2(cdir);
+    return {rank:1, det:0, row:[row[0]/rn,row[1]/rn], nul:[-row[1]/rn,row[0]/rn],
+            col:[cdir[0]/cn,cdir[1]/cn], lnul:[-cdir[1]/cn,cdir[0]/cn]};
+  }
+  function snap(which){
+    const me = which===1 ? a1 : a2, other = which===1 ? a2 : a1, no = nrm2(other), nm = nrm2(me);
+    if (no < 0.05 || nm < 0.05) return;
+    const cross = Math.abs(me[0]*other[1]-me[1]*other[0])/(no*nm);
+    if (cross < SNAP){ const c = dot2(me,other)/(no*no); me[0]=c*other[0]; me[1]=c*other[1]; }
+  }
+  function draw(){
+    const S = structure(), ink=css('--ink'), col=css('--col'), nul=css('--null'), mut=css('--muted');
+    // ---- input space
+    {
+      const {ctx,w,h} = setupCanvas(cin), F = frame(w,h,HALF);
+      ctx.fillStyle=css('--surface'); ctx.fillRect(0,0,w,h); axes(ctx,F,w,h);
+      ctx.fillStyle=col; ctx.globalAlpha=.10; ctx.fillRect(F.X(0),F.Y(1),F.s,F.s); ctx.globalAlpha=1;
+      if (S.rank===1){
+        worldLine(ctx,F,S.row,col,1.4,[6,4]); worldLine(ctx,F,S.nul,nul,1.6,[6,4]);
+        const xr = dot2(x,S.row), xn = dot2(x,S.nul);
+        const pr=[xr*S.row[0],xr*S.row[1]], pn=[xn*S.nul[0],xn*S.nul[1]];
+        seg(ctx,F.X(x[0]),F.Y(x[1]),F.X(pr[0]),F.Y(pr[1]),mut,1,[2,3]);
+        seg(ctx,F.X(x[0]),F.Y(x[1]),F.X(pn[0]),F.Y(pn[1]),mut,1,[2,3]);
+        arrow(ctx,F.X(0),F.Y(0),F.X(pr[0]),F.Y(pr[1]),col,2);
+        arrow(ctx,F.X(0),F.Y(0),F.X(pn[0]),F.Y(pn[1]),nul,2);
+        label(ctx,'null space: Ax = 0',F.X(2.6*S.nul[0])+(S.nul[0]>0?-4:4),F.Y(2.6*S.nul[1])-6,nul,S.nul[0]>0?'right':'left');
+        label(ctx,'row space',F.X(2.6*S.row[0])+6,F.Y(2.6*S.row[1])+4,col);
+      } else if (S.rank===0){
+        label(ctx,'A = 0: every input is in the null space',10,18,nul);
+      }
+      arrow(ctx,F.X(0),F.Y(0),F.X(x[0]),F.Y(x[1]),ink,2.2);
+      disc(ctx,F.X(x[0]),F.Y(x[1]),6,css('--surface'),ink);
+      label(ctx,'x',F.X(x[0])+9,F.Y(x[1])-8,ink,'left',13);
+      label(ctx,'unit square',F.X(0.05),F.Y(-0.25)+4,mut,'left',11);
+      cin._F = F;
+    }
+    // ---- output space
+    {
+      const {ctx,w,h} = setupCanvas(cout), F = frame(w,h,HALF);
+      ctx.fillStyle=css('--surface'); ctx.fillRect(0,0,w,h);
+      if (S.rank===2){ ctx.fillStyle=col; ctx.globalAlpha=.05; ctx.fillRect(0,0,w,h); ctx.globalAlpha=1; }
+      axes(ctx,F,w,h);
+      // image of the input grid
+      ctx.strokeStyle=col; ctx.globalAlpha=.28; ctx.lineWidth=1;
+      for (let g=-4; g<=4; g++){
+        let p=Ax([g,-4]), q=Ax([g,4]); ctx.beginPath(); ctx.moveTo(F.X(p[0]),F.Y(p[1])); ctx.lineTo(F.X(q[0]),F.Y(q[1])); ctx.stroke();
+        p=Ax([-4,g]); q=Ax([4,g]); ctx.beginPath(); ctx.moveTo(F.X(p[0]),F.Y(p[1])); ctx.lineTo(F.X(q[0]),F.Y(q[1])); ctx.stroke();
+      }
+      ctx.globalAlpha=1;
+      // image of the unit square
+      const c11=[a1[0]+a2[0],a1[1]+a2[1]];
+      ctx.fillStyle=col; ctx.globalAlpha=.16; ctx.beginPath(); ctx.moveTo(F.X(0),F.Y(0)); ctx.lineTo(F.X(a1[0]),F.Y(a1[1])); ctx.lineTo(F.X(c11[0]),F.Y(c11[1])); ctx.lineTo(F.X(a2[0]),F.Y(a2[1])); ctx.closePath(); ctx.fill(); ctx.globalAlpha=1;
+      if (S.rank===1){
+        worldLine(ctx,F,S.col,col,1.8,[6,4]); worldLine(ctx,F,S.lnul,nul,1.4,[6,4]);
+        label(ctx,'column space',F.X(-2.3*S.col[0]),F.Y(-2.3*S.col[1])+18,col,'center');
+        label(ctx,'left null space: unreachable',F.X(2.5*S.lnul[0])+6,F.Y(2.5*S.lnul[1])+4,nul);
+      } else if (S.rank===2){
+        label(ctx,'column space = all of ℝ²',10,18,col);
+      }
+      const y = Ax(x);
+      arrow(ctx,F.X(0),F.Y(0),F.X(y[0]),F.Y(y[1]),ink,2.2);
+      label(ctx,'Ax',F.X(y[0])+8,F.Y(y[1])+14,ink,'left',13);
+      arrow(ctx,F.X(0),F.Y(0),F.X(a1[0]),F.Y(a1[1]),col,2.4);
+      arrow(ctx,F.X(0),F.Y(0),F.X(a2[0]),F.Y(a2[1]),css('--c3'),2.4);
+      disc(ctx,F.X(a1[0]),F.Y(a1[1]),6,css('--surface'),col);
+      disc(ctx,F.X(a2[0]),F.Y(a2[1]),6,css('--surface'),css('--c3'));
+      label(ctx,'a₁',F.X(a1[0])+9,F.Y(a1[1])-8,col,'left',13);
+      label(ctx,'a₂',F.X(a2[0])+9,F.Y(a2[1])-8,css('--c3'),'left',13);
+      cout._F = F;
+    }
+    const y = Ax(x);
+    let s = `A = [[${fx(a1[0])}, ${fx(a2[0])}], [${fx(a1[1])}, ${fx(a2[1])}]] · det = <b>${fx(S.det)}</b> · rank <b>${S.rank}</b> · `
+          + `dim col(A) = <b>${S.rank}</b>, dim N(A) = <b>${2-S.rank}</b> (they add to 2) · Ax = ${vec(y)}`;
+    if (S.rank===1){
+      s += `<br>null space = span${vec(S.nul)}: x's null-space coordinate is <b>${fx(dot2(x,S.nul))}</b>, and changing it does not move Ax.`
+         + ` Row space ⟂ null space: ${vec(S.row)}·${vec(S.nul)} = ${fx(dot2(S.row,S.nul))}.`;
+    } else if (S.rank===2){
+      s += `<br>Invertible: every b has exactly one x with Ax = b, and N(A) = {0}. |det| = ${fx(Math.abs(S.det))} is the area of the shaded parallelogram.`;
+    }
+    read.innerHTML = s;
+  }
+  draggable(cout,
+    (px,py) => { const F=cout._F; if(!F) return null;
+      const d1=Math.hypot(F.X(a1[0])-px,F.Y(a1[1])-py), d2=Math.hypot(F.X(a2[0])-px,F.Y(a2[1])-py);
+      if (Math.min(d1,d2) > 16) return null; return d1<=d2 ? 1 : 2; },
+    (id,px,py) => { const F=cout._F, v=[F.ix(px),F.iy(py)]; if(id===1) a1=v; else a2=v; snap(id); draw(); });
+  draggable(cin,
+    (px,py) => { const F=cin._F; if(!F) return null; return Math.hypot(F.X(x[0])-px,F.Y(x[1])-py) < 16 ? 0 : null; },
+    (id,px,py) => { const F=cin._F; x=[F.ix(px),F.iy(py)]; draw(); });
+  document.getElementById('m1Sing').onclick = () => { a2 = [0.6*a1[0], 0.6*a1[1]]; draw(); };
+  document.getElementById('m1Reset').onclick = reset;
+  redrawers.push(draw);
+  reset();
+})();
+
+// ================================================================ widget 2
+(() => {
+  const cv = document.getElementById('lsCanvas'), fit = document.getElementById('lsFit'), read = document.getElementById('lsRead');
+  const mode = document.getElementById('lsMode'), sl = ['lsB1','lsB2','lsB3'].map(i => document.getElementById(i));
+  const T = [0,1,2];
+  const d3 = (a,b) => a[0]*b[0]+a[1]*b[1]+a[2]*b[2];
+  const sub = (a,b) => [a[0]-b[0],a[1]-b[1],a[2]-b[2]];
+  const add = (a,b) => [a[0]+b[0],a[1]+b[1],a[2]+b[2]];
+  const mul = (s,a) => [s*a[0],s*a[1],s*a[2]];
+  const n3 = a => Math.sqrt(d3(a,a));
+  const unit = a => mul(1/n3(a), a);
+  const crs = (a,b) => [a[1]*b[2]-a[2]*b[1], a[2]*b[0]-a[0]*b[2], a[0]*b[1]-a[1]*b[0]];
+  const A1=[1,1,1], A2=[0,1,2];
+  // initial camera: look at the column plane from 45 degrees above it
+  function initialView(){
+    if (mode.value === 'const'){
+      // column line vertical; residual plane seen from 30 degrees above
+      const u = unit(A1), right = unit([-1,1,0]), depth = crs(u, right), ph = 30*Math.PI/180;
+      const up = add(mul(Math.cos(ph),u), mul(-Math.sin(ph),depth));
+      return [right, up, crs(right, up)];
+    }
+    const u1 = unit(A1), u2 = unit(sub(A2, mul(d3(A2,u1),u1))), n = unit([1,-2,1]);
+    const th = 50*Math.PI/180, ph = 45*Math.PI/180;
+    const right = add(mul(Math.cos(th),u1), mul(Math.sin(th),u2));
+    const depth = add(mul(-Math.sin(th),u1), mul(Math.cos(th),u2));
+    const up = add(mul(-Math.sin(ph),depth), mul(Math.cos(ph), mul(-1,n)));
+    return [right, up, crs(right, up)];
+  }
+  let M = initialView();
+  const b = () => sl.map(s => +s.value);
+  function solve(bv){
+    if (mode.value === 'const'){
+      const m = (bv[0]+bv[1]+bv[2])/3;
+      return {coef:[m], p:[m,m,m]};
+    }
+    // normal equations for columns (1,1,1), (0,1,2): [[3,3],[3,5]] x = [sum b, b2 + 2 b3]
+    const s0 = bv[0]+bv[1]+bv[2], s1 = bv[1]+2*bv[2], det = 6;
+    const c0 = (5*s0 - 3*s1)/det, c1 = (-3*s0 + 3*s1)/det;
+    return {coef:[c0,c1], p:[c0, c0+c1, c0+2*c1]};
+  }
+  function rotate(ax, ang){
+    // rotate the camera about screen axis ax (0 = horizontal, 1 = vertical)
+    const c=Math.cos(ang), s=Math.sin(ang), [R,U,D]=M;
+    if (ax===1){ M = [add(mul(c,R),mul(s,D)), U, add(mul(-s,R),mul(c,D))]; }
+    else { M = [R, add(mul(c,U),mul(-s,D)), add(mul(s,U),mul(c,D))]; }
+  }
+  function draw(){
+    const bv = b(), {coef, p} = solve(bv), r = sub(bv, p), cst = mode.value==='const';
+    const ink=css('--ink'), col=css('--col'), nul=css('--null'), pro=css('--proj'), mut=css('--muted');
+    {
+      const {ctx,w,h} = setupCanvas(cv);
+      ctx.fillStyle=css('--surface'); ctx.fillRect(0,0,w,h);
+      // fit a fixed set of scene points (not b, so dragging b does not rescale the view),
+      // and rotate about their centroid so the scene stays in frame
+      let key;
+      if (!cst){ const Q=(s,t)=>add(mul(s,A1),mul(t,A2)); key=[[0,0,0],Q(-0.3,-0.3),Q(2.2,-0.3),Q(2.2,1.2),Q(-0.3,1.2),[1,3,2]]; }
+      else { key=[[0,0,0],mul(-0.5,A1),mul(2.6,A1),[1,3,2]]; const u=unit(A1), e1=unit(crs(u,[1,0,0])), e2=crs(u,e1);
+             [[1,1],[1,-1],[-1,1],[-1,-1]].forEach(([i,j]) => key.push(add(mul(1.8*i,e1),mul(1.8*j,e2)))); }
+      const c3 = mul(1/key.length, key.reduce((acc,q)=>add(acc,q),[0,0,0]));
+      const R3 = Math.max(...key.map(q => n3(sub(q,c3))));
+      const S = 0.94*Math.min(w,h)/(2*R3);
+      const P = v => { const d = sub(v,c3); return [w/2 + S*d3(d,M[0]), h/2 - S*d3(d,M[1])]; };
+      const poly = (pts, fill, alpha, stroke) => { ctx.beginPath(); pts.forEach((q,i)=>{ const z=P(q); i?ctx.lineTo(z[0],z[1]):ctx.moveTo(z[0],z[1]); }); ctx.closePath();
+        ctx.fillStyle=fill; ctx.globalAlpha=alpha; ctx.fill(); ctx.globalAlpha=1; if (stroke){ ctx.strokeStyle=stroke; ctx.lineWidth=.8; ctx.globalAlpha=.5; ctx.stroke(); ctx.globalAlpha=1; } };
+      // coordinate axes: one per data point
+      ['b₁ (t=0)','b₂ (t=1)','b₃ (t=2)'].forEach((name,i) => {
+        const e=[0,0,0]; e[i]=3.6; const q=P(e), o=P([0,0,0]);
+        seg(ctx,o[0],o[1],q[0],q[1],mut,0.8,[3,3]); label(ctx,name,q[0]+4,q[1]+4,mut,'left',11);
+      });
+      if (!cst){
+        const s0=Math.min(-0.3, coef[0]-0.4), s1=Math.max(2.2, coef[0]+0.4), t0=Math.min(-0.3, coef[1]-0.4), t1=Math.max(1.2, coef[1]+0.4);
+        const Q=(s,t)=>add(mul(s,A1),mul(t,A2));
+        poly([Q(s0,t0),Q(s1,t0),Q(s1,t1),Q(s0,t1)], col, .12, col);
+        const lab = P(Q(s1,t0)); label(ctx,'column space',lab[0]-4,lab[1]+14,col,'right',11);
+        const o=P([0,0,0]), q1=P(A1), q2=P(A2);
+        arrow(ctx,o[0],o[1],q1[0],q1[1],col,2); arrow(ctx,o[0],o[1],q2[0],q2[1],col,2);
+        label(ctx,'a₁',q1[0]+6,q1[1]-4,col,'left',12); label(ctx,'a₂',q2[0]+6,q2[1]+12,col,'left',12);
+      } else {
+        // column space is the line through (1,1,1); residual space is the plane perpendicular to it
+        const u = unit(A1), e1 = unit(crs(u,[1,0,0])), e2 = crs(u,e1), R0 = 1.8;
+        poly([add(mul(R0,e1),mul(R0,e2)), add(mul(-R0,e1),mul(R0,e2)), add(mul(-R0,e1),mul(-R0,e2)), add(mul(R0,e1),mul(-R0,e2))], nul, .09, nul);
+        const lo=P(mul(-0.5,A1)), hi=P(mul(2.6,A1));
+        seg(ctx,lo[0],lo[1],hi[0],hi[1],col,1.8,[6,4]);
+        label(ctx,'column space: span(1,1,1)',hi[0],hi[1]-8,col,'center',11);
+        const pl=[-R0,R0].map(i=>[-R0,R0].map(j=>P(add(mul(i,e1),mul(j,e2))))).flat().sort((a,b)=>b[1]-a[1])[0]; label(ctx,'residual space: 1ᵀr = 0',pl[0],pl[1]+14,nul,'center',11);
+      }
+      const o=P([0,0,0]), pb=P(bv), pp=P(p);
+      arrow(ctx,o[0],o[1],pp[0],pp[1],pro,2.2);
+      arrow(ctx,o[0],o[1],pb[0],pb[1],ink,2.2);
+      if (n3(r) > 1e-3) arrow(ctx,pp[0],pp[1],pb[0],pb[1],nul,2.2,8);
+      // right-angle marker at p
+      if (n3(r) > 0.05 && n3(p) > 0.05){
+        const k=0.18, ur=unit(r), up=mul(-1,unit(p));
+        const q1=P(add(p,mul(k,up))), q2=P(add(add(p,mul(k,up)),mul(k,ur))), q3=P(add(p,mul(k,ur)));
+        ctx.strokeStyle=mut; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(q1[0],q1[1]); ctx.lineTo(q2[0],q2[1]); ctx.lineTo(q3[0],q3[1]); ctx.stroke();
+      }
+      disc(ctx,o[0],o[1],2.5,ink);
+      label(ctx,'b',pb[0]+7,pb[1]-5,ink,'left',13);
+      label(ctx,'p',pp[0]+7,pp[1]+14,pro,'left',13);
+      if (n3(r) > 0.15){ const m=P(add(p,mul(.5,r))); label(ctx,'r',m[0]+7,m[1],nul,'left',13); }
+      cv._P = P;
+    }
+    {
+      const {ctx,w,h} = setupCanvas(fit);
+      ctx.fillStyle=css('--surface'); ctx.fillRect(0,0,w,h);
+      const L=34, R=w-12, Tp=12, B=h-28, X=t=>L+(t+0.3)/2.6*(R-L), Y=y=>B-(y+0.5)/5*(B-Tp);
+      ctx.strokeStyle=css('--line'); ctx.lineWidth=1;
+      for (let y=0;y<=4;y++){ ctx.beginPath(); ctx.moveTo(L,Y(y)); ctx.lineTo(R,Y(y)); ctx.stroke(); label(ctx,String(y),L-8,Y(y)+4,mut,'right',11); }
+      seg(ctx,L,Y(0),R,Y(0),mut,0.8);
+      T.forEach(t => label(ctx,'t='+t,X(t),B+18,mut,'center',11));
+      const yhat = t => cst ? coef[0] : coef[0]+coef[1]*t;
+      seg(ctx,X(-0.3),Y(yhat(-0.3)),X(2.3),Y(yhat(2.3)),pro,2);
+      T.forEach((t,i) => {
+        seg(ctx,X(t),Y(p[i]),X(t),Y(bv[i]),nul,2.2);
+        disc(ctx,X(t),Y(p[i]),3,pro);
+        disc(ctx,X(t),Y(bv[i]),7,css('--surface'),ink); disc(ctx,X(t),Y(bv[i]),3.5,ink);
+        if (Math.abs(r[i])>0.08) label(ctx,(r[i]>0?'+':'')+fx(r[i]),X(t)+10,Y((bv[i]+p[i])/2)+4,nul,'left',11);
+      });
+      label(ctx, cst ? `y = ${fx(coef[0])} (the mean)` : `y = ${fx(coef[0])} + ${fx(coef[1])} t`, R-4, Tp+14, pro, 'right', 12);
+      fit._geo = {X, Y, invY: py => (B-py)/(B-Tp)*5-0.5};
+    }
+    const Atr = cst ? [r[0]+r[1]+r[2]] : [r[0]+r[1]+r[2], r[1]+2*r[2]];
+    let s = `x̂ = ${vec(coef)} · p = ${vec(p)} · r = ${vec(r)} · Aᵀr = ${vec(Atr,3)} (perpendicular to every column)`
+          + `<br>‖b‖² = <b>${fx(d3(bv,bv),3)}</b> = ‖p‖² + ‖r‖² = ${fx(d3(p,p),3)} + ${fx(d3(r,r),3)}`;
+    if (!cst) s += ` · r = <b>${fx(r[0])}</b> × (1, −2, 1), always a multiple of that one vector: dim N(Aᵀ) = 3 − 2 = 1`;
+    else s += ` · r is the data minus its mean, ${vec(bv)} − ${fx(coef[0])}: dim of the residual space = 3 − 1 = 2`;
+    read.innerHTML = s;
+  }
+  // rotate by dragging
+  let last = null;
+  cv.addEventListener('pointerdown', e => { last=[e.clientX,e.clientY]; cv.setPointerCapture(e.pointerId); cv.style.cursor='grabbing'; });
+  cv.addEventListener('pointermove', e => { if (!last) return; const dx=e.clientX-last[0], dy=e.clientY-last[1]; last=[e.clientX,e.clientY]; rotate(1, -dx*0.01); rotate(0, -dy*0.01); draw(); });
+  const up = () => { last=null; cv.style.cursor='grab'; };
+  cv.addEventListener('pointerup', up); cv.addEventListener('pointercancel', up); cv.style.cursor='grab';
+  // drag the data points
+  draggable(fit,
+    (px,py) => { const g=fit._geo; if(!g) return null; const bv=b();
+      for (let i=0;i<3;i++) if (Math.hypot(g.X(T[i])-px, g.Y(bv[i])-py) < 14) return i; return null; },
+    (i,px,py) => { const g=fit._geo; sl[i].value = Math.max(-0.5, Math.min(4, g.invY(py))).toFixed(2); draw(); });
+  sl.forEach(s => s.oninput = draw);
+  mode.onchange = () => { M = initialView(); draw(); };
+  document.getElementById('lsView').onclick = () => { M = initialView(); draw(); };
+  redrawers.push(draw);
+  draw();
+})();
+
+// ================================================================ widget 3
+(() => {
+  const cv = document.getElementById('gdCanvas'), read = document.getElementById('gdRead');
+  const angS = document.getElementById('gdAng'), betaS = document.getElementById('gdBeta');
+  const HALF = 3.6;
+  let x0, path, timer = null;
+  const aVec = () => { const t = +angS.value*Math.PI/180; return [Math.sqrt(5)*Math.cos(t), Math.sqrt(5)*Math.sin(t)]; };
+  function restart(start){ stop(); x0 = start.slice(); path = [x0.slice()]; draw(); }
+  function stop(){ if (timer){ clearInterval(timer); timer=null; } }
+  function step(){
+    const a=aVec(), beta=+betaS.value, x=path[path.length-1], lr=0.12/dot2(a,a), g=dot2(a,x)-beta;
+    path.push([x[0]-lr*g*a[0], x[1]-lr*g*a[1]]); draw();
+    return Math.abs(g) < 1e-4;
+  }
+  function draw(){
+    const a=aVec(), beta=+betaS.value, aa=dot2(a,a), an=Math.sqrt(aa), u=[a[0]/an,a[1]/an], nv=[u[1],-u[0]];
+    const xmin=[a[0]*beta/aa, a[1]*beta/aa], land=[x0[0]-a[0]*(dot2(a,x0)-beta)/aa, x0[1]-a[1]*(dot2(a,x0)-beta)/aa];
+    const col=css('--col'), nul=css('--null'), pro=css('--proj'), ink=css('--ink'), mut=css('--muted');
+    const {ctx,w,h} = setupCanvas(cv), F = frame(w,h,HALF,1,1);
+    ctx.fillStyle=css('--surface'); ctx.fillRect(0,0,w,h); axes(ctx,F,w,h);
+    worldLine(ctx,F,nv,nul,1.3,[6,4]);
+    worldLine(ctx,F,nv,nul,2,null,xmin);
+    worldLine(ctx,F,u,col,1.2,[6,4]);
+    const tag = (p, dirv, s, c, al) => label(ctx, s, F.X(p[0]+dirv[0]), F.Y(p[1]+dirv[1]), c, al, 11);
+    tag(xmin, [2.6*nv[0], 2.6*nv[1]], 'all solutions of a·x = β', nul, 'center');
+    tag([0,0], [-2.2*nv[0], -2.2*nv[1]], 'null space a·x = 0', nul, 'center');
+    tag([0,0], [3.4*u[0], 3.4*u[1]], 'row space', col, 'center');
+    // path
+    ctx.strokeStyle=pro; ctx.lineWidth=2; ctx.beginPath();
+    path.forEach((q,i)=>{ i?ctx.lineTo(F.X(q[0]),F.Y(q[1])):ctx.moveTo(F.X(q[0]),F.Y(q[1])); }); ctx.stroke();
+    path.forEach(q => disc(ctx,F.X(q[0]),F.Y(q[1]),2,pro));
+    ctx.strokeStyle=pro; ctx.lineWidth=1.5; ctx.setLineDash([2,2]); ctx.beginPath(); ctx.arc(F.X(land[0]),F.Y(land[1]),7,0,7); ctx.stroke(); ctx.setLineDash([]);
+    disc(ctx,F.X(xmin[0]),F.Y(xmin[1]),5,col);
+    label(ctx,'x_min = A⁺β',F.X(xmin[0])-8,F.Y(xmin[1])-9,col,'right',12);
+    disc(ctx,F.X(0),F.Y(0),3,ink);
+    const cur = path[path.length-1];
+    disc(ctx,F.X(x0[0]),F.Y(x0[1]),7,css('--surface'),ink); disc(ctx,F.X(x0[0]),F.Y(x0[1]),3,ink);
+    label(ctx,'start (drag me)',F.X(x0[0])+10,F.Y(x0[1])-8,ink,'left',12);
+    disc(ctx,F.X(cur[0]),F.Y(cur[1]),4.5,pro);
+    cv._F = F;
+    const nc0 = dot2(x0,nv), ncC = dot2(cur,nv);
+    read.innerHTML = `a = ${vec(a)} · step ${path.length-1} · residual a·x − β = <b>${fx(dot2(a,cur)-beta,4)}</b>`
+      + `<br>null-space coordinate: start <b>${fx(nc0,4)}</b>, now <b>${fx(ncC,4)}</b> (it never changes) · `
+      + `x_min = ${vec(xmin)}, ‖x_min‖ = ${fx(nrm2(xmin),3)} · predicted landing = x_min ${nc0<0?'−':'+'} ${fx(Math.abs(nc0),3)}·${vec(nv)} = ${vec(land)}`;
+  }
+  draggable(cv,
+    (px,py) => { const F=cv._F; if(!F) return null; return Math.hypot(F.X(x0[0])-px,F.Y(x0[1])-py) < 16 ? 0 : null; },
+    (id,px,py) => { const F=cv._F; restart([F.ix(px),F.iy(py)]); });
+  document.getElementById('gdStep').onclick = () => { stop(); step(); };
+  document.getElementById('gdRun').onclick = () => { stop(); let n=0; timer = setInterval(() => { if (step() || ++n > 400) stop(); }, 40); };
+  document.getElementById('gdZero').onclick = () => restart([0,0]);
+  document.getElementById('gdReset').onclick = () => { angS.value=63.4349; betaS.value=4; restart([3,3]); };
+  angS.oninput = () => restart(x0); betaS.oninput = () => restart(x0);
+  redrawers.push(draw);
+  restart([3,3]);
+})();
+
+// ================================================================ widget 4
+(() => {
+  const cv = document.getElementById('ocCanvas'), read = document.getElementById('ocRead');
+  const scoreS = document.getElementById('ocScore'), angS = document.getElementById('ocAng'), thS = document.getElementById('ocThick');
+  const N = 400, HALF = 3.4;
+  let data, stats, test = [-0.6, 1.6];
+  const rnd = mulberry(20260925), Z = Array.from({length:N}, () => [gauss(rnd), gauss(rnd)]);
+  function build(){
+    const t=+angS.value*Math.PI/180, u=[Math.cos(t),Math.sin(t)], v=[-u[1],u[0]], thick=+thS.value/100;
+    data = Z.map(z => [1.15*z[0]*u[0] + thick*z[1]*v[0], 1.15*z[0]*u[1] + thick*z[1]*v[1]]);
+    // PCA from the sample, not from the generating directions
+    const mu=[0,0]; data.forEach(p=>{mu[0]+=p[0]/N; mu[1]+=p[1]/N;});
+    let sxx=0,sxy=0,syy=0; data.forEach(p=>{const dx=p[0]-mu[0], dy=p[1]-mu[1]; sxx+=dx*dx/N; sxy+=dx*dy/N; syy+=dy*dy/N;});
+    const tr=sxx+syy, det=sxx*syy-sxy*sxy, l1=tr/2+Math.sqrt(tr*tr/4-det), l2=Math.max(tr-l1,1e-9);
+    let e = Math.abs(sxy) > 1e-12 ? [l1-syy, sxy] : (sxx>=syy ? [1,0] : [0,1]); const en=nrm2(e); e=[e[0]/en,e[1]/en];
+    stats = {mu, e, f:[-e[1],e[0]], l1, l2};
+    const sc = data.map(p => score(p));
+    stats.thr = sc.slice().sort((a,b)=>a-b)[Math.floor(0.99*N)];
+    stats.sorted = sc.sort((a,b)=>a-b);
+  }
+  function parts(p){ const d=[p[0]-stats.mu[0], p[1]-stats.mu[1]]; return {pr: dot2(d,stats.e), rs: dot2(d,stats.f)}; }
+  function score(p){
+    const {pr, rs} = parts(p), k = scoreS.value;
+    if (k==='dist') return Math.hypot(pr, rs);
+    if (k==='resid') return Math.abs(rs);
+    return Math.sqrt(pr*pr/stats.l1 + rs*rs/stats.l2);
+  }
+  function draw(){
+    const col=css('--col'), nul=css('--null'), pro=css('--proj'), ink=css('--ink'), mut=css('--muted');
+    const {ctx,w,h} = setupCanvas(cv), F = frame(w,h,HALF);
+    ctx.fillStyle=css('--surface'); ctx.fillRect(0,0,w,h);
+    // accepted region, sampled on a coarse grid
+    ctx.fillStyle=pro; ctx.globalAlpha=.10; const cell=4;
+    for (let py=0; py<h; py+=cell) for (let px=0; px<w; px+=cell)
+      if (score([F.ix(px+cell/2), F.iy(py+cell/2)]) <= stats.thr) ctx.fillRect(px,py,cell,cell);
+    ctx.globalAlpha=1;
+    axes(ctx,F,w,h);
+    worldLine(ctx,F,stats.e,col,1.6,[6,4],stats.mu);
+    worldLine(ctx,F,stats.f,nul,1.4,[6,4],stats.mu);
+    ctx.fillStyle=col; ctx.globalAlpha=.45;
+    data.forEach(p => { ctx.beginPath(); ctx.arc(F.X(p[0]),F.Y(p[1]),1.9,0,7); ctx.fill(); });
+    ctx.globalAlpha=1;
+    const {pr, rs} = parts(test), foot=[stats.mu[0]+pr*stats.e[0], stats.mu[1]+pr*stats.e[1]];
+    seg(ctx,F.X(test[0]),F.Y(test[1]),F.X(foot[0]),F.Y(foot[1]),nul,2.4);
+    disc(ctx,F.X(foot[0]),F.Y(foot[1]),3,col);
+    const s = score(test), ok = s <= stats.thr;
+    disc(ctx,F.X(test[0]),F.Y(test[1]),8,css('--surface'),ok?pro:nul); disc(ctx,F.X(test[0]),F.Y(test[1]),4,ok?pro:nul);
+    label(ctx, ok ? 'accepted' : 'flagged OOD', F.X(test[0])+12, F.Y(test[1])-8, ok?pro:nul, 'left', 12);
+    label(ctx,'principal',F.X(stats.mu[0]+3*stats.e[0])+(stats.e[0]>=0?-4:4),F.Y(stats.mu[1]+3*stats.e[1])-6,col,stats.e[0]>=0?'right':'left',11);
+    label(ctx,'residual',F.X(stats.mu[0]-2.8*stats.f[0])+6,F.Y(stats.mu[1]-2.8*stats.f[1]),nul,'left',11);
+    cv._F = F;
+    const rank = stats.sorted.filter(v => v < s).length / N * 100;
+    read.innerHTML = `test point: ‖x − μ‖ = <b>${fx(Math.hypot(pr,rs))}</b> = √(principal² + residual²) with principal part <b>${fx(pr)}</b>, residual part <b>${fx(rs)}</b>`
+      + `<br>score = ${fx(s,3)}, threshold (99th training percentile) = ${fx(stats.thr,3)} · higher than <b>${rank.toFixed(1)}%</b> of training points`
+      + ` · variances: principal λ₁ = ${fx(stats.l1,3)}, residual λ₂ = ${fx(stats.l2,4)}`;
+  }
+  draggable(cv,
+    (px,py) => { const F=cv._F; if(!F) return null; return Math.hypot(F.X(test[0])-px,F.Y(test[1])-py) < 16 ? 0 : null; },
+    (id,px,py) => { const F=cv._F; test=[F.ix(px),F.iy(py)]; draw(); });
+  scoreS.onchange = () => { build(); draw(); };
+  angS.oninput = () => { build(); draw(); };
+  thS.oninput = () => { build(); draw(); };
+  redrawers.push(draw);
+  build(); draw();
+})();
+})();
+</script>
+</body>
+</html>

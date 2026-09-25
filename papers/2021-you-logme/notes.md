@@ -31,6 +31,8 @@ status: read
   Eq. 2 against an independent derivation, the fixed point against a grid search, $\gamma$
   spanning $[0,D]$, and the $D>n$ table that is the whole argument for the method.
   `make verify` runs it.
+- **[Column, null & residual spaces](../four-fundamental-subspaces/index.html)** — why that table happens: with $D\ge n$ the
+  column space is all of $\mathbb R^n$, and residual degrees of freedom $n-p$, which $\gamma$ generalises.
 
 ## In one paragraph
 

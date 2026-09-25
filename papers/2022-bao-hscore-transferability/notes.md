@@ -42,6 +42,8 @@ status: read
   Equations 2, 3 and 4 checked to machine precision on a discrete joint where $\tilde B$ can
   actually be built, plus the invariance, redundancy and locality questions, the six equivalent
   forms of the score, and the conditioning comparison. `make verify` runs it.
+- **[Column, null & residual spaces](../four-fundamental-subspaces/index.html)** — background for Eqs. 2–3: least squares as
+  projection onto a column space, the residual space, and why centring forces one right angle.
 
 ## In one paragraph
 

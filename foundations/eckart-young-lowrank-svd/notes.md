@@ -14,6 +14,8 @@ short_title: "Eckart–Young / low-rank SVD"
 - **[Source: §3.5 Low-rank approximation, MATH3030 lecture notes, Rich Wilkinson (Nottingham)](https://rich-d-wilkinson.github.io/MATH3030/3.5-lowrank.html)** —
   the section these notes summarise, part of a larger set of course notes on matrix
   decompositions.
+- **[Column, null & residual spaces](../four-fundamental-subspaces/index.html)** — what the kept and discarded singular
+  vectors span: the column space of $\mathbf A_k$ and the PCA residual subspace.
 
 ## In one paragraph
 

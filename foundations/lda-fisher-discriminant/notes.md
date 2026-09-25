@@ -13,6 +13,8 @@ short_title: "LDA / Fisher discriminant"
 - **[Source: Lecture 15, DOC493 Intelligent Data Analysis and Probabilistic Inference, Imperial College London](https://www.doc.ic.ac.uk/~dfg/ProbabilisticInference/old_IDAPILecture15.pdf)** —
   the lecture these notes summarise. A local copy also sits in `Theory_oriented_papers/` in
   this repo's parent folder.
+- **[Column, null & residual spaces](../four-fundamental-subspaces/index.html)** — the $g-1$ cap on $S_b$ and the singular
+  $S_w$ as column-space and null-space dimensions, checked numerically.
 
 ## In one paragraph
 

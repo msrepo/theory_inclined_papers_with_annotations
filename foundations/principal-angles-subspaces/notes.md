@@ -19,6 +19,8 @@ status: living
 - **[Bao 2022 — H-score](../2022-bao-hscore-transferability/index.html)** — where this page
   came from: H-score turns out to be $\sum_i\cos^2\theta_i$ between feature space and label
   indicators.
+- **[Column, null & residual spaces](../four-fundamental-subspaces/index.html)** — the four fundamental subspaces, projectors
+  and residuals; principal angles compare two of the column spaces defined there.
 
 ## In one paragraph
 

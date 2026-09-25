@@ -22,6 +22,8 @@ short_title: "Jacot 2018 — NTK"
   with both theorems checked numerically. `make verify` runs it.
 - **[Fort et al. 2020](../2020-fort-deep-vs-kernel/index.html)** — measures how far real
   training departs from this limit, and when. The short answer: the first two to three epochs.
+- **[Column, null & residual spaces](../four-fundamental-subspaces/index.html)** — the "$\Delta^0_f$ never moves" statement in
+  two dimensions: gradient descent cannot change the null-space part of its iterate.
 
 ## In one paragraph
 
