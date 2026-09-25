@@ -45,7 +45,7 @@ Bracketed numbers are the reference numbering from the rebuttal note, listed in 
 | Segmentation, detection, dense prediction | modality- or prompt-specific embeddings as Gaussian latent variables | C. Huang et al. 2024 **[8]**; Jia et al. 2025 **[9]** |
 
 Two adjacent results are worth naming because they close the loop in the other direction.
-Eftekhari & Papyan **[1]** show that *deliberately* Gaussianizing representations improves
+[Eftekhari & Papyan](../2025-eftekhari-normality-normalization/index.html) **[1]** show that *deliberately* Gaussianizing representations improves
 downstream performance — so Gaussianity is not merely a convenient fiction but correlated with
 quality. And Betser et al.'s *Whitened CLIP as a Likelihood Surrogate* **[10]** uses the
 assumption directly: whiten CLIP features and the Gaussian density becomes a usable likelihood
@@ -288,7 +288,7 @@ The reference list as given in the authors' rebuttal note
 [`zB9oh3CoAg`](https://openreview.net/forum?id=BlSH7gNQSq&noteId=zB9oh3CoAg), preserving its
 numbering. The three marked ▸ are read in detail above.
 
-1. D. Eftekhari and V. Papyan. *On the Importance of Gaussianizing Representations.* ICML 2025.
+1. D. Eftekhari and V. Papyan. *On the Importance of Gaussianizing Representations.* ICML 2025. Annotated [here](../2025-eftekhari-normality-normalization/index.html).
 2. Anton Baumann et al. *Post-hoc Probabilistic Vision–Language Models.* arXiv:2412.06014, 2024.
 3. Pablo Morales-Álvarez et al. *BayesAdapter: enhanced uncertainty estimation in CLIP few-shot
    adaptation.* arXiv:2412.09718.

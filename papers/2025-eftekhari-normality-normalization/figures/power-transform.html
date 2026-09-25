@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Power Transform Explorer</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/contrib/auto-render.min.js"></script>
+<style>
+:root{
+  --bg:#fbfaf7; --surface:#ffffff; --ink:#1c1d21; --muted:#5b5f68; --line:#e2dfd8; --soft:#f2f0ea;
+  --a:#2563eb; --b:#d45a22; --c:#7c3aed; --good:#0f7a5a; --bad:#b42318; --radius:12px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#131417; --surface:#1b1d21; --ink:#ebebed; --muted:#a3a6ae; --line:#2e3138; --soft:#23262b;
+    --a:#6e9dff; --b:#ff8a52; --c:#b48cff; --good:#4cc79a; --bad:#ff7a6b;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#131417; --surface:#1b1d21; --ink:#ebebed; --muted:#a3a6ae; --line:#2e3138; --soft:#23262b;
+  --a:#6e9dff; --b:#ff8a52; --c:#b48cff; --good:#4cc79a; --bad:#ff7a6b;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,sans-serif}
+main{max-width:880px;margin:0 auto;padding:36px 16px 80px}
+a{color:var(--c)}
+h1{font-size:1.9rem;line-height:1.2;margin:0 0 .4rem}
+h2{font-size:1.3rem;margin:2.6rem 0 .5rem;padding-top:.5rem;border-top:1px solid var(--line)}
+.lede{color:var(--muted);margin-bottom:1.2rem}
+.widget{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:14px;margin:1rem 0}
+.widget svg{width:100%;height:auto;display:block}
+.controls{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;margin:.2rem 0 .6rem;font-size:.9rem}
+.controls label{display:flex;align-items:center;gap:6px;color:var(--muted)}
+button,select{font:inherit;font-size:.88rem;color:var(--ink);background:var(--soft);border:1px solid var(--line);border-radius:8px;padding:5px 11px;cursor:pointer}
+input[type=range]{accent-color:var(--c);width:200px}
+.readout{font-size:.9rem;color:var(--muted);margin-top:.5rem;font-variant-numeric:tabular-nums}
+.readout b{color:var(--ink)}
+.callout{border-left:3px solid var(--c);background:var(--soft);padding:10px 14px;border-radius:0 8px 8px 0;margin:1rem 0}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media (max-width:640px){.grid2{grid-template-columns:1fr}}
+.cap{font-size:.82rem;color:var(--muted);text-align:center}
+.formula{overflow-x:auto}
+</style>
+</head>
+<body>
+<main>
+<h1>Power Transform Explorer</h1>
+<p class="lede"><a href="../index.html">← back to the notes</a> · Eftekhari &amp; Papyan (ICML 2025), <i>On the Importance of Gaussianizing Representations</i>. Interactive companions to Eq 3 (the transform), Eqs 4–5 and Appendices C–D (choosing λ), and Lemma B.1 (why Gaussian means "uncorrelated ⇒ independent").</p>
+
+<div class="formula">$$\psi(h;\lambda)=\begin{cases}\frac{1}{\lambda}\big((1+h)^{\lambda}-1\big), & h\ge 0,\ \lambda\ne 0\\ \log(1+h), & h\ge0,\ \lambda=0\\ \frac{-1}{2-\lambda}\big((1-h)^{2-\lambda}-1\big), & h<0,\ \lambda\ne2\\ -\log(1-h), & h<0,\ \lambda=2\end{cases}$$</div>
+
+<h2>1. What Eq 3 does to the number line</h2>
+<p>Each channel's pre-activations are standardised first, so <i>h</i> is mostly in [−3, 3]. The transform is <b>monotone</b> (it never reorders values), passes through 0 with <b>slope 1</b> for every λ, and only bends the <b>tails</b>. For λ &lt; 1 the right tail is pulled in and the left tail pushed out, which removes right skew. For λ &gt; 1 it's the mirror image. λ = 1 is the identity.</p>
+<div class="widget">
+  <div class="controls">
+    <label>λ <input id="lam1" type="range" min="-1" max="3" step="0.05" value="0.5"></label>
+    <b id="lam1v"></b>
+    <button data-l="0">λ = 0 (log)</button><button data-l="1">λ = 1 (identity)</button><button data-l="2">λ = 2</button>
+  </div>
+  <svg id="curveSvg" viewBox="0 0 720 360" aria-label="psi of h for the chosen lambda with reference curves, and a number line mapping"></svg>
+  <div class="readout" id="curveRead"></div>
+</div>
+
+<h2>2. Gaussianize a batch and see how λ is chosen</h2>
+<p>λ is chosen by maximum likelihood: <b>pick the λ for which ψ(h) looks most like a Gaussian sample</b>. The profile NLL (Eq 13, derived in Appendix C) has two competing parts:</p>
+<ul>
+  <li><b>variance term</b> ½ log σ̂²(λ): smaller when ψ squashes the data. On its own it would pick whatever λ shrinks things most;</li>
+  <li><b>Jacobian term</b> −(λ−1)·mean(sign(h)·log(1+|h|)): the change-of-variables charge for that squashing. You can't make a sample look tight just by compressing the axis.</li>
+</ul>
+<p>The layer doesn't minimise this exactly. It takes <b>one Newton step from λ = 1</b> on the quadratic Taylor expansion (Eq 5, Appendix D), shown as the dashed parabola.</p>
+<div class="widget">
+  <div class="controls">
+    <label>batch
+      <select id="preset">
+        <option value="gauss">Gaussian</option>
+        <option value="ln4" selected>Lognormal σ=0.4 (mild right skew)</option>
+        <option value="gam2">ReLU-ish Gamma(2)</option>
+        <option value="ln8">Lognormal σ=0.8 (strong right skew)</option>
+        <option value="left">Left-skewed (−Gamma(3))</option>
+        <option value="t5">Student-t, 5 dof (heavy tails)</option>
+        <option value="bi">Bimodal</option>
+      </select></label>
+    <label>λ <input id="lam2" type="range" min="-1.5" max="3" step="0.01" value="1"></label>
+    <b id="lam2v"></b>
+    <button id="useNewton">Use Newton λ̂ (Eq 5)</button>
+    <button id="useExact">Use exact minimiser</button>
+  </div>
+  <div class="grid2">
+    <div><svg id="histIn" viewBox="0 0 360 200"></svg><div class="cap">standardised input h (curve: N(0,1))</div></div>
+    <div><svg id="histOut" viewBox="0 0 360 200"></svg><div class="cap">ψ(h; λ), re-standardised</div></div>
+  </div>
+  <svg id="nllSvg" viewBox="0 0 720 260" aria-label="NLL as a function of lambda with its two parts and quadratic approximation"></svg>
+  <div class="readout" id="batchRead"></div>
+</div>
+<div class="callout">Things to try. (1) Mild skew: Newton λ̂ lands almost on the exact minimum, which is the regime of the paper's Fig 13. (2) Strong skew (lognormal σ=0.8): the parabola is a poor fit far from λ = 1 and one step undershoots. (3) Student-t or bimodal: λ̂ ≈ 1 and nothing changes. <b>Yeo–Johnson only removes skew</b>. It cannot thin heavy symmetric tails or merge two modes, because a monotone map with slope 1 at 0 and one parameter doesn't have the freedom to.</div>
+
+<h2>3. Lemma B.1: the joint shape is what makes "uncorrelated ⇒ independent"</h2>
+<p>Both panels have <b>exactly N(0,1) marginals</b> and the <b>same correlation ρ</b>. The left one is jointly Gaussian. The right one mixes two Gaussians with correlations ρ + d and ρ − d. Lemma B.1 says the Gaussian joint has the smallest mutual information among all joints with these marginals and this ρ. Set ρ = 0 and increase d to get variables that are uncorrelated but strongly dependent.</p>
+<div class="widget">
+  <div class="controls">
+    <label>ρ <input id="rho" type="range" min="-0.8" max="0.8" step="0.05" value="0"></label><b id="rhov"></b>
+    <label>non-Gaussianity d <input id="dd" type="range" min="0" max="0.95" step="0.05" value="0.8"></label><b id="ddv"></b>
+  </div>
+  <div class="grid2">
+    <div><svg id="scA" viewBox="0 0 300 300"></svg><div class="cap" id="capA"></div></div>
+    <div><svg id="scB" viewBox="0 0 300 300"></svg><div class="cap" id="capB"></div></div>
+  </div>
+  <div class="readout" id="lemRead"></div>
+</div>
+<div class="callout">Why this matters for the paper. The power transform acts <b>one unit at a time</b>, and mutual information doesn't change under an invertible map applied to each variable separately. So Gaussianizing each unit's marginal cannot, by itself, move a pair from the right panel to the left one. Any independence gain (the paper's Fig 12) has to come from how training responds to the layer, not from the transform.</div>
+</main>
+
+<script>
+const NS="http://www.w3.org/2000/svg";
+const cssv=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+function el(t,a={},p){const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);if(p)p.appendChild(e);return e;}
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+function normal(r){let u=0;while(u===0)u=r();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*r());}
+function gamma(r,k){if(k<1)return gamma(r,k+1)*Math.pow(r(),1/k);const d=k-1/3,c=1/Math.sqrt(9*d);for(;;){const x=normal(r),v=Math.pow(1+c*x,3);if(v<=0)continue;if(Math.log(r())<.5*x*x+d-d*v+d*Math.log(v))return d*v;}}
+const mean=a=>a.reduce((s,v)=>s+v,0)/a.length;
+const variance=a=>{const m=mean(a);return mean(a.map(v=>(v-m)**2));};
+const standardise=a=>{const m=mean(a),s=Math.sqrt(variance(a)+1e-5);return a.map(v=>(v-m)/s);};
+const skew=a=>{const m=mean(a),s=Math.sqrt(variance(a));return mean(a.map(v=>((v-m)/s)**3));};
+const pathD=(pts)=>'M'+pts.map(p=>p[0].toFixed(1)+','+p[1].toFixed(1)).join(' L');
+
+/* Eq 3 */
+function psi(h,l){
+  if(h>=0) return Math.abs(l)>1e-9?(Math.pow(1+h,l)-1)/l:Math.log1p(h);
+  return Math.abs(l-2)>1e-9?-(Math.pow(1-h,2-l)-1)/(2-l):-Math.log1p(-h);
+}
+/* Eq 13 with the sign(h) Jacobian term */
+function nllParts(h,l){
+  const x=h.map(v=>psi(v,l)); const vt=.5*Math.log(variance(x));
+  const jac=mean(h.map(v=>Math.sign(v)*Math.log1p(Math.abs(v))));
+  return {vt, jt:-(l-1)*jac, total:.5*(Math.log(2*Math.PI)+1)+vt-(l-1)*jac};
+}
+/* Eqs 15-21 reduced to moments (h standardised) */
+function newton(h){
+  const p1=h.map(v=>{const t=Math.abs(v);return (1+t)*Math.log1p(t)-t;});
+  const p2=h.map(v=>{const t=Math.abs(v),a=Math.log1p(t);return Math.sign(v)*((1+t)*a*a-2*((1+t)*a-t));});
+  const s2=variance(h);
+  const ds2=2*mean(h.map((v,i)=>v*p1[i]));
+  const d2s2=2*(mean(h.map((v,i)=>v*p2[i]))+variance(p1));
+  const jac=mean(h.map(v=>Math.sign(v)*Math.log1p(Math.abs(v))));
+  const L1=ds2/(2*s2)-jac, L2=-ds2*ds2/(2*s2*s2)+d2s2/(2*s2);
+  return {lam:1-L1/L2,L0:nllParts(h,1).total,L1,L2};
+}
+function exactLam(h){let lo=-1.5,hi=3,best=1;for(let r=0;r<3;r++){let bv=Infinity;const n=90;for(let i=0;i<=n;i++){const l=lo+(hi-lo)*i/n,v=nllParts(h,l).total;if(v<bv){bv=v;best=l;}}const st=(hi-lo)/n;lo=best-st;hi=best+st;}return best;}
+
+/* ---------- §1 curves ---------- */
+(function(){
+  const svg=document.getElementById('curveSvg'),s=document.getElementById('lam1');
+  function draw(){
+    const l=+s.value; document.getElementById('lam1v').textContent='λ = '+l.toFixed(2);
+    svg.innerHTML='';
+    const x0=40,x1=380,y0=20,y1=340,X=h=>x0+(h+4)/8*(x1-x0),Y=v=>y1-(v+6)/12*(y1-y0);
+    const mut=cssv('--muted'),line=cssv('--line');
+    el('rect',{x:x0,y:y0,width:X(0)-x0,height:y1-y0,fill:cssv('--b'),opacity:.05},svg);
+    el('rect',{x:X(0),y:y0,width:x1-X(0),height:y1-y0,fill:cssv('--a'),opacity:.05},svg);
+    el('line',{x1:x0,x2:x1,y1:Y(0),y2:Y(0),stroke:mut},svg);el('line',{x1:X(0),x2:X(0),y1:y0,y2:y1,stroke:mut},svg);
+    [-4,-2,2,4].forEach(v=>{el('text',{x:X(v),y:Y(0)+14,'text-anchor':'middle','font-size':11,fill:mut},svg).textContent=v;el('text',{x:X(0)-5,y:Y(v)+4,'text-anchor':'end','font-size':11,fill:mut},svg).textContent=v;});
+    const curve=(lam,attrs)=>{const pts=[];for(let i=0;i<=200;i++){const h=-4+8*i/200;pts.push([X(h),Y(Math.max(-6.3,Math.min(6.3,psi(h,lam))))]);}el('path',Object.assign({d:pathD(pts),fill:'none'},attrs),svg);};
+    [0,.5,1.5,2].forEach(r=>curve(r,{stroke:mut,'stroke-width':.8,opacity:.45}));
+    curve(1,{stroke:mut,'stroke-width':1,'stroke-dasharray':'4 3'});
+    curve(l,{stroke:cssv('--c'),'stroke-width':2.6});
+    el('text',{x:x0+4,y:y1-6,'font-size':11,fill:cssv('--b')},svg).textContent='h<0: exponent 2−λ';
+    el('text',{x:x1-4,y:y0+12,'text-anchor':'end','font-size':11,fill:cssv('--a')},svg).textContent='h≥0: exponent λ';
+    // number line
+    const lx0=420,lx1=705,L=v=>lx0+(v+3.4)/6.8*(lx1-lx0),yt=110,yb=240;
+    el('text',{x:lx0,y:yt-30,'font-size':12,fill:mut},svg).textContent='input h';
+    el('text',{x:lx0,y:yb+36,'font-size':12,fill:mut},svg).textContent='output ψ(h; λ)';
+    el('line',{x1:lx0,x2:lx1,y1:yt,y2:yt,stroke:mut},svg);el('line',{x1:lx0,x2:lx1,y1:yb,y2:yb,stroke:mut},svg);
+    for(let h=-3;h<=3.001;h+=.5){const p=psi(h,l),pc=Math.max(-3.4,Math.min(3.4,p));
+      el('line',{x1:L(h),y1:yt,x2:L(pc),y2:yb,stroke:mut,'stroke-width':.9,opacity:.7},svg);
+      el('circle',{cx:L(h),cy:yt,r:3.2,fill:cssv('--a')},svg);el('circle',{cx:L(pc),cy:yb,r:3.2,fill:cssv('--b')},svg);
+      if(Math.abs(h-Math.round(h))<1e-9){el('text',{x:L(h),y:yt-9,'text-anchor':'middle','font-size':11,fill:mut},svg).textContent=Math.round(h);
+        el('text',{x:L(pc),y:yb+16,'text-anchor':'middle','font-size':11,fill:mut},svg).textContent=(Math.abs(p)>3.4?(p>0?'>':'<'):'')+p.toFixed(1);}}
+    const gapR=psi(3,l)-psi(2.5,l), gapL=psi(-2.5,l)-psi(-3,l);
+    document.getElementById('curveRead').innerHTML=`Spacing of the last input step (0.5 wide): right tail → <b>${gapR.toFixed(2)}</b>, left tail → <b>${gapL.toFixed(2)}</b>. `+
+      (Math.abs(l-1)<.025?'Identity: nothing moves.':l<1?'λ &lt; 1 compresses large positives and stretches large negatives, the cure for right skew.':'λ &gt; 1 stretches large positives and compresses large negatives, the cure for left skew.')+
+      ` Slope at h = 0 is always 1: dψ/dh = (1+h)<sup>λ−1</sup> for h ≥ 0 and (1−h)<sup>1−λ</sup> for h &lt; 0.`;
+  }
+  s.addEventListener('input',draw);
+  document.querySelectorAll('button[data-l]').forEach(b=>b.onclick=()=>{s.value=b.dataset.l;draw();});
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change',draw);
+  draw();
+})();
+
+/* ---------- §2 batch ---------- */
+(function(){
+  const N=2000,cache={};
+  function sample(key){
+    if(cache[key])return cache[key];const r=mulberry32(42);let a;
+    const G=()=>normal(r);
+    if(key==='gauss')a=Array.from({length:N},G);
+    else if(key==='ln4')a=Array.from({length:N},()=>Math.exp(.4*G()));
+    else if(key==='ln8')a=Array.from({length:N},()=>Math.exp(.8*G()));
+    else if(key==='gam2')a=Array.from({length:N},()=>gamma(r,2));
+    else if(key==='left')a=Array.from({length:N},()=>-gamma(r,3));
+    else if(key==='t5')a=Array.from({length:N},()=>G()/Math.sqrt(2*gamma(r,2.5)/5));
+    else a=Array.from({length:N},()=>(r()<.5?-1.6:1.6)+.55*G());
+    const h=standardise(a);const nw=newton(h);
+    return cache[key]={h,nw,ex:exactLam(h)};
+  }
+  const s=document.getElementById('lam2'),sel=document.getElementById('preset');
+  function hist(svg,vals,color){
+    svg.innerHTML='';const W=360,H=200,x0=10,x1=350,yb=180,lo=-4.5,hi=4.5,nb=45;
+    const X=v=>x0+(v-lo)/(hi-lo)*(x1-x0);const c=new Array(nb).fill(0);let out=0;
+    vals.forEach(v=>{const b=Math.floor((v-lo)/(hi-lo)*nb);if(b>=0&&b<nb)c[b]++;else out++;});
+    const bw=(hi-lo)/nb,dens=c.map(k=>k/(vals.length*bw)),top=.6;
+    dens.forEach((d,i)=>el('rect',{x:X(lo+i*bw)+.5,y:yb-Math.min(d,top)/top*160,width:(x1-x0)/nb-1,height:Math.min(d,top)/top*160,fill:color,opacity:.55},svg));
+    const pts=[];for(let i=0;i<=120;i++){const v=lo+(hi-lo)*i/120;pts.push([X(v),yb-Math.exp(-v*v/2)/Math.sqrt(2*Math.PI)/top*160]);}
+    el('path',{d:pathD(pts),fill:'none',stroke:cssv('--ink'),'stroke-width':1.3},svg);
+    el('line',{x1:x0,x2:x1,y1:yb,y2:yb,stroke:cssv('--muted')},svg);
+    [-4,-2,0,2,4].forEach(v=>el('text',{x:X(v),y:yb+14,'text-anchor':'middle','font-size':10,fill:cssv('--muted')},svg).textContent=v);
+    el('text',{x:x1,y:16,'text-anchor':'end','font-size':11,fill:cssv('--muted')},svg).textContent=`skew ${skew(vals).toFixed(2)}`+(out?` · ${out} off-plot`:'');
+  }
+  function draw(){
+    const {h,nw,ex}=sample(sel.value),l=+s.value;
+    document.getElementById('lam2v').textContent='λ = '+l.toFixed(2);
+    hist(document.getElementById('histIn'),h,cssv('--a'));
+    const y=standardise(h.map(v=>psi(v,l)));hist(document.getElementById('histOut'),y,cssv('--b'));
+    // NLL plot
+    const svg=document.getElementById('nllSvg');svg.innerHTML='';
+    const x0=50,x1=600,y0=18,y1=225,lo=-1.5,hi=3,X=v=>x0+(v-lo)/(hi-lo)*(x1-x0);
+    const L=[],V=[],J=[],Q=[];
+    for(let i=0;i<=90;i++){const lam=lo+(hi-lo)*i/90,p=nllParts(h,lam);L.push([lam,p.total]);V.push([lam,p.vt]);J.push([lam,p.jt]);Q.push([lam,nw.L0+(lam-1)*nw.L1+.5*(lam-1)**2*nw.L2]);}
+    const Lmin=Math.min(...L.map(p=>p[1]));const shift=Lmin; // plot everything relative to the NLL minimum
+    const series=[L.map(p=>[p[0],p[1]-shift]),V.map(p=>[p[0],p[1]]),J.map(p=>[p[0],p[1]]),Q.map(p=>[p[0],p[1]-shift])];
+    let ymin=Infinity,ymax=-Infinity;series.slice(0,3).forEach(sr=>sr.forEach(p=>{ymin=Math.min(ymin,p[1]);ymax=Math.max(ymax,p[1]);}));
+    ymax=Math.min(ymax,Math.max(1.2,(series[0].reduce((m,p)=>Math.max(m,p[1]),0))));ymin=Math.max(ymin,-ymax);
+    const Y=v=>y1-(Math.max(ymin,Math.min(ymax,v))-ymin)/(ymax-ymin)*(y1-y0);
+    el('line',{x1:x0,x2:x1,y1:y1,y2:y1,stroke:cssv('--muted')},svg);
+    if(ymin<0&&ymax>0)el('line',{x1:x0,x2:x1,y1:Y(0),y2:Y(0),stroke:cssv('--line')},svg);
+    [-1,0,1,2,3].forEach(v=>el('text',{x:X(v),y:y1+15,'text-anchor':'middle','font-size':11,fill:cssv('--muted')},svg).textContent=v);
+    el('text',{x:x1+4,y:y1+4,'font-size':11,fill:cssv('--muted')},svg).textContent='λ';
+    const draw1=(sr,st)=>el('path',Object.assign({d:pathD(sr.map(p=>[X(p[0]),Y(p[1])])),fill:'none'},st),svg);
+    draw1(series[1],{stroke:cssv('--a'),'stroke-width':1.4,opacity:.8});
+    draw1(series[2],{stroke:cssv('--b'),'stroke-width':1.4,opacity:.8});
+    draw1(series[3],{stroke:cssv('--muted'),'stroke-width':1.4,'stroke-dasharray':'5 4'});
+    draw1(series[0],{stroke:cssv('--c'),'stroke-width':2.6});
+    const lab=(t,c,yy)=>el('text',{x:x1+8,y:yy,'font-size':11,fill:c},svg).textContent=t;
+    lab('NLL (Eq 13)',cssv('--c'),30);lab('variance term',cssv('--a'),46);lab('Jacobian term',cssv('--b'),62);lab('quadratic at λ=1',cssv('--muted'),78);
+    lab('(NLL shifted',cssv('--muted'),100);lab(' so min = 0)',cssv('--muted'),114);
+    const mark=(lam,c,txt,dy)=>{el('line',{x1:X(lam),x2:X(lam),y1:y0,y2:y1,stroke:c,'stroke-width':1.2,'stroke-dasharray':'2 3'},svg);el('text',{x:X(lam)+3,y:y0+10+dy,'font-size':10.5,fill:c},svg).textContent=txt;};
+    if(nw.lam>lo&&nw.lam<hi)mark(nw.lam,cssv('--good'),'Newton λ̂',0);
+    mark(ex,cssv('--c'),'exact',14);
+    el('line',{x1:X(l),x2:X(l),y1:y0,y2:y1,stroke:cssv('--ink'),'stroke-width':1.5},svg);
+    el('circle',{cx:X(1),cy:Y(nw.L0-shift),r:4,fill:cssv('--muted')},svg);
+    document.getElementById('batchRead').innerHTML=`Newton λ̂ = <b>${nw.lam.toFixed(3)}</b> (L′(1) = ${nw.L1.toFixed(3)}, L″(1) = ${nw.L2.toFixed(3)}) · exact minimiser = <b>${ex.toFixed(3)}</b> · skew ${skew(h).toFixed(2)} → <b>${skew(y).toFixed(2)}</b> at the current λ. `+
+      (nw.L1>0?'L′(1) &gt; 0 so the step goes left (λ̂ &lt; 1).':'L′(1) &lt; 0 so the step goes right (λ̂ &gt; 1).');
+  }
+  s.addEventListener('input',draw);
+  sel.addEventListener('change',()=>{s.value=1;draw();});
+  document.getElementById('useNewton').onclick=()=>{s.value=Math.max(-1.5,Math.min(3,sample(sel.value).nw.lam));draw();};
+  document.getElementById('useExact').onclick=()=>{s.value=sample(sel.value).ex;draw();};
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change',draw);
+  draw();
+})();
+
+/* ---------- §3 Lemma B.1 ---------- */
+(function(){
+  const n=900,r0=mulberry32(5),Z=Array.from({length:n},()=>[normal(r0),normal(r0),r0()]);
+  function bvn(x,y,r){const q=(x*x-2*r*x*y+y*y)/(1-r*r);return Math.exp(-q/2)/(2*Math.PI*Math.sqrt(1-r*r));}
+  function miMix(r1,r2){const L=6,m=161,dx=2*L/(m-1);let s=0;for(let i=0;i<m;i++){const x=-L+i*dx,px=Math.exp(-x*x/2)/Math.sqrt(2*Math.PI);for(let j=0;j<m;j++){const y=-L+j*dx,py=Math.exp(-y*y/2)/Math.sqrt(2*Math.PI),p=.5*bvn(x,y,r1)+.5*bvn(x,y,r2);if(p>1e-300)s+=p*Math.log(p/(px*py));}}return s*dx*dx;}
+  function scatter(svg,pts,color){
+    svg.innerHTML='';const c=150,s=125;
+    el('rect',{x:c-s-8,y:c-s-8,width:2*s+16,height:2*s+16,fill:'none',stroke:cssv('--line')},svg);
+    el('line',{x1:c-s,x2:c+s,y1:c,y2:c,stroke:cssv('--muted'),'stroke-width':.7},svg);el('line',{x1:c,x2:c,y1:c-s,y2:c+s,stroke:cssv('--muted'),'stroke-width':.7},svg);
+    pts.forEach(([a,b])=>{if(Math.abs(a)<3.4&&Math.abs(b)<3.4)el('circle',{cx:c+a/3.4*s,cy:c-b/3.4*s,r:1.7,fill:color,opacity:.5},svg);});
+  }
+  function draw(){
+    const rho=+document.getElementById('rho').value;let d=+document.getElementById('dd').value;
+    d=Math.min(d,.97-Math.abs(rho));document.getElementById('rhov').textContent=rho.toFixed(2);document.getElementById('ddv').textContent=d.toFixed(2);
+    const r1=rho+d,r2=rho-d;
+    const A=Z.map(([a,b])=>[a,rho*a+Math.sqrt(1-rho*rho)*b]);
+    const B=Z.map(([a,b,u])=>{const r=u<.5?r1:r2;return [a,r*a+Math.sqrt(1-r*r)*b];});
+    scatter(document.getElementById('scA'),A,cssv('--a'));scatter(document.getElementById('scB'),B,cssv('--b'));
+    const mg=-.5*Math.log(1-rho*rho),mm=miMix(r1,r2);
+    document.getElementById('capA').innerHTML=`jointly Gaussian · MI = <b>${mg.toFixed(3)}</b> nats`;
+    document.getElementById('capB').innerHTML=`½N(${r1.toFixed(2)}) + ½N(${r2.toFixed(2)}) · MI = <b>${mm.toFixed(3)}</b> nats`;
+    document.getElementById('lemRead').innerHTML=`Same marginals, same ρ = ${rho.toFixed(2)}. Gaussian MI −½log(1−ρ²) = <b>${mg.toFixed(3)}</b> ≤ mixture MI <b>${mm.toFixed(3)}</b>, as Lemma B.1 says. `+
+      (Math.abs(rho)<.001&&d>.05?'<span style="color:var(--bad)">Uncorrelated, yet dependent.</span> Normal marginals alone are not enough; the <i>joint</i> must be Gaussian.':'');
+  }
+  ['rho','dd'].forEach(id=>document.getElementById(id).addEventListener('input',draw));
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change',draw);
+  draw();
+})();
+
+window.addEventListener('DOMContentLoaded',()=>{if(window.renderMathInElement)renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}],ignoredTags:['script','svg']});});
+</script>
+</body>
+</html>
