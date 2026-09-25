@@ -1,0 +1,59 @@
+<svg viewBox="0 0 700 300" xmlns="http://www.w3.org/2000/svg" role="img">
+<title>log p = L + KL through one EM iteration</title>
+<desc>Three stacked bars. In each, the blue part is the lower bound L and the red part on top is the KL gap, and together they reach the red line, the log-likelihood. Bar one: an arbitrary q leaves a visible KL gap. Bar two: after the E-step the gap is zero and L equals the log-likelihood. Bar three: after the M-step L has grown, and the log-likelihood has grown by at least as much because a new KL gap has opened above it.</desc>
+<style>
+  text{font-family:ui-sans-serif,-apple-system,"Segoe UI",sans-serif;font-weight:400}
+  .lab{font-size:12px;fill:#57564f} .hd{font-size:13px;font-weight:500;fill:#1a1a19}
+  .sm{font-size:11px;fill:#57564f}
+  .ax{stroke:#c3c2b7;stroke-width:0.75;fill:none}
+  .gd{stroke:#e2e1da;stroke-width:0.5;fill:none;stroke-dasharray:4 4}
+  .a{fill:none;stroke:#2f6fb5;stroke-width:1.6} .af{fill:#2f6fb5}
+  .b{fill:none;stroke:#c2571a;stroke-width:1.6} .bf{fill:#c2571a}
+  .mix{fill:none;stroke:#1a1a19;stroke-width:2}
+  .ll{fill:none;stroke:#b42318;stroke-width:2.2}
+  .bd{fill:none;stroke-width:1.6}
+  .tick{stroke:#8a8880;stroke-width:1}
+  .drop{stroke:#8a8880;stroke-width:0.8;stroke-dasharray:2 3}
+  .dot{fill:#1a1a19}
+  .bar{stroke:none}
+  .kl{fill:#b42318;opacity:.18} .lb{fill:#2f6fb5;opacity:.22}
+  .edge{stroke:#1a1a19;stroke-width:1.4;fill:none}
+  .arr{stroke:#0f7a5a;stroke-width:1.6;fill:none}
+  .arrf{fill:#0f7a5a}
+  @media (prefers-color-scheme: dark){
+    .lab,.sm{fill:#b6b4ab} .hd{fill:#eceae3} .ax{stroke:#4a4844} .gd{stroke:#33312e}
+    .a{stroke:#7fb2e8} .af{fill:#7fb2e8} .b{stroke:#f0a070} .bf{fill:#f0a070}
+    .mix{stroke:#eceae3} .ll{stroke:#ff7a6b} .tick{stroke:#85837b} .drop{stroke:#85837b}
+    .dot{fill:#eceae3} .kl{fill:#ff7a6b;opacity:.22} .lb{fill:#7fb2e8;opacity:.25}
+    .edge{stroke:#eceae3} .arr{stroke:#4cc79a} .arrf{fill:#4cc79a}
+  }
+</style>
+<path d="M 30,250 H 670" class="ax"/>
+<rect x="70" y="186.7" width="70" height="63.3" class="lb"/>
+<rect x="70" y="129.8" width="70" height="56.9" class="kl"/>
+<path d="M 62,129.8 H 148" class="ll"/>
+<path d="M 70,186.7 H 140" stroke="#2f6fb5" stroke-width="2" class="a"/>
+<text x="154" y="133.8" class="lab">log p = -265.6</text>
+<text x="154" y="190.7" class="lab">ℒ = -276.3</text>
+<text x="105" y="162.2" class="lab" text-anchor="middle">KL</text>
+<text x="70" y="272" class="hd">1. some old q</text>
+<text x="70" y="290" class="sm">q ≠ posterior: a gap</text>
+<rect x="280" y="129.8" width="70" height="120.2" class="lb"/>
+<path d="M 272,129.8 H 358" class="ll"/>
+<path d="M 280,129.8 H 350" stroke="#2f6fb5" stroke-width="2" class="a"/>
+<text x="364" y="133.8" class="lab">log p = -265.6</text>
+<text x="364" y="147.8" class="lab">ℒ = -265.6</text>
+<text x="280" y="272" class="hd">2. after the E-step</text>
+<text x="280" y="290" class="sm">q := p(z | x, θ): gap closes</text>
+<rect x="490" y="85.3" width="70" height="164.7" class="lb"/>
+<rect x="490" y="71.7" width="70" height="13.6" class="kl"/>
+<path d="M 482,71.7 H 568" class="ll"/>
+<path d="M 490,85.3 H 560" stroke="#2f6fb5" stroke-width="2" class="a"/>
+<text x="574" y="75.7" class="lab">log p = -254.5</text>
+<text x="574" y="103.3" class="lab">ℒ = -257.1</text>
+<text x="490" y="272" class="hd">3. after the M-step</text>
+<text x="490" y="290" class="sm">θ moves: ℒ rises, gap reopens</text>
+<path d="M 220,140 h 36" class="arr"/><path d="M 256,135 l 8,5 l -8,5 z" class="arrf"/>
+<path d="M 430,140 h 36" class="arr"/><path d="M 466,135 l 8,5 l -8,5 z" class="arrf"/>
+<text x="30" y="20" class="sm">vertical axis: log-likelihood units, truncated (bars start at a common floor, not at zero)</text>
+</svg>

@@ -167,6 +167,7 @@ inside one paper's notes.
 | Page | Covers |
 |---|---|
 | *Optimal transport and the Wasserstein distance* — [read online](https://msrepo.github.io/theory_inclined_papers_with_annotations/optimal-transport/) · [interactive](https://msrepo.github.io/theory_inclined_papers_with_annotations/optimal-transport/figures/interactive.html) · [source](foundations/optimal-transport/notes.md) | Monge maps vs. Kantorovich couplings, pushforward in plain words, $W_p$ and why it beats KL/JS without overlap (WGAN), Sinkhorn, duality, 1-D and Gaussian (FID) closed forms, minibatch OT for flow matching, and a symbol-by-symbol reading of the discrete OT definition used in data selection |
+| *Expectation–Maximization (EM) and Gaussian mixtures* — [read online](https://msrepo.github.io/theory_inclined_papers_with_annotations/expectation-maximization/) · [interactive](https://msrepo.github.io/theory_inclined_papers_with_annotations/expectation-maximization/figures/interactive.html) · [source](foundations/expectation-maximization/notes.md) · [code](foundations/expectation-maximization/code/) | the chicken-and-egg of latent labels, responsibilities by Bayes' rule (a softmax, and a sigmoid for two blobs), weighted M-step refits with a worked six-point example, why the likelihood never drops (Jensen, a touching lower bound, the $\ln p = \mathcal L + \mathrm{KL}$ gap), k-means as the hard limit, and the step to the ELBO of VAEs |
 
 ## Topics
 

@@ -1,0 +1,57 @@
+<svg viewBox="0 0 720 260" xmlns="http://www.w3.org/2000/svg" role="img">
+<title>Jensen's inequality: log of an average is at least the average of logs</title>
+<desc>The curve log x with two points a and b joined by a straight chord that lies below the curve. Above their midpoint, an orange dot on the curve (log of the average) sits higher than a blue dot on the chord (average of the logs). Text beside it states log of a weighted sum is at least the weighted sum of logs, with equality when all terms are equal.</desc>
+<style>
+  text{font-family:ui-sans-serif,-apple-system,"Segoe UI",sans-serif;font-weight:400}
+  .lab{font-size:12px;fill:#57564f} .hd{font-size:13px;font-weight:500;fill:#1a1a19}
+  .sm{font-size:11px;fill:#57564f}
+  .ax{stroke:#c3c2b7;stroke-width:0.75;fill:none}
+  .gd{stroke:#e2e1da;stroke-width:0.5;fill:none;stroke-dasharray:4 4}
+  .a{fill:none;stroke:#2f6fb5;stroke-width:1.6} .af{fill:#2f6fb5}
+  .b{fill:none;stroke:#c2571a;stroke-width:1.6} .bf{fill:#c2571a}
+  .mix{fill:none;stroke:#1a1a19;stroke-width:2}
+  .ll{fill:none;stroke:#b42318;stroke-width:2.2}
+  .bd{fill:none;stroke-width:1.6}
+  .tick{stroke:#8a8880;stroke-width:1}
+  .drop{stroke:#8a8880;stroke-width:0.8;stroke-dasharray:2 3}
+  .dot{fill:#1a1a19}
+  .bar{stroke:none}
+  .kl{fill:#b42318;opacity:.18} .lb{fill:#2f6fb5;opacity:.22}
+  .edge{stroke:#1a1a19;stroke-width:1.4;fill:none}
+  .arr{stroke:#0f7a5a;stroke-width:1.6;fill:none}
+  .arrf{fill:#0f7a5a}
+  @media (prefers-color-scheme: dark){
+    .lab,.sm{fill:#b6b4ab} .hd{fill:#eceae3} .ax{stroke:#4a4844} .gd{stroke:#33312e}
+    .a{stroke:#7fb2e8} .af{fill:#7fb2e8} .b{stroke:#f0a070} .bf{fill:#f0a070}
+    .mix{stroke:#eceae3} .ll{stroke:#ff7a6b} .tick{stroke:#85837b} .drop{stroke:#85837b}
+    .dot{fill:#eceae3} .kl{fill:#ff7a6b;opacity:.22} .lb{fill:#7fb2e8;opacity:.25}
+    .edge{stroke:#eceae3} .arr{stroke:#4cc79a} .arrf{fill:#4cc79a}
+  }
+</style>
+<path d="M 60,220 H 390" class="ax"/>
+<path d="M 61.3,206.7 L 62.4,200.4 L 63.5,194.8 L 64.6,189.8 L 65.7,185.3 L 66.8,181.2 L 67.9,177.4 L 69.0,173.9 L 70.1,170.6 L 71.2,167.6 L 72.3,164.7 L 73.4,162.0 L 74.5,159.4 L 75.6,157.0 L 76.7,154.6 L 77.8,152.4 L 78.9,150.3 L 80.0,148.3 L 81.1,146.4 L 82.2,144.5 L 83.3,142.7 L 84.4,141.0 L 85.5,139.3 L 86.6,137.7 L 87.7,136.1 L 88.8,134.6 L 89.9,133.2 L 91.0,131.8 L 92.1,130.4 L 93.2,129.0 L 94.3,127.7 L 95.4,126.5 L 96.5,125.2 L 97.6,124.0 L 98.7,122.9 L 99.8,121.7 L 100.9,120.6 L 102.0,119.5 L 103.1,118.4 L 104.2,117.4 L 105.3,116.4 L 106.4,115.4 L 107.5,114.4 L 108.6,113.4 L 109.7,112.5 L 110.8,111.6 L 111.9,110.7 L 113.0,109.8 L 114.1,108.9 L 115.2,108.0 L 116.3,107.2 L 117.4,106.4 L 118.5,105.5 L 119.6,104.7 L 120.7,104.0 L 121.8,103.2 L 122.9,102.4 L 124.0,101.7 L 125.1,100.9 L 126.2,100.2 L 127.3,99.5 L 128.4,98.8 L 129.5,98.1 L 130.6,97.4 L 131.7,96.7 L 132.8,96.1 L 133.9,95.4 L 135.0,94.8 L 136.0,94.1 L 137.1,93.5 L 138.2,92.9 L 139.3,92.3 L 140.4,91.7 L 141.5,91.1 L 142.6,90.5 L 143.7,89.9 L 144.8,89.3 L 145.9,88.7 L 147.0,88.2 L 148.1,87.6 L 149.2,87.1 L 150.3,86.5 L 151.4,86.0 L 152.5,85.5 L 153.6,84.9 L 154.7,84.4 L 155.8,83.9 L 156.9,83.4 L 158.0,82.9 L 159.1,82.4 L 160.2,81.9 L 161.3,81.4 L 162.4,80.9 L 163.5,80.4 L 164.6,80.0 L 165.7,79.5 L 166.8,79.0 L 167.9,78.6 L 169.0,78.1 L 170.1,77.7 L 171.2,77.2 L 172.3,76.8 L 173.4,76.3 L 174.5,75.9 L 175.6,75.5 L 176.7,75.1 L 177.8,74.6 L 178.9,74.2 L 180.0,73.8 L 181.1,73.4 L 182.2,73.0 L 183.3,72.6 L 184.4,72.2 L 185.5,71.8 L 186.6,71.4 L 187.7,71.0 L 188.8,70.6 L 189.9,70.2 L 191.0,69.8 L 192.1,69.4 L 193.2,69.1 L 194.3,68.7 L 195.4,68.3 L 196.5,68.0 L 197.6,67.6 L 198.7,67.2 L 199.8,66.9 L 200.9,66.5 L 202.0,66.2 L 203.1,65.8 L 204.2,65.5 L 205.3,65.1 L 206.4,64.8 L 207.5,64.4 L 208.6,64.1 L 209.7,63.8 L 210.8,63.4 L 211.9,63.1 L 213.0,62.8 L 214.1,62.4 L 215.2,62.1 L 216.3,61.8 L 217.4,61.5 L 218.5,61.1 L 219.6,60.8 L 220.7,60.5 L 221.8,60.2 L 222.9,59.9 L 224.0,59.6 L 225.1,59.3 L 226.2,59.0 L 227.3,58.7 L 228.4,58.4 L 229.5,58.1 L 230.6,57.8 L 231.7,57.5 L 232.8,57.2 L 233.9,56.9 L 235.0,56.6 L 236.1,56.3 L 237.2,56.0 L 238.3,55.8 L 239.4,55.5 L 240.5,55.2 L 241.6,54.9 L 242.7,54.6 L 243.8,54.4 L 244.9,54.1 L 246.0,53.8 L 247.1,53.5 L 248.2,53.3 L 249.3,53.0 L 250.4,52.7 L 251.5,52.5 L 252.6,52.2 L 253.7,51.9 L 254.8,51.7 L 255.9,51.4 L 257.0,51.2 L 258.1,50.9 L 259.2,50.7 L 260.3,50.4 L 261.4,50.1 L 262.5,49.9 L 263.6,49.6 L 264.7,49.4 L 265.8,49.1 L 266.9,48.9 L 268.0,48.7 L 269.1,48.4 L 270.2,48.2 L 271.3,47.9 L 272.4,47.7 L 273.5,47.5 L 274.6,47.2 L 275.7,47.0 L 276.8,46.7 L 277.9,46.5 L 279.0,46.3 L 280.1,46.0 L 281.2,45.8 L 282.3,45.6 L 283.4,45.4 L 284.5,45.1 L 285.6,44.9 L 286.7,44.7 L 287.8,44.5 L 288.9,44.2 L 290.0,44.0 L 291.1,43.8 L 292.2,43.6 L 293.3,43.3 L 294.4,43.1 L 295.5,42.9 L 296.6,42.7 L 297.7,42.5 L 298.8,42.3 L 299.9,42.1 L 301.0,41.8 L 302.1,41.6 L 303.2,41.4 L 304.3,41.2 L 305.3,41.0 L 306.4,40.8 L 307.5,40.6 L 308.6,40.4 L 309.7,40.2 L 310.8,40.0 L 311.9,39.8 L 313.0,39.6 L 314.1,39.4 L 315.2,39.2 L 316.3,39.0 L 317.4,38.8 L 318.5,38.6 L 319.6,38.4 L 320.7,38.2 L 321.8,38.0 L 322.9,37.8 L 324.0,37.6 L 325.1,37.4 L 326.2,37.2 L 327.3,37.0 L 328.4,36.8 L 329.5,36.6 L 330.6,36.5 L 331.7,36.3 L 332.8,36.1 L 333.9,35.9 L 335.0,35.7 L 336.1,35.5 L 337.2,35.3 L 338.3,35.1 L 339.4,35.0 L 340.5,34.8 L 341.6,34.6 L 342.7,34.4 L 343.8,34.2 L 344.9,34.1 L 346.0,33.9 L 347.1,33.7 L 348.2,33.5 L 349.3,33.3 L 350.4,33.2 L 351.5,33.0 L 352.6,32.8 L 353.7,32.6 L 354.8,32.5 L 355.9,32.3 L 357.0,32.1 L 358.1,31.9 L 359.2,31.8 L 360.3,31.6 L 361.4,31.4 L 362.5,31.3 L 363.6,31.1 L 364.7,30.9 L 365.8,30.8 L 366.9,30.6 L 368.0,30.4 L 369.1,30.3 L 370.2,30.1 L 371.3,29.9 L 372.4,29.8 L 373.5,29.6 L 374.6,29.4 L 375.7,29.3 L 376.8,29.1 L 377.9,28.9 L 379.0,28.8 L 380.1,28.6 L 381.2,28.5 L 382.3,28.3 L 383.4,28.1 L 384.5,28.0 L 385.6,27.8 L 386.7,27.7 L 387.8,27.5 L 388.9,27.4 L 390.0,27.2" class="mix"/>
+<path d="M 79.4,149.3 L 344.7,34.1" class="a"/>
+<circle cx="79.4" cy="149.3" r="3.5" class="dot"/>
+<circle cx="344.7" cy="34.1" r="3.5" class="dot"/>
+<circle cx="212.1" cy="91.7" r="4" class="af"/>
+<circle cx="212.1" cy="63.0" r="4" class="bf"/>
+<line x1="212.1" x2="212.1" y1="63.0" y2="220" class="drop"/>
+<text x="204.1" y="55.0" class="lab" text-anchor="end">log(average)</text>
+<text x="220.1" y="105.7" class="lab">average of logs</text>
+<text x="79.4" y="236" class="lab" text-anchor="middle">a</text>
+<text x="344.7" y="236" class="lab" text-anchor="middle">b</text>
+<text x="212.1" y="236" class="lab" text-anchor="middle">(a+b)/2</text>
+<text x="377.1" y="19.1" class="hd" text-anchor="end">log x</text>
+<text x="430" y="40" class="hd" xml:space="preserve">Jensen's inequality for log</text>
+<text x="430" y="58" class="lab" xml:space="preserve">log bends downward (it is concave), so the</text>
+<text x="430" y="76" class="lab" xml:space="preserve">straight chord between two points on it</text>
+<text x="430" y="94" class="lab" xml:space="preserve">lies below the curve. At the midpoint:</text>
+<text x="430" y="112" class="lab" xml:space="preserve"></text>
+<text x="430" y="130" class="lab" xml:space="preserve">  log( ½a + ½b )  ≥  ½ log a + ½ log b</text>
+<text x="430" y="148" class="lab" xml:space="preserve"></text>
+<text x="430" y="166" class="lab" xml:space="preserve">Same for any weights q₁…q_K summing to 1:</text>
+<text x="430" y="184" class="lab" xml:space="preserve">  log Σ q_k r_k  ≥  Σ q_k log r_k</text>
+<text x="430" y="202" class="lab" xml:space="preserve"></text>
+<text x="430" y="220" class="lab" xml:space="preserve">EM uses this to pull the log inside the sum.</text>
+<text x="430" y="238" class="lab" xml:space="preserve">Equality holds when all the r_k are equal.</text>
+</svg>

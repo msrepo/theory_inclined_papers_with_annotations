@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EM, Step by Step</title>
+<style>
+:root{
+  --bg:#fbfaf7; --surface:#ffffff; --ink:#1c1d21; --muted:#5b5f68; --line:#e2dfd8; --soft:#f2f0ea;
+  --c0:#2f6fb5; --c1:#c2571a; --c2:#0f7a5a; --c3:#7c3aed; --c4:#b8860b;
+  --ll:#b42318; --bound:#2f6fb5; --radius:12px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#131417; --surface:#1b1d21; --ink:#ebebed; --muted:#a3a6ae; --line:#2e3138; --soft:#23262b;
+    --c0:#7fb2e8; --c1:#f0a070; --c2:#4cc79a; --c3:#b48cff; --c4:#e6c34d;
+    --ll:#ff7a6b; --bound:#7fb2e8;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#131417; --surface:#1b1d21; --ink:#ebebed; --muted:#a3a6ae; --line:#2e3138; --soft:#23262b;
+  --c0:#7fb2e8; --c1:#f0a070; --c2:#4cc79a; --c3:#b48cff; --c4:#e6c34d;
+  --ll:#ff7a6b; --bound:#7fb2e8;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,sans-serif;}
+main{max-width:860px;margin:0 auto;padding:40px 16px 80px}
+h1{font-size:2.1rem;line-height:1.2;margin:0 0 .4rem;letter-spacing:-.01em}
+h2{font-size:1.4rem;margin:3rem 0 .6rem;padding-top:.5rem;border-top:1px solid var(--line)}
+p{margin:.6rem 0}
+a{color:var(--c0)}
+.lede{color:var(--muted);font-size:1.08rem;margin-bottom:1.4rem}
+nav.toc{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:12px 18px;font-size:.93rem}
+nav.toc ol{margin:.3rem 0;padding-left:1.2rem}
+nav.toc a{color:var(--ink);text-decoration:none;border-bottom:1px dotted var(--muted)}
+.widget{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:14px;margin:1rem 0 1.2rem}
+.controls{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;margin:.2rem 0 .6rem;font-size:.9rem}
+.controls label{display:flex;align-items:center;gap:6px;color:var(--muted)}
+button,select{font:inherit;font-size:.88rem;color:var(--ink);background:var(--soft);border:1px solid var(--line);border-radius:8px;padding:5px 11px;cursor:pointer}
+button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+button.next{outline:2px solid var(--c2);outline-offset:1px}
+input[type=range]{accent-color:var(--c0);width:130px}
+.readout{font-size:.9rem;color:var(--muted);margin-top:.5rem;font-variant-numeric:tabular-nums}
+.readout b{color:var(--ink)}
+.callout{border-left:3px solid var(--c2);background:var(--soft);padding:10px 14px;border-radius:0 8px 8px 0;margin:1rem 0;font-size:.95rem}
+canvas{display:block;width:100%;touch-action:none}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:.82rem;color:var(--muted);margin-top:.3rem}
+.legend span::before{content:"";display:inline-block;width:14px;height:3px;margin-right:6px;vertical-align:3px;background:var(--c)}
+.kbd{font-family:ui-monospace,Menlo,monospace;font-size:.85em;background:var(--soft);padding:1px 5px;border-radius:4px}
+@media (max-width:600px){ h1{font-size:1.7rem} input[type=range]{width:100px} }
+</style>
+</head>
+<body>
+<main>
+
+<h1>EM, Step by Step</h1>
+<p class="lede"><a href="../index.html">← text notes</a> · Foundations › Probability. Three widgets for the Expectation–Maximization algorithm: watch it cluster, watch it climb, and see where the soft assignments come from.</p>
+
+<nav class="toc"><b>Contents</b>
+<ol>
+  <li><a href="#s1">EM on 2-D clusters, one step at a time</a></li>
+  <li><a href="#s2">Climbing the likelihood with lower bounds</a></li>
+  <li><a href="#s3">Where responsibilities come from</a></li>
+</ol></nav>
+
+<!-- ============================================================ -->
+<h2 id="s1">1. EM on 2-D clusters, one step at a time</h2>
+<p>Each point is coloured by its <b>responsibilities</b>: a point that's surely in one blob takes that blob's colour, and a point that's split between blobs gets a blend. Ellipses show each Gaussian at 1 and 2 standard deviations, with thickness proportional to its weight π<sub>k</sub>.</p>
+<p>Press <b>E-step</b> and only the <i>colours</i> change: the blobs stay put and the points re-vote. Press <b>M-step</b> and only the <i>ellipses</i> change: each blob moves to the weighted average of the points that voted for it. The button that comes next is outlined. Click the canvas to add points.</p>
+
+<div class="widget">
+  <div class="controls">
+    <label>Data
+      <select id="emData">
+        <option value="three">Three blobs</option>
+        <option value="long">Two long stripes</option>
+        <option value="overlap">Heavy overlap</option>
+        <option value="unequal">Big and small</option>
+      </select></label>
+    <label>K <select id="emK"><option>1</option><option>2</option><option selected>3</option><option>4</option><option>5</option></select></label>
+    <label>Start
+      <select id="emInit">
+        <option value="random">random points</option>
+        <option value="stacked">all on top of each other</option>
+      </select></label>
+    <button id="emMode">Soft (EM)</button>
+  </div>
+  <div class="controls">
+    <button id="emE">E-step</button>
+    <button id="emM">M-step</button>
+    <button id="emRun">▶ Run</button>
+    <button id="emReset">↻ New start</button>
+  </div>
+  <canvas id="emCanvas" height="420"></canvas>
+  <canvas id="emTrace" height="110" style="margin-top:8px"></canvas>
+  <div class="readout" id="emRead"></div>
+</div>
+<div class="callout">Things to try. <b>Two long stripes</b> with K=2: EM usually finds the two thin ellipses (press ↻ if a start lands badly). Flip to <b>Hard (k-means)</b> and it can only think in round clusters, so it chops the stripes into a left half and a right half instead. <b>Start: all on top of each other</b> shows the plateau from the notes (§6): nothing happens for many steps, then it suddenly splits. Try K=5 on three blobs a few times: sometimes a blob shrinks around a handful of points, the start of the collapse in §3 (a tiny ridge 10<sup>-4</sup> is added to every covariance to stop it at zero).</div>
+
+<!-- ============================================================ -->
+<h2 id="s2">2. Climbing the likelihood with lower bounds</h2>
+<p>The red curve is the log-likelihood of 120 one-dimensional points as a function of one parameter, θ = μ<sub>1</sub> (the second blob's mean is fixed at 1.8, both variances at 1, both weights at ½). EM never looks at the red curve directly. <b>E-step</b> builds a bound ℒ(q, θ) that lies under it and touches it at the current θ. <b>M-step</b> jumps to the top of that bound. Drag the start slider and step.</p>
+
+<div class="widget">
+  <div class="controls">
+    <label>start θ⁰ <input id="lbStart" type="range" min="-65" max="45" value="-62"></label>
+    <button id="lbE">E-step: build bound</button>
+    <button id="lbM">M-step: jump to its top</button>
+    <button id="lbReset">↻ Reset</button>
+  </div>
+  <canvas id="lbCanvas" height="330"></canvas>
+  <div class="legend">
+    <span style="--c:var(--ll)">log p(X | θ)</span>
+    <span style="--c:var(--bound)">current bound ℒ(q, θ)</span>
+    <span style="--c:var(--line)">earlier bounds</span>
+  </div>
+  <div class="readout" id="lbRead"></div>
+</div>
+<div class="callout">Start at the far left and two or three big steps reach the top. Now start at the far right, where blob 1 begins on the <i>wrong side</i> of blob 2: the first bounds are nearly flat, the first few steps are short, and it needs about twice as many steps. A slow-looking EM run is usually this, a nearly flat stretch of the likelihood, not a bug. (A <i>decreasing</i> log-likelihood, on the other hand, is always a bug.)</div>
+
+<!-- ============================================================ -->
+<h2 id="s3">3. Where responsibilities come from</h2>
+<p>Two weighted Gaussians on a line. At every x, the responsibility of the blue blob is its share of the total height: γ<sub>1</sub>(x) = π<sub>1</sub>N(x | μ<sub>1</sub>, σ²) / p(x). With a shared σ, that share is exactly a logistic sigmoid in x, shown in the lower panel. Shrink σ and it sharpens into a step at the midpoint. That's the k-means limit: nearest centre takes all.</p>
+
+<div class="widget">
+  <div class="controls">
+    <label>μ₁ <input id="rMu1" type="range" min="-40" max="40" value="-15"></label>
+    <label>μ₂ <input id="rMu2" type="range" min="-40" max="40" value="15"></label>
+    <label>shared σ <input id="rSig" type="range" min="3" max="40" value="12"></label>
+    <label>π₁ <input id="rPi" type="range" min="5" max="95" value="50"></label>
+  </div>
+  <canvas id="rCanvas" height="340"></canvas>
+  <div class="readout" id="rRead"></div>
+</div>
+<div class="callout">Set π₁ to 0.8 and the crossover point slides <i>toward the orange blob</i>: a more common blob claims ambiguous points. Unequal weights shift the curve sideways; they don't change how steep it is. That's the <span class="kbd">ln(π₁/π₂)</span> term in the intercept.</div>
+
+<p class="readout" style="margin-top:2.5rem">Data are generated in the browser from a fixed seed, so they differ slightly from the figures in the text notes, which come from <span class="kbd">code/em.py</span>.</p>
+</main>
+
+<script>
+(() => {
+// ------------------------------------------------------------ utilities
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const COLS = () => ['--c0','--c1','--c2','--c3','--c4'].map(css);
+function hexRgb(h){ h=h.replace('#',''); if(h.length===3) h=h.split('').map(c=>c+c).join(''); const n=parseInt(h,16); return [n>>16&255,n>>8&255,n&255]; }
+function mulberry(seed){ return () => { seed|=0; seed=seed+0x6D2B79F5|0; let t=Math.imul(seed^seed>>>15,1|seed); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+function gauss(r){ let u=0,v=0; while(u===0) u=r(); v=r(); return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v); }
+function lse(a){ let m=-Infinity; for(const v of a) if(v>m) m=v; let s=0; for(const v of a) s+=Math.exp(v-m); return m+Math.log(s); }
+function setupCanvas(cv){
+  if (!cv.dataset.h) cv.dataset.h = cv.getAttribute('height');  // canvas.height gets scaled below
+  const dpr = window.devicePixelRatio||1, w = cv.clientWidth, h = +cv.dataset.h;
+  cv.style.height = h+'px'; cv.width = Math.round(w*dpr); cv.height = Math.round(h*dpr);
+  const ctx = cv.getContext('2d'); ctx.setTransform(dpr,0,0,dpr,0,0); return {ctx,w,h};
+}
+const redrawers = [];
+window.addEventListener('resize', () => redrawers.forEach(f => f()));
+if (window.matchMedia) matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change', () => redrawers.forEach(f => f()));
+
+// ================================================================ widget 1
+const W1 = (() => {
+  const cv = document.getElementById('emCanvas'), tr = document.getElementById('emTrace');
+  const read = document.getElementById('emRead');
+  const bE = document.getElementById('emE'), bM = document.getElementById('emM');
+  const bRun = document.getElementById('emRun'), bMode = document.getElementById('emMode');
+  const RIDGE = 1e-4;
+  let X = [], K = 3, mu = [], S = [], pi = [], G = [], hard = false, next = 'E', trace = [], timer = null, seedCtr = 1;
+
+  function makeData(kind){
+    const r = mulberry(kind.length*97 + 11), pts = [];
+    // n points around (mx, my), spread `major` along a direction at `deg` degrees and `minor` across it
+    const blob = (n, mx, my, major, minor, deg) => { const c=Math.cos(deg*Math.PI/180), s=Math.sin(deg*Math.PI/180);
+      for(let i=0;i<n;i++){ const a=major*gauss(r), b=minor*gauss(r); pts.push([mx + c*a - s*b, my + s*a + c*b]); } };
+    if (kind==='three'){ blob(70,-0.5,0.45,0.13,0.13,0); blob(70,0.45,0.5,0.17,0.08,25); blob(70,0.05,-0.45,0.22,0.1,-20); }
+    if (kind==='long'){ blob(110,0,-0.2,0.5,0.04,15); blob(110,0,0.2,0.5,0.04,15); }
+    if (kind==='overlap'){ blob(100,-0.18,0,0.22,0.22,0); blob(100,0.22,0.05,0.22,0.22,0); }
+    if (kind==='unequal'){ blob(200,-0.2,0,0.35,0.3,30); blob(30,0.62,0.55,0.07,0.07,0); }
+    return pts;
+  }
+  function logN(x, m, s){
+    const a=s[0], b=s[1], c=s[3], det=a*c-b*b, dx=x[0]-m[0], dy=x[1]-m[1];
+    return -Math.log(2*Math.PI) - 0.5*Math.log(det) - 0.5*(c*dx*dx - 2*b*dx*dy + a*dy*dy)/det;
+  }
+  function loglik(){ let s=0; for(const x of X){ const l=[]; for(let k=0;k<K;k++) l.push(Math.log(pi[k])+logN(x,mu[k],S[k])); s+=lse(l); } return s; }
+  function sse(){ let s=0; for(const x of X){ let m=Infinity; for(let k=0;k<K;k++){ const d=(x[0]-mu[k][0])**2+(x[1]-mu[k][1])**2; if(d<m) m=d; } s+=m; } return s; }
+  function objective(){ return hard ? sse() : loglik(); }
+
+  function init(){
+    const r = mulberry(seedCtr++*7919), mode = document.getElementById('emInit').value;
+    mu=[]; S=[]; pi=[];
+    let mx=0, my=0; for(const x of X){ mx+=x[0]; my+=x[1]; } mx/=X.length; my/=X.length;
+    for(let k=0;k<K;k++){
+      if (mode==='stacked') mu.push([mx + 0.004*(k-(K-1)/2), my + 0.003*(k%2)]);
+      else { const p = X[Math.floor(r()*X.length)]; mu.push([p[0], p[1]]); }
+      const v = mode==='stacked' ? 0.25 : 0.04;
+      S.push([v,0,0,v]); pi.push(1/K);
+    }
+    G = X.map(() => new Array(K).fill(1/K));
+    next = 'E'; trace = [objective()]; draw();
+  }
+  function eStep(){
+    G = X.map(x => {
+      if (hard){ let best=0, bd=Infinity; for(let k=0;k<K;k++){ const d=(x[0]-mu[k][0])**2+(x[1]-mu[k][1])**2; if(d<bd){bd=d;best=k;} }
+        const g=new Array(K).fill(0); g[best]=1; return g; }
+      const l=[]; for(let k=0;k<K;k++) l.push(Math.log(pi[k])+logN(x,mu[k],S[k]));
+      const z=lse(l); return l.map(v=>Math.exp(v-z));
+    });
+    next = 'M'; draw();
+  }
+  function mStep(){
+    for(let k=0;k<K;k++){
+      let n=0, sx=0, sy=0; X.forEach((x,i)=>{ const g=G[i][k]; n+=g; sx+=g*x[0]; sy+=g*x[1]; });
+      if (n < 1e-8){ continue; } // an empty blob keeps its old parameters
+      const m=[sx/n, sy/n]; mu[k]=m;
+      if (!hard){
+        let a=0,b=0,c=0; X.forEach((x,i)=>{ const g=G[i][k], dx=x[0]-m[0], dy=x[1]-m[1]; a+=g*dx*dx; b+=g*dx*dy; c+=g*dy*dy; });
+        S[k]=[a/n+RIDGE, b/n, b/n, c/n+RIDGE]; pi[k]=n/X.length;
+      }
+    }
+    if (!hard){ const t=pi.reduce((a,b)=>a+b,0); pi=pi.map(p=>p/t); }
+    next = 'E'; trace.push(objective()); draw();
+  }
+
+  function draw(){
+    const {ctx,w,h} = setupCanvas(cv), cols = COLS().map(hexRgb);
+    const sc = Math.min(w,h)/2.0, ox = w/2, oy = h/2;
+    const P = p => [ox + p[0]*sc, oy - p[1]*sc];
+    ctx.fillStyle = css('--surface'); ctx.fillRect(0,0,w,h);
+    X.forEach((x,i) => {
+      const g = G[i]; let c=[0,0,0];
+      for(let k=0;k<K;k++) for(let j=0;j<3;j++) c[j]+=g[k]*cols[k][j];
+      const [px,py]=P(x); ctx.beginPath(); ctx.arc(px,py,3.3,0,7);
+      ctx.fillStyle = next==='E' && trace.length===1 ? css('--muted') : `rgb(${c.map(Math.round).join(',')})`; ctx.fill();
+    });
+    for(let k=0;k<K;k++){
+      const [a,b,,c] = hard ? [0.02,0,0,0.02] : S[k];
+      const tr2=(a+c)/2, d=Math.sqrt(((a-c)/2)**2+b*b), l1=tr2+d, l2=Math.max(tr2-d,1e-12), ang=0.5*Math.atan2(2*b,a-c);
+      const [cx,cy]=P(mu[k]);
+      ctx.strokeStyle = `rgb(${cols[k].join(',')})`;
+      for(const r of (hard?[1]:[1,2])){
+        ctx.lineWidth = hard ? 2 : (r===1?1:0.6) * (1 + 5*pi[k]);
+        ctx.beginPath(); ctx.ellipse(cx,cy,r*Math.sqrt(l1)*sc,r*Math.sqrt(l2)*sc,-ang,0,7); ctx.stroke();
+      }
+      ctx.beginPath(); ctx.moveTo(cx-6,cy); ctx.lineTo(cx+6,cy); ctx.moveTo(cx,cy-6); ctx.lineTo(cx,cy+6);
+      ctx.lineWidth=2; ctx.stroke();
+    }
+    ctx.fillStyle = css('--muted'); ctx.font='12px -apple-system,sans-serif';
+    ctx.fillText(next==='E' ? 'next: E-step (points re-vote)' : 'next: M-step (blobs move)', 10, 18);
+    drawTrace();
+    bE.classList.toggle('next', next==='E'); bM.classList.toggle('next', next==='M');
+    const it = trace.length-1, v = trace[trace.length-1];
+    const Nk = hard ? mu.map((_,k)=>G.reduce((s,g)=>s+g[k],0)) : pi.map(p=>p*X.length);
+    read.innerHTML = `iteration <b>${it}</b> · ${hard?'sum of squared distances':'log-likelihood'} <b>${v.toFixed(2)}</b>`
+      + ` · N<sub>k</sub> = ${Nk.map(n=>n.toFixed(1)).join(', ')}`
+      + (trace.length>1 && !hard && trace[trace.length-1] < trace[trace.length-2]-1e-7 ? ' · <b>decreased!</b>' : '');
+  }
+  function drawTrace(){
+    const {ctx,w,h} = setupCanvas(tr);
+    ctx.fillStyle = css('--surface'); ctx.fillRect(0,0,w,h);
+    const pad=38, n=Math.max(trace.length,10);
+    const lo=Math.min(...trace), hi=Math.max(...trace), span=(hi-lo)||1;
+    ctx.strokeStyle=css('--line'); ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(pad,h-18); ctx.lineTo(w-6,h-18); ctx.stroke();
+    ctx.fillStyle=css('--muted'); ctx.font='11px -apple-system,sans-serif';
+    ctx.fillText(hard?'SSE (↓ better)':'log-lik', 2, 14); ctx.fillText('iteration →', w-80, h-4);
+    ctx.strokeStyle=css('--ll'); ctx.lineWidth=2; ctx.beginPath();
+    trace.forEach((v,i)=>{ const x=pad+(w-pad-10)*i/(n-1), y=(h-24)-(v-lo)/span*(h-40); i?ctx.lineTo(x,y):ctx.moveTo(x,y); });
+    ctx.stroke();
+    trace.forEach((v,i)=>{ const x=pad+(w-pad-10)*i/(n-1), y=(h-24)-(v-lo)/span*(h-40); ctx.beginPath(); ctx.arc(x,y,2.2,0,7); ctx.fillStyle=css('--ll'); ctx.fill(); });
+  }
+  function stop(){ if(timer){ clearInterval(timer); timer=null; bRun.textContent='▶ Run'; bRun.classList.remove('on'); } }
+  function load(){ stop(); X = makeData(document.getElementById('emData').value); K = +document.getElementById('emK').value; init(); }
+
+  bE.onclick = () => { stop(); eStep(); };
+  bM.onclick = () => { stop(); mStep(); };
+  bRun.onclick = () => {
+    if (timer) return stop();
+    bRun.textContent='❚❚ Pause'; bRun.classList.add('on');
+    let steps = 0;
+    timer = setInterval(() => { next==='E' ? eStep() : mStep(); if(++steps>400) stop(); }, 160);
+  };
+  document.getElementById('emReset').onclick = () => { stop(); init(); };
+  document.getElementById('emData').onchange = load;
+  document.getElementById('emK').onchange = load;
+  document.getElementById('emInit').onchange = () => { stop(); init(); };
+  bMode.onclick = () => { hard=!hard; bMode.textContent = hard ? 'Hard (k-means)' : 'Soft (EM)'; bMode.classList.toggle('on',hard); stop(); init(); };
+  cv.addEventListener('pointerdown', e => {
+    const r = cv.getBoundingClientRect(), w=r.width, h=r.height, sc=Math.min(w,h)/2.0;
+    X.push([(e.clientX-r.left-w/2)/sc, -(e.clientY-r.top-h/2)/sc]);
+    G.push(new Array(K).fill(1/K)); next='E'; draw();
+  });
+  redrawers.push(draw);
+  load();
+})();
+
+// ================================================================ widget 2
+const W2 = (() => {
+  const cv = document.getElementById('lbCanvas'), read = document.getElementById('lbRead');
+  const sl = document.getElementById('lbStart');
+  const r = mulberry(2024); const X=[];
+  for(let i=0;i<45;i++) X.push(-2+0.8*gauss(r));
+  for(let i=0;i<75;i++) X.push(1.8+1.1*gauss(r));
+  const MU2 = 1.8, XL = [-7, 5];
+  const lj = (x, m1) => [Math.log(0.5) - 0.5*Math.log(2*Math.PI) - 0.5*(x-m1)**2, Math.log(0.5) - 0.5*Math.log(2*Math.PI) - 0.5*(x-MU2)**2];
+  const ll = m1 => X.reduce((s,x)=>s+lse(lj(x,m1)),0);
+  const post = m1 => X.map(x=>{ const l=lj(x,m1), z=lse(l); return [Math.exp(l[0]-z), Math.exp(l[1]-z)]; });
+  const bound = (q, m1) => X.reduce((s,x,i)=>{ const l=lj(x,m1); let t=0; for(let k=0;k<2;k++) if(q[i][k]>0) t+=q[i][k]*(l[k]-Math.log(q[i][k])); return s+t; },0);
+  let theta, steps, bounds, q, next;
+  const grid = Array.from({length:300},(_,i)=>XL[0]+(XL[1]-XL[0])*i/299);
+  const llg = grid.map(ll);
+  function reset(){ theta = sl.value/10; steps=[theta]; bounds=[]; q=null; next='E'; draw(); }
+  function eStep(){ q = post(theta); bounds.push(grid.map(m=>bound(q,m))); next='M'; draw(); }
+  function mStep(){ if(!q) return; let a=0,b=0; X.forEach((x,i)=>{a+=q[i][0]*x; b+=q[i][0];}); theta=a/b; steps.push(theta); q=null; next='E'; draw(); }
+  function draw(){
+    const {ctx,w,h} = setupCanvas(cv);
+    ctx.fillStyle=css('--surface'); ctx.fillRect(0,0,w,h);
+    const L=44, R=w-12, T=12, B=h-34;
+    const lo = Math.min(ll(sl.value/10), ...steps.map(ll)) - 20, hi = Math.max(...llg) + 8;
+    const PX = v => L+(v-XL[0])/(XL[1]-XL[0])*(R-L), PY = v => B-(v-lo)/(hi-lo)*(B-T);
+    ctx.save(); ctx.beginPath(); ctx.rect(L,T,R-L,B-T); ctx.clip();
+    bounds.forEach((bd,j)=>{
+      const cur = j===bounds.length-1 && next==='M';
+      ctx.strokeStyle = cur ? css('--bound') : css('--line'); ctx.lineWidth = cur?2.2:1.4;
+      ctx.beginPath(); bd.forEach((v,i)=>{ const y=PY(Math.max(v,lo-100)); i?ctx.lineTo(PX(grid[i]),y):ctx.moveTo(PX(grid[i]),y); }); ctx.stroke();
+      if (cur){ let bi=0; bd.forEach((v,i)=>{ if(v>bd[bi]) bi=i; }); ctx.setLineDash([3,3]); ctx.strokeStyle=css('--bound'); ctx.lineWidth=1;
+        ctx.beginPath(); ctx.moveTo(PX(grid[bi]),PY(bd[bi])); ctx.lineTo(PX(grid[bi]),B); ctx.stroke(); ctx.setLineDash([]);
+        ctx.fillStyle=css('--bound'); ctx.beginPath(); ctx.arc(PX(grid[bi]),PY(bd[bi]),4,0,7); ctx.fill(); }
+    });
+    ctx.strokeStyle=css('--ll'); ctx.lineWidth=2.4; ctx.beginPath();
+    llg.forEach((v,i)=>{ const y=PY(v); i?ctx.lineTo(PX(grid[i]),y):ctx.moveTo(PX(grid[i]),y); }); ctx.stroke();
+    ctx.restore();
+    ctx.strokeStyle=css('--line'); ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(L,B); ctx.lineTo(R,B); ctx.moveTo(L,T); ctx.lineTo(L,B); ctx.stroke();
+    ctx.fillStyle=css('--muted'); ctx.font='11px -apple-system,sans-serif'; ctx.textAlign='center';
+    for(let t=-6;t<=4;t+=2) ctx.fillText(t, PX(t), B+14);
+    ctx.fillText('θ = μ₁', (L+R)/2, B+28); ctx.textAlign='left';
+    ctx.save(); ctx.translate(12,(T+B)/2); ctx.rotate(-Math.PI/2); ctx.textAlign='center'; ctx.fillText('log-likelihood', 0, 0); ctx.restore();
+    ctx.strokeStyle=css('--muted'); ctx.setLineDash([2,3]); ctx.beginPath(); ctx.moveTo(PX(MU2),T); ctx.lineTo(PX(MU2),B); ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillText('μ₂ = 1.8', PX(MU2)+4, T+12);
+    steps.forEach((s,i)=>{ const last=i===steps.length-1; ctx.fillStyle = last?css('--ink'):css('--muted');
+      ctx.beginPath(); ctx.arc(PX(s),PY(ll(s)),last?5:3.5,0,7); ctx.fill(); });
+    document.getElementById('lbE').classList.toggle('next', next==='E');
+    document.getElementById('lbM').classList.toggle('next', next==='M');
+    const cur = ll(theta), gain = steps.length>1 ? cur-ll(steps[steps.length-2]) : null;
+    read.innerHTML = `step <b>${steps.length-1}</b> · θ = <b>${theta.toFixed(3)}</b> · log p(X | θ) = <b>${cur.toFixed(2)}</b>`
+      + (gain!==null ? ` · last M-step gained <b>${gain.toFixed(3)}</b>` : '')
+      + (next==='M' ? ' · the bound touches the red curve at θ, and its top (blue dot) is where the M-step will go' : '');
+  }
+  sl.oninput = reset;
+  document.getElementById('lbE').onclick = () => { if(next==='E') eStep(); };
+  document.getElementById('lbM').onclick = () => { if(next==='M') mStep(); else { eStep(); mStep(); } };
+  document.getElementById('lbReset').onclick = reset;
+  redrawers.push(draw);
+  reset();
+})();
+
+// ================================================================ widget 3
+const W3 = (() => {
+  const cv = document.getElementById('rCanvas'), read = document.getElementById('rRead');
+  const ids = ['rMu1','rMu2','rSig','rPi'].map(i=>document.getElementById(i));
+  function draw(){
+    const m1=ids[0].value/10, m2=ids[1].value/10, s=ids[2].value/10, p1=ids[3].value/100, p2=1-p1;
+    const {ctx,w,h} = setupCanvas(cv);
+    ctx.fillStyle=css('--surface'); ctx.fillRect(0,0,w,h);
+    const L=34, R=w-10, XL=[-6,6], PX=v=>L+(v-XL[0])/(XL[1]-XL[0])*(R-L);
+    const T1=10, B1=180, T2=210, B2=h-26;
+    const N=(x,m)=>Math.exp(-0.5*((x-m)/s)**2)/(s*Math.sqrt(2*Math.PI));
+    const xs=Array.from({length:400},(_,i)=>XL[0]+(XL[1]-XL[0])*i/399);
+    const d1=xs.map(x=>p1*N(x,m1)), d2=xs.map(x=>p2*N(x,m2)), mx=Math.max(...d1.map((v,i)=>v+d2[i]));
+    const PY1=v=>B1-v/mx*(B1-T1), PY2=v=>B2-v*(B2-T2);
+    // stacked fill so the "share of the height" reading is literal
+    ctx.globalAlpha=0.22; ctx.fillStyle=css('--c0'); ctx.beginPath(); ctx.moveTo(PX(xs[0]),B1);
+    xs.forEach((x,i)=>ctx.lineTo(PX(x),PY1(d1[i]))); ctx.lineTo(PX(xs[xs.length-1]),B1); ctx.fill();
+    ctx.fillStyle=css('--c1'); ctx.beginPath(); xs.forEach((x,i)=>ctx.lineTo(PX(x),PY1(d1[i]))); for(let i=xs.length-1;i>=0;i--) ctx.lineTo(PX(xs[i]),PY1(d1[i]+d2[i])); ctx.fill();
+    ctx.globalAlpha=1;
+    const line=(ys,col,PY,lw)=>{ ctx.strokeStyle=col; ctx.lineWidth=lw; ctx.beginPath(); xs.forEach((x,i)=>{ const y=PY(ys[i]); i?ctx.lineTo(PX(x),y):ctx.moveTo(PX(x),y); }); ctx.stroke(); };
+    line(d1.map((v,i)=>v+d2[i]), css('--ink'), PY1, 1.6);
+    line(d1, css('--c0'), PY1, 1.6); line(d2, css('--c1'), PY1, 1.6);
+    const g = xs.map((x,i)=>d1[i]/(d1[i]+d2[i]||1e-300));
+    ctx.strokeStyle=css('--line'); ctx.lineWidth=1;
+    [B1,B2,T2,(T2+B2)/2].forEach(y=>{ ctx.beginPath(); ctx.moveTo(L,y); ctx.lineTo(R,y); ctx.stroke(); });
+    line(g, css('--c0'), PY2, 2.4);
+    const wgt=(m1-m2)/(s*s), b=(m2*m2-m1*m1)/(2*s*s)+Math.log(p1/p2), cross = Math.abs(wgt)>1e-9 ? -b/wgt : null;
+    if (cross!==null && cross>XL[0] && cross<XL[1]){
+      ctx.setLineDash([3,3]); ctx.strokeStyle=css('--muted'); ctx.beginPath(); ctx.moveTo(PX(cross),T1); ctx.lineTo(PX(cross),B2); ctx.stroke(); ctx.setLineDash([]);
+    }
+    const mid=(m1+m2)/2; ctx.fillStyle=css('--muted'); ctx.beginPath(); ctx.arc(PX(mid),B2,3,0,7); ctx.fill();
+    ctx.font='11px -apple-system,sans-serif'; ctx.fillStyle=css('--muted');
+    ctx.fillText('π₁N(x|μ₁,σ²), π₂N(x|μ₂,σ²) and their sum p(x)', L+4, T1+10);
+    ctx.fillText('γ₁(x) = p(z=1 | x)', L+4, T2+12);
+    ctx.fillText('1', 6, T2+4); ctx.fillText('½', 6, (T2+B2)/2+4); ctx.fillText('0', 6, B2+4);
+    ctx.textAlign='center'; for(let t=-6;t<=6;t+=2) ctx.fillText(t, PX(t), B2+16); ctx.textAlign='left';
+    read.innerHTML = `γ₁(x) = 1 / (1 + e<sup>−(wx + b)</sup>) with w = (μ₁−μ₂)/σ² = <b>${wgt.toFixed(2)}</b>, `
+      + `b = (μ₂²−μ₁²)/(2σ²) + ln(π₁/π₂) = <b>${b.toFixed(2)}</b>`
+      + (cross!==null ? ` · 50/50 point at x = <b>${cross.toFixed(2)}</b> (dashed; midpoint of the means ${mid.toFixed(2)} is the dot)` : '');
+  }
+  ids.forEach(i=>i.oninput=draw);
+  redrawers.push(draw);
+  draw();
+})();
+})();
+</script>
+</body>
+</html>
