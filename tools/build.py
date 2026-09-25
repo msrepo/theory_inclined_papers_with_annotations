@@ -34,7 +34,7 @@ NON_PAPER_KINDS = {"foundations", "topic"}
 # the only place to edit when adding a section. Anything uncategorised is
 # collected under "Unsorted" at the end rather than silently disappearing.
 CATEGORIES: list[tuple[str, list[str]]] = [
-    ("Foundations", ["Linear algebra"]),
+    ("Foundations", ["Linear algebra", "Probability"]),
     ("NTK & function space", ["Theory", "Applications"]),
     ("Contrastive learning", ["Theory", "Applications"]),
     ("Gradient estimation", ["Theory"]),

@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Optimal Transport, Visually</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
+<style>
+:root{
+  --bg:#fbfaf7; --surface:#ffffff; --ink:#1c1d21; --muted:#5b5f68; --line:#e2dfd8; --soft:#f2f0ea;
+  --mu:#2563eb; --nu:#d45a22; --plan:#7c3aed; --good:#0f7a5a; --bad:#b42318;
+  --radius:12px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#131417; --surface:#1b1d21; --ink:#ebebed; --muted:#a3a6ae; --line:#2e3138; --soft:#23262b;
+    --mu:#6e9dff; --nu:#ff8a52; --plan:#b48cff; --good:#4cc79a; --bad:#ff7a6b;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#131417; --surface:#1b1d21; --ink:#ebebed; --muted:#a3a6ae; --line:#2e3138; --soft:#23262b;
+  --mu:#6e9dff; --nu:#ff8a52; --plan:#b48cff; --good:#4cc79a; --bad:#ff7a6b;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,sans-serif;}
+a{color:var(--plan)}
+main{max-width:860px;margin:0 auto;padding:40px 16px 80px}
+h1{font-size:2.1rem;line-height:1.2;margin:0 0 .4rem;letter-spacing:-.01em}
+h2{font-size:1.4rem;margin:3rem 0 .6rem;padding-top:.5rem;border-top:1px solid var(--line)}
+h3{font-size:1.05rem;margin:1.6rem 0 .4rem}
+p{margin:.6rem 0}
+.lede{color:var(--muted);font-size:1.08rem;margin-bottom:1.4rem}
+.mu{color:var(--mu);font-weight:600}
+.nu{color:var(--nu);font-weight:600}
+.pl{color:var(--plan);font-weight:600}
+nav.toc{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:12px 18px;font-size:.93rem}
+nav.toc ol{margin:.3rem 0;padding-left:1.2rem;columns:2;column-gap:2rem}
+nav.toc a{color:var(--ink);text-decoration:none;border-bottom:1px dotted var(--muted)}
+@media (max-width:600px){nav.toc ol{columns:1}}
+.widget{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:14px;margin:1rem 0 1.2rem}
+.widget svg{width:100%;height:auto;display:block;touch-action:none}
+.controls{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;margin:.2rem 0 .6rem;font-size:.9rem}
+.controls label{display:flex;align-items:center;gap:6px;color:var(--muted)}
+button,select{font:inherit;font-size:.88rem;color:var(--ink);background:var(--soft);border:1px solid var(--line);border-radius:8px;padding:5px 11px;cursor:pointer}
+button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+input[type=range]{accent-color:var(--plan);width:160px}
+.readout{font-size:.9rem;color:var(--muted);margin-top:.5rem;font-variant-numeric:tabular-nums}
+.readout b{color:var(--ink)}
+.callout{border-left:3px solid var(--plan);background:var(--soft);padding:10px 14px;border-radius:0 8px 8px 0;margin:1rem 0}
+.callout.why{border-left-color:var(--good)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:640px){.grid2{grid-template-columns:1fr}}
+table.mat{border-collapse:collapse;font-size:.85rem;font-variant-numeric:tabular-nums;margin:.3rem 0}
+table.mat td,table.mat th{border:1px solid var(--line);padding:3px 8px;text-align:right}
+table.mat th{background:var(--soft);font-weight:600}
+table.mat td.marg{color:var(--muted);font-style:italic}
+.tables{display:flex;flex-wrap:wrap;gap:18px;margin-top:.5rem}
+.tables .cap{font-size:.8rem;color:var(--muted);margin-bottom:2px}
+.formula{overflow-x:auto;padding:2px 0}
+dl.gloss dt{font-weight:600;margin-top:.7rem}
+dl.gloss dd{margin:0 0 0 1rem;color:var(--muted)}
+ul.refs li{margin:.35rem 0}
+.kbd{font-family:ui-monospace,Menlo,monospace;font-size:.85em;background:var(--soft);padding:1px 5px;border-radius:4px}
+canvas{display:block;max-width:100%}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:.82rem;color:var(--muted);margin-top:.3rem}
+.legend span::before{content:"";display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px;background:var(--c)}
+</style>
+</head>
+<body>
+<main>
+
+<h1>Optimal Transport, Visually</h1>
+<p class="lede"><a href="../index.html">← text notes</a> · Foundations › Probability. How to move one distribution onto another as cheaply as possible, and why the answer gives a distance between distributions that deep learning keeps reaching for (Wasserstein distance, FID, OT flow matching, domain adaptation).</p>
+
+<nav class="toc"><b>Contents</b>
+<ol>
+  <li><a href="#s1">The idea: sand into holes</a></li>
+  <li><a href="#s2">A worked example with numbers</a></li>
+  <li><a href="#s3">Maps vs. plans (Monge vs. Kantorovich)</a></li>
+  <li><a href="#s4">A plan is a joint distribution</a></li>
+  <li><a href="#s5">Why ML likes Wasserstein</a></li>
+  <li><a href="#s6">Point clouds &amp; straight-line flows</a></li>
+  <li><a href="#s7">The formal definitions, piece by piece</a></li>
+  <li><a href="#s8">Reading a paper's OT definition</a></li>
+  <li><a href="#s9">Where it shows up in papers</a></li>
+  <li><a href="#s10">Cheat sheet</a></li>
+</ol></nav>
+
+<!-- ============================================================ -->
+<h2 id="s1">1. The idea: sand into holes</h2>
+<p>Picture a probability distribution as a <b>pile of sand</b>: where the pile is tall, there's a lot of probability. You have one pile, <span class="mu">μ</span> (the <i>source</i>), and a set of holes shaped like a second distribution, <span class="nu">ν</span> (the <i>target</i>). Both hold the same total amount (probability 1).</p>
+<p><b>The optimal transport question:</b> <i>what's the cheapest way to shovel all the sand into the holes?</i> Moving a grain a distance <i>d</i> costs <i>d</i> (or <i>d</i>², depending on the cost we pick). The minimum total cost is a number that says <b>how far apart the two distributions are</b>. That number is the <b>Wasserstein distance</b>, also called the <i>earth mover's distance</i>.</p>
+
+<div class="widget">
+  <div class="controls">
+    <label>Shapes
+      <select id="sandPreset">
+        <option value="shift">Shift a pile right</option>
+        <option value="split">One pile → two piles</option>
+        <option value="spread">Narrow → wide</option>
+        <option value="swap">Two piles → two piles</option>
+      </select></label>
+    <button id="sandOpt" class="on">Optimal matching</button>
+    <button id="sandRand">Random matching</button>
+    <button id="sandPlay">▶ Shovel</button>
+    <label>progress <input id="sandT" type="range" min="0" max="1000" value="0"></label>
+  </div>
+  <svg id="sandSvg" viewBox="0 0 720 290" aria-label="Grains of sand moving from pile mu into holes shaped like nu"></svg>
+  <div class="legend"><span style="--c:var(--mu)">sand grains (μ), above ground</span><span style="--c:var(--nu)">holes to fill (ν), below ground</span></div>
+  <div class="readout" id="sandReadout"></div>
+</div>
+
+<div class="callout"><b>What to notice.</b> In 1-D, the optimal rule is simple: <b>sort the grains left to right, sort the holes left to right, and match the 1st with the 1st, the 2nd with the 2nd, and so on.</b> Nothing ever crosses over. Switch to <i>random matching</i> and the grains criss-cross, so the average distance goes up. Optimal transport is the matching with the smallest possible average distance.</div>
+
+<!-- ============================================================ -->
+<h2 id="s2">2. A worked example with numbers</h2>
+<p>Swap sand for bread. Three <span class="mu">bakeries</span> produce 30, 20 and 50 loaves (total 100). Three <span class="nu">cafés</span> need 40, 35 and 25 loaves (total 100). Shipping one loaf costs its distance on the map. Divide everything by 100 and it's a probability problem: <span class="mu">μ = (0.3, 0.2, 0.5)</span>, <span class="nu">ν = (0.4, 0.35, 0.25)</span>.</p>
+<p>A <b class="pl">transport plan</b> is a table: <i>“ship γ<sub>ij</sub> loaves from bakery i to café j.”</i> It has to obey two rules:</p>
+<ul>
+  <li><b>Row sums = supply.</b> Each bakery ships out exactly what it baked (row <i>i</i> adds up to μ<sub>i</sub>).</li>
+  <li><b>Column sums = demand.</b> Each café receives exactly what it needs (column <i>j</i> adds up to ν<sub>j</sub>).</li>
+</ul>
+<p>Among all tables obeying both rules, OT picks the one with the smallest total cost Σ<sub>ij</sub> cost<sub>ij</sub> × γ<sub>ij</sub>. <b>Drag the shops around</b> and watch the plan re-route.</p>
+
+<div class="widget">
+  <div class="controls">
+    <button id="bakOpt" class="on">Optimal plan</button>
+    <button id="bakNaive">Naive plan (ignores distance)</button>
+    <span style="color:var(--muted)">Drag any shop.</span>
+  </div>
+  <svg id="bakSvg" viewBox="0 0 720 380" aria-label="Map with three bakeries and three cafes; lines show shipments"></svg>
+  <div class="tables" id="bakTables"></div>
+  <div class="readout" id="bakReadout"></div>
+</div>
+
+<div class="callout">The naive plan fills café 1 first, then café 2, then café 3, without looking at distances. It still obeys both rules (it's a valid plan), but it costs more. Notice that the optimal plan sometimes <b>splits</b> one bakery's output across two cafés. That splitting is the key difference between the two classic formulations, coming up next.</div>
+
+<!-- ============================================================ -->
+<h2 id="s3">3. Maps vs. plans (Monge vs. Kantorovich)</h2>
+<p>There are two ways to write down “a way of moving the sand.”</p>
+
+<div class="grid2">
+  <div class="widget" style="margin:0">
+    <svg viewBox="0 0 340 200" aria-label="Monge map: each point goes to exactly one place">
+      <text x="170" y="22" text-anchor="middle" font-size="15" font-weight="600" fill="currentColor">Monge (1781): a map T</text>
+      <g id="mongeA"></g>
+    </svg>
+    <p style="font-size:.92rem;margin:.3rem 0 0">Each grain at <i>x</i> goes to <b>one</b> place, <i>T(x)</i>. It's a function, like an encoder mapping each input to one embedding.</p>
+  </div>
+  <div class="widget" style="margin:0">
+    <svg viewBox="0 0 340 200" aria-label="Kantorovich plan: mass at a point may split">
+      <text x="170" y="22" text-anchor="middle" font-size="15" font-weight="600" fill="currentColor">Kantorovich (1942): a plan γ</text>
+      <g id="kantoA"></g>
+    </svg>
+    <p style="font-size:.92rem;margin:.3rem 0 0">Mass at one spot is allowed to <b>split</b>. γ(x, y) says how much goes from <i>x</i> to <i>y</i>. That's the table from §2.</p>
+  </div>
+</div>
+
+<h3>The problem with maps (and a reminder about “pushforward”)</h3>
+<p>Monge's constraint is written <span class="kx">$T_\#\mu = \nu$</span>, read <i>“T pushes μ forward to ν.”</i> In plain words: <b>take every grain of μ, move it to T(grain), and the pile you end up with must look exactly like ν.</b> In deep learning terms: if <i>X</i> ~ μ is an input and <i>T</i> is your network, then <span class="kx">$T_\#\mu$</span> is simply <b>the distribution of the outputs T(X)</b>.</p>
+<p>Now look at the right-hand picture above. If μ is a single spike of mass 1 and ν is two spikes of mass ½, <b>no function T can do it</b>: a function sends one point to one point, so the whole spike lands in one place. Kantorovich fixed this by letting mass split. That makes the problem always solvable, and it turns it into a linear program (a table of unknowns, linear constraints, linear cost), which is why it's the version everyone uses.</p>
+<div class="callout why"><b>Good to know:</b> when μ is a smooth density (no spikes) and the cost is squared distance, the best Kantorovich plan doesn't split anything. It turns out to be a Monge map after all (<b>Brenier's theorem</b>). §4 lets you see this: the optimal plan collapses onto a thin curve, which is the graph of the map <i>y = T(x)</i>.</div>
+
+<!-- ============================================================ -->
+<h2 id="s4">4. A plan is a joint distribution</h2>
+<p>Here is the view that makes OT click for probability. Divide the plan table by the total mass and <b>γ is a joint distribution of a pair (X, Y)</b>:</p>
+<ul>
+  <li>its <b>row sums</b> (marginal over y) give back <span class="mu">μ</span>, the distribution of X;</li>
+  <li>its <b>column sums</b> (marginal over x) give back <span class="nu">ν</span>, the distribution of Y.</li>
+</ul>
+<p>A joint distribution with prescribed marginals is called a <b>coupling</b>. So OT means <b>choosing the coupling of μ and ν that makes X and Y as close as possible on average</b>, i.e. the one with the smallest 𝔼[|X − Y|²].</p>
+<p>Below, the square is γ(x, y): source position <i>x</i> runs up the left side (with <span class="mu">μ</span> drawn there), target position <i>y</i> runs along the top (with <span class="nu">ν</span>). Dark cells mean a lot of mass travels from that x to that y. The dashed diagonal is “don't move” (y = x).</p>
+
+<div class="widget">
+  <div class="controls">
+    <label><span class="mu">μ</span>
+      <select id="hmMu">
+        <option value="gl" selected>Gaussian, left</option>
+        <option value="bi">Two bumps</option>
+        <option value="gw">Gaussian, wide right</option>
+        <option value="un">Uniform</option>
+        <option value="sk">Skewed</option>
+      </select></label>
+    <label><span class="nu">ν</span>
+      <select id="hmNu">
+        <option value="gl">Gaussian, left</option>
+        <option value="bi" selected>Two bumps</option>
+        <option value="gw">Gaussian, wide right</option>
+        <option value="un">Uniform</option>
+        <option value="sk">Skewed</option>
+      </select></label>
+    <label>blur ε <input id="hmEps" type="range" min="0" max="7" step="1" value="0"></label>
+    <b id="hmEpsLabel" style="font-size:.88rem"></b>
+  </div>
+  <div style="display:flex;justify-content:center"><canvas id="hmCanvas" width="480" height="480" style="width:100%;max-width:480px;aspect-ratio:1"></canvas></div>
+  <div class="readout" id="hmReadout"></div>
+</div>
+
+<div class="callout"><b>Play with the blur ε</b> (the “entropic regularisation” behind the <b>Sinkhorn algorithm</b>):
+<ul style="margin:.3rem 0">
+<li><b>ε = 0:</b> the exact OT plan, a thin increasing curve. Each x goes to one y (a Monge map, as Brenier promised), and it's the “sort and match” rule from §1.</li>
+<li><b>small ε:</b> the curve gets a soft halo. It costs slightly more, but it's much faster to compute on GPUs and it's differentiable. This is what libraries like POT and <span class="kbd">geomloss</span> usually compute.</li>
+<li><b>ε → ∞:</b> the plan becomes <span class="kx">$\mu(x)\,\nu(y)$</span>, the <b>independent coupling</b>: X and Y ignore each other and sand gets sent everywhere. It's still a valid plan (the marginals are right), just a terrible one.</li>
+</ul></div>
+
+<!-- ============================================================ -->
+<h2 id="s5">5. Why ML likes Wasserstein distance</h2>
+<p>KL divergence and Jensen–Shannon compare distributions <b>point by point</b>: “at this location, how different are the heights?” They don't care <i>how far</i> apart the mass is. Wasserstein compares them by <b>how far the mass has to travel</b>. Slide the target away from the source:</p>
+
+<div class="widget">
+  <div class="controls">
+    <label>shift θ <input id="wkTheta" type="range" min="-1000" max="1000" value="600" style="width:260px"></label>
+    <b id="wkThetaLabel" style="font-size:.88rem"></b>
+  </div>
+  <svg id="wkSvg" viewBox="0 0 720 360" aria-label="Two uniform distributions and plots of W1, JS and KL against the shift"></svg>
+  <div class="readout" id="wkReadout"></div>
+</div>
+
+<div class="callout why"><b>Why this matters for training.</b> Once the two distributions stop overlapping (|θ| &gt; width), JS is stuck at log 2 and KL is ∞. Neither changes as you move, so their <b>gradient is zero</b> and a generator gets no signal about which way to go. W₁ = |θ| keeps shrinking as you move closer, so its gradient always points the right way. That's the core argument of the <b>Wasserstein GAN</b> paper (Arjovsky et al., 2017). Real data and early generator samples live on thin, non-overlapping manifolds, so this is the normal situation, not a corner case.</div>
+
+<!-- ============================================================ -->
+<h2 id="s6">6. Point clouds &amp; straight-line flows</h2>
+<p>In practice you rarely have densities. You have <b>samples</b>, e.g. a batch of embeddings from domain A and a batch from domain B. With <i>n</i> equally-weighted points on each side, OT becomes an <b>assignment problem</b>: pair every <span class="mu">source point</span> with exactly one <span class="nu">target point</span> so that the average squared distance is smallest. Slide <i>t</i> to move every point along a straight line to its partner.</p>
+
+<div class="widget">
+  <div class="controls">
+    <label>target
+      <select id="pcShape">
+        <option value="ring">Ring</option>
+        <option value="two">Two clusters</option>
+        <option value="moon">Crescent</option>
+      </select></label>
+    <button id="pcOpt" class="on">Optimal pairing</button>
+    <button id="pcRand">Random pairing</button>
+    <button id="pcNew">New samples</button>
+    <label>t <input id="pcT" type="range" min="0" max="1000" value="0"></label>
+    <button id="pcPlay">▶ Flow</button>
+  </div>
+  <svg id="pcSvg" viewBox="0 0 720 400" aria-label="Two point clouds with lines showing optimal pairing"></svg>
+  <div class="readout" id="pcReadout"></div>
+</div>
+
+<div class="callout"><b>Link to flow matching.</b> Sliding <i>t</i> moves each point along <span class="kx">$x_t = (1-t)\,x_0 + t\,x_1$</span>. With the <b>optimal</b> pairing, the paths are short and orderly, and (for squared cost) two moving points never occupy the same spot at the same time. With <b>random</b> pairing, paths are long and tangled. Flow-matching models learn a velocity field along exactly these paths, and tangled paths are harder to learn and need more integration steps. That's why <b>OT-coupled flow matching</b> (Tong et al., 2023; Pooladian et al., 2023) pairs noise and data inside each minibatch with OT before training. The <a href="../../2026-li-hyperbolic-flow-matching/index.html">Path-Decoupled Hyperbolic Flow Matching</a> paper (Li et al., 2026) builds on this family.</div>
+
+<!-- ============================================================ -->
+<h2 id="s7">7. The formal definitions, piece by piece</h2>
+<p>Now the symbols, each one tied back to a picture above.</p>
+
+<h3>Ingredients</h3>
+<ul>
+  <li><span class="kx">$\mu$</span> on a space <span class="kx">$\mathcal X$</span>: the source distribution (the sand pile, the bakeries, the batch from domain A).</li>
+  <li><span class="kx">$\nu$</span> on <span class="kx">$\mathcal Y$</span>: the target distribution (the holes, the cafés, domain B).</li>
+  <li><span class="kx">$c(x,y)$</span>: the cost of moving one unit of mass from x to y. Usually <span class="kx">$\|x-y\|$</span> or <span class="kx">$\|x-y\|^2$</span>.</li>
+</ul>
+
+<h3>Monge's problem (maps, §3 left)</h3>
+<div class="formula">$$\inf_{T}\ \int_{\mathcal X} c\big(x, T(x)\big)\, d\mu(x) \quad\text{subject to}\quad T_\#\mu = \nu .$$</div>
+<p><span class="kx">$\int c(x,T(x))\,d\mu(x)$</span> is just “the average cost per grain when grains are drawn from μ”, i.e. <span class="kx">$\mathbb E_{X\sim\mu}[c(X,T(X))]$</span>. The constraint <span class="kx">$T_\#\mu=\nu$</span> says “the outputs T(X) must be distributed as ν”. Formally <span class="kx">$(T_\#\mu)(B) = \mu(T^{-1}(B))$</span>: the probability of landing in a region B equals the probability of starting somewhere that T sends into B.</p>
+
+<h3>Kantorovich's problem (plans, §2 and §4)</h3>
+<div class="formula">$$\mathrm{OT}_c(\mu,\nu) \;=\; \min_{\gamma\in\Pi(\mu,\nu)} \int_{\mathcal X\times\mathcal Y} c(x,y)\, d\gamma(x,y) \;=\; \min_{\gamma\in\Pi(\mu,\nu)} \mathbb E_{(X,Y)\sim\gamma}\big[c(X,Y)\big]$$</div>
+<p><span class="kx">$\Pi(\mu,\nu)$</span> is the set of <b>couplings</b>: joint distributions of (X, Y) whose first marginal is μ and second marginal is ν (the “row sums / column sums” rule). Formally, <span class="kx">$\gamma(A\times\mathcal Y)=\mu(A)$</span> and <span class="kx">$\gamma(\mathcal X\times B)=\nu(B)$</span>.</p>
+
+<h3>The discrete version (what code actually solves)</h3>
+<p>With weights <span class="kx">$a\in\mathbb R^n$</span> on source points, <span class="kx">$b\in\mathbb R^m$</span> on target points, and cost matrix <span class="kx">$C_{ij}=c(x_i,y_j)$</span>:</p>
+<div class="formula">$$\min_{P\in\mathbb R_{\ge 0}^{n\times m}} \ \sum_{i,j} C_{ij}P_{ij} \quad\text{s.t.}\quad P\mathbf 1_m = a,\;\; P^\top\mathbf 1_n = b .$$</div>
+<p>That's §2 exactly: <span class="kx">$P$</span> is the shipping table, <span class="kx">$P\mathbf 1 = a$</span> is “row sums = supply”, <span class="kx">$P^\top\mathbf 1 = b$</span> is “column sums = demand”. It's a linear program with <span class="kx">$nm$</span> unknowns.</p>
+
+<h3>Wasserstein distance</h3>
+<p>Choose the cost <span class="kx">$c(x,y)=\|x-y\|^p$</span> and take a p-th root:</p>
+<div class="formula">$$W_p(\mu,\nu) \;=\; \Big(\min_{\gamma\in\Pi(\mu,\nu)} \mathbb E_{(X,Y)\sim\gamma}\,\|X-Y\|^p\Big)^{1/p}.$$</div>
+<p>This is a genuine metric on distributions (symmetric, zero only if μ = ν, triangle inequality). <span class="kx">$W_1$</span> is the earth mover's distance (§1, §5) and <span class="kx">$W_2$</span> is the one with the nice geometry (§4, §6).</p>
+
+<h3>Closed forms worth memorising</h3>
+<ul>
+  <li><b>1-D:</b> sort and match. With <span class="kx">$F^{-1}, G^{-1}$</span> the quantile functions of μ and ν,
+  <div class="formula">$$W_p^p(\mu,\nu)=\int_0^1 \big|F^{-1}(u)-G^{-1}(u)\big|^p\,du .$$</div>
+  “Match the u-th quantile of μ with the u-th quantile of ν”, which is the §1 animation.</li>
+  <li><b>Gaussians:</b> for <span class="kx">$\mathcal N(m_1,\Sigma_1)$</span> and <span class="kx">$\mathcal N(m_2,\Sigma_2)$</span>,
+  <div class="formula">$$W_2^2 = \|m_1-m_2\|^2 + \operatorname{tr}\!\Big(\Sigma_1+\Sigma_2-2\big(\Sigma_2^{1/2}\Sigma_1\Sigma_2^{1/2}\big)^{1/2}\Big).$$</div>
+  This is <b>exactly the FID score</b>: fit a Gaussian to Inception features of real images and one to generated images, then compute this. It's also useful for the Gaussian-embedding papers (<a href="../../2026-betser-infonce-gaussian/index.html">Betser et al. 2026</a>, <a href="../../gaussianity-in-practice/index.html">Gaussianity in practice</a>): if embeddings are Gaussian, the W₂ distance between two domains has this formula.</li>
+</ul>
+
+<h3>Entropic OT and Sinkhorn (the ε slider in §4)</h3>
+<div class="formula">$$\min_{P\in\Pi(a,b)} \sum_{ij} C_{ij}P_{ij} \;-\; \varepsilon\, H(P), \qquad H(P) = -\sum_{ij} P_{ij}\log P_{ij}.$$</div>
+<p>The entropy term <span class="kx">$H(P)$</span> rewards spread-out plans, which is the blur. The solution has the form <span class="kx">$P = \operatorname{diag}(u)\,K\,\operatorname{diag}(v)$</span> with <span class="kx">$K_{ij}=e^{-C_{ij}/\varepsilon}$</span>. The <b>Sinkhorn algorithm</b> finds it by alternately rescaling rows to match <i>a</i> and columns to match <i>b</i>. It uses only matrix–vector products, so it's GPU-friendly and differentiable (Cuturi, 2013).</p>
+
+<h3>Duality: the shipping company's view</h3>
+<div class="formula">$$\mathrm{OT}_c(\mu,\nu) = \max_{f,g}\ \Big\{\ \mathbb E_{\mu}[f(X)] + \mathbb E_{\nu}[g(Y)] \ :\ f(x)+g(y)\le c(x,y)\ \text{for all } x,y \Big\}.$$</div>
+<p>Story: a shipping company offers to do the job. It charges <i>f(x)</i> per loaf to pick up at x and <i>g(y)</i> per loaf to drop off at y. To stay competitive, pickup + dropoff can never exceed what you'd pay to ship it yourself, <i>c(x, y)</i>. The most the company can earn equals your cheapest self-shipping cost. For <span class="kx">$W_1$</span> this becomes the <b>Kantorovich–Rubinstein</b> form</p>
+<div class="formula">$$W_1(\mu,\nu)=\sup_{\|f\|_{\text{Lip}}\le 1}\ \mathbb E_{\mu}[f(X)]-\mathbb E_{\nu}[f(Y)],$$</div>
+<p>which is where the WGAN “critic” comes from: <i>f</i> is a neural network kept 1-Lipschitz (by weight clipping or a gradient penalty).</p>
+
+<!-- ============================================================ -->
+<h2 id="s8">8. Reading a paper's OT definition (data-selection example)</h2>
+<p>Here is a definition from a data-selection paper ("Optimal Transport between Discrete Distributions", which reads like TSDS, Liu et al., 2024, the OT-based baseline in the <a href="../../2026-wang-ntk-selector/index.html">NTK-Selector</a> paper). It's the discrete Kantorovich problem from §7, i.e. the bakery problem from §2, with different letters:</p>
+<div class="formula">$$\begin{aligned}&\min_{\gamma\in\mathbb R_{\ge 0}^{|U|\times|V|}}\ \sum_{i=1}^{|U|}\sum_{j=1}^{|V|}\gamma_{ij}\,f(u_i,v_j)\\ &\text{s.t.}\ \ \sum_{j=1}^{|V|}\gamma_{ij}=\mu_i\ \ \forall i,\qquad \sum_{i=1}^{|U|}\gamma_{ij}=\nu_j\ \ \forall j .\end{aligned}$$</div>
+<table class="mat" style="font-size:.9rem;margin:.8rem 0">
+<tr><th style="text-align:left">Paper symbol</th><th style="text-align:left">Plain meaning</th><th style="text-align:left">In the bakery widget (§2)</th></tr>
+<tr><td style="text-align:left">$(A, f)$, a metric space</td><td style="text-align:left">A finite set of examples $A$ with a distance $f(a,a')$ between any two, e.g. distance between embeddings</td><td style="text-align:left">The map; $f$ = straight-line distance</td></tr>
+<tr><td style="text-align:left">$U \subseteq A$, points $u_i$</td><td style="text-align:left">The source examples (e.g. a candidate pool)</td><td style="text-align:left">The bakeries</td></tr>
+<tr><td style="text-align:left">$V \subseteq A$, points $v_j$</td><td style="text-align:left">The target examples (e.g. a small target-task set)</td><td style="text-align:left">The cafés</td></tr>
+<tr><td style="text-align:left">$\mu_i = \mu(u_i)$</td><td style="text-align:left">Probability mass sitting on example $u_i$. Uniform would be $1/|U|$</td><td style="text-align:left">Supply 30, 20, 50 ÷ 100</td></tr>
+<tr><td style="text-align:left">$\nu_j = \nu(v_j)$</td><td style="text-align:left">Probability mass on target example $v_j$</td><td style="text-align:left">Demand 40, 35, 25 ÷ 100</td></tr>
+<tr><td style="text-align:left">$\gamma\in\mathbb R_{\ge0}^{|U|\times|V|}$</td><td style="text-align:left">A non-negative $|U|\times|V|$ table; $\gamma_{ij}$ = mass moved from $u_i$ to $v_j$</td><td style="text-align:left">The “Plan γ” table</td></tr>
+<tr><td style="text-align:left">$\sum_{i,j}\gamma_{ij}f(u_i,v_j)$</td><td style="text-align:left">Total cost = mass × distance, summed over every pair</td><td style="text-align:left">“Total cost” readout</td></tr>
+<tr><td style="text-align:left">$\sum_j \gamma_{ij}=\mu_i$</td><td style="text-align:left">Everything at $u_i$ gets shipped out (row sums)</td><td style="text-align:left">“row sum = μᵢ” column</td></tr>
+<tr><td style="text-align:left">$\sum_i \gamma_{ij}=\nu_j$</td><td style="text-align:left">Each $v_j$ receives exactly what it should (column sums)</td><td style="text-align:left">“col sum = νⱼ” row</td></tr>
+</table>
+<p>Two remarks help when reading such papers:</p>
+<ul>
+  <li><b>$U$ and $V$ living in one space $A$</b> just means one distance function $f$ compares any source example with any target example. In practice $A$ is “all texts or images” and $f$ is a distance between their embeddings (often cosine or Euclidean in a pretrained model's feature space). The OT answer is only as meaningful as that embedding space.</li>
+  <li><b>Why OT is useful for selection.</b> The optimal value (with $f$ a metric, this is $W_1(\mu,\nu)$) measures how far the source distribution is from the target distribution. If you get to choose the weights $\mu$ on the candidate pool, e.g. by putting mass only on selected examples, then making this value small means choosing candidates whose <i>distribution</i> covers the target distribution. That's a different goal from just grabbing each target point's nearest neighbours: the column constraints force every target example to be served, so selections can't all pile up near one popular target region. Look at §2: with the column-sum rule, every café gets its full demand even if it's far from all bakeries.</li>
+</ul>
+
+<!-- ============================================================ -->
+<h2 id="s9">9. Where it shows up in papers</h2>
+<ul class="refs">
+  <li><b>Generative models:</b> Wasserstein GAN (Arjovsky, Chintala &amp; Bottou, 2017) trains against W₁ via the dual (§5, §7). <b>FID</b> is W₂ between Gaussian fits (§7).</li>
+  <li><b>Flow matching / diffusion:</b> OT-conditional flow matching (Tong et al., 2023) and multisample flow matching (Pooladian et al., 2023) use minibatch OT couplings to straighten paths (§6).</li>
+  <li><b>Domain adaptation:</b> Courty et al. (2017) align source and target feature distributions with an OT plan.</li>
+  <li><b>Transferability / dataset similarity:</b> OTDD (Alvarez-Melis &amp; Fusi, 2020) measures distance between labelled datasets with OT. OTCE (Tan et al., 2021) uses an OT coupling between source and target to predict transfer performance. Both sit next to <a href="../../2020-nguyen-leep/index.html">LEEP</a> and <a href="../../2021-you-logme/index.html">LogME</a> in the transferability notes.</li>
+  <li><b>Computation:</b> Sinkhorn (Cuturi, 2013). Libraries: <span class="kbd">POT</span> (Python Optimal Transport), <span class="kbd">geomloss</span>, <span class="kbd">ott-jax</span>.</li>
+  <li><b>Textbooks:</b> Peyré &amp; Cuturi, <i>Computational Optimal Transport</i> (2019) is readable and ML-oriented and has most of these pictures. Villani, <i>Optimal Transport: Old and New</i> (2009) is the deep-theory reference.</li>
+</ul>
+
+<!-- ============================================================ -->
+<h2 id="s10">10. Cheat sheet</h2>
+<dl class="gloss">
+  <dt>Optimal transport (OT)</dt><dd>Cheapest way to rearrange distribution μ into distribution ν, given a per-unit moving cost c(x, y).</dd>
+  <dt>Transport plan / coupling γ</dt><dd>A joint distribution of (X, Y) with marginals μ and ν. “How much mass goes from x to y.” In code: an n×m matrix with fixed row and column sums.</dd>
+  <dt>Transport map T</dt><dd>A function sending each x to one T(x). It can't split mass. Exists for nice (smooth) μ with squared cost (Brenier).</dd>
+  <dt>Pushforward T<sub>#</sub>μ</dt><dd>The distribution of T(X) when X ~ μ.</dd>
+  <dt>Wasserstein distance W<sub>p</sub></dt><dd>(min over couplings of 𝔼‖X − Y‖<sup>p</sup>)<sup>1/p</sup>. It measures how far mass must travel, and it stays informative when supports don't overlap.</dd>
+  <dt>Earth mover's distance</dt><dd>Another name for W₁.</dd>
+  <dt>Entropic OT / Sinkhorn</dt><dd>OT with a blur term −εH(P). Fast, differentiable, GPU-friendly. ε → 0 gives exact OT, ε → ∞ gives the independent coupling μ⊗ν.</dd>
+  <dt>Dual potentials f, g</dt><dd>Pickup/dropoff “prices” whose sum never exceeds the cost. In W₁ this is a single 1-Lipschitz function (the WGAN critic).</dd>
+</dl>
+
+</main>
+
+<script>
+/* ---------- shared helpers ---------- */
+const NS = "http://www.w3.org/2000/svg";
+const cssv = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+function el(tag, attrs = {}, parent) {
+  const e = document.createElementNS(NS, tag);
+  for (const k in attrs) e.setAttribute(k, attrs[k]);
+  if (parent) parent.appendChild(e);
+  return e;
+}
+const gauss = (x, m, s) => Math.exp(-0.5 * ((x - m) / s) ** 2) / s;
+function mulberry32(a) { return function () { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+function shuffle(arr, rng) { const a = arr.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(rng() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+const ease = t => t < .5 ? 2 * t * t : 1 - (-2 * t + 2) ** 2 / 2;
+function hexToRgb(h) { h = h.replace('#', ''); if (h.length === 3) h = h.split('').map(c => c + c).join(''); const n = parseInt(h, 16); return [n >> 16 & 255, n >> 8 & 255, n & 255]; }
+function toggle(a, b, aOn) { a.classList.toggle('on', aOn); b.classList.toggle('on', !aOn); }
+function svgPoint(svg, evt) { const p = svg.createSVGPoint(); p.x = evt.clientX; p.y = evt.clientY; return p.matrixTransform(svg.getScreenCTM().inverse()); }
+function animate(rangeEl, onFrame, ms = 1800) {
+  const start = performance.now();
+  (function step(now) { const t = Math.min(1, (now - start) / ms); rangeEl.value = Math.round(t * 1000); onFrame(); if (t < 1) requestAnimationFrame(step); })(start);
+}
+
+/* Exact balanced transport via successive shortest paths (min-cost flow). Fine for small problems. */
+function minCostTransport(a, b, C) {
+  const m = a.length, n = b.length, N = m + n + 2, S = m + n, T = m + n + 1;
+  const g = Array.from({ length: N }, () => []);
+  const add = (u, v, cap, cost) => { g[u].push({ v, cap, cost, r: g[v].length }); g[v].push({ v: u, cap: 0, cost: -cost, r: g[u].length - 1 }); return g[u].length - 1; };
+  const idx = [];
+  for (let i = 0; i < m; i++) add(S, i, a[i], 0);
+  for (let j = 0; j < n; j++) add(m + j, T, b[j], 0);
+  for (let i = 0; i < m; i++) { idx.push([]); for (let j = 0; j < n; j++) idx[i].push(add(i, m + j, Infinity, C[i][j])); }
+  for (let guard = 0; guard < 10000; guard++) {
+    const dist = new Array(N).fill(Infinity), pv = new Array(N).fill(-1), pe = new Array(N).fill(-1);
+    dist[S] = 0;
+    for (let it = 0; it < N; it++) {
+      let upd = false;
+      for (let u = 0; u < N; u++) { if (dist[u] === Infinity) continue;
+        g[u].forEach((e, k) => { if (e.cap > 1e-9 && dist[u] + e.cost < dist[e.v] - 1e-12) { dist[e.v] = dist[u] + e.cost; pv[e.v] = u; pe[e.v] = k; upd = true; } }); }
+      if (!upd) break;
+    }
+    if (dist[T] === Infinity) break;
+    let f = Infinity;
+    for (let v = T; v !== S; v = pv[v]) f = Math.min(f, g[pv[v]][pe[v]].cap);
+    for (let v = T; v !== S; v = pv[v]) { const e = g[pv[v]][pe[v]]; e.cap -= f; g[v][e.r].cap += f; }
+  }
+  return idx.map((row, i) => row.map(k => { const e = g[i][k]; return g[e.v][e.r].cap; }));
+}
+
+/* ---------- §1 sand piles ---------- */
+(function sand() {
+  const svg = document.getElementById('sandSvg');
+  const x0 = 40, x1 = 680, ground = 132, NB = 26, N = 52, step = 11.2, sz = 10;
+  const bw = (x1 - x0) / NB;
+  const presets = {
+    shift: { mu: x => gauss(x, .25, .07), nu: x => gauss(x, .72, .07) },
+    split: { mu: x => gauss(x, .5, .07), nu: x => gauss(x, .18, .05) + gauss(x, .82, .05) },
+    spread: { mu: x => gauss(x, .5, .045), nu: x => gauss(x, .5, .17) },
+    swap: { mu: x => gauss(x, .2, .05) + .55 * gauss(x, .62, .05), nu: x => .55 * gauss(x, .38, .05) + gauss(x, .82, .05) }
+  };
+  let preset = 'shift', mode = 'opt', src = [], tgt = [], match = [], rects = [], paths = [];
+  const rng = mulberry32(7);
+  function alloc(f) {
+    const w = []; for (let b = 0; b < NB; b++) w.push(f((b + .5) / NB));
+    const s = w.reduce((p, c) => p + c, 0), raw = w.map(v => v / s * N), cnt = raw.map(Math.floor);
+    const rem = N - cnt.reduce((p, c) => p + c, 0);
+    raw.map((v, i) => [v - Math.floor(v), i]).sort((p, q) => q[0] - p[0]).slice(0, rem).forEach(([, i]) => cnt[i]++);
+    const out = []; cnt.forEach((c, b) => { for (let k = 0; k < c; k++) out.push({ b, k, x: (b + .5) / NB }); });
+    return out;
+  }
+  const slotX = g => x0 + g.b * bw + (bw - 2 * step) / 2 + (g.k % 2) * step;
+  const upY = g => ground - (Math.floor(g.k / 2) + 1) * step;
+  const downY = g => ground + 3 + Math.floor(g.k / 2) * step;
+  function build() {
+    svg.innerHTML = '';
+    src = alloc(presets[preset].mu); tgt = alloc(presets[preset].nu);
+    match = mode === 'opt' ? src.map((_, i) => i) : shuffle(src.map((_, i) => i), mulberry32(11));
+    // ground + axis
+    el('rect', { x: 0, y: ground, width: 720, height: 150, fill: cssv('--soft') }, svg);
+    el('line', { x1: x0 - 10, x2: x1 + 10, y1: ground, y2: ground, stroke: cssv('--muted'), 'stroke-width': 1.2 }, svg);
+    for (let v = 0; v <= 1.0001; v += .25) {
+      const X = x0 + v * (x1 - x0);
+      el('text', { x: X, y: 282, 'text-anchor': 'middle', 'font-size': 11, fill: cssv('--muted') }, svg).textContent = v.toFixed(2);
+    }
+    el('text', { x: 12, y: 24, 'font-size': 12, fill: cssv('--mu') }, svg).textContent = 'μ: sand above ground';
+    el('text', { x: 12, y: ground + 18, 'font-size': 12, fill: cssv('--nu') }, svg).textContent = 'ν: holes';
+    // holes
+    tgt.forEach(g => el('rect', { x: slotX(g), y: downY(g), width: sz, height: sz, rx: 2, fill: 'none', stroke: cssv('--nu'), 'stroke-dasharray': '2 2', 'stroke-width': 1.1 }, svg));
+    // paths
+    const pg = el('g', { opacity: .28 }, svg);
+    paths = src.map((g, i) => {
+      const t = tgt[match[i]], xs = slotX(g) + sz / 2, xt = slotX(t) + sz / 2, ys = upY(g) + sz / 2, yt = downY(t) + sz / 2;
+      const lift = 30 + Math.abs(xt - xs) * .25;
+      return el('path', { d: `M${xs},${ys} C${xs},${ys - lift} ${xt},${yt - lift - 40} ${xt},${yt}`, fill: 'none', stroke: cssv('--plan'), 'stroke-width': .8 }, pg);
+    });
+    rects = src.map(() => el('rect', { width: sz, height: sz, rx: 2, fill: cssv('--mu') }, svg));
+    const cost = src.reduce((s, g, i) => s + Math.abs(g.x - tgt[match[i]].x), 0) / N;
+    const optCost = src.reduce((s, g, i) => s + Math.abs(g.x - tgt[i].x), 0) / N;
+    document.getElementById('sandReadout').innerHTML =
+      `Average distance a grain travels: <b>${cost.toFixed(3)}</b>` +
+      (mode === 'opt' ? ` ← this is <b>W₁(μ, ν)</b>, the earth mover's distance.` : `, versus <b>${optCost.toFixed(3)}</b> for the optimal matching. Random is ${(cost / optCost).toFixed(1)}× worse.`);
+    draw();
+  }
+  function draw() {
+    const t = ease(+document.getElementById('sandT').value / 1000);
+    src.forEach((g, i) => {
+      const tg = tgt[match[i]], xs = slotX(g), xt = slotX(tg), ys = upY(g), yt = downY(tg);
+      const lift = (30 + Math.abs(xt - xs) * .25) * 1.1;
+      rects[i].setAttribute('x', xs + (xt - xs) * t);
+      rects[i].setAttribute('y', ys + (yt - ys) * t - lift * Math.sin(Math.PI * t));
+    });
+  }
+  document.getElementById('sandPreset').onchange = e => { preset = e.target.value; document.getElementById('sandT').value = 0; build(); };
+  const bo = document.getElementById('sandOpt'), br = document.getElementById('sandRand');
+  bo.onclick = () => { mode = 'opt'; toggle(bo, br, true); document.getElementById('sandT').value = 0; build(); };
+  br.onclick = () => { mode = 'rand'; toggle(bo, br, false); document.getElementById('sandT').value = 0; build(); };
+  document.getElementById('sandT').oninput = draw;
+  document.getElementById('sandPlay').onclick = () => animate(document.getElementById('sandT'), draw, 2000);
+  window.addEventListener('themechange', build);
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', build);
+  build();
+})();
+
+/* ---------- §2 bakeries ---------- */
+(function bakeries() {
+  const svg = document.getElementById('bakSvg');
+  const B = [{ x: 110, y: 90, s: 30 }, { x: 150, y: 300, s: 20 }, { x: 320, y: 190, s: 50 }];
+  const Cf = [{ x: 570, y: 70, s: 40 }, { x: 620, y: 240, s: 35 }, { x: 430, y: 335, s: 25 }];
+  let mode = 'opt', drag = null;
+  const d = (p, q) => Math.hypot(p.x - q.x, p.y - q.y) / 100;
+  function naive(a, b) { // north-west corner rule: fill in order, ignore costs
+    const P = a.map(() => b.map(() => 0)), ra = a.slice(), rb = b.slice(); let i = 0, j = 0;
+    while (i < a.length && j < b.length) { const m = Math.min(ra[i], rb[j]); P[i][j] += m; ra[i] -= m; rb[j] -= m; if (ra[i] <= 1e-9) i++; else j++; }
+    return P;
+  }
+  function render() {
+    const a = B.map(p => p.s), b = Cf.map(p => p.s);
+    const C = B.map(p => Cf.map(q => d(p, q)));
+    const Popt = minCostTransport(a, b, C), Pn = naive(a, b);
+    const P = mode === 'opt' ? Popt : Pn;
+    const tot = M => M.reduce((s, r, i) => s + r.reduce((t, v, j) => t + v * C[i][j], 0), 0);
+    svg.innerHTML = '';
+    // shipments
+    B.forEach((p, i) => Cf.forEach((q, j) => {
+      if (P[i][j] < .01) return;
+      el('line', { x1: p.x, y1: p.y, x2: q.x, y2: q.y, stroke: cssv('--plan'), 'stroke-width': 1.5 + P[i][j] / 50 * 14, 'stroke-linecap': 'round', opacity: .55 }, svg);
+      const mx = (p.x + q.x) / 2, my = (p.y + q.y) / 2;
+      el('rect', { x: mx - 17, y: my - 10, width: 34, height: 19, rx: 5, fill: cssv('--surface'), stroke: cssv('--plan') }, svg);
+      el('text', { x: mx, y: my + 4, 'text-anchor': 'middle', 'font-size': 12, 'font-weight': 600, fill: cssv('--ink') }, svg).textContent = Math.round(P[i][j]);
+    }));
+    const node = (p, i, isB) => {
+      const g = el('g', { style: 'cursor:grab' }, svg);
+      const r = Math.sqrt(p.s) * 3.4;
+      if (isB) el('circle', { cx: p.x, cy: p.y, r, fill: cssv('--mu'), opacity: .9 }, g);
+      else el('rect', { x: p.x - r, y: p.y - r, width: 2 * r, height: 2 * r, rx: 5, fill: cssv('--nu'), opacity: .9 }, g);
+      el('text', { x: p.x, y: p.y + 4, 'text-anchor': 'middle', 'font-size': 12, 'font-weight': 700, fill: '#fff' }, g).textContent = p.s;
+      el('text', { x: p.x, y: p.y - r - 6, 'text-anchor': 'middle', 'font-size': 12, fill: cssv('--muted') }, g).textContent = (isB ? 'Bakery ' : 'Café ') + (i + 1);
+      g.addEventListener('pointerdown', e => { drag = p; svg.setPointerCapture(e.pointerId); });
+    };
+    B.forEach((p, i) => node(p, i, true)); Cf.forEach((p, i) => node(p, i, false));
+    // tables
+    const fmt = v => (Math.abs(v - Math.round(v)) < .05 ? Math.round(v) : v.toFixed(1));
+    let h = `<div><div class="cap">Cost per loaf C<sub>ij</sub> (distance)</div><table class="mat"><tr><th></th>${Cf.map((_, j) => `<th>Café ${j + 1}</th>`).join('')}</tr>`;
+    C.forEach((r, i) => h += `<tr><th>Bakery ${i + 1}</th>${r.map(v => `<td>${v.toFixed(2)}</td>`).join('')}</tr>`);
+    h += `</table></div><div><div class="cap">Plan γ<sub>ij</sub> (loaves shipped), ${mode === 'opt' ? 'optimal' : 'naive'}</div><table class="mat"><tr><th></th>${Cf.map((_, j) => `<th>Café ${j + 1}</th>`).join('')}<th>row sum</th></tr>`;
+    P.forEach((r, i) => h += `<tr><th>Bakery ${i + 1}</th>${r.map(v => `<td>${fmt(v)}</td>`).join('')}<td class="marg">${fmt(r.reduce((s, v) => s + v, 0))} = μ${i + 1}</td></tr>`);
+    h += `<tr><th>col sum</th>${b.map((_, j) => `<td class="marg">${fmt(P.reduce((s, r) => s + r[j], 0))}</td>`).join('')}<td></td></tr><tr><th></th>${b.map((_, j) => `<td class="marg">= ν${j + 1}</td>`).join('')}<td></td></tr></table></div>`;
+    document.getElementById('bakTables').innerHTML = h;
+    const co = tot(Popt), cn = tot(Pn);
+    document.getElementById('bakReadout').innerHTML = `Total cost Σ C<sub>ij</sub>γ<sub>ij</sub>: optimal <b>${co.toFixed(1)}</b> · naive <b>${cn.toFixed(1)}</b>` +
+      (cn > co + 1e-6 ? ` (naive wastes ${((cn / co - 1) * 100).toFixed(0)}%)` : ' (here the naive order happens to be optimal. Drag a shop!)') +
+      `. Per loaf, i.e. with μ, ν as probabilities, the optimal cost is <b>${(co / 100).toFixed(3)}</b> = W₁(μ, ν).`;
+  }
+  svg.addEventListener('pointermove', e => { if (!drag) return; const p = svgPoint(svg, e); drag.x = Math.max(30, Math.min(690, p.x)); drag.y = Math.max(40, Math.min(355, p.y)); render(); });
+  svg.addEventListener('pointerup', () => drag = null);
+  svg.addEventListener('pointercancel', () => drag = null);
+  const bo = document.getElementById('bakOpt'), bn = document.getElementById('bakNaive');
+  bo.onclick = () => { mode = 'opt'; toggle(bo, bn, true); render(); };
+  bn.onclick = () => { mode = 'naive'; toggle(bo, bn, false); render(); };
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', render);
+  render();
+})();
+
+/* ---------- §3 Monge vs Kantorovich static pictures ---------- */
+(function mk() {
+  function draw(gid, split) {
+    const g = document.getElementById(gid); g.innerHTML = '';
+    const axisY = 170, mu = cssv('--mu'), nu = cssv('--nu'), pl = cssv('--plan'), muted = cssv('--muted');
+    el('line', { x1: 20, x2: 320, y1: axisY, y2: axisY, stroke: muted }, g);
+    // source spike at x=100 (mass 1), target spikes at 220 and 290 (mass 1/2 each)
+    el('rect', { x: 92, y: axisY - 100, width: 16, height: 100, rx: 2, fill: mu }, g);
+    el('text', { x: 100, y: axisY + 18, 'text-anchor': 'middle', 'font-size': 12, fill: mu }, g).textContent = 'μ: mass 1';
+    [210, 285].forEach(x => {
+      el('rect', { x: x - 8, y: axisY - 50, width: 16, height: 50, rx: 2, fill: 'none', stroke: nu, 'stroke-width': 2, 'stroke-dasharray': '3 2' }, g);
+      el('text', { x, y: axisY + 18, 'text-anchor': 'middle', 'font-size': 12, fill: nu }, g).textContent = 'ν: ½';
+    });
+    const defs = el('defs', {}, g);
+    const mk = el('marker', { id: gid + 'ar', viewBox: '0 0 10 10', refX: 8, refY: 5, markerWidth: 7, markerHeight: 7, orient: 'auto-start-reverse' }, defs);
+    el('path', { d: 'M0,0 L10,5 L0,10 z', fill: pl }, mk);
+    if (split) {
+      el('path', { d: `M108,${axisY - 80} Q160,40 206,${axisY - 56}`, fill: 'none', stroke: pl, 'stroke-width': 3, 'marker-end': `url(#${gid}ar)` }, g);
+      el('path', { d: `M108,${axisY - 70} Q200,20 281,${axisY - 56}`, fill: 'none', stroke: pl, 'stroke-width': 3, 'marker-end': `url(#${gid}ar)` }, g);
+      el('text', { x: 170, y: 52, 'text-anchor': 'middle', 'font-size': 12, fill: pl }, g).textContent = '½ here, ½ there ✓';
+    } else {
+      el('path', { d: `M108,${axisY - 80} Q160,40 206,${axisY - 56}`, fill: 'none', stroke: pl, 'stroke-width': 3, 'marker-end': `url(#${gid}ar)` }, g);
+      el('text', { x: 250, y: 60, 'text-anchor': 'middle', 'font-size': 12, fill: cssv('--bad') }, g).textContent = 'all mass 1 lands at one spot';
+      el('text', { x: 250, y: 76, 'text-anchor': 'middle', 'font-size': 12, fill: cssv('--bad') }, g).textContent = '→ can’t produce ν ✗';
+      el('text', { x: 285, y: axisY - 60, 'text-anchor': 'middle', 'font-size': 18, fill: cssv('--bad') }, g).textContent = '?';
+    }
+  }
+  const run = () => { draw('mongeA', false); draw('kantoA', true); };
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', run);
+  run();
+})();
+
+/* ---------- §4 coupling heatmap ---------- */
+(function heatmap() {
+  const n = 64, xs = Array.from({ length: n }, (_, i) => (i + .5) / n);
+  const shapes = {
+    gl: x => gauss(x, .3, .08),
+    bi: x => .5 * gauss(x, .25, .06) + .5 * gauss(x, .74, .07),
+    gw: x => gauss(x, .64, .13),
+    un: x => (x > .2 && x < .8) ? 1 : 0,
+    sk: x => gauss(x, .18, .05) + .6 * gauss(x, .42, .13)
+  };
+  const epsVals = [0, .001, .003, .01, .03, .1, .3, Infinity];
+  const epsNames = ['ε = 0 (exact OT)', 'ε = 0.001', 'ε = 0.003', 'ε = 0.01', 'ε = 0.03', 'ε = 0.1', 'ε = 0.3', 'ε = ∞ (independent)'];
+  const C = new Float64Array(n * n);
+  for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) C[i * n + j] = (xs[i] - xs[j]) ** 2;
+  const cache = {};
+  function dens(key) { const w = xs.map(x => shapes[key](x) + 1e-9); const s = w.reduce((p, c) => p + c, 0); return w.map(v => v / s); }
+  function nwCorner(a, b) {
+    const P = new Float64Array(n * n); let i = 0, j = 0, ra = a[0], rb = b[0];
+    while (i < n && j < n) { const m = Math.min(ra, rb); P[i * n + j] += m; ra -= m; rb -= m;
+      if (ra <= 1e-15) { i++; ra = a[i]; } else { j++; rb = b[j]; } }
+    return P;
+  }
+  function sinkhorn(a, b, eps) {
+    const la = a.map(Math.log), lb = b.map(Math.log), f = new Float64Array(n), g = new Float64Array(n), tmp = new Float64Array(n);
+    for (let it = 0; it < 4000; it++) {
+      for (let i = 0; i < n; i++) { let mx = -Infinity; for (let j = 0; j < n; j++) { const v = (g[j] - C[i * n + j]) / eps + lb[j]; tmp[j] = v; if (v > mx) mx = v; } let s = 0; for (let j = 0; j < n; j++) s += Math.exp(tmp[j] - mx); f[i] = -eps * (mx + Math.log(s)); }
+      for (let j = 0; j < n; j++) { let mx = -Infinity; for (let i = 0; i < n; i++) { const v = (f[i] - C[i * n + j]) / eps + la[i]; tmp[i] = v; if (v > mx) mx = v; } let s = 0; for (let i = 0; i < n; i++) s += Math.exp(tmp[i] - mx); g[j] = -eps * (mx + Math.log(s)); }
+      if (it % 25 === 0) { let err = 0; for (let i = 0; i < n; i++) { let r = 0; for (let j = 0; j < n; j++) r += Math.exp(la[i] + lb[j] + (f[i] + g[j] - C[i * n + j]) / eps); err += Math.abs(r - a[i]); } if (err < 1e-6) break; }
+    }
+    const P = new Float64Array(n * n);
+    for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) P[i * n + j] = Math.exp(la[i] + lb[j] + (f[i] + g[j] - C[i * n + j]) / eps);
+    return P;
+  }
+  function plan(mk, nk, ei) {
+    const key = mk + nk + ei; if (cache[key]) return cache[key];
+    const a = dens(mk), b = dens(nk), eps = epsVals[ei];
+    let P;
+    if (eps === 0) P = nwCorner(a, b);
+    else if (eps === Infinity) { P = new Float64Array(n * n); for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) P[i * n + j] = a[i] * b[j]; }
+    else P = sinkhorn(a, b, eps);
+    return cache[key] = { P, a, b };
+  }
+  const cv = document.getElementById('hmCanvas'), ctx = cv.getContext('2d');
+  const off = document.createElement('canvas'); off.width = n; off.height = n; const octx = off.getContext('2d');
+  function render() {
+    const mk = document.getElementById('hmMu').value, nk = document.getElementById('hmNu').value, ei = +document.getElementById('hmEps').value;
+    document.getElementById('hmEpsLabel').textContent = epsNames[ei];
+    const { P, a, b } = plan(mk, nk, ei);
+    const dpr = window.devicePixelRatio || 1, W = cv.clientWidth || 480;
+    cv.width = W * dpr; cv.height = W * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, W, W);
+    const L = W * .2, Tp = W * .2, S = W - L - 12; // heatmap area
+    const bg = hexToRgb(cssv('--surface')), pc = hexToRgb(cssv('--plan'));
+    let mx = 0; for (const v of P) if (v > mx) mx = v;
+    const img = octx.createImageData(n, n);
+    for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) {
+      const v = Math.sqrt(P[i * n + j] / mx), row = n - 1 - i, k = (row * n + j) * 4;
+      for (let c = 0; c < 3; c++) img.data[k + c] = bg[c] + (pc[c] - bg[c]) * v;
+      img.data[k + 3] = 255;
+    }
+    octx.putImageData(img, 0, 0);
+    ctx.imageSmoothingEnabled = false;
+    ctx.drawImage(off, L, Tp, S, S);
+    ctx.strokeStyle = cssv('--line'); ctx.lineWidth = 1; ctx.strokeRect(L, Tp, S, S);
+    // diagonal y = x
+    ctx.setLineDash([4, 4]); ctx.strokeStyle = cssv('--muted'); ctx.beginPath(); ctx.moveTo(L, Tp + S); ctx.lineTo(L + S, Tp); ctx.stroke(); ctx.setLineDash([]);
+    // mu on left (vertical), nu on top
+    const ma = Math.max(...a), mb = Math.max(...b), depth = W * .16;
+    ctx.fillStyle = cssv('--mu'); ctx.globalAlpha = .25; ctx.beginPath(); ctx.moveTo(L - 4, Tp + S);
+    for (let i = 0; i < n; i++) ctx.lineTo(L - 4 - a[i] / ma * depth, Tp + S - (i + .5) / n * S);
+    ctx.lineTo(L - 4, Tp); ctx.closePath(); ctx.fill(); ctx.globalAlpha = 1;
+    ctx.strokeStyle = cssv('--mu'); ctx.lineWidth = 2; ctx.beginPath();
+    for (let i = 0; i < n; i++) { const X = L - 4 - a[i] / ma * depth, Y = Tp + S - (i + .5) / n * S; i ? ctx.lineTo(X, Y) : ctx.moveTo(X, Y); } ctx.stroke();
+    ctx.fillStyle = cssv('--nu'); ctx.globalAlpha = .25; ctx.beginPath(); ctx.moveTo(L, Tp - 4);
+    for (let j = 0; j < n; j++) ctx.lineTo(L + (j + .5) / n * S, Tp - 4 - b[j] / mb * depth);
+    ctx.lineTo(L + S, Tp - 4); ctx.closePath(); ctx.fill(); ctx.globalAlpha = 1;
+    ctx.strokeStyle = cssv('--nu'); ctx.beginPath();
+    for (let j = 0; j < n; j++) { const X = L + (j + .5) / n * S, Y = Tp - 4 - b[j] / mb * depth; j ? ctx.lineTo(X, Y) : ctx.moveTo(X, Y); } ctx.stroke();
+    // labels
+    ctx.fillStyle = cssv('--muted'); ctx.font = `${Math.max(10, W * .026)}px sans-serif`;
+    ctx.textAlign = 'center'; ctx.fillText('target position y  →', L + S / 2, Tp + S + W * .045 > W ? W - 4 : Tp - depth - 10 < 12 ? 12 : Tp - depth - 8);
+    ctx.save(); ctx.translate(12, Tp + S / 2); ctx.rotate(-Math.PI / 2); ctx.fillText('source position x  →', 0, 0); ctx.restore();
+    ctx.fillStyle = cssv('--mu'); ctx.textAlign = 'right'; ctx.fillText('μ(x)', L - 8, Tp - 8);
+    ctx.fillStyle = cssv('--nu'); ctx.textAlign = 'left'; ctx.fillText('ν(y)', L + S - 30, Tp - depth - 8 < 12 ? 12 : Tp - depth + 8);
+    // readout
+    let cost = 0, rowErr = 0, colErr = 0;
+    for (let i = 0; i < n; i++) { let r = 0; for (let j = 0; j < n; j++) { cost += P[i * n + j] * C[i * n + j]; r += P[i * n + j]; } rowErr = Math.max(rowErr, Math.abs(r - a[i])); }
+    for (let j = 0; j < n; j++) { let c = 0; for (let i = 0; i < n; i++) c += P[i * n + j]; colErr = Math.max(colErr, Math.abs(c - b[j])); }
+    const exact = plan(mk, nk, 0); let c0 = 0; for (let k = 0; k < n * n; k++) c0 += exact.P[k] * C[k];
+    const ok = rowErr < 1e-4 && colErr < 1e-4;
+    document.getElementById('hmReadout').innerHTML =
+      `Transport cost 𝔼<sub>γ</sub>|X − Y|² = <b>${cost.toFixed(4)}</b> (exact OT = ${c0.toFixed(4)}, so W₂ = ${Math.sqrt(c0).toFixed(3)}). ` +
+      `Row sums = μ and column sums = ν: <b style="color:var(${ok ? '--good' : '--bad'})">${ok ? '✓ valid coupling' : '≈ (still converging)'}</b>`;
+  }
+  ['hmMu', 'hmNu', 'hmEps'].forEach(id => document.getElementById(id).addEventListener('input', render));
+  window.addEventListener('resize', render);
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', render);
+  render();
+})();
+
+/* ---------- §5 Wasserstein vs KL / JS ---------- */
+(function wk() {
+  const svg = document.getElementById('wkSvg'), w = .3, LN2 = Math.log(2);
+  const ax = v => 60 + (v + 1.4) / 2.8 * 620;              // top panel x in [-1.4, 1.4]
+  const cx = th => 80 + (th + 1) / 2 * 580;                  // chart x, theta in [-1,1]
+  const cy = v => 330 - v / 1.1 * 150;                       // chart y, value in [0,1.1]
+  function render() {
+    const th = +document.getElementById('wkTheta').value / 1000;
+    document.getElementById('wkThetaLabel').textContent = `θ = ${th.toFixed(2)}`;
+    svg.innerHTML = '';
+    const mu = cssv('--mu'), nu = cssv('--nu'), pl = cssv('--plan'), muted = cssv('--muted'), good = cssv('--good'), bad = cssv('--bad');
+    // top panel: two uniform blocks
+    el('line', { x1: 50, x2: 690, y1: 120, y2: 120, stroke: muted }, svg);
+    el('rect', { x: ax(-w / 2), y: 60, width: ax(w / 2) - ax(-w / 2), height: 60, fill: mu, opacity: .45 }, svg);
+    el('rect', { x: ax(th - w / 2), y: 60, width: ax(w / 2) - ax(-w / 2), height: 60, fill: nu, opacity: .45 }, svg);
+    el('text', { x: ax(0), y: 52, 'text-anchor': 'middle', 'font-size': 12, fill: mu }, svg).textContent = 'μ';
+    el('text', { x: ax(th), y: 52, 'text-anchor': 'middle', 'font-size': 12, fill: nu }, svg).textContent = 'ν';
+    if (Math.abs(th) > .02) {
+      const defs = el('defs', {}, svg), mk = el('marker', { id: 'wkar', viewBox: '0 0 10 10', refX: 8, refY: 5, markerWidth: 6, markerHeight: 6, orient: 'auto' }, defs);
+      el('path', { d: 'M0,0 L10,5 L0,10 z', fill: pl }, mk);
+      el('line', { x1: ax(0), y1: 90, x2: ax(th) - Math.sign(th) * 4, y2: 90, stroke: pl, 'stroke-width': 2.5, 'marker-end': 'url(#wkar)' }, svg);
+    }
+    el('text', { x: 360, y: 20, 'text-anchor': 'middle', 'font-size': 13, fill: muted }, svg).textContent = 'Every grain of μ must move by θ, so W₁ = |θ|';
+    // chart axes
+    el('line', { x1: 80, x2: 660, y1: 330, y2: 330, stroke: muted }, svg);
+    el('line', { x1: 80, x2: 80, y1: 170, y2: 330, stroke: muted }, svg);
+    [-1, -.5, 0, .5, 1].forEach(v => el('text', { x: cx(v), y: 348, 'text-anchor': 'middle', 'font-size': 11, fill: muted }, svg).textContent = v);
+    [0, .5, 1].forEach(v => el('text', { x: 72, y: cy(v) + 4, 'text-anchor': 'end', 'font-size': 11, fill: muted }, svg).textContent = v);
+    el('text', { x: 670, y: 334, 'font-size': 11, fill: muted }, svg).textContent = 'θ';
+    // curves
+    const pts = f => { let s = ''; for (let k = 0; k <= 200; k++) { const t = -1 + k / 100; s += (k ? 'L' : 'M') + cx(t) + ',' + cy(f(t)); } return s; };
+    el('path', { d: pts(t => Math.abs(t)), fill: 'none', stroke: good, 'stroke-width': 2.5 }, svg);
+    el('path', { d: pts(t => LN2 * Math.min(1, Math.abs(t) / w)), fill: 'none', stroke: nu, 'stroke-width': 2.5 }, svg);
+    el('line', { x1: cx(-1), x2: cx(-.006), y1: 172, y2: 172, stroke: bad, 'stroke-width': 2, 'stroke-dasharray': '5 4' }, svg);
+    el('line', { x1: cx(.006), x2: cx(1), y1: 172, y2: 172, stroke: bad, 'stroke-width': 2, 'stroke-dasharray': '5 4' }, svg);
+    el('text', { x: cx(-.98), y: 166, 'font-size': 11, fill: bad }, svg).textContent = 'KL = ∞ for every θ ≠ 0';
+    el('text', { x: cx(1) + 6, y: cy(1) + 4, 'font-size': 12, fill: good }, svg).textContent = 'W₁';
+    el('text', { x: cx(1) + 6, y: cy(LN2) + 4, 'font-size': 12, fill: nu }, svg).textContent = 'JS';
+    // markers
+    const js = LN2 * Math.min(1, Math.abs(th) / w);
+    el('line', { x1: cx(th), x2: cx(th), y1: 175, y2: 330, stroke: muted, 'stroke-dasharray': '2 3' }, svg);
+    el('circle', { cx: cx(th), cy: cy(Math.abs(th)), r: 5, fill: good }, svg);
+    el('circle', { cx: cx(th), cy: cy(js), r: 5, fill: nu }, svg);
+    const disjoint = Math.abs(th) >= w;
+    document.getElementById('wkReadout').innerHTML =
+      `W₁ = <b>${Math.abs(th).toFixed(3)}</b> · JS = <b>${js.toFixed(3)}</b>${disjoint ? ' (stuck at log 2)' : ''} · KL(μ‖ν) = <b>${Math.abs(th) < 1e-9 ? '0' : '∞'}</b>. ` +
+      (disjoint ? `<span style="color:var(--bad)">Supports don't overlap: JS and KL give no hint which way ν should move.</span> W₁ still does.`
+                : `Supports overlap by ${((1 - Math.abs(th) / w) * 100).toFixed(0)}%.`);
+  }
+  document.getElementById('wkTheta').addEventListener('input', render);
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', render);
+  render();
+})();
+
+/* ---------- §6 point clouds ---------- */
+(function clouds() {
+  const svg = document.getElementById('pcSvg'), n = 16;
+  let seed = 3, shape = 'ring', mode = 'opt', X = [], Y = [], perm = [], rperm = [];
+  function gen() {
+    const r = mulberry32(seed), nrm = () => { const u = r() || 1e-9, v = r(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v); };
+    X = Array.from({ length: n }, () => ({ x: 170 + 45 * nrm(), y: 200 + 55 * nrm() }));
+    Y = Array.from({ length: n }, (_, k) => {
+      if (shape === 'ring') { const a = 2 * Math.PI * (k / n) + .3 * r(); const R = 110 + 8 * nrm(); return { x: 520 + R * Math.cos(a), y: 200 + R * Math.sin(a) }; }
+      if (shape === 'two') { const top = k % 2 === 0; return { x: (top ? 470 : 590) + 22 * nrm(), y: (top ? 95 : 305) + 22 * nrm() }; }
+      const a = Math.PI * (.15 + .7 * k / (n - 1)); return { x: 470 + 140 * Math.sin(a) + 6 * nrm(), y: 200 - 150 * Math.cos(a) + 6 * nrm() };
+    });
+    const C = X.map(p => Y.map(q => ((p.x - q.x) ** 2 + (p.y - q.y) ** 2) / 1e4));
+    const P = minCostTransport(X.map(() => 1), Y.map(() => 1), C);
+    perm = P.map(row => row.findIndex(v => v > .5));
+    rperm = shuffle(perm.map((_, i) => i), mulberry32(seed * 13 + 1));
+  }
+  function render() {
+    const t = ease(+document.getElementById('pcT').value / 1000), pm = mode === 'opt' ? perm : rperm;
+    svg.innerHTML = '';
+    const mu = cssv('--mu'), nu = cssv('--nu'), pl = cssv('--plan');
+    X.forEach((p, i) => { const q = Y[pm[i]]; el('line', { x1: p.x, y1: p.y, x2: q.x, y2: q.y, stroke: pl, 'stroke-width': 1.2, opacity: .35 }, svg); });
+    X.forEach(p => el('circle', { cx: p.x, cy: p.y, r: 5.5, fill: 'none', stroke: mu, 'stroke-width': 2 }, svg));
+    Y.forEach(q => el('circle', { cx: q.x, cy: q.y, r: 5.5, fill: 'none', stroke: nu, 'stroke-width': 2 }, svg));
+    X.forEach((p, i) => { const q = Y[pm[i]]; el('circle', { cx: p.x + (q.x - p.x) * t, cy: p.y + (q.y - p.y) * t, r: 4.5, fill: pl }, svg); });
+    el('text', { x: 170, y: 30, 'text-anchor': 'middle', 'font-size': 13, fill: mu }, svg).textContent = 'source samples x₀ ~ μ';
+    el('text', { x: 530, y: 30, 'text-anchor': 'middle', 'font-size': 13, fill: nu }, svg).textContent = 'target samples x₁ ~ ν';
+    const cost = p => X.reduce((s, a, i) => s + ((a.x - Y[p[i]].x) ** 2 + (a.y - Y[p[i]].y) ** 2) / 1e4, 0) / n;
+    const co = cost(perm), cr = cost(rperm);
+    document.getElementById('pcReadout').innerHTML = `Mean squared distance: optimal <b>${co.toFixed(2)}</b> (= W₂² between the two samples) · random <b>${cr.toFixed(2)}</b> (${(cr / co).toFixed(1)}× longer). ` +
+      (mode === 'opt' ? 'Play the flow: points glide past each other without colliding.' : 'Play the flow: paths criss-cross and points pass through the same region from different directions.');
+  }
+  const bo = document.getElementById('pcOpt'), br = document.getElementById('pcRand');
+  bo.onclick = () => { mode = 'opt'; toggle(bo, br, true); render(); };
+  br.onclick = () => { mode = 'rand'; toggle(bo, br, false); render(); };
+  document.getElementById('pcNew').onclick = () => { seed++; gen(); render(); };
+  document.getElementById('pcShape').onchange = e => { shape = e.target.value; gen(); render(); };
+  document.getElementById('pcT').oninput = render;
+  document.getElementById('pcPlay').onclick = () => animate(document.getElementById('pcT'), render, 2200);
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', render);
+  gen(); render();
+})();
+
+/* ---------- KaTeX ---------- */
+window.addEventListener('DOMContentLoaded', () => {
+  if (window.renderMathInElement) renderMathInElement(document.body, {
+    delimiters: [{ left: '$$', right: '$$', display: true }, { left: '$', right: '$', display: false }],
+    ignoredTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code', 'svg']
+  });
+});
+</script>
+</body>
+</html>
