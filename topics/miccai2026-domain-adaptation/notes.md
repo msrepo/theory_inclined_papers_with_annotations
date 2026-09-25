@@ -44,6 +44,43 @@ A quick index by the kind of mathematics used. Several papers appear more than o
 | Invariance by construction (augmentation, geometry, pairwise differences) | One Sequence (W-PM-047), CoRe-DA (W-PM-142), JANUS (W-PM-207), EchoTracker2 (T-PM-169), MKGA (M-PM-145) |
 | Policy optimisation for VLM reasoning (GRPO) | BrReMark (W-PM-122) |
 
+## Interactive figures
+
+The static figures below each freeze one setting of a toy. **[The interactive page](figures/interactive.html)**
+has one widget per paper that lets you move those settings yourself. Each widget runs on small
+toy numbers in the browser, not on the paper's data, and each has a callout naming the one
+thing worth trying. The widgets use their own seeded random draws, so exact values can differ
+slightly from the static figures while the behaviour matches.
+
+| Widget | What you can do |
+|---|---|
+| [M-PM-011 · MaRS](figures/interactive.html#m-pm-011) | Drag a test residual around a 2-D residual cloud and compare ‖r‖² with rᵀΣ⁻¹r; then move 16-D OOD energy between the smallest- and largest-λ directions and add a ridge ε the paper lacks, watching AUROC. |
+| [M-PM-042 · HierEM](figures/interactive.html#m-pm-042) | Tune a site's α and β and drag π to see the E-step posterior q; drag raw site sensitivities and change σₐ and the counts to watch the prior shrink them; α = 1 − β collapses q onto π. |
+| [M-PM-058 · PSP](figures/interactive.html#m-pm-058) | Rotate, scale, shift and re-start a contour and watch its Fourier descriptor stay fixed; add boundary noise, and meet a phase-scrambled shape with the same descriptor but a different outline. |
+| [M-PM-145 · MKGA](figures/interactive.html#m-pm-145) | Change the gate weights, the refinement kernel and the artefact size, and read how much skip energy survives in the nodule versus at the artefacts; raising W_s lets the spikes through. |
+| [T-AM-027 · ContiStain](figures/interactive.html#t-am-027) | Drag tokens, rotate, reflect, add relative drift or shuffle token order, and watch the teacher, student and difference relation matrices and L_rel update. |
+| [T-AM-049 · TTA-Flow](figures/interactive.html#t-am-049) | Change the entry step, speckle and tissue share, and toggle histogram matching; with matching on, the entry step has no effect, because both maps preserve rank order. |
+| [T-AM-061 · ReGA](figures/interactive.html#t-am-061) | Move S_v, λ, S_b, α and λ₁ to see SICE and its floor, and compare the teacher's memory kernel and half-life with a reference EMA momentum. |
+| [T-AM-114 · ASFOSDA](figures/interactive.html#t-am-114) | Drag target samples on the embedding circle and vary the query budget and the SDD weight; at weight 0 the near-duplicate clump takes two of three queries, at 1 it gets one. |
+| [T-PM-095 · SC-UNSB](figures/interactive.html#t-pm-095) | Vary slide drift, texture growth and tile count, and compare per-tile instance norm with the interpolated dense norm, with the seam jump shown live; a "μ̂ only" mode shows σ must be interpolated too. |
+| [T-PM-123 · IntraStyler](figures/interactive.html#t-pm-123) | Drag the query, positive and negatives on the style sphere and change τ to read each InfoNCE weight; slide t to compare SLERP with the straight blend, up to where SLERP breaks at 180°. |
+| [T-PM-169 · EchoTracker2](figures/interactive.html#t-pm-169) | Pick window size and stride, scale wall and apical motion, and play the cardiac cycle to see which paths leave the window; a switch compares Euclidean distance with the square-window test. |
+| [T-PM-200 · CoWA](figures/interactive.html#t-pm-200) | Set five class probabilities or load samples A–C, rebuild M from simulated predictions, and switch to an off-diagonal-only distance to see that the unit diagonal is what penalises the no-finding sample. |
+| [T-PM-214 · MedTS-TTT](figures/interactive.html#t-pm-214) | Drag W₀ in fast-weight space, vary η·λ_max and the number of inner steps, and see Δ = QW₀ − η(QKᵀ)G computed as linear attention. |
+| [W-AM-013 · WALDO](figures/interactive.html#w-am-013) | Drag the projection direction θ and the reference cloud to watch sliced W₂ project, sort and pair; switch the weighting to expose the rank-indexing issue in Eq. 1, and compare DPP, random and nearest-K reference picks. |
+| [W-AM-160 · VesselSim](figures/interactive.html#w-am-160) | Grow a vessel tree with heading noise, branching decay, the branching exponent γ (3 is Murray's law) and depth; a second toy runs test-time adaptation on L_rec as it drifts away from L_seg. |
+| [W-AM-192 · PromptGate](figures/interactive.html#w-am-192) | Rotate t_OOD or drag any prototype and see the argmax sectors and leaked artefacts against the shared-only boundaries; run an active-learning round and see that softmax temperature never changes the gate. |
+| [W-PM-007 · IMaX](figures/interactive.html#w-pm-007) | Move α, imbalance, λ and K to compare the Shannon and Tsallis pushes and the optimal marginal against the true long tail. |
+| [W-PM-044 · CHILD](figures/interactive.html#w-pm-044) | Replay a 400-sample stream with the Otsu threshold, the one-sided query band and the budget, and compare errors for the base detector and for CHILD. |
+| [W-PM-047 · One sequence to segment them all](figures/interactive.html#w-pm-047) | Pick one of nine label-preserving transforms, set its strength and redraw its parameters, and see how well 300 random draws cover a T2-like or T1-like target; none gets close. |
+| [W-PM-054 · PET-Adapter](figures/interactive.html#w-pm-054) | Run 1-D Poisson MLEM while changing iterations, blur, counts and a hidden null-space detail; NLL always falls while RMSE turns back up, and the hidden detail barely moves the measurements. |
+| [W-PM-078 · BeatRhythm-TTA](figures/interactive.html#w-pm-078) | Pick a corruption, drag its severity and τ_q, and place 320 toy beats on the reachable 0.067–0.366 SQI band; τ_q = 0.05 gates nothing, and at τ_q ≈ 0.2 clean beats are dropped while muscle noise passes. |
+| [W-PM-122 · BrReMark](figures/interactive.html#w-pm-122) | Switch between real, synthetic and healthy scans, edit one response's IoU, judge and format scores and the gates, and watch the group-standardised advantages; nearly equal rewards still give advantages of about ±1.5. |
+| [W-PM-124 · HD-TTA](figures/interactive.html#w-pm-124) | Change the neighbour region's intensity and texture, toggle the island, and move λ_inf and γ while both energies optimise live and S_rep picks one; a different texture with the same mean is still accepted. |
+| [W-PM-142 · CoRe-DA](figures/interactive.html#w-pm-142) | Drag the true target and set the number of exemplars, noise, scale error, offset, absolute-head shift and training pull; the scale error cancels mid-range but biases the edges, and a full pull makes both heads agree on the wrong value. |
+| [W-PM-180 · PROTON](figures/interactive.html#w-pm-180) | Change the shift angle, shifted share, gate γ and τ, and read live AUROCs, running variance, α_t and bank contamination; MCM AUROC is 0.00 while α_t stays near 0.6. |
+| [W-PM-207 · JANUS](figures/interactive.html#w-pm-207) | Change organ size, gate slope and bias and the sign of the evidence; z_v never changes, the 8-token case is vetoed, and negative evidence lets the gate push p above the visual-only value. |
+
 ## The papers
 
 ### M-PM-011 · MaRS: Robust Out-of-Distribution Detection via Mahalanobis Residual Scoring
