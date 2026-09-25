@@ -1,0 +1,122 @@
+<svg viewBox="0 0 700 362" xmlns="http://www.w3.org/2000/svg" role="img">
+<title>Contrastive style vectors and SLERP</title>
+<desc>Two unit circles standing for the style hypersphere. Left: a query style vector v from one crop and a positive v-plus from another crop of the same image sit a few degrees apart, while five negatives made by intensity perturbations of the positive (contrast change, smoothing, noise, bias field, and a mix) are spread around the circle. With temperature 0.01 the softmax puts almost all weight on the positive even though the contrast negative is only 30 degrees away, so the encoder must separate style changes that keep anatomy fixed. Right: grey dots are target-image styles in three clusters; two cluster references v0 and v1, 120 degrees apart, are joined by a blue geodesic arc (SLERP) whose intermediate points stay on the circle, and by an orange straight chord whose midpoint has norm cos(60 degrees) = 0.50, falling well inside the sphere.</desc>
+<style>
+  text{font-family:ui-sans-serif,-apple-system,"Segoe UI",sans-serif;font-weight:400}
+  .lab{font-size:11px;fill:#57564f} .hd{font-size:13px;font-weight:500;fill:#1a1a19}
+  .sub{font-size:11.5px;fill:#57564f} .big{font-size:12.5px;font-weight:500;fill:#1a1a19}
+  .c1{fill:#2f6fb5;stroke:none} .c2{fill:#c8702f;stroke:none} .c3{fill:#8a8880;stroke:none}
+  .m1{fill:#2f6fb5;stroke:#fbfaf6;stroke-width:1.4} .m2{fill:#c8702f;stroke:#fbfaf6;stroke-width:1.4}
+  .sep{stroke:#1a1a19;stroke-width:1.6;fill:none}
+  .ell{fill:none;stroke:#8a8880;stroke-width:1.2}
+  .eucl{fill:none;stroke:#8a8880;stroke-width:1.2;stroke-dasharray:4 3}
+  .maha{fill:none;stroke:#2f6fb5;stroke-width:1.3;stroke-dasharray:4 3}
+  .vec{stroke:#1a1a19;stroke-width:1.6;fill:none}
+  .pt{fill:#1a1a19;stroke:#fbfaf6;stroke-width:1.2}
+  .arr{stroke:#8a8880;stroke-width:1;fill:none;opacity:0.75}
+  .box{fill:none;stroke:#e2e1da;stroke-width:1}
+  .ax{stroke:#c3c2b7;stroke-width:0.8;fill:none}
+  .gd{stroke:#e2e1da;stroke-width:0.6;fill:none;stroke-dasharray:3 3}
+  .l1{fill:none;stroke:#2f6fb5;stroke-width:2}
+  .l2{fill:none;stroke:#c8702f;stroke-width:2}
+  .op{stroke:#1a1a19;stroke-width:1.2;stroke-dasharray:4 3;fill:none}
+  @media (prefers-color-scheme: dark){
+    .lab{fill:#b6b4ab} .hd{fill:#eceae3} .sub{fill:#b6b4ab} .big{fill:#eceae3}
+    .box{stroke:#33312e} .ax{stroke:#4a4844} .gd{stroke:#33312e}
+    .c1{fill:#7fb2e8} .c2{fill:#e09a5f} .c3{fill:#85837b}
+    .m1{fill:#7fb2e8;stroke:#1c1b19} .m2{fill:#e09a5f;stroke:#1c1b19}
+    .sep{stroke:#eceae3} .ell{stroke:#85837b} .eucl{stroke:#85837b}
+    .maha{stroke:#7fb2e8} .vec{stroke:#eceae3} .pt{fill:#eceae3;stroke:#1c1b19}
+    .arr{stroke:#85837b} .l1{stroke:#7fb2e8} .l2{stroke:#e09a5f} .op{stroke:#eceae3}
+  }
+</style>
+<text x="350" y="24" text-anchor="middle" class="hd">Styles are unit vectors trained by contrast against same-anatomy perturbations and blended along the sphere</text>
+<text x="175.0" y="62.0" text-anchor="middle" class="sub">anatomy-invariant InfoNCE on the sphere (τ = 0.01)</text>
+<circle cx="175.0" cy="196.0" r="92" class="ell"/>
+<circle cx="175.0" cy="196.0" r="2" class="pt"/>
+<line x1="175.0" y1="196.0" x2="191.0" y2="105.4" class="eucl"/>
+<circle cx="191.0" cy="105.4" r="4.5" class="m2"/>
+<text x="193.5" y="94.9" text-anchor="middle" class="lab">contrast</text>
+<line x1="175.0" y1="196.0" x2="95.3" y2="150.0" class="eucl"/>
+<circle cx="95.3" cy="150.0" r="4.5" class="m2"/>
+<text x="82.6" y="146.6" text-anchor="end" class="lab">smoothing</text>
+<line x1="175.0" y1="196.0" x2="86.1" y2="219.8" class="eucl"/>
+<circle cx="86.1" cy="219.8" r="4.5" class="m2"/>
+<text x="71.9" y="227.6" text-anchor="end" class="lab">noise</text>
+<line x1="175.0" y1="196.0" x2="136.1" y2="279.4" class="eucl"/>
+<circle cx="136.1" cy="279.4" r="4.5" class="m2"/>
+<text x="129.9" y="296.7" text-anchor="end" class="lab">bias field</text>
+<line x1="175.0" y1="196.0" x2="245.5" y2="255.1" class="eucl"/>
+<circle cx="245.5" cy="255.1" r="4.5" class="m2"/>
+<text x="256.8" y="268.6" text-anchor="start" class="lab">mix</text>
+<line x1="175.0" y1="196.0" x2="234.1" y2="125.5" class="vec"/>
+<circle cx="234.1" cy="125.5" r="4.5" class="m1"/>
+<line x1="175.0" y1="196.0" x2="223.8" y2="118.0" class="maha"/>
+<circle cx="223.8" cy="118.0" r="4.5" class="m1"/>
+<text x="249.8" y="123.8" text-anchor="start" class="c1" font-size="11">v (crop 1)</text>
+<text x="221.1" y="101.8" text-anchor="start" class="c1" font-size="11">v⁺ (crop 2, same image)</text>
+<text x="175.0" y="334.0" text-anchor="middle" class="lab">softmax weight: v⁺ ≈ 1 − 4×10⁻⁶, contrast negative ≈ 4×10⁻⁶</text>
+<text x="175.0" y="349.0" text-anchor="middle" class="c2" font-size="11">negatives ε(y⁺): same anatomy, different style</text>
+<text x="525.0" y="62.0" text-anchor="middle" class="sub">interpolating two reference styles</text>
+<circle cx="525.0" cy="196.0" r="92" class="ell"/>
+<circle cx="525.0" cy="196.0" r="2" class="pt"/>
+<circle cx="602.1" cy="145.7" r="2.2" class="c3"/>
+<circle cx="598.1" cy="140.1" r="2.2" class="c3"/>
+<circle cx="602.2" cy="145.9" r="2.2" class="c3"/>
+<circle cx="612.4" cy="167.2" r="2.2" class="c3"/>
+<circle cx="597.4" cy="139.2" r="2.2" class="c3"/>
+<circle cx="601.3" cy="144.5" r="2.2" class="c3"/>
+<circle cx="608.3" cy="156.9" r="2.2" class="c3"/>
+<circle cx="600.1" cy="142.9" r="2.2" class="c3"/>
+<circle cx="601.9" cy="145.5" r="2.2" class="c3"/>
+<circle cx="602.5" cy="146.4" r="2.2" class="c3"/>
+<circle cx="604.5" cy="149.6" r="2.2" class="c3"/>
+<circle cx="600.4" cy="143.3" r="2.2" class="c3"/>
+<circle cx="609.5" cy="159.5" r="2.2" class="c3"/>
+<circle cx="605.8" cy="152.1" r="2.2" class="c3"/>
+<circle cx="449.0" cy="144.1" r="2.2" class="c3"/>
+<circle cx="441.4" cy="157.7" r="2.2" class="c3"/>
+<circle cx="445.0" cy="150.5" r="2.2" class="c3"/>
+<circle cx="447.5" cy="146.4" r="2.2" class="c3"/>
+<circle cx="451.6" cy="140.6" r="2.2" class="c3"/>
+<circle cx="447.2" cy="146.8" r="2.2" class="c3"/>
+<circle cx="445.3" cy="150.1" r="2.2" class="c3"/>
+<circle cx="447.4" cy="146.6" r="2.2" class="c3"/>
+<circle cx="437.7" cy="167.0" r="2.2" class="c3"/>
+<circle cx="439.1" cy="163.1" r="2.2" class="c3"/>
+<circle cx="471.4" cy="121.2" r="2.2" class="c3"/>
+<circle cx="462.3" cy="128.7" r="2.2" class="c3"/>
+<circle cx="446.6" cy="147.8" r="2.2" class="c3"/>
+<circle cx="448.5" cy="144.8" r="2.2" class="c3"/>
+<circle cx="528.1" cy="287.9" r="2.2" class="c3"/>
+<circle cx="528.1" cy="287.9" r="2.2" class="c3"/>
+<circle cx="555.0" cy="283.0" r="2.2" class="c3"/>
+<circle cx="509.0" cy="286.6" r="2.2" class="c3"/>
+<circle cx="519.5" cy="287.8" r="2.2" class="c3"/>
+<circle cx="554.0" cy="283.3" r="2.2" class="c3"/>
+<circle cx="534.3" cy="287.5" r="2.2" class="c3"/>
+<circle cx="534.6" cy="287.5" r="2.2" class="c3"/>
+<circle cx="517.6" cy="287.7" r="2.2" class="c3"/>
+<circle cx="501.4" cy="284.9" r="2.2" class="c3"/>
+<circle cx="527.4" cy="288.0" r="2.2" class="c3"/>
+<circle cx="526.6" cy="288.0" r="2.2" class="c3"/>
+<circle cx="507.4" cy="286.3" r="2.2" class="c3"/>
+<circle cx="515.1" cy="287.5" r="2.2" class="c3"/>
+<polyline points="604.7,150.0 603.0,147.2 601.2,144.5 599.3,141.8 597.4,139.2 595.3,136.7 593.2,134.2 590.9,131.8 588.6,129.5 586.2,127.3 583.7,125.2 581.2,123.1 578.5,121.2 575.9,119.3 573.1,117.6 570.3,115.9 567.4,114.4 564.5,112.9 561.5,111.6 558.5,110.3 555.4,109.2 552.3,108.2 549.2,107.2 546.0,106.4 542.8,105.7 539.6,105.2 536.4,104.7 533.2,104.4 529.9,104.1 526.6,104.0 523.4,104.0 520.1,104.1 516.8,104.4 513.6,104.7 510.4,105.2 507.2,105.7 504.0,106.4 500.8,107.2 497.7,108.2 494.6,109.2 491.5,110.3 488.5,111.6 485.5,112.9 482.6,114.4 479.7,115.9 476.9,117.6 474.1,119.3 471.5,121.2 468.8,123.1 466.3,125.2 463.8,127.3 461.4,129.5 459.1,131.8 456.8,134.2 454.7,136.7 452.6,139.2 450.7,141.8 448.8,144.5 447.0,147.2 445.3,150.0" class="l1"/>
+<line x1="604.7" y1="150.0" x2="445.3" y2="150.0" class="l2" stroke-dasharray="5 3"/>
+<circle cx="571.0" cy="116.3" r="4" class="m1"/>
+<circle cx="564.8" cy="150.0" r="4" class="m2"/>
+<circle cx="525.0" cy="104.0" r="4" class="m1"/>
+<circle cx="525.0" cy="150.0" r="4" class="m2"/>
+<circle cx="479.0" cy="116.3" r="4" class="m1"/>
+<circle cx="485.2" cy="150.0" r="4" class="m2"/>
+<line x1="525.0" y1="196.0" x2="525.0" y2="150.0" class="eucl"/>
+<circle cx="604.7" cy="150.0" r="5" class="pt"/>
+<circle cx="445.3" cy="150.0" r="5" class="pt"/>
+<text x="619.1" y="154.1" text-anchor="start" class="big">v₀</text>
+<text x="430.9" y="154.1" text-anchor="end" class="big">v₁</text>
+<text x="531.0" y="184.0" text-anchor="start" class="c2" font-size="11">‖lerp(½)‖ = cos(θ/2) = 0.50</text>
+<text x="525.0" y="94.8" text-anchor="middle" class="c1" font-size="11">SLERP stays at ‖·‖ = 1 (θ = 120°)</text>
+<text x="525.0" y="334.0" text-anchor="middle" class="lab">grey: target styles; v₀, v₁ = K-means cluster references</text>
+<text x="525.0" y="349.0" text-anchor="middle" class="lab">blue: geodesic at t = ¼, ½, ¾;  orange: straight-line blend</text>
+</svg>

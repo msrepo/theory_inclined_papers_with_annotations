@@ -1,0 +1,252 @@
+<svg viewBox="0 0 700 386" xmlns="http://www.w3.org/2000/svg" role="img">
+<title>ContiStain cross-domain relation distillation</title>
+<desc>Three columns, each a toy with six normalised tokens per domain drawn on the unit circle: blue tokens are the rendering of old biomarker i, orange tokens the rendering of old biomarker j, from the same H&amp;E input and the same patch positions. Under each circle is the 6 by 6 cross-domain relation matrix R(i,j), entry (p,q) the cosine between token p of domain i and token q of domain j, blue for positive and orange for negative. Column 1 is the frozen teacher. Column 2 is a student whose whole feature space is rotated by 55 degrees: every token moved, but R is unchanged and the relational loss is 0.00. Column 3 is a student in which the domain-j tokens drifted relative to domain i: R changes visibly and the loss is 0.51. The distillation term therefore penalises changes in cross-domain geometry, not absolute feature positions.</desc>
+<style>
+  text{font-family:ui-sans-serif,-apple-system,"Segoe UI",sans-serif;font-weight:400}
+  .lab{font-size:11px;fill:#57564f} .hd{font-size:13px;font-weight:500;fill:#1a1a19}
+  .sub{font-size:11.5px;fill:#57564f} .big{font-size:12.5px;font-weight:500;fill:#1a1a19}
+  .t1{fill:#2f6fb5} .t2{fill:#c8702f}
+  .c1{fill:#2f6fb5;stroke:none;opacity:0.5} .c2{fill:#c8702f;stroke:none;opacity:0.5}
+  .f1{fill:#2f6fb5;stroke:none} .f2{fill:#c8702f;stroke:none} .fg{fill:#c3c2b7;stroke:none}
+  .m1{fill:#2f6fb5;stroke:#fbfaf6;stroke-width:1.4} .m2{fill:#c8702f;stroke:#fbfaf6;stroke-width:1.4}
+  .pt{fill:#1a1a19;stroke:#fbfaf6;stroke-width:1.2}
+  .arr{stroke:#8a8880;stroke-width:1;fill:none}
+  .box{fill:none;stroke:#e2e1da;stroke-width:1}
+  .ax{stroke:#c3c2b7;stroke-width:0.8;fill:none}
+  .gd{stroke:#e2e1da;stroke-width:0.6;fill:none;stroke-dasharray:3 3}
+  .l1{fill:none;stroke:#2f6fb5;stroke-width:2} .l2{fill:none;stroke:#c8702f;stroke-width:2}
+  .l1t{fill:none;stroke:#2f6fb5;stroke-width:1.1} .l2t{fill:none;stroke:#c8702f;stroke-width:1.1}
+  .lg{fill:none;stroke:#8a8880;stroke-width:1.2} .lgt{fill:none;stroke:#c3c2b7;stroke-width:0.8}
+  .ell{fill:none;stroke:#8a8880;stroke-width:1.2}
+  .eucl{fill:none;stroke:#8a8880;stroke-width:1.2;stroke-dasharray:4 3}
+  .maha{fill:none;stroke:#2f6fb5;stroke-width:1.3;stroke-dasharray:4 3}
+  .vec{stroke:#1a1a19;stroke-width:1.6;fill:none}
+  .op{stroke:#1a1a19;stroke-width:1.2;stroke-dasharray:4 3;fill:none}
+  .ah{fill:#8a8880;stroke:none} .ahk{fill:#1a1a19;stroke:none}
+  .hl{paint-order:stroke;stroke:#fbfaf6;stroke-width:3.5;stroke-linejoin:round}
+  @media (prefers-color-scheme: dark){
+    .lab{fill:#b6b4ab} .hd{fill:#eceae3} .sub{fill:#b6b4ab} .big{fill:#eceae3}
+    .t1{fill:#7fb2e8} .t2{fill:#e09a5f}
+    .box{stroke:#33312e} .ax{stroke:#4a4844} .gd{stroke:#33312e}
+    .c1{fill:#7fb2e8} .c2{fill:#e09a5f} .f1{fill:#7fb2e8} .f2{fill:#e09a5f} .fg{fill:#4a4844}
+    .m1{fill:#7fb2e8;stroke:#1c1b19} .m2{fill:#e09a5f;stroke:#1c1b19}
+    .pt{fill:#eceae3;stroke:#1c1b19}
+    .arr{stroke:#85837b} .l1{stroke:#7fb2e8} .l2{stroke:#e09a5f} .l1t{stroke:#7fb2e8} .l2t{stroke:#e09a5f}
+    .lg{stroke:#85837b} .lgt{stroke:#4a4844}
+    .ell{stroke:#85837b} .eucl{stroke:#85837b} .maha{stroke:#7fb2e8}
+    .vec{stroke:#eceae3} .op{stroke:#eceae3} .ah{fill:#85837b} .ahk{fill:#eceae3}
+    .hl{stroke:#1c1b19}
+  }
+</style>
+<text class="hd" x="26.0" y="26.0">Distillation keeps the cross-domain cosine matrix, so rotations are free but relative drift is penalised</text>
+<text class="sub" x="26.0" y="44.0">R(i,j) = N(F_i) N(F_j)ᵀ ∈ ℝ^(P×P);   L_rel = mean ‖Rᵗ(i,j) − Rᵗ⁻¹(i,j)‖₁ over old-domain pairs and layers</text>
+<text class="big" x="134.0" y="72.0" text-anchor="middle">teacher (frozen, from step t−1)</text>
+<circle cx="134.0" cy="134.0" r="44" class="ell"/>
+<line x1="84.0" y1="134.0" x2="184.0" y2="134.0" class="gd"/>
+<line x1="134.0" y1="84.0" x2="134.0" y2="184.0" class="gd"/>
+<circle cx="177.3" cy="126.4" r="4.0" class="m1"/>
+<circle cx="171.3" cy="110.7" r="4.0" class="m2"/>
+<circle cx="154.7" cy="95.2" r="4.0" class="m1"/>
+<circle cx="164.6" cy="102.3" r="4.0" class="m2"/>
+<circle cx="106.9" cy="99.3" r="4.0" class="m1"/>
+<circle cx="93.2" cy="117.5" r="4.0" class="m2"/>
+<circle cx="91.7" cy="146.1" r="4.0" class="m1"/>
+<circle cx="95.2" cy="154.7" r="4.0" class="m2"/>
+<circle cx="119.0" cy="175.3" r="4.0" class="m1"/>
+<circle cx="102.3" cy="164.6" r="4.0" class="m2"/>
+<circle cx="166.7" cy="163.4" r="4.0" class="m1"/>
+<circle cx="173.5" cy="153.3" r="4.0" class="m2"/>
+<rect x="89.0" y="204.0" width="14.0" height="14.0" class="f1" opacity="0.87"/>
+<rect x="104.0" y="204.0" width="14.0" height="14.0" class="f1" opacity="0.77"/>
+<rect x="119.0" y="204.0" width="14.0" height="14.0" class="f2" opacity="0.80"/>
+<rect x="134.0" y="204.0" width="14.0" height="14.0" class="f2" opacity="0.89"/>
+<rect x="149.0" y="204.0" width="14.0" height="14.0" class="f2" opacity="0.78"/>
+<rect x="164.0" y="204.0" width="14.0" height="14.0" class="f1" opacity="0.77"/>
+<rect x="89.0" y="219.0" width="14.0" height="14.0" class="f1" opacity="0.82"/>
+<rect x="104.0" y="219.0" width="14.0" height="14.0" class="f1" opacity="0.90"/>
+<rect x="119.0" y="219.0" width="14.0" height="14.0" class="f2" opacity="0.17"/>
+<rect x="134.0" y="219.0" width="14.0" height="14.0" class="f2" opacity="0.78"/>
+<rect x="149.0" y="219.0" width="14.0" height="14.0" class="f2" opacity="0.89"/>
+<rect x="164.0" y="219.0" width="14.0" height="14.0" class="f1" opacity="0.11"/>
+<rect x="89.0" y="234.0" width="14.0" height="14.0" class="f2" opacity="0.17"/>
+<rect x="104.0" y="234.0" width="14.0" height="14.0" class="f1" opacity="0.20"/>
+<rect x="119.0" y="234.0" width="14.0" height="14.0" class="f1" opacity="0.82"/>
+<rect x="134.0" y="234.0" width="14.0" height="14.0" class="f1" opacity="0.23"/>
+<rect x="149.0" y="234.0" width="14.0" height="14.0" class="f2" opacity="0.17"/>
+<rect x="164.0" y="234.0" width="14.0" height="14.0" class="f2" opacity="0.84"/>
+<rect x="89.0" y="249.0" width="14.0" height="14.0" class="f2" opacity="0.90"/>
+<rect x="104.0" y="249.0" width="14.0" height="14.0" class="f2" opacity="0.82"/>
+<rect x="119.0" y="249.0" width="14.0" height="14.0" class="f1" opacity="0.75"/>
+<rect x="134.0" y="249.0" width="14.0" height="14.0" class="f1" opacity="0.91"/>
+<rect x="149.0" y="249.0" width="14.0" height="14.0" class="f1" opacity="0.83"/>
+<rect x="164.0" y="249.0" width="14.0" height="14.0" class="f2" opacity="0.71"/>
+<rect x="89.0" y="264.0" width="14.0" height="14.0" class="f2" opacity="0.75"/>
+<rect x="104.0" y="264.0" width="14.0" height="14.0" class="f2" opacity="0.86"/>
+<rect x="119.0" y="264.0" width="14.0" height="14.0" class="f2" opacity="0.11"/>
+<rect x="134.0" y="264.0" width="14.0" height="14.0" class="f1" opacity="0.71"/>
+<rect x="149.0" y="264.0" width="14.0" height="14.0" class="f1" opacity="0.84"/>
+<rect x="164.0" y="264.0" width="14.0" height="14.0" class="f1" opacity="0.17"/>
+<rect x="89.0" y="279.0" width="14.0" height="14.0" class="f1" opacity="0.31"/>
+<rect x="104.0" y="279.0" width="14.0" height="14.0" class="f1" opacity="0.11"/>
+<rect x="119.0" y="279.0" width="14.0" height="14.0" class="f2" opacity="0.88"/>
+<rect x="134.0" y="279.0" width="14.0" height="14.0" class="f2" opacity="0.37"/>
+<rect x="149.0" y="279.0" width="14.0" height="14.0" class="f2" opacity="0.14"/>
+<rect x="164.0" y="279.0" width="14.0" height="14.0" class="f1" opacity="0.90"/>
+<text class="lab" x="84.0" y="253.0" text-anchor="end">p</text>
+<text class="lab" x="134.0" y="199.0" text-anchor="middle">q</text>
+<text class="big" x="134.0" y="312.0" text-anchor="middle">reference Rᵗ⁻¹</text>
+<text class="big" x="358.0" y="72.0" text-anchor="middle">student: whole space rotated 55°</text>
+<circle cx="358.0" cy="134.0" r="44" class="ell"/>
+<line x1="308.0" y1="134.0" x2="408.0" y2="134.0" class="gd"/>
+<line x1="358.0" y1="84.0" x2="358.0" y2="184.0" class="gd"/>
+<circle cx="401.3" cy="126.4" r="2.2" class="fg"/>
+<circle cx="378.7" cy="95.2" r="2.2" class="fg"/>
+<circle cx="330.9" cy="99.3" r="2.2" class="fg"/>
+<circle cx="315.7" cy="146.1" r="2.2" class="fg"/>
+<circle cx="343.0" cy="175.3" r="2.2" class="fg"/>
+<circle cx="390.7" cy="163.4" r="2.2" class="fg"/>
+<circle cx="395.3" cy="110.7" r="2.2" class="fg"/>
+<circle cx="388.6" cy="102.3" r="2.2" class="fg"/>
+<circle cx="317.2" cy="117.5" r="2.2" class="fg"/>
+<circle cx="319.2" cy="154.7" r="2.2" class="fg"/>
+<circle cx="326.3" cy="164.6" r="2.2" class="fg"/>
+<circle cx="397.5" cy="153.3" r="2.2" class="fg"/>
+<circle cx="376.6" cy="94.1" r="4.0" class="m1"/>
+<circle cx="360.3" cy="90.1" r="4.0" class="m2"/>
+<circle cx="338.0" cy="94.8" r="4.0" class="m1"/>
+<circle cx="349.6" cy="90.8" r="4.0" class="m2"/>
+<circle cx="314.1" cy="136.3" r="4.0" class="m1"/>
+<circle cx="321.1" cy="158.0" r="4.0" class="m2"/>
+<circle cx="343.7" cy="175.6" r="4.0" class="m1"/>
+<circle cx="352.6" cy="177.7" r="4.0" class="m2"/>
+<circle cx="383.2" cy="170.0" r="4.0" class="m1"/>
+<circle cx="364.9" cy="177.5" r="4.0" class="m2"/>
+<circle cx="400.9" cy="124.1" r="4.0" class="m1"/>
+<circle cx="396.5" cy="112.7" r="4.0" class="m2"/>
+<rect x="313.0" y="204.0" width="14.0" height="14.0" class="f1" opacity="0.87"/>
+<rect x="328.0" y="204.0" width="14.0" height="14.0" class="f1" opacity="0.77"/>
+<rect x="343.0" y="204.0" width="14.0" height="14.0" class="f2" opacity="0.80"/>
+<rect x="358.0" y="204.0" width="14.0" height="14.0" class="f2" opacity="0.89"/>
+<rect x="373.0" y="204.0" width="14.0" height="14.0" class="f2" opacity="0.78"/>
+<rect x="388.0" y="204.0" width="14.0" height="14.0" class="f1" opacity="0.77"/>
+<rect x="313.0" y="219.0" width="14.0" height="14.0" class="f1" opacity="0.82"/>
+<rect x="328.0" y="219.0" width="14.0" height="14.0" class="f1" opacity="0.90"/>
+<rect x="343.0" y="219.0" width="14.0" height="14.0" class="f2" opacity="0.17"/>
+<rect x="358.0" y="219.0" width="14.0" height="14.0" class="f2" opacity="0.78"/>
+<rect x="373.0" y="219.0" width="14.0" height="14.0" class="f2" opacity="0.89"/>
+<rect x="388.0" y="219.0" width="14.0" height="14.0" class="f1" opacity="0.11"/>
+<rect x="313.0" y="234.0" width="14.0" height="14.0" class="f2" opacity="0.17"/>
+<rect x="328.0" y="234.0" width="14.0" height="14.0" class="f1" opacity="0.20"/>
+<rect x="343.0" y="234.0" width="14.0" height="14.0" class="f1" opacity="0.82"/>
+<rect x="358.0" y="234.0" width="14.0" height="14.0" class="f1" opacity="0.23"/>
+<rect x="373.0" y="234.0" width="14.0" height="14.0" class="f2" opacity="0.17"/>
+<rect x="388.0" y="234.0" width="14.0" height="14.0" class="f2" opacity="0.84"/>
+<rect x="313.0" y="249.0" width="14.0" height="14.0" class="f2" opacity="0.90"/>
+<rect x="328.0" y="249.0" width="14.0" height="14.0" class="f2" opacity="0.82"/>
+<rect x="343.0" y="249.0" width="14.0" height="14.0" class="f1" opacity="0.75"/>
+<rect x="358.0" y="249.0" width="14.0" height="14.0" class="f1" opacity="0.91"/>
+<rect x="373.0" y="249.0" width="14.0" height="14.0" class="f1" opacity="0.83"/>
+<rect x="388.0" y="249.0" width="14.0" height="14.0" class="f2" opacity="0.71"/>
+<rect x="313.0" y="264.0" width="14.0" height="14.0" class="f2" opacity="0.75"/>
+<rect x="328.0" y="264.0" width="14.0" height="14.0" class="f2" opacity="0.86"/>
+<rect x="343.0" y="264.0" width="14.0" height="14.0" class="f2" opacity="0.11"/>
+<rect x="358.0" y="264.0" width="14.0" height="14.0" class="f1" opacity="0.71"/>
+<rect x="373.0" y="264.0" width="14.0" height="14.0" class="f1" opacity="0.84"/>
+<rect x="388.0" y="264.0" width="14.0" height="14.0" class="f1" opacity="0.17"/>
+<rect x="313.0" y="279.0" width="14.0" height="14.0" class="f1" opacity="0.31"/>
+<rect x="328.0" y="279.0" width="14.0" height="14.0" class="f1" opacity="0.11"/>
+<rect x="343.0" y="279.0" width="14.0" height="14.0" class="f2" opacity="0.88"/>
+<rect x="358.0" y="279.0" width="14.0" height="14.0" class="f2" opacity="0.37"/>
+<rect x="373.0" y="279.0" width="14.0" height="14.0" class="f2" opacity="0.14"/>
+<rect x="388.0" y="279.0" width="14.0" height="14.0" class="f1" opacity="0.90"/>
+<text class="lab" x="308.0" y="253.0" text-anchor="end">p</text>
+<text class="lab" x="358.0" y="199.0" text-anchor="middle">q</text>
+<text class="big" x="358.0" y="312.0" text-anchor="middle">L_rel = 0.00</text>
+<text class="lab" x="358.0" y="328.0" text-anchor="middle">every token moved, R identical</text>
+<text class="big" x="582.0" y="72.0" text-anchor="middle">student: domain-j tokens drifted</text>
+<circle cx="582.0" cy="134.0" r="44" class="ell"/>
+<line x1="532.0" y1="134.0" x2="632.0" y2="134.0" class="gd"/>
+<line x1="582.0" y1="84.0" x2="582.0" y2="184.0" class="gd"/>
+<circle cx="625.3" cy="126.4" r="2.2" class="fg"/>
+<circle cx="602.7" cy="95.2" r="2.2" class="fg"/>
+<circle cx="554.9" cy="99.3" r="2.2" class="fg"/>
+<circle cx="539.7" cy="146.1" r="2.2" class="fg"/>
+<circle cx="567.0" cy="175.3" r="2.2" class="fg"/>
+<circle cx="614.7" cy="163.4" r="2.2" class="fg"/>
+<circle cx="619.3" cy="110.7" r="2.2" class="fg"/>
+<circle cx="612.6" cy="102.3" r="2.2" class="fg"/>
+<circle cx="541.2" cy="117.5" r="2.2" class="fg"/>
+<circle cx="543.2" cy="154.7" r="2.2" class="fg"/>
+<circle cx="550.3" cy="164.6" r="2.2" class="fg"/>
+<circle cx="621.5" cy="153.3" r="2.2" class="fg"/>
+<circle cx="624.7" cy="123.4" r="4.0" class="m1"/>
+<circle cx="572.9" cy="91.0" r="4.0" class="m2"/>
+<circle cx="604.7" cy="96.3" r="4.0" class="m1"/>
+<circle cx="581.2" cy="90.0" r="4.0" class="m2"/>
+<circle cx="552.0" cy="101.8" r="4.0" class="m1"/>
+<circle cx="572.1" cy="91.1" r="4.0" class="m2"/>
+<circle cx="539.7" cy="146.1" r="4.0" class="m1"/>
+<circle cx="545.1" cy="158.0" r="4.0" class="m2"/>
+<circle cx="569.1" cy="176.1" r="4.0" class="m1"/>
+<circle cx="606.6" cy="170.5" r="4.0" class="m2"/>
+<circle cx="612.6" cy="165.7" r="4.0" class="m1"/>
+<circle cx="599.9" cy="174.2" r="4.0" class="m2"/>
+<rect x="537.0" y="204.0" width="14.0" height="14.0" class="f1" opacity="0.11"/>
+<rect x="552.0" y="204.0" width="14.0" height="14.0" class="f1" opacity="0.27"/>
+<rect x="567.0" y="204.0" width="14.0" height="14.0" class="f1" opacity="0.09"/>
+<rect x="582.0" y="204.0" width="14.0" height="14.0" class="f2" opacity="0.88"/>
+<rect x="597.0" y="204.0" width="14.0" height="14.0" class="f1" opacity="0.37"/>
+<rect x="612.0" y="204.0" width="14.0" height="14.0" class="f1" opacity="0.23"/>
+<rect x="537.0" y="219.0" width="14.0" height="14.0" class="f1" opacity="0.70"/>
+<rect x="552.0" y="219.0" width="14.0" height="14.0" class="f1" opacity="0.80"/>
+<rect x="567.0" y="219.0" width="14.0" height="14.0" class="f1" opacity="0.69"/>
+<rect x="582.0" y="219.0" width="14.0" height="14.0" class="f2" opacity="0.84"/>
+<rect x="597.0" y="219.0" width="14.0" height="14.0" class="f2" opacity="0.44"/>
+<rect x="612.0" y="219.0" width="14.0" height="14.0" class="f2" opacity="0.57"/>
+<rect x="537.0" y="234.0" width="14.0" height="14.0" class="f1" opacity="0.81"/>
+<rect x="552.0" y="234.0" width="14.0" height="14.0" class="f1" opacity="0.71"/>
+<rect x="567.0" y="234.0" width="14.0" height="14.0" class="f1" opacity="0.82"/>
+<rect x="582.0" y="234.0" width="14.0" height="14.0" class="f1" opacity="0.23"/>
+<rect x="597.0" y="234.0" width="14.0" height="14.0" class="f2" opacity="0.92"/>
+<rect x="612.0" y="234.0" width="14.0" height="14.0" class="f2" opacity="0.88"/>
+<rect x="537.0" y="249.0" width="14.0" height="14.0" class="f2" opacity="0.14"/>
+<rect x="552.0" y="249.0" width="14.0" height="14.0" class="f2" opacity="0.30"/>
+<rect x="567.0" y="249.0" width="14.0" height="14.0" class="f2" opacity="0.12"/>
+<rect x="582.0" y="249.0" width="14.0" height="14.0" class="f1" opacity="0.89"/>
+<rect x="597.0" y="249.0" width="14.0" height="14.0" class="f2" opacity="0.34"/>
+<rect x="612.0" y="249.0" width="14.0" height="14.0" class="f2" opacity="0.20"/>
+<rect x="537.0" y="264.0" width="14.0" height="14.0" class="f2" opacity="0.82"/>
+<rect x="552.0" y="264.0" width="14.0" height="14.0" class="f2" opacity="0.89"/>
+<rect x="567.0" y="264.0" width="14.0" height="14.0" class="f2" opacity="0.82"/>
+<rect x="582.0" y="264.0" width="14.0" height="14.0" class="f1" opacity="0.73"/>
+<rect x="597.0" y="264.0" width="14.0" height="14.0" class="f1" opacity="0.61"/>
+<rect x="612.0" y="264.0" width="14.0" height="14.0" class="f1" opacity="0.72"/>
+<rect x="537.0" y="279.0" width="14.0" height="14.0" class="f2" opacity="0.80"/>
+<rect x="552.0" y="279.0" width="14.0" height="14.0" class="f2" opacity="0.70"/>
+<rect x="567.0" y="279.0" width="14.0" height="14.0" class="f2" opacity="0.81"/>
+<rect x="582.0" y="279.0" width="14.0" height="14.0" class="f2" opacity="0.24"/>
+<rect x="597.0" y="279.0" width="14.0" height="14.0" class="f1" opacity="0.92"/>
+<rect x="612.0" y="279.0" width="14.0" height="14.0" class="f1" opacity="0.88"/>
+<text class="lab" x="532.0" y="253.0" text-anchor="end">p</text>
+<text class="lab" x="582.0" y="199.0" text-anchor="middle">q</text>
+<text class="big" x="582.0" y="312.0" text-anchor="middle">L_rel = 0.51</text>
+<text class="lab" x="582.0" y="328.0" text-anchor="middle">relative geometry changed</text>
+<circle cx="34.0" cy="348.0" r="4.0" class="m1"/>
+<text class="lab" x="42.0" y="352.0">tokens of old domain i</text>
+<circle cx="186.0" cy="348.0" r="4.0" class="m2"/>
+<text class="lab" x="194.0" y="352.0">tokens of old domain j</text>
+<circle cx="338.0" cy="348.0" r="2.2" class="fg"/>
+<text class="lab" x="344.0" y="352.0">teacher positions</text>
+<rect x="470.0" y="342.0" width="13.0" height="10.0" class="f2" opacity="0.93"/>
+<rect x="484.0" y="342.0" width="13.0" height="10.0" class="f2" opacity="0.72"/>
+<rect x="498.0" y="342.0" width="13.0" height="10.0" class="f2" opacity="0.51"/>
+<rect x="512.0" y="342.0" width="13.0" height="10.0" class="f2" opacity="0.29"/>
+<rect x="526.0" y="342.0" width="13.0" height="10.0" class="f1" opacity="0.08"/>
+<rect x="540.0" y="342.0" width="13.0" height="10.0" class="f1" opacity="0.29"/>
+<rect x="554.0" y="342.0" width="13.0" height="10.0" class="f1" opacity="0.51"/>
+<rect x="568.0" y="342.0" width="13.0" height="10.0" class="f1" opacity="0.72"/>
+<rect x="582.0" y="342.0" width="13.0" height="10.0" class="f1" opacity="0.93"/>
+<text class="lab" x="466.0" y="352.0" text-anchor="end">−1</text>
+<text class="lab" x="600.0" y="352.0">+1 cosine</text>
+<text class="lab" x="26.0" y="374.0">Caveat shown in column 2: a cosine Gram matrix constrains geometry only up to an orthogonal transform.</text>
+</svg>

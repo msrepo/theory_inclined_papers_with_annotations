@@ -1,0 +1,150 @@
+<svg viewBox="0 0 700 392" xmlns="http://www.w3.org/2000/svg" role="img">
+<title>Why PET-Adapter can warm-start diffusion from OSEM</title>
+<desc>Left: for a toy one-dimensional Poisson deblurring problem, the error power of the MLEM reconstruction divided by the signal power in each spatial-frequency band, after 2, 10 and 200 iterations, on a log frequency axis. After only 2 iterations the low-frequency bands already have near-zero error while the high bands sit at 1, meaning nothing has been recovered there; more iterations push the recovered range slightly higher, and by 200 iterations noise is amplified to several times the signal power in the mid-high bands. A dashed curve shows the squared singular values of the blur operator, and a shaded band marks frequencies where they fall below 0.01, effectively the null space the measurement loss cannot see. Right: two diffusion time lines. Standard sampling starts from pure noise at t = 1 and takes 50 steps; PET-Adapter inverts the OSEM image to t = 0.4 and takes only 2 steps.</desc>
+<style>
+  text{font-family:ui-sans-serif,-apple-system,"Segoe UI",sans-serif;font-weight:400}
+  .lab{font-size:11px;fill:#57564f} .hd{font-size:13px;font-weight:500;fill:#1a1a19}
+  .sub{font-size:11.5px;fill:#57564f} .big{font-size:12.5px;font-weight:500;fill:#1a1a19}
+  .t1{fill:#2f6fb5} .t2{fill:#c8702f}
+  .c1{fill:#2f6fb5;stroke:none;opacity:0.5} .c2{fill:#c8702f;stroke:none;opacity:0.5}
+  .f1{fill:#2f6fb5;stroke:none;opacity:0.1} .f2{fill:#c8702f;stroke:none;opacity:0.1} .fg{fill:#8a8880;stroke:none;opacity:0.35}
+  .m1{fill:#2f6fb5;stroke:#fbfaf6;stroke-width:1.4} .m2{fill:#c8702f;stroke:#fbfaf6;stroke-width:1.4}
+  .mg{fill:#c3c2b7;stroke:#fbfaf6;stroke-width:1.2}
+  .arr{stroke:#8a8880;stroke-width:1;fill:none;opacity:0.75}
+  .box{fill:none;stroke:#e2e1da;stroke-width:1}
+  .ax{stroke:#c3c2b7;stroke-width:0.8;fill:none}
+  .gd{stroke:#e2e1da;stroke-width:0.6;fill:none;stroke-dasharray:3 3}
+  .l1{fill:none;stroke:#2f6fb5;stroke-width:2}
+  .l2{fill:none;stroke:#c8702f;stroke-width:2}
+  .lg{fill:none;stroke:#8a8880;stroke-width:1.5}
+  .d1{fill:none;stroke:#2f6fb5;stroke-width:1.3;stroke-dasharray:4 3}
+  .d2{fill:none;stroke:#c8702f;stroke-width:1.3;stroke-dasharray:4 3}
+  .op{stroke:#1a1a19;stroke-width:1.2;stroke-dasharray:4 3;fill:none}
+  .vec{stroke:#1a1a19;stroke-width:1.6;fill:none}
+  .pt{fill:#1a1a19;stroke:#fbfaf6;stroke-width:1.2}
+  @media (prefers-color-scheme: dark){
+    .lab{fill:#b6b4ab} .hd{fill:#eceae3} .sub{fill:#b6b4ab} .big{fill:#eceae3}
+    .t1{fill:#7fb2e8} .t2{fill:#e09a5f}
+    .box{stroke:#33312e} .ax{stroke:#4a4844} .gd{stroke:#33312e}
+    .c1{fill:#7fb2e8} .c2{fill:#e09a5f} .f1{fill:#7fb2e8} .f2{fill:#e09a5f} .fg{fill:#85837b}
+    .m1{fill:#7fb2e8;stroke:#1c1b19} .m2{fill:#e09a5f;stroke:#1c1b19} .mg{fill:#6a6862;stroke:#1c1b19}
+    .arr{stroke:#85837b} .l1{stroke:#7fb2e8} .l2{stroke:#e09a5f} .lg{stroke:#85837b}
+    .d1{stroke:#7fb2e8} .d2{stroke:#e09a5f} .op{stroke:#eceae3}
+    .vec{stroke:#eceae3} .pt{fill:#eceae3;stroke:#1c1b19}
+  }
+</style>
+<rect x="324.6" y="66" width="105.4" height="184" class="fg" style="opacity:0.18"/>
+<line x1="149.1" y1="66.0" x2="149.1" y2="250.0" class="gd"/>
+<text class="lab" x="149.1" y="265.0" text-anchor="middle">0.01</text>
+<line x1="228.0" y1="66.0" x2="228.0" y2="250.0" class="gd"/>
+<text class="lab" x="228.0" y="265.0" text-anchor="middle">0.03</text>
+<line x1="314.4" y1="66.0" x2="314.4" y2="250.0" class="gd"/>
+<text class="lab" x="314.4" y="265.0" text-anchor="middle">0.1</text>
+<line x1="393.3" y1="66.0" x2="393.3" y2="250.0" class="gd"/>
+<text class="lab" x="393.3" y="265.0" text-anchor="middle">0.3</text>
+<line x1="74.0" y1="250.0" x2="430.0" y2="250.0" class="gd"/>
+<text class="lab" x="68.0" y="254.0" text-anchor="end">0.0</text>
+<line x1="74.0" y1="204.0" x2="430.0" y2="204.0" class="gd"/>
+<text class="lab" x="68.0" y="208.0" text-anchor="end">0.5</text>
+<line x1="74.0" y1="158.0" x2="430.0" y2="158.0" class="gd"/>
+<text class="lab" x="68.0" y="162.0" text-anchor="end">1.0</text>
+<line x1="74.0" y1="112.0" x2="430.0" y2="112.0" class="gd"/>
+<text class="lab" x="68.0" y="116.0" text-anchor="end">1.5</text>
+<line x1="74.0" y1="66.0" x2="430.0" y2="66.0" class="gd"/>
+<text class="lab" x="68.0" y="70.0" text-anchor="end">2.0</text>
+<rect x="74.0" y="66.0" width="356.0" height="184.0" rx="3" class="box"/>
+<path d="M74.0 158.4 L75.8 158.4 L77.6 158.4 L79.4 158.5 L81.2 158.5 L82.9 158.5 L84.7 158.5 L86.5 158.6 L88.3 158.6 L90.1 158.6 L91.9 158.7 L93.7 158.7 L95.5 158.7 L97.3 158.8 L99.0 158.8 L100.8 158.8 L102.6 158.9 L104.4 158.9 L106.2 159.0 L108.0 159.0 L109.8 159.1 L111.6 159.1 L113.4 159.2 L115.1 159.3 L116.9 159.3 L118.7 159.4 L120.5 159.5 L122.3 159.5 L124.1 159.6 L125.9 159.7 L127.7 159.8 L129.5 159.9 L131.2 160.0 L133.0 160.1 L134.8 160.2 L136.6 160.3 L138.4 160.4 L140.2 160.5 L142.0 160.6 L143.8 160.8 L145.6 160.9 L147.3 161.1 L149.1 161.2 L150.9 161.4 L152.7 161.5 L154.5 161.7 L156.3 161.9 L158.1 162.1 L159.9 162.3 L161.7 162.5 L163.4 162.8 L165.2 163.0 L167.0 163.2 L168.8 163.5 L170.6 163.8 L172.4 164.1 L174.2 164.3 L176.0 164.7 L177.8 165.0 L179.5 165.3 L181.3 165.7 L183.1 166.1 L184.9 166.5 L186.7 166.9 L188.5 167.3 L190.3 167.7 L192.1 168.2 L193.9 168.7 L195.6 169.2 L197.4 169.8 L199.2 170.3 L201.0 170.9 L202.8 171.5 L204.6 172.1 L206.4 172.8 L208.2 173.5 L210.0 174.2 L211.7 174.9 L213.5 175.7 L215.3 176.5 L217.1 177.4 L218.9 178.2 L220.7 179.1 L222.5 180.1 L224.3 181.1 L226.1 182.1 L227.8 183.1 L229.6 184.2 L231.4 185.3 L233.2 186.5 L235.0 187.7 L236.8 188.9 L238.6 190.1 L240.4 191.4 L242.2 192.8 L243.9 194.2 L245.7 195.6 L247.5 197.0 L249.3 198.5 L251.1 200.0 L252.9 201.5 L254.7 203.1 L256.5 204.7 L258.3 206.3 L260.1 207.9 L261.8 209.5 L263.6 211.2 L265.4 212.9 L267.2 214.6 L269.0 216.2 L270.8 217.9 L272.6 219.6 L274.4 221.3 L276.2 222.9 L277.9 224.6 L279.7 226.2 L281.5 227.8 L283.3 229.3 L285.1 230.9 L286.9 232.3 L288.7 233.8 L290.5 235.1 L292.3 236.5 L294.0 237.7 L295.8 238.9 L297.6 240.1 L299.4 241.1 L301.2 242.1 L303.0 243.1 L304.8 243.9 L306.6 244.7 L308.4 245.4 L310.1 246.1 L311.9 246.7 L313.7 247.2 L315.5 247.6 L317.3 248.0 L319.1 248.4 L320.9 248.7 L322.7 248.9 L324.5 249.2 L326.2 249.3 L328.0 249.5 L329.8 249.6 L331.6 249.7 L333.4 249.8 L335.2 249.8 L337.0 249.9 L338.8 249.9 L340.6 249.9 L342.3 250.0 L344.1 250.0 L345.9 250.0 L347.7 250.0 L349.5 250.0 L351.3 250.0 L353.1 250.0 L354.9 250.0 L356.7 250.0 L358.4 250.0 L360.2 250.0 L362.0 250.0 L363.8 250.0 L365.6 250.0 L367.4 250.0 L369.2 250.0 L371.0 250.0 L372.8 250.0 L374.5 250.0 L376.3 250.0 L378.1 250.0 L379.9 250.0 L381.7 250.0 L383.5 250.0 L385.3 250.0 L387.1 250.0 L388.9 250.0 L390.6 250.0 L392.4 250.0 L394.2 250.0 L396.0 250.0 L397.8 250.0 L399.6 250.0 L401.4 250.0 L403.2 250.0 L405.0 250.0 L406.7 250.0 L408.5 250.0 L410.3 250.0 L412.1 250.0 L413.9 250.0 L415.7 250.0 L417.5 250.0 L419.3 250.0 L421.1 250.0 L422.8 250.0 L424.6 250.0 L426.4 250.0 L428.2 250.0 L430.0 250.0" class="op"/>
+<path d="M81.6 249.4 L110.7 249.9 L139.4 249.9 L160.5 249.8 L176.3 249.7 L196.9 249.1 L215.8 248.6 L235.0 247.2 L255.2 241.3 L273.4 224.0 L291.8 198.4 L310.3 167.1 L328.5 163.4 L347.2 159.8 L365.8 157.9 L384.4 158.0 L402.7 158.0 L421.0 158.0" class="l2"/>
+<path d="M81.6 249.5 L110.7 250.0 L139.4 249.9 L160.5 249.8 L176.3 249.7 L196.9 249.6 L215.8 249.5 L235.0 249.6 L255.2 248.7 L273.4 245.3 L291.8 224.1 L310.3 184.3 L328.5 179.3 L347.2 170.5 L365.8 156.7 L384.4 157.9 L402.7 158.0 L421.0 158.0" class="lg"/>
+<path d="M81.6 249.5 L110.7 250.0 L139.4 249.9 L160.5 249.8 L176.3 249.7 L196.9 249.6 L215.8 249.5 L235.0 249.6 L255.2 248.7 L273.4 245.5 L291.8 215.8 L310.3 110.0 L328.5 66.0 L347.2 99.6 L365.8 128.6 L384.4 126.2 L402.7 155.4 L421.0 158.3" class="l1"/>
+<text class="lab" x="91.7" y="174.0">|σ(f)|² of A: what the</text>
+<text class="lab" x="91.7" y="188.0">measurements see</text>
+<text class="lab" x="330.6" y="226.0">σ² &lt; 0.01:</text>
+<text class="lab" x="330.6" y="240.0">≈ null space</text>
+<text class="lab t1" x="335.7" y="78.0">clipped, peak 3.9</text>
+<line x1="84.0" y1="85.0" x2="102.0" y2="85.0" class="l2"/>
+<text class="lab" x="108.0" y="89.0">MLEM, 2 iterations</text>
+<line x1="84.0" y1="99.0" x2="102.0" y2="99.0" class="lg"/>
+<text class="lab" x="108.0" y="103.0">MLEM, 10 iterations</text>
+<line x1="84.0" y1="113.0" x2="102.0" y2="113.0" class="l1"/>
+<text class="lab" x="108.0" y="117.0">MLEM, 200 iterations</text>
+<text class="lab" x="252.0" y="281.0" text-anchor="middle">spatial frequency f, cycles per pixel (log scale)</text>
+<text class="lab" x="26.0" y="158.0" text-anchor="middle" transform="rotate(-90 26 158.0)">error power ÷ signal power</text>
+<text class="big" x="74.0" y="56.0">Semi-convergence: low frequencies are right after 2 iterations</text>
+<text class="big" x="470.0" y="56.0">so start the sampler late</text>
+<text class="lab" x="470.0" y="86.0">standard: from N(0, I)</text>
+<text class="lab" x="470.0" y="100.0">50 prior + data-consistency steps</text>
+<line x1="470.0" y1="112.0" x2="676.0" y2="112.0" class="ax"/>
+<line x1="470.0" y1="112.0" x2="676.0" y2="112.0" class="lg"/>
+<line x1="470.0" y1="108.0" x2="470.0" y2="116.0" class="ax"/>
+<line x1="474.1" y1="108.0" x2="474.1" y2="116.0" class="ax"/>
+<line x1="478.2" y1="108.0" x2="478.2" y2="116.0" class="ax"/>
+<line x1="482.4" y1="108.0" x2="482.4" y2="116.0" class="ax"/>
+<line x1="486.5" y1="108.0" x2="486.5" y2="116.0" class="ax"/>
+<line x1="490.6" y1="108.0" x2="490.6" y2="116.0" class="ax"/>
+<line x1="494.7" y1="108.0" x2="494.7" y2="116.0" class="ax"/>
+<line x1="498.8" y1="108.0" x2="498.8" y2="116.0" class="ax"/>
+<line x1="503.0" y1="108.0" x2="503.0" y2="116.0" class="ax"/>
+<line x1="507.1" y1="108.0" x2="507.1" y2="116.0" class="ax"/>
+<line x1="511.2" y1="108.0" x2="511.2" y2="116.0" class="ax"/>
+<line x1="515.3" y1="108.0" x2="515.3" y2="116.0" class="ax"/>
+<line x1="519.4" y1="108.0" x2="519.4" y2="116.0" class="ax"/>
+<line x1="523.6" y1="108.0" x2="523.6" y2="116.0" class="ax"/>
+<line x1="527.7" y1="108.0" x2="527.7" y2="116.0" class="ax"/>
+<line x1="531.8" y1="108.0" x2="531.8" y2="116.0" class="ax"/>
+<line x1="535.9" y1="108.0" x2="535.9" y2="116.0" class="ax"/>
+<line x1="540.0" y1="108.0" x2="540.0" y2="116.0" class="ax"/>
+<line x1="544.2" y1="108.0" x2="544.2" y2="116.0" class="ax"/>
+<line x1="548.3" y1="108.0" x2="548.3" y2="116.0" class="ax"/>
+<line x1="552.4" y1="108.0" x2="552.4" y2="116.0" class="ax"/>
+<line x1="556.5" y1="108.0" x2="556.5" y2="116.0" class="ax"/>
+<line x1="560.6" y1="108.0" x2="560.6" y2="116.0" class="ax"/>
+<line x1="564.8" y1="108.0" x2="564.8" y2="116.0" class="ax"/>
+<line x1="568.9" y1="108.0" x2="568.9" y2="116.0" class="ax"/>
+<line x1="573.0" y1="108.0" x2="573.0" y2="116.0" class="ax"/>
+<line x1="577.1" y1="108.0" x2="577.1" y2="116.0" class="ax"/>
+<line x1="581.2" y1="108.0" x2="581.2" y2="116.0" class="ax"/>
+<line x1="585.4" y1="108.0" x2="585.4" y2="116.0" class="ax"/>
+<line x1="589.5" y1="108.0" x2="589.5" y2="116.0" class="ax"/>
+<line x1="593.6" y1="108.0" x2="593.6" y2="116.0" class="ax"/>
+<line x1="597.7" y1="108.0" x2="597.7" y2="116.0" class="ax"/>
+<line x1="601.8" y1="108.0" x2="601.8" y2="116.0" class="ax"/>
+<line x1="606.0" y1="108.0" x2="606.0" y2="116.0" class="ax"/>
+<line x1="610.1" y1="108.0" x2="610.1" y2="116.0" class="ax"/>
+<line x1="614.2" y1="108.0" x2="614.2" y2="116.0" class="ax"/>
+<line x1="618.3" y1="108.0" x2="618.3" y2="116.0" class="ax"/>
+<line x1="622.4" y1="108.0" x2="622.4" y2="116.0" class="ax"/>
+<line x1="626.6" y1="108.0" x2="626.6" y2="116.0" class="ax"/>
+<line x1="630.7" y1="108.0" x2="630.7" y2="116.0" class="ax"/>
+<line x1="634.8" y1="108.0" x2="634.8" y2="116.0" class="ax"/>
+<line x1="638.9" y1="108.0" x2="638.9" y2="116.0" class="ax"/>
+<line x1="643.0" y1="108.0" x2="643.0" y2="116.0" class="ax"/>
+<line x1="647.2" y1="108.0" x2="647.2" y2="116.0" class="ax"/>
+<line x1="651.3" y1="108.0" x2="651.3" y2="116.0" class="ax"/>
+<line x1="655.4" y1="108.0" x2="655.4" y2="116.0" class="ax"/>
+<line x1="659.5" y1="108.0" x2="659.5" y2="116.0" class="ax"/>
+<line x1="663.6" y1="108.0" x2="663.6" y2="116.0" class="ax"/>
+<line x1="667.8" y1="108.0" x2="667.8" y2="116.0" class="ax"/>
+<line x1="671.9" y1="108.0" x2="671.9" y2="116.0" class="ax"/>
+<line x1="676.0" y1="108.0" x2="676.0" y2="116.0" class="ax"/>
+<text class="lab" x="470.0" y="170.0">PET-Adapter: DDIM-invert OSEM</text>
+<text class="lab" x="470.0" y="184.0">to t_r = 0.4, then T = 2 steps</text>
+<line x1="470.0" y1="196.0" x2="676.0" y2="196.0" class="ax"/>
+<line x1="593.6" y1="196.0" x2="676.0" y2="196.0" class="l1"/>
+<line x1="593.6" y1="192.0" x2="593.6" y2="200.0" class="l1"/>
+<line x1="634.8" y1="192.0" x2="634.8" y2="200.0" class="l1"/>
+<line x1="676.0" y1="192.0" x2="676.0" y2="200.0" class="l1"/>
+<text class="lab" x="470.0" y="214.0" text-anchor="middle">t = 1</text>
+<text class="lab" x="593.6" y="214.0" text-anchor="middle">t = 0.4</text>
+<text class="lab" x="676.0" y="214.0" text-anchor="middle">t = 0</text>
+<line x1="593.6" y1="120.0" x2="593.6" y2="162.0" class="gd"/>
+<text class="lab" x="470.0" y="240.0">The inverted OSEM image keeps its</text>
+<text class="lab" x="470.0" y="254.0">reliable low frequencies; the prior</text>
+<text class="lab" x="470.0" y="268.0">only has to add the high ones.</text>
+<line x1="452.0" y1="52.0" x2="452.0" y2="286.0" class="box"/>
+<text class="hd" x="26.0" y="24.0">PET-Adapter warm-starts diffusion from OSEM, because EM recovers large-singular-value components first</text>
+<text class="lab" x="26.0" y="318.0">Toy 1-D Poisson problem y ~ Poisson(Ax + b) with a Gaussian blur A. Curves at 1 mean a band is not recovered at all; above 1,</text>
+<text class="lab" x="26.0" y="334.0">noise is being amplified (200 iterations), which is why OSEM is stopped early. The adaptation loss, Poisson NLL on y,</text>
+<text class="lab" x="26.0" y="350.0">cannot see the shaded band, which is large for limited-angle PET; detail there comes from the prior and the MR-weighted TV.</text>
+<text class="lab" x="26.0" y="366.0">LoRA adapters, FiLM-conditioned on MR features, are the only parameters trained on the clinical data.</text>
+</svg>

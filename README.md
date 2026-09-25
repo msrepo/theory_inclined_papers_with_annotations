@@ -176,7 +176,7 @@ Themes that cut across several papers.
 | Page | Covers |
 |---|---|
 | *Applications of Gaussianity: uncertainty, dense prediction, test-time adaptation* — [read online](https://msrepo.github.io/theory_inclined_papers_with_annotations/gaussianity-in-practice/) · [source](topics/gaussianity-in-practice/notes.md) | the applied literature that assumes CLIP features are Gaussian, with close reads of Zhou et al. 2025 (CVPR), Venkataramanan et al. 2025 (UAI) and C. Huang et al. 2024 (IJCAI) |
-| *MICCAI 2026: domain adaptation and generalisation — the mathematical constructs* — [read online](https://msrepo.github.io/theory_inclined_papers_with_annotations/miccai2026-domain-adaptation/) · [source](topics/miccai2026-domain-adaptation/notes.md) | the core mathematical construct of each of 26 MICCAI 2026 DA/DG/TTA/OOD papers (Mahalanobis residuals, deep EM, OT and Schrödinger bridges, flow-matching TTA, InfoMax, variational logit energies, GRPO), with a construct map and a *What to watch* per paper |
+| *MICCAI 2026: domain adaptation and generalisation — the mathematical constructs* — [read online](https://msrepo.github.io/theory_inclined_papers_with_annotations/miccai2026-domain-adaptation/) · [source](topics/miccai2026-domain-adaptation/notes.md) | the core mathematical construct of each of 26 MICCAI 2026 DA/DG/TTA/OOD papers (Mahalanobis residuals, deep EM, OT and Schrödinger bridges, flow-matching TTA, InfoMax, variational logit energies, GRPO), with a construct map, one toy-computed figure per paper, and a *What to watch* per paper |
 
 ## Papers
 

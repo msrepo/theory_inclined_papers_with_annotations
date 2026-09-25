@@ -1,0 +1,136 @@
+<svg viewBox="0 0 700 340" xmlns="http://www.w3.org/2000/svg" role="img">
+<title>Co-occurrence consistency weight</title>
+<desc>Left: a five-by-five heatmap of the label co-occurrence matrix M estimated online from the model's own binarised predictions, for effusion, cardiomegaly, edema, pneumothorax and nodule. Effusion, cardiomegaly and edema co-occur strongly (off-diagonal values around 0.5 to 0.6), while pneumothorax and nodule are nearly independent of everything (values near 0.1). Right: stacked bars of the Frobenius distance between each sample's soft outer product and M, split into a grey diagonal part and a coloured off-diagonal part. Sample A predicts the common pair effusion plus cardiomegaly and gets a small off-diagonal part and the highest weight. Sample B has the same two confidences but on the rare pair effusion plus pneumothorax, so its off-diagonal part is larger and its weight lower. Sample C predicts no finding; its off-diagonal part is moderate but its diagonal part is the largest because every diagonal entry of M equals one, so it gets the lowest weight of all.</desc>
+<style>
+  text{font-family:ui-sans-serif,-apple-system,"Segoe UI",sans-serif;font-weight:400}
+  .lab{font-size:11px;fill:#57564f} .hd{font-size:13px;font-weight:500;fill:#1a1a19}
+  .sub{font-size:11.5px;fill:#57564f} .big{font-size:12.5px;font-weight:500;fill:#1a1a19}
+  .c1{fill:#2f6fb5;stroke:none} .c2{fill:#c8702f;stroke:none} .c3{fill:#8a8880;stroke:none}
+  .m1{fill:#2f6fb5;stroke:#fbfaf6;stroke-width:1.4} .m2{fill:#c8702f;stroke:#fbfaf6;stroke-width:1.4}
+  .sep{stroke:#1a1a19;stroke-width:1.6;fill:none}
+  .ell{fill:none;stroke:#8a8880;stroke-width:1.2}
+  .eucl{fill:none;stroke:#8a8880;stroke-width:1.2;stroke-dasharray:4 3}
+  .maha{fill:none;stroke:#2f6fb5;stroke-width:1.3;stroke-dasharray:4 3}
+  .vec{stroke:#1a1a19;stroke-width:1.6;fill:none}
+  .pt{fill:#1a1a19;stroke:#fbfaf6;stroke-width:1.2}
+  .arr{stroke:#8a8880;stroke-width:1;fill:none;opacity:0.75}
+  .box{fill:none;stroke:#e2e1da;stroke-width:1}
+  .ax{stroke:#c3c2b7;stroke-width:0.8;fill:none}
+  .gd{stroke:#e2e1da;stroke-width:0.6;fill:none;stroke-dasharray:3 3}
+  .l1{fill:none;stroke:#2f6fb5;stroke-width:2}
+  .l2{fill:none;stroke:#c8702f;stroke-width:2}
+  .op{stroke:#1a1a19;stroke-width:1.2;stroke-dasharray:4 3;fill:none}
+  @media (prefers-color-scheme: dark){
+    .lab{fill:#b6b4ab} .hd{fill:#eceae3} .sub{fill:#b6b4ab} .big{fill:#eceae3}
+    .box{stroke:#33312e} .ax{stroke:#4a4844} .gd{stroke:#33312e}
+    .c1{fill:#7fb2e8} .c2{fill:#e09a5f} .c3{fill:#85837b}
+    .m1{fill:#7fb2e8;stroke:#1c1b19} .m2{fill:#e09a5f;stroke:#1c1b19}
+    .sep{stroke:#eceae3} .ell{stroke:#85837b} .eucl{stroke:#85837b}
+    .maha{stroke:#7fb2e8} .vec{stroke:#eceae3} .pt{fill:#eceae3;stroke:#1c1b19}
+    .arr{stroke:#85837b} .l1{stroke:#7fb2e8} .l2{stroke:#e09a5f} .op{stroke:#eceae3}
+  }
+</style>
+<text x="350" y="24" text-anchor="middle" class="hd">Entropy is down-weighted for samples whose predicted label pairs disagree with the estimated co-occurrence</text>
+<text x="142.0" y="62.0" text-anchor="middle" class="sub">M from 4000 of the model's own predictions</text>
+<text x="142.0" y="76.0" text-anchor="middle" class="lab">M(j,k) = P(j,k) / √(P(j,j)·P(k,k)), diag = 1</text>
+<rect x="62.0" y="92.0" width="30.0" height="30.0" class="c1" fill-opacity="0.66"/>
+<text x="77.0" y="110.5" text-anchor="middle" class="lab">1.00</text>
+<rect x="94.0" y="92.0" width="30.0" height="30.0" class="c1" fill-opacity="0.41"/>
+<text x="109.0" y="110.5" text-anchor="middle" class="lab">0.59</text>
+<rect x="126.0" y="92.0" width="30.0" height="30.0" class="c1" fill-opacity="0.37"/>
+<text x="141.0" y="110.5" text-anchor="middle" class="lab">0.52</text>
+<rect x="158.0" y="92.0" width="30.0" height="30.0" class="c1" fill-opacity="0.15"/>
+<text x="173.0" y="110.5" text-anchor="middle" class="lab">0.15</text>
+<rect x="190.0" y="92.0" width="30.0" height="30.0" class="c1" fill-opacity="0.17"/>
+<text x="205.0" y="110.5" text-anchor="middle" class="lab">0.18</text>
+<text x="56.0" y="110.5" text-anchor="end" class="lab">Eff</text>
+<text x="77.0" y="264.0" text-anchor="middle" class="lab">Eff</text>
+<rect x="62.0" y="124.0" width="30.0" height="30.0" class="c1" fill-opacity="0.41"/>
+<text x="77.0" y="142.5" text-anchor="middle" class="lab">0.59</text>
+<rect x="94.0" y="124.0" width="30.0" height="30.0" class="c1" fill-opacity="0.66"/>
+<text x="109.0" y="142.5" text-anchor="middle" class="lab">1.00</text>
+<rect x="126.0" y="124.0" width="30.0" height="30.0" class="c1" fill-opacity="0.38"/>
+<text x="141.0" y="142.5" text-anchor="middle" class="lab">0.53</text>
+<rect x="158.0" y="124.0" width="30.0" height="30.0" class="c1" fill-opacity="0.14"/>
+<text x="173.0" y="142.5" text-anchor="middle" class="lab">0.13</text>
+<rect x="190.0" y="124.0" width="30.0" height="30.0" class="c1" fill-opacity="0.15"/>
+<text x="205.0" y="142.5" text-anchor="middle" class="lab">0.15</text>
+<text x="56.0" y="142.5" text-anchor="end" class="lab">Card</text>
+<text x="109.0" y="264.0" text-anchor="middle" class="lab">Card</text>
+<rect x="62.0" y="156.0" width="30.0" height="30.0" class="c1" fill-opacity="0.37"/>
+<text x="77.0" y="174.5" text-anchor="middle" class="lab">0.52</text>
+<rect x="94.0" y="156.0" width="30.0" height="30.0" class="c1" fill-opacity="0.38"/>
+<text x="109.0" y="174.5" text-anchor="middle" class="lab">0.53</text>
+<rect x="126.0" y="156.0" width="30.0" height="30.0" class="c1" fill-opacity="0.66"/>
+<text x="141.0" y="174.5" text-anchor="middle" class="lab">1.00</text>
+<rect x="158.0" y="156.0" width="30.0" height="30.0" class="c1" fill-opacity="0.14"/>
+<text x="173.0" y="174.5" text-anchor="middle" class="lab">0.14</text>
+<rect x="190.0" y="156.0" width="30.0" height="30.0" class="c1" fill-opacity="0.15"/>
+<text x="205.0" y="174.5" text-anchor="middle" class="lab">0.15</text>
+<text x="56.0" y="174.5" text-anchor="end" class="lab">Ede</text>
+<text x="141.0" y="264.0" text-anchor="middle" class="lab">Ede</text>
+<rect x="62.0" y="188.0" width="30.0" height="30.0" class="c1" fill-opacity="0.15"/>
+<text x="77.0" y="206.5" text-anchor="middle" class="lab">0.15</text>
+<rect x="94.0" y="188.0" width="30.0" height="30.0" class="c1" fill-opacity="0.14"/>
+<text x="109.0" y="206.5" text-anchor="middle" class="lab">0.13</text>
+<rect x="126.0" y="188.0" width="30.0" height="30.0" class="c1" fill-opacity="0.14"/>
+<text x="141.0" y="206.5" text-anchor="middle" class="lab">0.14</text>
+<rect x="158.0" y="188.0" width="30.0" height="30.0" class="c1" fill-opacity="0.66"/>
+<text x="173.0" y="206.5" text-anchor="middle" class="lab">1.00</text>
+<rect x="190.0" y="188.0" width="30.0" height="30.0" class="c1" fill-opacity="0.12"/>
+<text x="205.0" y="206.5" text-anchor="middle" class="lab">0.10</text>
+<text x="56.0" y="206.5" text-anchor="end" class="lab">Ptx</text>
+<text x="173.0" y="264.0" text-anchor="middle" class="lab">Ptx</text>
+<rect x="62.0" y="220.0" width="30.0" height="30.0" class="c1" fill-opacity="0.17"/>
+<text x="77.0" y="238.5" text-anchor="middle" class="lab">0.18</text>
+<rect x="94.0" y="220.0" width="30.0" height="30.0" class="c1" fill-opacity="0.15"/>
+<text x="109.0" y="238.5" text-anchor="middle" class="lab">0.15</text>
+<rect x="126.0" y="220.0" width="30.0" height="30.0" class="c1" fill-opacity="0.15"/>
+<text x="141.0" y="238.5" text-anchor="middle" class="lab">0.15</text>
+<rect x="158.0" y="220.0" width="30.0" height="30.0" class="c1" fill-opacity="0.12"/>
+<text x="173.0" y="238.5" text-anchor="middle" class="lab">0.10</text>
+<rect x="190.0" y="220.0" width="30.0" height="30.0" class="c1" fill-opacity="0.66"/>
+<text x="205.0" y="238.5" text-anchor="middle" class="lab">1.00</text>
+<text x="56.0" y="238.5" text-anchor="end" class="lab">Nod</text>
+<text x="205.0" y="264.0" text-anchor="middle" class="lab">Nod</text>
+<text x="276.0" y="62.0" text-anchor="start" class="sub">per-sample squared Frobenius distance ‖mᵢ − M‖²</text>
+<text x="276.0" y="76.0" text-anchor="start" class="lab">mᵢ = ŷᵢŷᵢᵀ,  wᵢ = exp(−‖mᵢ − M‖² / τ),  τ = 4</text>
+<text x="276.0" y="109.0" text-anchor="start" class="big">A: Eff 0.9 + Card 0.85</text>
+<text x="276.0" y="124.0" text-anchor="start" class="lab">common pair</text>
+<rect x="432.0" y="100.0" width="69.1" height="20.0" class="c3" fill-opacity="0.45"/>
+<rect x="501.1" y="100.0" width="22.7" height="20.0" class="c1"/>
+<text x="529.8" y="114.0" text-anchor="start" class="big">w = 0.36</text>
+<text x="276.0" y="159.0" text-anchor="start" class="big">B: Eff 0.9 + Ptx 0.85</text>
+<text x="276.0" y="174.0" text-anchor="start" class="lab">rare pair</text>
+<rect x="432.0" y="150.0" width="69.1" height="20.0" class="c3" fill-opacity="0.45"/>
+<rect x="501.1" y="150.0" width="53.8" height="20.0" class="c2"/>
+<text x="560.8" y="164.0" text-anchor="start" class="big">w = 0.25</text>
+<text x="276.0" y="209.0" text-anchor="start" class="big">C: all classes 0.05</text>
+<text x="276.0" y="224.0" text-anchor="start" class="lab">no finding</text>
+<rect x="432.0" y="200.0" width="111.4" height="20.0" class="c3" fill-opacity="0.45"/>
+<rect x="543.4" y="200.0" width="46.0" height="20.0" class="c3"/>
+<text x="595.4" y="214.0" text-anchor="start" class="big">w = 0.17</text>
+<line x1="432.0" y1="96.0" x2="432.0" y2="244.0" class="ax"/>
+<line x1="432.0" y1="244.0" x2="432.0" y2="248.0" class="ax"/>
+<text x="432.0" y="260.0" text-anchor="middle" class="lab">0</text>
+<line x1="454.4" y1="244.0" x2="454.4" y2="248.0" class="ax"/>
+<text x="454.4" y="260.0" text-anchor="middle" class="lab">1</text>
+<line x1="476.8" y1="244.0" x2="476.8" y2="248.0" class="ax"/>
+<text x="476.8" y="260.0" text-anchor="middle" class="lab">2</text>
+<line x1="499.2" y1="244.0" x2="499.2" y2="248.0" class="ax"/>
+<text x="499.2" y="260.0" text-anchor="middle" class="lab">3</text>
+<line x1="521.6" y1="244.0" x2="521.6" y2="248.0" class="ax"/>
+<text x="521.6" y="260.0" text-anchor="middle" class="lab">4</text>
+<line x1="544.0" y1="244.0" x2="544.0" y2="248.0" class="ax"/>
+<text x="544.0" y="260.0" text-anchor="middle" class="lab">5</text>
+<line x1="566.4" y1="244.0" x2="566.4" y2="248.0" class="ax"/>
+<text x="566.4" y="260.0" text-anchor="middle" class="lab">6</text>
+<line x1="588.8" y1="244.0" x2="588.8" y2="248.0" class="ax"/>
+<text x="588.8" y="260.0" text-anchor="middle" class="lab">7</text>
+<rect x="276.0" y="276.0" width="12.0" height="10.0" class="c3" fill-opacity="0.45"/>
+<text x="293.0" y="285.0" text-anchor="start" class="lab">diagonal part: Σ over j of (ŷ(j)² − 1)²</text>
+<rect x="478.0" y="276.0" width="6.0" height="10.0" class="c1"/><rect x="484.0" y="276.0" width="6.0" height="10.0" class="c2"/><rect x="490.0" y="276.0" width="6.0" height="10.0" class="c3"/>
+<text x="501.0" y="285.0" text-anchor="start" class="lab">off-diagonal part: pairs j≠k</text>
+<text x="62.0" y="312.0" text-anchor="start" class="lab">Why C loses most: M has 1s on its diagonal, so every low-confidence class adds (ŷ² − 1)² ≈ 1 to the distance,</text>
+<text x="62.0" y="326.0" text-anchor="start" class="lab">which mixes confidence into what is meant to be a label-structure check.</text>
+</svg>

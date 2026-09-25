@@ -1,0 +1,183 @@
+<svg viewBox="0 0 700 322" xmlns="http://www.w3.org/2000/svg" role="img">
+<title>Uncertainty then diversity query score</title>
+<desc>Three linked panels for a toy pool of unlabelled target volumes. Panel 1 plots each sample's quantile-normalised aleatoric term (mean entropy over test-time augmentations) against its normalised epistemic term (variance of free energy over augmentations), with dashed lines of constant sum CDU; the six lowest-CDU samples are blue source-like prototypes L and the six highest-CDU samples are orange candidates H. Panel 2 places the same samples on a unit circle by encoder-embedding direction: the prototypes cluster together, while the candidates lie far away, three of them in a tight clump. Panel 3 shows stacked bars of the prototype discrepancy for each candidate: an orange cross-domain part (mean cosine distance to the prototypes) plus a grey self-domain part (mean cosine distance to the other candidates). The three highest totals are queried for annotation, these are two isolated candidates and only one member of the clump, because the clumped candidates have a small self-domain part.</desc>
+<style>
+  text{font-family:ui-sans-serif,-apple-system,"Segoe UI",sans-serif;font-weight:400}
+  .lab{font-size:11px;fill:#57564f} .hd{font-size:13px;font-weight:500;fill:#1a1a19}
+  .sub{font-size:11.5px;fill:#57564f} .big{font-size:12.5px;font-weight:500;fill:#1a1a19}
+  .c1{fill:#2f6fb5;stroke:none} .c2{fill:#c8702f;stroke:none} .c3{fill:#8a8880;stroke:none}
+  .m1{fill:#2f6fb5;stroke:#fbfaf6;stroke-width:1.4} .m2{fill:#c8702f;stroke:#fbfaf6;stroke-width:1.4}
+  .sep{stroke:#1a1a19;stroke-width:1.6;fill:none}
+  .ell{fill:none;stroke:#8a8880;stroke-width:1.2}
+  .eucl{fill:none;stroke:#8a8880;stroke-width:1.2;stroke-dasharray:4 3}
+  .maha{fill:none;stroke:#2f6fb5;stroke-width:1.3;stroke-dasharray:4 3}
+  .vec{stroke:#1a1a19;stroke-width:1.6;fill:none}
+  .pt{fill:#1a1a19;stroke:#fbfaf6;stroke-width:1.2}
+  .arr{stroke:#8a8880;stroke-width:1;fill:none;opacity:0.75}
+  .box{fill:none;stroke:#e2e1da;stroke-width:1}
+  .ax{stroke:#c3c2b7;stroke-width:0.8;fill:none}
+  .gd{stroke:#e2e1da;stroke-width:0.6;fill:none;stroke-dasharray:3 3}
+  .l1{fill:none;stroke:#2f6fb5;stroke-width:2}
+  .l2{fill:none;stroke:#c8702f;stroke-width:2}
+  .op{stroke:#1a1a19;stroke-width:1.2;stroke-dasharray:4 3;fill:none}
+  @media (prefers-color-scheme: dark){
+    .lab{fill:#b6b4ab} .hd{fill:#eceae3} .sub{fill:#b6b4ab} .big{fill:#eceae3}
+    .box{stroke:#33312e} .ax{stroke:#4a4844} .gd{stroke:#33312e}
+    .c1{fill:#7fb2e8} .c2{fill:#e09a5f} .c3{fill:#85837b}
+    .m1{fill:#7fb2e8;stroke:#1c1b19} .m2{fill:#e09a5f;stroke:#1c1b19}
+    .sep{stroke:#eceae3} .ell{stroke:#85837b} .eucl{stroke:#85837b}
+    .maha{stroke:#7fb2e8} .vec{stroke:#eceae3} .pt{fill:#eceae3;stroke:#1c1b19}
+    .arr{stroke:#85837b} .l1{stroke:#7fb2e8} .l2{stroke:#e09a5f} .op{stroke:#eceae3}
+  }
+</style>
+<text x="350" y="24" text-anchor="middle" class="hd">Query target samples that are uncertain under augmentation, far from source-like prototypes, and unlike each other</text>
+<text x="138.0" y="58.0" text-anchor="middle" class="sub">① CDU = Norm(CAU) + Norm(CEU)</text>
+<rect x="58.0" y="76.0" width="160.0" height="160.0" class="box"/>
+<line x1="58.0" y1="156.0" x2="138.0" y2="236.0" class="gd"/>
+<line x1="58.0" y1="76.0" x2="218.0" y2="236.0" class="gd"/>
+<line x1="138.0" y1="76.0" x2="218.0" y2="156.0" class="gd"/>
+<circle cx="131.0" cy="145.6" r="2.4" class="c3"/>
+<circle cx="71.9" cy="121.2" r="2.4" class="c3"/>
+<circle cx="85.8" cy="236.0" r="4" class="m1"/>
+<circle cx="75.4" cy="215.1" r="4" class="m1"/>
+<circle cx="58.0" cy="159.5" r="2.4" class="c3"/>
+<circle cx="96.3" cy="135.1" r="2.4" class="c3"/>
+<circle cx="113.7" cy="166.4" r="2.4" class="c3"/>
+<circle cx="68.4" cy="225.6" r="4" class="m1"/>
+<circle cx="151.9" cy="176.9" r="2.4" class="c3"/>
+<circle cx="145.0" cy="183.8" r="2.4" class="c3"/>
+<circle cx="138.0" cy="187.3" r="2.4" class="c3"/>
+<circle cx="103.2" cy="222.1" r="4" class="m1"/>
+<circle cx="134.5" cy="169.9" r="2.4" class="c3"/>
+<circle cx="65.0" cy="180.3" r="2.4" class="c3"/>
+<circle cx="117.1" cy="190.8" r="2.4" class="c3"/>
+<circle cx="120.6" cy="197.7" r="2.4" class="c3"/>
+<circle cx="61.5" cy="229.0" r="4" class="m1"/>
+<circle cx="99.7" cy="211.7" r="2.4" class="c3"/>
+<circle cx="82.3" cy="149.0" r="2.4" class="c3"/>
+<circle cx="124.1" cy="194.3" r="2.4" class="c3"/>
+<circle cx="89.3" cy="232.5" r="4" class="m1"/>
+<circle cx="110.2" cy="138.6" r="2.4" class="c3"/>
+<circle cx="106.7" cy="163.0" r="2.4" class="c3"/>
+<circle cx="78.9" cy="128.2" r="2.4" class="c3"/>
+<circle cx="141.5" cy="173.4" r="2.4" class="c3"/>
+<circle cx="92.8" cy="208.2" r="2.4" class="c3"/>
+<circle cx="162.3" cy="218.6" r="2.4" class="c3"/>
+<circle cx="172.8" cy="96.9" r="2.4" class="c3"/>
+<circle cx="200.6" cy="79.5" r="4" class="m2"/>
+<circle cx="155.4" cy="201.2" r="2.4" class="c3"/>
+<circle cx="158.9" cy="156.0" r="2.4" class="c3"/>
+<circle cx="165.8" cy="142.1" r="2.4" class="c3"/>
+<circle cx="169.3" cy="204.7" r="2.4" class="c3"/>
+<circle cx="214.5" cy="117.7" r="2.4" class="c3"/>
+<circle cx="148.4" cy="131.7" r="2.4" class="c3"/>
+<circle cx="204.1" cy="100.3" r="4" class="m2"/>
+<circle cx="179.7" cy="110.8" r="2.4" class="c3"/>
+<circle cx="190.2" cy="103.8" r="2.4" class="c3"/>
+<circle cx="127.6" cy="124.7" r="2.4" class="c3"/>
+<circle cx="207.6" cy="114.3" r="2.4" class="c3"/>
+<circle cx="176.3" cy="89.9" r="2.4" class="c3"/>
+<circle cx="197.1" cy="152.5" r="2.4" class="c3"/>
+<circle cx="218.0" cy="107.3" r="4" class="m2"/>
+<circle cx="183.2" cy="76.0" r="4" class="m2"/>
+<circle cx="211.0" cy="86.4" r="4" class="m2"/>
+<circle cx="186.7" cy="83.0" r="4" class="m2"/>
+<circle cx="193.7" cy="93.4" r="2.4" class="c3"/>
+<text x="138.0" y="252.0" text-anchor="middle" class="lab">Norm(CAU): mean TTA entropy</text>
+<text x="48" y="156.0" text-anchor="middle" class="lab" transform="rotate(-90 48 156.0)">Norm(CEU): energy variance</text>
+<circle cx="62.0" cy="270.0" r="4" class="m1"/>
+<text x="70.0" y="274.0" text-anchor="start" class="lab">lowest K = 6 → prototypes L</text>
+<circle cx="62.0" cy="286.0" r="4" class="m2"/>
+<text x="70.0" y="290.0" text-anchor="start" class="lab">highest K = 6 → candidates H</text>
+<text x="352.0" y="58.0" text-anchor="middle" class="sub">② encoder embeddings</text>
+<circle cx="352.0" cy="158.0" r="76" class="ell"/>
+<circle cx="417.5" cy="119.5" r="2.4" class="c3"/>
+<circle cx="401.8" cy="100.6" r="2.4" class="c3"/>
+<circle cx="420.4" cy="124.9" r="2.4" class="c3"/>
+<circle cx="422.2" cy="128.8" r="2.4" class="c3"/>
+<circle cx="411.9" cy="111.2" r="2.4" class="c3"/>
+<circle cx="409.8" cy="108.7" r="2.4" class="c3"/>
+<circle cx="427.8" cy="152.5" r="2.4" class="c3"/>
+<circle cx="398.9" cy="98.2" r="2.4" class="c3"/>
+<circle cx="410.6" cy="109.6" r="2.4" class="c3"/>
+<circle cx="419.0" cy="122.2" r="2.4" class="c3"/>
+<circle cx="421.1" cy="126.3" r="2.4" class="c3"/>
+<circle cx="413.1" cy="112.8" r="2.4" class="c3"/>
+<circle cx="419.6" cy="123.3" r="2.4" class="c3"/>
+<circle cx="419.2" cy="122.5" r="2.4" class="c3"/>
+<circle cx="410.6" cy="109.6" r="2.4" class="c3"/>
+<circle cx="427.1" cy="146.4" r="2.4" class="c3"/>
+<circle cx="413.8" cy="113.8" r="2.4" class="c3"/>
+<circle cx="423.1" cy="131.2" r="2.4" class="c3"/>
+<circle cx="427.9" cy="153.9" r="2.4" class="c3"/>
+<circle cx="424.0" cy="133.8" r="2.4" class="c3"/>
+<circle cx="363.7" cy="82.9" r="2.4" class="c3"/>
+<circle cx="301.0" cy="101.7" r="2.4" class="c3"/>
+<circle cx="376.0" cy="85.9" r="2.4" class="c3"/>
+<circle cx="336.2" cy="83.7" r="2.4" class="c3"/>
+<circle cx="358.7" cy="82.3" r="2.4" class="c3"/>
+<circle cx="381.1" cy="87.8" r="2.4" class="c3"/>
+<circle cx="293.2" cy="109.8" r="2.4" class="c3"/>
+<circle cx="370.9" cy="231.6" r="2.4" class="c3"/>
+<circle cx="394.4" cy="221.1" r="2.4" class="c3"/>
+<circle cx="346.9" cy="233.8" r="2.4" class="c3"/>
+<circle cx="412.0" cy="204.7" r="2.4" class="c3"/>
+<circle cx="348.5" cy="233.9" r="2.4" class="c3"/>
+<circle cx="329.3" cy="230.5" r="2.4" class="c3"/>
+<circle cx="346.8" cy="233.8" r="2.4" class="c3"/>
+<circle cx="281.5" cy="129.5" r="2.4" class="c3"/>
+<circle cx="408.9" cy="107.6" r="4" class="m1"/>
+<circle cx="418.3" cy="120.9" r="4" class="m1"/>
+<circle cx="403.7" cy="102.3" r="4" class="m1"/>
+<circle cx="424.4" cy="134.7" r="4" class="m1"/>
+<circle cx="422.0" cy="128.5" r="4" class="m1"/>
+<circle cx="418.7" cy="121.6" r="4" class="m1"/>
+<circle cx="341.2" cy="233.2" r="4" class="m2"/>
+<circle cx="341.2" cy="233.2" r="8" class="vec" fill="none" stroke-width="1.2"/>
+<circle cx="305.2" cy="217.9" r="4" class="m2"/>
+<circle cx="305.2" cy="217.9" r="8" class="vec" fill="none" stroke-width="1.2"/>
+<circle cx="278.9" cy="178.9" r="4" class="m2"/>
+<circle cx="276.4" cy="165.9" r="4" class="m2"/>
+<circle cx="295.5" cy="107.2" r="4" class="m2"/>
+<circle cx="283.7" cy="191.3" r="4" class="m2"/>
+<circle cx="283.7" cy="191.3" r="8" class="vec" fill="none" stroke-width="1.2"/>
+<text x="403.3" y="132.4" text-anchor="end" class="c1" font-size="11">source-like L</text>
+<text x="264.3" y="187.1" text-anchor="end" class="lab">clump</text>
+<text x="352.0" y="254.0" text-anchor="middle" class="lab">circled = queried (top-3 CPD)</text>
+<text x="590.0" y="58.0" text-anchor="middle" class="sub">③ CPD = CDD + SDD</text>
+<text x="524.0" y="89.0" text-anchor="end" class="lab">H at 262°</text>
+<rect x="530.0" y="78.0" width="70.1" height="15.0" class="c2"/>
+<rect x="600.1" y="78.0" width="29.9" height="15.0" class="c3" fill-opacity="0.5"/>
+<text x="634.0" y="89.0" text-anchor="start" class="big">query</text>
+<text x="524.0" y="114.0" text-anchor="end" class="lab">H at 232°</text>
+<rect x="530.0" y="103.0" width="82.8" height="15.0" class="c2"/>
+<rect x="612.8" y="103.0" width="15.5" height="15.0" class="c3" fill-opacity="0.5"/>
+<text x="632.3" y="114.0" text-anchor="start" class="big">query</text>
+<text x="524.0" y="139.0" text-anchor="end" class="lab">H at 206°</text>
+<rect x="530.0" y="128.0" width="85.4" height="15.0" class="c2"/>
+<rect x="615.4" y="128.0" width="10.7" height="15.0" class="c3" fill-opacity="0.5"/>
+<text x="630.1" y="139.0" text-anchor="start" class="big">query</text>
+<text x="524.0" y="164.0" text-anchor="end" class="lab">H at 196°</text>
+<rect x="530.0" y="153.0" width="84.1" height="15.0" class="c2"/>
+<rect x="614.1" y="153.0" width="11.0" height="15.0" class="c3" fill-opacity="0.5"/>
+<text x="524.0" y="189.0" text-anchor="end" class="lab">H at 186°</text>
+<rect x="530.0" y="178.0" width="81.5" height="15.0" class="c2"/>
+<rect x="611.5" y="178.0" width="12.6" height="15.0" class="c3" fill-opacity="0.5"/>
+<text x="524.0" y="214.0" text-anchor="end" class="lab">H at 138°</text>
+<rect x="530.0" y="203.0" width="55.4" height="15.0" class="c2"/>
+<rect x="585.4" y="203.0" width="34.9" height="15.0" class="c3" fill-opacity="0.5"/>
+<line x1="530.0" y1="72.0" x2="530.0" y2="228.0" class="ax"/>
+<line x1="530.0" y1="228.0" x2="530.0" y2="232.0" class="ax"/>
+<text x="530.0" y="244.0" text-anchor="middle" class="lab">0</text>
+<line x1="573.1" y1="228.0" x2="573.1" y2="232.0" class="ax"/>
+<text x="573.1" y="244.0" text-anchor="middle" class="lab">1</text>
+<line x1="616.2" y1="228.0" x2="616.2" y2="232.0" class="ax"/>
+<text x="616.2" y="244.0" text-anchor="middle" class="lab">2</text>
+<line x1="659.4" y1="228.0" x2="659.4" y2="232.0" class="ax"/>
+<text x="659.4" y="244.0" text-anchor="middle" class="lab">3</text>
+<rect x="452.0" y="259.0" width="10.0" height="10.0" class="c2"/>
+<text x="467.0" y="268.0" text-anchor="start" class="lab">CDD: mean (1 − cos) to prototypes L</text>
+<rect x="452.0" y="274.0" width="10.0" height="10.0" class="c3" fill-opacity="0.5"/>
+<text x="467.0" y="283.0" text-anchor="start" class="lab">SDD: mean (1 − cos) to other H</text>
+<text x="350.0" y="312.0" text-anchor="middle" class="lab">The clump's members are close to each other, so their SDD is small: only one of the three is queried, while isolated 232° and 262° both are.</text>
+</svg>
