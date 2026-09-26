@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Score Kalman Filter, Interactive</title>
+<style>
+:root{
+  --bg:#fbfaf7; --surface:#ffffff; --ink:#1c1d21; --muted:#5b5f68; --line:#e2dfd8; --soft:#f2f0ea;
+  --c0:#2f6fb5; --c1:#c2571a; --c2:#0f7a5a; --c3:#7c3aed; --c4:#b8860b; --bad:#b42318; --grey:#8a8880;
+  --radius:12px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#131417; --surface:#1b1d21; --ink:#ebebed; --muted:#a3a6ae; --line:#2e3138; --soft:#23262b;
+    --c0:#7fb2e8; --c1:#f0a070; --c2:#4cc79a; --c3:#b48cff; --c4:#e6c34d; --bad:#ff7a6b; --grey:#8f9199;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#131417; --surface:#1b1d21; --ink:#ebebed; --muted:#a3a6ae; --line:#2e3138; --soft:#23262b;
+  --c0:#7fb2e8; --c1:#f0a070; --c2:#4cc79a; --c3:#b48cff; --c4:#e6c34d; --bad:#ff7a6b; --grey:#8f9199;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,sans-serif;}
+main{max-width:900px;margin:0 auto;padding:40px 16px 80px}
+h1{font-size:2.05rem;line-height:1.2;margin:0 0 .4rem;letter-spacing:-.01em}
+h2{font-size:1.38rem;margin:3rem 0 .6rem;padding-top:.5rem;border-top:1px solid var(--line)}
+h3{font-size:1.08rem;margin:1.8rem 0 .4rem}
+p{margin:.6rem 0}
+a{color:var(--c0)}
+.lede{color:var(--muted);font-size:1.05rem;margin-bottom:1.4rem}
+nav.toc{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:12px 18px;font-size:.93rem}
+nav.toc ol{margin:.3rem 0;padding-left:1.2rem}
+nav.toc a{color:var(--ink);text-decoration:none;border-bottom:1px dotted var(--muted)}
+.widget{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:14px;margin:1rem 0 1.2rem}
+.controls{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;margin:.2rem 0 .6rem;font-size:.9rem}
+.controls label{display:flex;align-items:center;gap:6px;color:var(--muted)}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg button{border:0;border-radius:0;border-right:1px solid var(--line)}
+.seg button:last-child{border-right:0}
+button,select{font:inherit;font-size:.88rem;color:var(--ink);background:var(--soft);border:1px solid var(--line);border-radius:8px;padding:5px 11px;cursor:pointer}
+button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+button:disabled{opacity:.4;cursor:not-allowed}
+input[type=range]{accent-color:var(--c0);width:140px}
+.readout{font-size:.9rem;color:var(--muted);margin-top:.5rem;font-variant-numeric:tabular-nums}
+.readout b{color:var(--ink);font-weight:600}
+.readout .bad{color:var(--bad);font-weight:600}
+.readout .good{color:var(--c2);font-weight:600}
+.callout{border-left:3px solid var(--c2);background:var(--soft);padding:10px 14px;border-radius:0 8px 8px 0;margin:1rem 0;font-size:.95rem}
+canvas{display:block;width:100%;touch-action:none}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:680px){.grid2{grid-template-columns:1fr}}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:.82rem;color:var(--muted);margin:.3rem 0 0}
+.legend span::before{content:"";display:inline-block;width:16px;height:3px;margin-right:6px;vertical-align:3px;background:var(--c)}
+.legend span.dash::before{background:repeating-linear-gradient(90deg,var(--c) 0 5px,transparent 5px 8px)}
+.legend span.fill::before{height:9px;vertical-align:0;opacity:.35}
+.legend span.dot::before{width:7px;height:7px;border-radius:50%;vertical-align:1px}
+table.mx{border-collapse:collapse;font-size:.8rem;font-variant-numeric:tabular-nums;margin:.4rem 0;overflow-x:auto;display:block;max-width:100%}
+table.mx td,table.mx th{border:1px solid var(--line);padding:3px 7px;text-align:right;white-space:nowrap}
+table.mx th{background:var(--soft);color:var(--muted);font-weight:500}
+table.mx td.sym{color:var(--muted)}
+table.mx tr.hl td{background:var(--soft)}
+.small{font-size:.86rem;color:var(--muted)}
+.kbd{font-family:ui-monospace,Menlo,monospace;font-size:.85em;background:var(--soft);padding:1px 5px;border-radius:4px}
+@media (max-width:600px){ h1{font-size:1.7rem} input[type=range]{width:110px} }
+</style>
+</head>
+<body>
+<main>
+
+<h1>Score Kalman Filter, Interactive</h1>
+<p class="lede"><a href="../index.html">← text notes</a> · Iwasaki, Bloch, Lee &amp; Ghaffari 2026. Four widgets for the pieces of the SKF: the score-matching fit, Stein's identity and the closure, the measurement update, and the benchmark. Everything here is computed in your browser, in 1-D except the last.</p>
+
+<nav class="toc"><b>Contents</b>
+<ol>
+  <li><a href="#fit">Score matching is one linear solve</a></li>
+  <li><a href="#stein">Stein's identity: moments from λ, and a closure that breaks</a></li>
+  <li><a href="#update">The measurement update, step by step</a></li>
+  <li><a href="#bench">The oscillator benchmark: who wins depends on the truth</a></li>
+</ol></nav>
+
+<!-- ============================================================ -->
+<h2 id="fit">1. Score matching is one linear solve</h2>
+<p>Pick a target density and a polynomial degree <i>r</i>. The page computes the target's moments m<sub>k</sub> = E[x<sup>k</sup>], builds A (entries <i>jk</i>·m<sub>j+k−2</sub>) and b (entries <i>j</i>(<i>j</i>−1)·m<sub>j−2</sub>), and solves Aλ = b. That is Proposition 1: no normaliser, no iterations. For comparison it also runs <b>MaxEnt</b>, which matches the moments exactly but needs the normaliser Z(λ) at every Newton step. That is cheap in 1-D and costs G<sup>n</sup> in n dimensions.</p>
+
+<div class="widget">
+  <div class="controls">
+    <label>Target <select id="fitTarget">
+      <option value="quartic">In the family: two wells (degree 4)</option>
+      <option value="sextic">In the family: three wells (degree 6)</option>
+      <option value="mixture" selected>Outside: two-Gaussian mixture</option>
+      <option value="skew">Outside: skewed (Gaussian × logistic)</option>
+    </select></label>
+    <label>degree r <span class="seg" id="fitR"><button data-r="2">2</button><button data-r="4" class="on">4</button><button data-r="6">6</button><button data-r="8">8</button></span></label>
+    <label><input type="checkbox" id="fitME" checked> show MaxEnt</label>
+  </div>
+  <div class="grid2">
+    <div><canvas id="fitDens" height="260"></canvas>
+      <div class="legend"><span class="fill" style="--c:var(--grey)">target p</span><span style="--c:var(--c0)">score matching</span><span class="dash" style="--c:var(--c1)">MaxEnt</span></div></div>
+    <div><canvas id="fitEnergy" height="260"></canvas>
+      <div class="legend"><span class="dash" style="--c:var(--ink)">−log p (target)</span><span style="--c:var(--c0)">SM energy λ·φ</span><span class="dash" style="--c:var(--c1)">MaxEnt energy</span><span class="fill" style="--c:var(--grey)">where the target has mass</span></div></div>
+  </div>
+  <div class="readout" id="fitRead"></div>
+  <div id="fitMatrix"></div>
+</div>
+<div class="callout">Things to try. <b>Two wells</b> at r = 4, or <b>three wells</b> at r = 6: the fit is exact, and score matching and MaxEnt coincide (Theorem 1). Three wells at r = 4 is off-model, and the two part company. On the <b>mixture</b>, step r from 2 to 8. Score matching is fine at r = 4, stops being a density at r = 6 (its energy turns down outside the shaded data region), and at r = 8 digs a deep well at −3.8 sd where the target has no mass. MaxEnt keeps improving. The right panel shows why: the fit only has to follow −log p where the data are.</div>
+
+<!-- ============================================================ -->
+<h2 id="stein">2. Stein's identity: moments from λ, and a closure that breaks</h2>
+<h3>2a. The identity is a recursion</h3>
+<p>For p ∝ e<sup>−E</sup> with a polynomial energy, E[ −E′(x)·x<sup>k</sup> + k·x<sup>k−1</sup> ] = 0 for every k. With E′ of degree r−1, each value of k links r+1 consecutive moments, so the lower ones generate all the higher ones. For a Gaussian it is m<sub>k+1</sub> = μ·m<sub>k</sub> + kσ²·m<sub>k−1</sub>.</p>
+<div class="widget">
+  <div class="controls">
+    <label>Density <select id="stDens"><option value="gauss">Gaussian</option><option value="quartic">two-well quartic, E = x⁴ + 0.1x³ − 2x² + 0.3x</option></select></label>
+    <label id="stMuL">μ <input type="range" id="stMu" min="-2" max="2" step="0.05" value="1"><span id="stMuV">1.00</span></label>
+    <label id="stSgL">σ <input type="range" id="stSg" min="0.3" max="2" step="0.05" value="1"><span id="stSgV">1.00</span></label>
+    <label><input type="checkbox" id="stPert"> nudge the seed m<sub>1</sub> by 1%</label>
+  </div>
+  <div id="stTable"></div>
+  <div class="readout" id="stRead"></div>
+</div>
+<div class="callout">The nudged seed still satisfies every Stein equation, yet it produces a moment sequence that no density in the family has. So <b>the identities alone do not pin down the moments</b>: you also need the right seeds. That is exactly the difficulty in recovering moments after an update (section 3).</div>
+
+<h3>2b. The closure through a change of modality</h3>
+<p>A 1-D double well, dx = (x − x³)dt + σdW, started as a narrow bump on the hilltop. The density splits into two lumps at ±1. The moment ODE ṁ<sub>k</sub> = k·m<sub>k</sub> − k·m<sub>k+2</sub> + ½σ²k(k−1)·m<sub>k−2</sub> needs two degrees beyond the budget K = 2r−2 (excess degree 2). So each step score-matches λ from m<sub>0..K</sub> and gets m<sub>K+1</sub>, m<sub>K+2</sub> from two Stein layers. Monte Carlo with 20,000 particles is the reference. This is a 1-D analogue of Appendix L, in raw coordinates.</p>
+<div class="widget">
+  <div class="controls">
+    <label>degree r <span class="seg" id="dwR"><button data-r="2">2 (Gaussian closure)</button><button data-r="4" class="on">4</button><button data-r="6">6</button></span></label>
+    <label>σ <input type="range" id="dwSig" min="0.3" max="0.8" step="0.05" value="0.5"><span id="dwSigV">0.50</span></label>
+    <label>start mean <input type="range" id="dwMu" min="-0.4" max="0.4" step="0.05" value="0.05"><span id="dwMuV">0.05</span></label>
+  </div>
+  <div class="grid2">
+    <div><canvas id="dwMom" height="250"></canvas>
+      <div class="legend"><span style="--c:var(--ink)">MC m₂</span><span style="--c:var(--grey)">MC m₄</span><span class="dash" style="--c:var(--c0)">closure m₂</span><span class="dash" style="--c:var(--c1)">closure m₄</span></div></div>
+    <div><canvas id="dwDens" height="250"></canvas>
+      <div class="controls" style="margin-top:.4rem">time <span class="seg" id="dwT"><button data-t="0.5">0.5</button><button data-t="1">1</button><button data-t="2" class="on">2</button><button data-t="3">3</button></span></div></div>
+  </div>
+  <div class="readout" id="dwRead"></div>
+</div>
+<div class="callout">Try it. At <b>r = 2</b>, Gaussian closure runs to the end but settles on the wrong variance, because one bump cannot sit in two wells. At <b>r = 4</b> the fitted density does split, but the moments drift away from Monte Carlo as the split happens. At <b>r = 6</b> the closed ODE diverges almost at once. The start is Gaussian, so the fitted leading coefficient λ<sub>6</sub> begins at zero and stays small, and every Stein layer divides by it (the readout shows its value). App L's mechanism is the same division: the closure is fragile wherever the leading coefficient is small, near a Gaussian or near a change of modality. Higher r fails <i>sooner</i>, as the paper reports.</div>
+
+<!-- ============================================================ -->
+<h2 id="update">3. The measurement update, step by step</h2>
+<p>Bayes' rule in score form is addition: λ⁺ = λ⁻ + λ<sub>lik</sub>. That step is exact whenever the log-likelihood is a polynomial of degree ≤ r, and the blue curve below is its result, computed by quadrature. The filter then needs the posterior's <i>moments</i> for the next prediction. Here you choose how they are recovered, then watch what the refinement loop λ ← SM(m⁺) + λ<sub>lik</sub> does.</p>
+<div class="widget">
+  <div class="controls">
+    <label>prior <select id="upPrior"><option value="gauss">Gaussian</option><option value="twowell">two-well quartic</option></select></label>
+    <label id="upMuL">μ₀ <input type="range" id="upMu" min="-2" max="2" step="0.05" value="0"><span id="upMuV">0.00</span></label>
+    <label id="upSgL">σ₀ <input type="range" id="upSg" min="0.4" max="2" step="0.05" value="1"><span id="upSgV">1.00</span></label>
+  </div>
+  <div class="controls">
+    <label>sensor <select id="upSensor"><option value="lin">linear, z = x + v</option><option value="quad">quadratic, z = x² + v</option></select></label>
+    <label>z <input type="range" id="upZ" min="-3" max="4" step="0.05" value="2"><span id="upZV">2.00</span></label>
+    <label>R <input type="range" id="upR" min="0.1" max="2" step="0.05" value="1"><span id="upRV">1.00</span></label>
+    <label>degree r <span class="seg" id="upRr"><button data-r="2" class="on">2</button><button data-r="4">4</button><button data-r="6">6</button></span></label>
+  </div>
+  <div class="controls">
+    <label>recover moments by <select id="upMethod">
+      <option value="stein" selected>Stein, as §5.2 (centred at the prior mean)</option>
+      <option value="stein0">Stein + the β = 0 row, E[s] = 0</option>
+      <option value="oracle">Stein, centred at the posterior mean (oracle)</option>
+      <option value="exact">exact (quadrature, 1-D only)</option>
+    </select></label>
+    <button id="upPass">+ refinement pass</button>
+    <button id="upReset">↻ reset passes</button>
+  </div>
+  <canvas id="upCanvas" height="300"></canvas>
+  <div class="legend"><span class="fill" style="--c:var(--grey)">prior</span><span class="dash" style="--c:var(--ink)">likelihood (scaled)</span><span style="--c:var(--c0)">exact posterior, from λ⁺</span><span style="--c:var(--bad)">what the filter carries on: SM(recovered m⁺)</span></div>
+  <div class="readout" id="upRead"></div>
+  <div id="upTable"></div>
+</div>
+<div class="callout">Start with the defaults: Gaussian prior N(0, 1), linear sensor, z = 2, R = 1, r = 2. The exact posterior is N(1, 0.5). <b>Stein as §5.2</b> recovers a mean of −0.25: truncation sets E[x³] = 0 about the prior mean, but for the posterior it is 2.5. Switch to <b>+ β = 0 row</b> or <b>oracle</b> and the mean comes back. Then pick <b>exact</b> and press <b>+ refinement pass</b> a few times. The posterior narrows and slides towards z, because each pass adds λ<sub>lik</sub> again. With §5.2's recovery, passes pull the mean back to the prior instead. For a <b>quadratic sensor</b> (needs r ≥ 4), try z = 2. The posterior has two modes near ±1.2, and λ⁺ = λ⁻ + λ<sub>lik</sub> represents them exactly. Recovering its moments is another matter: every Stein variant returns a <i>negative variance</i>. By symmetry the mean is right, so centring cannot help. Truncation sets m<sub>8</sub> ≈ 14 to zero in the row where it carries the leading coefficient.</div>
+
+<!-- ============================================================ -->
+<h2 id="bench">4. The oscillator benchmark: who wins depends on the truth</h2>
+<p>Two coupled "Duffing" oscillators (n = 4), with the paper's parameters: γ = 0.3, α = 1, β = 0.6, κ = 0.3, process noise σ = 0.4 on the momenta. The prior is N((0.3, −0.2, 0, 0), 0.15²I). q₁ is measured every 0.15 s with R = 0.3², for 25 steps. The filter is an EKF with the correct model, except that its measurement noise is divided by a <b>trust</b> factor: trust 1 is correctly tuned, trust 0.01 barely listens to the sensor.</p>
+<div class="widget">
+  <div class="controls">
+    <label>truth <select id="bnMode">
+      <option value="det" selected>noise-free, from the prior mean (the paper's Fig. 3)</option>
+      <option value="sde">drawn from the model (x₀ ~ prior, σ = 0.4)</option>
+    </select></label>
+    <label>seed <span class="seg" id="bnSeed"><button data-s="0" class="on">1</button><button data-s="1">2</button><button data-s="2">3</button><button data-s="3">4</button><button data-s="4">5</button></span></label>
+    <label><input type="checkbox" id="bnPF"> bootstrap PF (5,000)</label>
+  </div>
+  <div class="controls">
+    <label>trust in measurements <input type="range" id="bnTrust" min="-3" max="2" step="0.1" value="0" style="width:220px"><span id="bnTrustV">1</span></label>
+  </div>
+  <div class="grid2">
+    <div><canvas id="bnQ1" height="210"></canvas></div>
+    <div><canvas id="bnQ2" height="210"></canvas></div>
+  </div>
+  <div class="legend"><span class="dash" style="--c:var(--c2)">truth</span><span class="dot" style="--c:var(--grey)">measurements of q₁</span><span style="--c:var(--c0)">EKF at the chosen trust</span><span style="--c:var(--c1)">EKF at trust 1</span><span style="--c:var(--c3)">PF</span></div>
+  <canvas id="bnCurve" height="250" style="margin-top:14px"></canvas>
+  <div class="legend"><span style="--c:var(--c0)">40-seed mean RMSE, noise-free truth</span><span style="--c:var(--c1)">40-seed mean RMSE, model-drawn truth</span><span class="dash" style="--c:var(--grey)">paper, n = 4: SKF 0.0103, PF 0.0727</span></div>
+  <div class="readout" id="bnRead"></div>
+</div>
+<div class="callout">With the <b>noise-free truth</b>, slide trust down. The blue EKF stops chasing the noisy dots, hugs the green curve, and its error falls below the paper's SKF value around trust 0.03. Nothing about the filter improved: the truth simply is the prior's noise-free forecast. Now switch to <b>drawn from the model</b>. The truth wanders, low trust loses track, and the best trust is 1. Every error is above 0.2. That level is set by the process noise, and no filter can beat the posterior mean, which the PF approximates. (This page uses its own random numbers, so values differ a little from <span class="kbd">oscillator_benchmark.py</span>, which gives 0.0657 at trust 1 and 0.0103 at trust 0.03 for the noise-free truth, and 0.225 at trust 1 over 40 seeds for the model-drawn one.)</div>
+
+</main>
+
+<script>
+(() => {
+'use strict';
+// ------------------------------------------------------------ utilities
+const $ = id => document.getElementById(id);
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const col = c => c && c.startsWith('--') ? css(c) : c;
+function linspace(a, b, n){ const out = new Float64Array(n); for (let i = 0; i < n; i++) out[i] = a + (b - a) * i / (n - 1); return out; }
+function mulberry(seed){ return () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+function gaussGen(r){ let spare = null; return () => { if (spare !== null){ const s = spare; spare = null; return s; } let u = 0; while (u === 0) u = r(); const v = r(), m = Math.sqrt(-2 * Math.log(u)); spare = m * Math.sin(2 * Math.PI * v); return m * Math.cos(2 * Math.PI * v); }; }
+const binom = (() => { const c = []; for (let n = 0; n < 40; n++){ c[n] = [1]; for (let k = 1; k <= n; k++) c[n][k] = (c[n-1][k-1] || 0) + (k < n ? c[n-1][k] : 0); } return (n, k) => (k < 0 || k > n) ? 0 : c[n][k]; })();
+const softplus = t => t > 30 ? t : (t < -30 ? Math.exp(t) : Math.log1p(Math.exp(t)));
+const fmt = (v, d = 3) => (v === null || !isFinite(v)) ? '—' : Math.abs(v) < 1e-10 ? (0).toFixed(d) : (Math.abs(v) >= 1e4 || (Math.abs(v) < 1e-3 && v !== 0) ? v.toExponential(2) : v.toFixed(d));
+const sgn = (v, d = 2) => (v >= 0 ? '+' : '−') + Math.abs(v).toFixed(d);
+
+function solve(A, b){
+  const n = b.length, M = A.map((row, i) => [...row, b[i]]);
+  for (let c = 0; c < n; c++){
+    let p = c; for (let r = c + 1; r < n; r++) if (Math.abs(M[r][c]) > Math.abs(M[p][c])) p = r;
+    [M[c], M[p]] = [M[p], M[c]];
+    const piv = M[c][c]; if (!isFinite(piv) || Math.abs(piv) < 1e-300) return null;
+    for (let r = c + 1; r < n; r++){ const f = M[r][c] / piv; if (f) for (let k = c; k <= n; k++) M[r][k] -= f * M[c][k]; }
+  }
+  const x = new Array(n).fill(0);
+  for (let r = n - 1; r >= 0; r--){ let s = M[r][n]; for (let k = r + 1; k < n; k++) s -= M[r][k] * x[k]; x[r] = s / M[r][r]; }
+  return x.every(isFinite) ? x : null;
+}
+function lstsq(A, b){                       // Householder QR
+  const m = A.length, n = A[0].length, R = A.map(r => r.slice()), y = b.slice();
+  for (let k = 0; k < n; k++){
+    let norm = 0; for (let i = k; i < m; i++) norm += R[i][k] * R[i][k]; norm = Math.sqrt(norm); if (norm === 0) continue;
+    const alpha = R[k][k] > 0 ? -norm : norm, v = new Array(m).fill(0);
+    for (let i = k; i < m; i++) v[i] = R[i][k]; v[k] -= alpha;
+    let vv = 0; for (let i = k; i < m; i++) vv += v[i] * v[i]; if (vv === 0) continue;
+    for (let j = k; j < n; j++){ let s = 0; for (let i = k; i < m; i++) s += v[i] * R[i][j]; s = 2 * s / vv; for (let i = k; i < m; i++) R[i][j] -= s * v[i]; }
+    let s = 0; for (let i = k; i < m; i++) s += v[i] * y[i]; s = 2 * s / vv; for (let i = k; i < m; i++) y[i] -= s * v[i];
+  }
+  const x = new Array(n).fill(0);
+  for (let r = n - 1; r >= 0; r--){ let s = y[r]; for (let k = r + 1; k < n; k++) s -= R[r][k] * x[k]; x[r] = s / R[r][r]; }
+  return x;
+}
+function symEig(A){                         // Jacobi eigenvalues of a small symmetric matrix
+  const n = A.length, a = A.map(r => r.slice());
+  for (let sweep = 0; sweep < 60; sweep++){
+    let off = 0; for (let i = 0; i < n; i++) for (let j = i + 1; j < n; j++) off += a[i][j] * a[i][j];
+    if (off < 1e-24) break;
+    for (let p = 0; p < n; p++) for (let q = p + 1; q < n; q++){
+      if (Math.abs(a[p][q]) < 1e-300) continue;
+      const th = (a[q][q] - a[p][p]) / (2 * a[p][q]), t = Math.sign(th || 1) / (Math.abs(th) + Math.sqrt(th * th + 1)), c = 1 / Math.sqrt(t * t + 1), s = t * c;
+      for (let k = 0; k < n; k++){ const akp = a[k][p], akq = a[k][q]; a[k][p] = c * akp - s * akq; a[k][q] = s * akp + c * akq; }
+      for (let k = 0; k < n; k++){ const apk = a[p][k], aqk = a[q][k]; a[p][k] = c * apk - s * aqk; a[q][k] = s * apk + c * aqk; }
+    }
+  }
+  return a.map((r, i) => r[i]);
+}
+const condSym = A => { const e = symEig(A).map(Math.abs); return Math.max(...e) / Math.min(...e); };
+
+// 1-D polynomial energy E(x) = sum_{k=1..r} lam[k-1] x^k and its helpers
+const energy = (lam, x) => { let s = 0, p = 1; for (let k = 0; k < lam.length; k++){ p *= x; s += lam[k] * p; } return s; };
+function densityOnGrid(lam, xs){            // normalised density of exp(-E) on a uniform grid, or null
+  const n = xs.length, E = new Float64Array(n); let mn = Infinity;
+  for (let i = 0; i < n; i++){ E[i] = energy(lam, xs[i]); if (E[i] < mn) mn = E[i]; }
+  const p = new Float64Array(n), dx = xs[1] - xs[0]; let z = 0;
+  for (let i = 0; i < n; i++){ p[i] = Math.exp(-(E[i] - mn)); z += p[i]; }
+  z *= dx; if (!isFinite(z) || z <= 0) return null;
+  for (let i = 0; i < n; i++) p[i] /= z;
+  return p;
+}
+function moments(p, xs, K){ const dx = xs[1] - xs[0], m = new Array(K + 1).fill(0);
+  for (let i = 0; i < xs.length; i++){ let t = p[i] * dx; for (let k = 0; k <= K; k++){ m[k] += t; t *= xs[i]; } } return m; }
+function smSystem(m, r){                    // Eq 8 in 1-D: A_jk = jk m_{j+k-2}, b_j = j(j-1) m_{j-2}
+  const A = [], b = [];
+  for (let j = 1; j <= r; j++){ const row = []; for (let k = 1; k <= r; k++) row.push(j * k * m[j + k - 2]); A.push(row); b.push(j >= 2 ? j * (j - 1) * m[j - 2] : 0); }
+  return {A, b};
+}
+const smFit = (m, r) => { const {A, b} = smSystem(m, r); return solve(A, b); };
+// affine changes of coordinates x = c + s w
+function lamToW(lam, c, s){ const r = lam.length, out = new Array(r).fill(0);
+  for (let k = 1; k <= r; k++) for (let j = 1; j <= k; j++) out[j - 1] += lam[k - 1] * binom(k, j) * Math.pow(c, k - j) * Math.pow(s, j); return out; }
+function lamFromW(lw, c, s){ const r = lw.length, out = new Array(r).fill(0);
+  for (let j = 1; j <= r; j++) for (let i = 1; i <= j; i++) out[i - 1] += lw[j - 1] * Math.pow(s, -j) * binom(j, i) * Math.pow(-c, j - i); return out; }
+function momFromW(mw, c, s){ const K = mw.length - 1, out = new Array(K + 1).fill(0);
+  for (let k = 0; k <= K; k++) for (let j = 0; j <= k; j++) out[k] += binom(k, j) * Math.pow(c, k - j) * Math.pow(s, j) * mw[j]; return out; }
+function momToW(mx, c, s){ const K = mx.length - 1, out = new Array(K + 1).fill(0);
+  for (let j = 0; j <= K; j++){ let t = 0; for (let i = 0; i <= j; i++) t += binom(j, i) * Math.pow(-c, j - i) * mx[i]; out[j] = t / Math.pow(s, j); } return out; }
+// score matching in the standardised coordinates of the moments themselves (for conditioning)
+function smFitStd(mx, r){
+  const mu = mx[1], v = mx[2] - mx[1] * mx[1]; if (!(v > 0)) return null;
+  const s = Math.sqrt(v), lw = smFit(momToW(mx, mu, s), r);
+  return lw ? lamFromW(lw, mu, s) : null;
+}
+
+// ------------------------------------------------------------ plotting
+const redrawers = [];
+window.addEventListener('resize', () => redrawers.forEach(f => f()));
+if (window.matchMedia) matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change', () => redrawers.forEach(f => f()));
+function niceTicks(a, b, n = 5){
+  const span = b - a; if (!(span > 0)) return [a];
+  const step0 = span / n, mag = Math.pow(10, Math.floor(Math.log10(step0))), f = step0 / mag;
+  const step = (f < 1.5 ? 1 : f < 3 ? 2 : f < 7 ? 5 : 10) * mag, out = [];
+  for (let t = Math.ceil(a / step) * step; t <= b + 1e-9 * span; t += step) out.push(Math.abs(t) < 1e-12 * span ? 0 : t);
+  return out;
+}
+function tickLabel(t, log){ if (log){ const e = Math.round(Math.log10(t)); return e >= 0 && e <= 3 ? String(10 ** e) : '10' + String(e).replace('-', '⁻').replace(/\d/g, d => '⁰¹²³⁴⁵⁶⁷⁸⁹'[d]); }
+  const a = Math.abs(t); return a === 0 ? '0' : (a >= 1000 || a < 0.01) ? t.toExponential(0) : String(+t.toPrecision(3)); }
+function plot(cv, spec){
+  if (!cv.dataset.h) cv.dataset.h = cv.getAttribute('height');
+  const dpr = window.devicePixelRatio || 1, W = cv.clientWidth, H = +cv.dataset.h;
+  cv.style.height = H + 'px'; cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+  const ctx = cv.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  const L = 52, R = 12, T = spec.title ? 24 : 12, B = 36, w = W - L - R, h = H - T - B;
+  const [x0, x1] = spec.xlim, [y0, y1] = spec.ylim, lx = !!spec.logx, ly = !!spec.logy;
+  const tx = v => lx ? Math.log10(v) : v, ty = v => ly ? Math.log10(Math.max(v, 1e-300)) : v;
+  const X = v => L + (tx(v) - tx(x0)) / (tx(x1) - tx(x0)) * w, Y = v => T + h - (ty(v) - ty(y0)) / (ty(y1) - ty(y0)) * h;
+  ctx.fillStyle = css('--surface'); ctx.fillRect(0, 0, W, H);
+  ctx.font = '11px -apple-system,BlinkMacSystemFont,sans-serif';
+  if (spec.title){ ctx.fillStyle = css('--ink'); ctx.font = '600 12.5px -apple-system,sans-serif'; ctx.fillText(spec.title, L, 15); ctx.font = '11px -apple-system,sans-serif'; }
+  for (const sh of spec.shade || []){ ctx.fillStyle = col(sh.color || '--soft'); ctx.globalAlpha = sh.alpha ?? 1; const a = X(Math.max(sh.x0, x0)), b = X(Math.min(sh.x1, x1)); ctx.fillRect(a, T, b - a, h); ctx.globalAlpha = 1; }
+  const xt = lx ? decades(x0, x1) : niceTicks(x0, x1, spec.nx || 6), yt = ly ? decades(y0, y1) : niceTicks(y0, y1, spec.ny || 5);
+  ctx.strokeStyle = css('--line'); ctx.lineWidth = 1; ctx.fillStyle = css('--muted');
+  ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+  for (const t of yt){ const y = Y(t); ctx.beginPath(); ctx.setLineDash([3, 3]); ctx.moveTo(L, y); ctx.lineTo(L + w, y); ctx.stroke(); ctx.setLineDash([]); ctx.fillText(tickLabel(t, ly), L - 5, y); }
+  ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+  for (const t of xt){ const x = X(t); ctx.beginPath(); ctx.moveTo(x, T + h); ctx.lineTo(x, T + h + 4); ctx.stroke(); ctx.fillText(tickLabel(t, lx), x, T + h + 6); }
+  ctx.strokeRect(L, T, w, h);
+  if (spec.xlabel){ ctx.fillText(spec.xlabel, L + w / 2, T + h + 20); }
+  if (spec.ylabel){ ctx.save(); ctx.translate(13, T + h / 2); ctx.rotate(-Math.PI / 2); ctx.textBaseline = 'middle'; ctx.fillText(spec.ylabel, 0, 0); ctx.restore(); }
+  ctx.save(); ctx.beginPath(); ctx.rect(L, T, w, h); ctx.clip();
+  const clampY = v => Math.max(-1e5, Math.min(1e5, v));
+  for (const hl of spec.hlines || []){ ctx.strokeStyle = col(hl.color || '--muted'); ctx.lineWidth = hl.width || 1; ctx.setLineDash(hl.dash || [5, 4]); ctx.beginPath(); ctx.moveTo(L, Y(hl.y)); ctx.lineTo(L + w, Y(hl.y)); ctx.stroke(); ctx.setLineDash([]);
+    if (hl.label){ ctx.fillStyle = col(hl.color || '--muted'); ctx.textAlign = hl.align || 'left'; ctx.textBaseline = 'bottom'; ctx.fillText(hl.label, hl.align === 'right' ? L + w - 4 : L + 4, Y(hl.y) - 2); } }
+  for (const vl of spec.vlines || []){ ctx.strokeStyle = col(vl.color || '--muted'); ctx.lineWidth = vl.width || 1; ctx.setLineDash(vl.dash || [4, 4]); ctx.beginPath(); ctx.moveTo(X(vl.x), T); ctx.lineTo(X(vl.x), T + h); ctx.stroke(); ctx.setLineDash([]);
+    if (vl.label){ ctx.fillStyle = col(vl.color || '--muted'); ctx.textAlign = 'left'; ctx.textBaseline = 'top'; ctx.fillText(vl.label, X(vl.x) + 4, T + 4 + (vl.dy || 0)); } }
+  for (const s of spec.series || []){
+    if (!s.x || s.x.length < 2) continue;
+    ctx.strokeStyle = ctx.fillStyle = col(s.color); ctx.lineWidth = s.width || 2; ctx.setLineDash(s.dash || []);
+    ctx.beginPath(); let started = false;
+    for (let i = 0; i < s.x.length; i++){ const yv = s.y[i]; if (!isFinite(yv) || (ly && yv <= 0)){ started = false; continue; }
+      const px = X(s.x[i]), py = clampY(Y(yv)); if (!started){ ctx.moveTo(px, py); started = true; } else ctx.lineTo(px, py); }
+    if (s.fill){ ctx.lineTo(X(s.x[s.x.length - 1]), Y(ly ? y0 : Math.max(y0, 0))); ctx.lineTo(X(s.x[0]), Y(ly ? y0 : Math.max(y0, 0))); ctx.closePath(); ctx.globalAlpha = s.alpha ?? 0.25; ctx.fill(); ctx.globalAlpha = 1; }
+    else { ctx.globalAlpha = s.alpha ?? 1; ctx.stroke(); ctx.globalAlpha = 1; }
+    ctx.setLineDash([]);
+  }
+  for (const pt of spec.points || []){ ctx.fillStyle = col(pt.color); ctx.globalAlpha = pt.alpha ?? 1; ctx.beginPath(); ctx.arc(X(pt.x), Y(pt.y), pt.r || 3, 0, 7); ctx.fill(); ctx.globalAlpha = 1; }
+  for (const tx_ of spec.texts || []){ ctx.fillStyle = col(tx_.color || '--muted'); ctx.textAlign = tx_.align || 'left'; ctx.textBaseline = 'top'; ctx.font = tx_.font || '11px -apple-system,sans-serif'; ctx.fillText(tx_.text, tx_.px ?? X(tx_.x), tx_.py ?? Y(tx_.y)); }
+  ctx.restore();
+}
+function decades(a, b){ const lo = Math.min(a, b), hi = Math.max(a, b), out = []; for (let e = Math.ceil(Math.log10(lo) - 1e-9); e <= Math.floor(Math.log10(hi) + 1e-9); e++) out.push(10 ** e); return out; }
+
+// ================================================================ widget 1: score matching
+const FIT = (() => {
+  const logN = (x, m, s) => -0.5 * ((x - m) / s) ** 2 - Math.log(s);
+  const TARGETS = {
+    quartic: x => -(x ** 4 + 0.1 * x ** 3 - 2 * x ** 2 + 0.3 * x),
+    sextic: x => -(0.02 * x ** 6 - 0.24 * x ** 4 + 0.72 * x ** 2 + 0.1 * x),
+    mixture: x => { const a = Math.log(0.6) + logN(x, -1.2, 0.5), b = Math.log(0.4) + logN(x, 1.5, 0.8), m = Math.max(a, b); return m + Math.log(Math.exp(a - m) + Math.exp(b - m)); },
+    skew: x => -0.5 * x * x - softplus(-4 * x),
+  };
+  let r = 4, cache = {};
+  const u = linspace(-8, 8, 3201), du = u[1] - u[0];
+  function target(name){
+    if (cache[name]) return cache[name];
+    const lp = TARGETS[name], xw = linspace(-12, 12, 24001), dx = xw[1] - xw[0];
+    let mx = -Infinity; const L = Array.from(xw, lp); for (const v of L) mx = Math.max(mx, v);
+    let z = 0, s1 = 0, s2 = 0; for (let i = 0; i < xw.length; i++){ const p = Math.exp(L[i] - mx); z += p; s1 += p * xw[i]; }
+    const mu = s1 / z; for (let i = 0; i < xw.length; i++) s2 += Math.exp(L[i] - mx) * (xw[i] - mu) ** 2; const sd = Math.sqrt(s2 / z);
+    const lu = Array.from(u, v => lp(mu + sd * v)); let m2 = -Infinity; for (const v of lu) m2 = Math.max(m2, v);
+    const p = new Float64Array(u.length); let zz = 0; for (let i = 0; i < u.length; i++){ p[i] = Math.exp(lu[i] - m2); zz += p[i]; } zz *= du;
+    for (let i = 0; i < u.length; i++) p[i] /= zz;
+    const m = moments(p, u, 16), nlp = lu.map(v => -(v - m2));
+    let mode = 0; for (let i = 0; i < u.length; i++) if (p[i] > p[mode]) mode = i;
+    return (cache[name] = {mu, sd, p, m, nlp, mode});
+  }
+  function maxent(m, r){
+    const n = u.length, Phi = []; for (let k = 1; k <= r; k++){ const row = new Float64Array(n); for (let i = 0; i < n; i++) row[i] = u[i] ** k; Phi.push(row); }
+    let lam = new Array(r).fill(0); lam[1] = 0.5;
+    const dual = l => { let mn = Infinity; const E = new Float64Array(n); for (let i = 0; i < n; i++){ let s = 0; for (let k = 0; k < r; k++) s += l[k] * Phi[k][i]; E[i] = s; if (s < mn) mn = s; }
+      let z = 0; for (let i = 0; i < n; i++) z += Math.exp(-(E[i] - mn)); let lm = 0; for (let k = 0; k < r; k++) lm += l[k] * m[k + 1]; return lm + Math.log(z * du) - mn; };
+    for (let it = 0; it < 120; it++){
+      const E = new Float64Array(n); let mn = Infinity; for (let i = 0; i < n; i++){ let s = 0; for (let k = 0; k < r; k++) s += lam[k] * Phi[k][i]; E[i] = s; if (s < mn) mn = s; }
+      const w = new Float64Array(n); let z = 0; for (let i = 0; i < n; i++){ w[i] = Math.exp(-(E[i] - mn)); z += w[i]; } for (let i = 0; i < n; i++) w[i] /= z;
+      const mp = new Array(r).fill(0); for (let k = 0; k < r; k++){ let s = 0; for (let i = 0; i < n; i++) s += w[i] * Phi[k][i]; mp[k] = s; }
+      const C = []; for (let a = 0; a < r; a++){ C.push(new Array(r).fill(0)); for (let b = 0; b <= a; b++){ let s = 0; for (let i = 0; i < n; i++) s += w[i] * Phi[a][i] * Phi[b][i]; C[a][b] = s - mp[a] * mp[b] + (a === b ? 1e-12 : 0); } }
+      for (let a = 0; a < r; a++) for (let b = a + 1; b < r; b++) C[a][b] = C[b][a];
+      const g = mp.map((v, k) => m[k + 1] - v); if (Math.max(...g.map(Math.abs)) < 1e-11) break;
+      const d = solve(C, g.map(v => -v)); if (!d) break;
+      let t = 1, f0 = dual(lam), gd = 0; for (let k = 0; k < r; k++) gd += g[k] * d[k];
+      while (t > 1e-10){ const cand = lam.map((v, k) => v + t * d[k]); if (dual(cand) <= f0 + 1e-4 * t * gd) { lam = cand; break; } t *= 0.5; }
+      if (t <= 1e-10) break;
+    }
+    return lam;
+  }
+  function l1(pf, pt){ let s = 0; for (let i = 0; i < u.length; i++) s += Math.abs(pf[i] - pt[i]); return s * du; }
+  function update(){
+    const name = $('fitTarget').value, T = target(name), showME = $('fitME').checked;
+    const {A, b} = smSystem(T.m, r), lsm = solve(A, b), lme = showME ? maxent(T.m, r) : null;
+    const okSM = lsm && lsm[r - 1] > 0, psm = okSM ? densityOnGrid(lsm, u) : null, pme = lme ? densityOnGrid(lme, u) : null;
+    const toX = v => T.mu + T.sd * v;
+    let offMode = null; if (psm){ let im = 0; for (let i = 0; i < u.length; i++) if (psm[i] > psm[im]) im = i; if (Math.abs(u[im]) > 3.6) offMode = u[im]; }
+    // density panel, in the original x units
+    const sel = [], xs = [], pt = [], ps = [], pm = [];
+    for (let i = 0; i < u.length; i += 4) if (Math.abs(u[i]) <= 3.6){ xs.push(toX(u[i])); pt.push(T.p[i] / T.sd); ps.push(psm ? psm[i] / T.sd : NaN); pm.push(pme ? pme[i] / T.sd : NaN); }
+    const ymax = 1.15 * Math.max(...pt, ...ps.filter(isFinite).map(v => Math.min(v, 1.6 * Math.max(...pt))));
+    const draw1 = () => plot($('fitDens'), { title: 'densities', xlim: [toX(-3.6), toX(3.6)], ylim: [0, ymax], xlabel: 'x',
+      series: [{x: xs, y: pt, color: '--grey', fill: true, alpha: 0.28}, {x: xs, y: pt, color: '--grey', width: 1},
+               psm ? {x: xs, y: ps, color: '--c0', width: 2.2} : null, pme ? {x: xs, y: pm, color: '--c1', width: 2, dash: [6, 4]} : null].filter(Boolean),
+      texts: okSM ? (offMode === null ? [] : [{px: 60, py: 34, text: 'SM density: its mass sits near x = ' + fmt(toX(offMode), 1) + ', off this plot', color: '--bad', font: '600 11.5px -apple-system,sans-serif'}])
+                  : [{px: 60, py: 34, text: 'SM fit is not a density: leading coefficient ' + fmt(lsm ? lsm[r - 1] : NaN) + ' < 0', color: '--bad', font: '600 11.5px -apple-system,sans-serif'}] });
+    // energy panel
+    const ref = T.nlp[T.mode], xe = [], en = [], es = [], em = [];
+    const Esm0 = lsm ? energy(lsm, u[T.mode]) : 0, Eme0 = lme ? energy(lme, u[T.mode]) : 0;
+    let lo = Infinity, hi = -Infinity;
+    for (let i = 0; i < u.length; i += 4) if (Math.abs(u[i]) <= 5){ xe.push(toX(u[i])); en.push(T.nlp[i]); if (T.p[i] > 1e-3 * T.p[T.mode]){ lo = Math.min(lo, T.nlp[i]); hi = Math.max(hi, T.nlp[i]); }
+      es.push(lsm ? energy(lsm, u[i]) - Esm0 + ref : NaN); em.push(lme ? energy(lme, u[i]) - Eme0 + ref : NaN); }
+    let a = 0, bb = u.length - 1; while (T.p[a] < 1e-3 * T.p[T.mode]) a++; while (T.p[bb] < 1e-3 * T.p[T.mode]) bb--;
+    const draw2 = () => plot($('fitEnergy'), { title: 'energies, aligned at the mode', xlim: [toX(-5), toX(5)], ylim: [lo - 22, hi + 10], xlabel: 'x',
+      shade: [{x0: toX(u[a]), x1: toX(u[bb]), color: '--soft'}],
+      series: [{x: xe, y: en, color: '--ink', width: 1.3, dash: [4, 3]}, lsm ? {x: xe, y: es, color: '--c0', width: 2.2} : null, lme ? {x: xe, y: em, color: '--c1', width: 2, dash: [6, 4]} : null].filter(Boolean),
+    });
+    draw1(); draw2(); redrawers[0] = () => { draw1(); draw2(); };
+    // readout
+    const momErr = pf => { if (!pf) return NaN; const mf = moments(pf, u, r); let e = 0; for (let k = 1; k <= r; k++) e = Math.max(e, Math.abs(mf[k] - T.m[k])); return e; };
+    let wellNote = '';
+    if (okSM && psm){ let im = 0; for (let i = 0; i < u.length; i++) if (psm[i] > psm[im]) im = i; if (T.p[im] < 1e-4 * T.p[T.mode]) wellNote = ` · <span class="bad">its mode is at ${sgn(u[im], 1)} sd, where the target density is ${T.p[im].toExponential(0)}</span>`; }
+    $('fitRead').innerHTML =
+      `score matching: cond(A) <b>${fmt(condSym(A), 0)}</b> · leading coefficient <b>${fmt(lsm ? lsm[r - 1] : NaN, 4)}</b> → ` +
+      (okSM ? `<span class="good">normalisable</span> · L1 error <b>${fmt(l1(psm, T.p))}</b> · worst moment error (k ≤ r) <b>${fmt(momErr(psm))}</b>${wellNote}` : `<span class="bad">not a density</span>`) +
+      (pme ? `<br>MaxEnt: L1 error <b>${fmt(l1(pme, T.p))}</b> · worst moment error <b>${fmt(momErr(pme))}</b> · |λ<sub>SM</sub> − λ<sub>ME</sub>| = <b>${fmt(Math.max(...lme.map((v, k) => Math.abs(v - (lsm ? lsm[k] : NaN)))))}</b>` : '');
+    // the matrix
+    const sub = s => `<sub>${s}</sub>`;
+    let html = `<p class="small">The system Aλ = b in standardised coordinates (mean 0, sd 1), with m<sub>0</sub> = 1, m<sub>1</sub> = 0, m<sub>2</sub> = 1:</p><table class="mx"><tr><th></th>`;
+    for (let k = 1; k <= r; k++) html += `<th>x${k > 1 ? '<sup>' + k + '</sup>' : ''}</th>`;
+    html += `<th>b</th><th>λ (SM)</th></tr>`;
+    for (let j = 1; j <= r; j++){
+      html += `<tr><th>x${j > 1 ? '<sup>' + j + '</sup>' : ''}</th>`;
+      for (let k = 1; k <= r; k++) html += r <= 4 ? `<td><span class="sym">${j * k}m${sub(j + k - 2)} =</span> ${fmt(A[j - 1][k - 1], 3)}</td>` : `<td>${fmt(A[j - 1][k - 1], 2)}</td>`;
+      html += (r <= 4 ? `<td><span class="sym">${j * (j - 1)}m${sub(Math.max(j - 2, 0))} =</span> ${fmt(b[j - 1], 3)}</td>` : `<td>${fmt(b[j - 1], 2)}</td>`) + `<td><b>${fmt(lsm ? lsm[j - 1] : NaN, 4)}</b></td></tr>`;
+    }
+    $('fitMatrix').innerHTML = html + '</table>';
+  }
+  document.querySelectorAll('#fitR button').forEach(btn => btn.addEventListener('click', () => { r = +btn.dataset.r; document.querySelectorAll('#fitR button').forEach(x => x.classList.toggle('on', x === btn)); update(); }));
+  $('fitTarget').addEventListener('change', update); $('fitME').addEventListener('change', update);
+  return {update};
+})();
+
+// ================================================================ widget 2a: Stein recursion
+const REC = (() => {
+  const QL = [0.3, -2.0, 0.1, 1.0], xs = linspace(-6, 6, 12001);
+  function update(){
+    const kind = $('stDens').value, pert = $('stPert').checked, mu = +$('stMu').value, sg = +$('stSg').value;
+    $('stMuV').textContent = mu.toFixed(2); $('stSgV').textContent = sg.toFixed(2);
+    $('stMuL').style.display = $('stSgL').style.display = kind === 'gauss' ? '' : 'none';
+    const K = 10; let exact, rec;
+    if (kind === 'gauss'){
+      const xg = linspace(mu - 14 * sg, mu + 14 * sg, 14001);
+      exact = moments(densityOnGrid([-mu / sg ** 2, 0.5 / sg ** 2], xg), xg, K);
+      rec = [1, mu * (pert ? 1.01 : 1)]; for (let k = 1; k < K; k++) rec.push(mu * rec[k] + k * sg * sg * rec[k - 1]);
+    } else {
+      exact = moments(densityOnGrid(QL, xs), xs, K);
+      rec = exact.slice(0, 4); if (pert) rec[1] *= 1.01;
+      for (let k = 1; rec.length <= K; k++) rec.push((k * rec[k - 1] - QL[0] * rec[k] - 2 * QL[1] * rec[k + 1] - 3 * QL[2] * rec[k + 2]) / (4 * QL[3]));
+    }
+    const seeds = kind === 'gauss' ? 2 : 4;
+    let html = '<table class="mx"><tr><th>k</th>'; for (let k = 0; k <= K; k++) html += `<th>${k}</th>`;
+    html += '</tr><tr><th>from the recursion</th>'; for (let k = 0; k <= K; k++) html += `<td${k < seeds ? ' class="sym"' : ''}>${fmt(rec[k], 3)}</td>`;
+    html += '</tr><tr><th>by quadrature</th>'; for (let k = 0; k <= K; k++) html += `<td>${fmt(exact[k], 3)}</td>`;
+    html += '</tr><tr class="hl"><th>relative gap</th>'; for (let k = 0; k <= K; k++){ const g = Math.abs(rec[k] - exact[k]) / Math.max(Math.abs(exact[k]), 1e-12); html += `<td>${g < 1e-9 ? '0' : g.toExponential(1)}</td>`; }
+    $('stTable').innerHTML = html + '</tr></table>';
+    $('stRead').innerHTML = kind === 'gauss'
+      ? `m<sub>k+1</sub> = μ·m<sub>k</sub> + kσ²·m<sub>k−1</sub>, seeds m<sub>0</sub> = 1 and m<sub>1</sub> = μ (grey). Every later moment follows.`
+      : `4λ<sub>4</sub>m<sub>k+3</sub> = k·m<sub>k−1</sub> − λ<sub>1</sub>m<sub>k</sub> − 2λ<sub>2</sub>m<sub>k+1</sub> − 3λ<sub>3</sub>m<sub>k+2</sub>, seeds m<sub>0..3</sub> (grey) taken from quadrature. With E of degree 4 each equation links five moments.`;
+  }
+  ['stDens', 'stPert', 'stMu', 'stSg'].forEach(id => $(id).addEventListener('input', update));
+  return {update};
+})();
+
+// ================================================================ widget 2b: double-well closure
+const DW = (() => {
+  let r = 4, tSel = 2, mc = null, mcKey = '';
+  const TEND = 3, S0 = 0.1, xs = linspace(-3, 3, 1201);
+  function runMC(sig, mu0){
+    const key = sig + '|' + mu0; if (mc && mcKey === key) return mc;
+    const N = 20000, dt = 0.002, steps = Math.round(TEND / dt), rng = gaussGen(mulberry(12345)), X = new Float64Array(N);
+    for (let i = 0; i < N; i++) X[i] = mu0 + S0 * rng();
+    const t = [0], m2 = [], m4 = [], snaps = {}; const rec = () => { let a = 0, b = 0; for (let i = 0; i < N; i++){ const x2 = X[i] * X[i]; a += x2; b += x2 * x2; } m2.push(a / N); m4.push(b / N); };
+    rec(); const sq = sig * Math.sqrt(dt);
+    for (let s = 1; s <= steps; s++){
+      for (let i = 0; i < N; i++){ const x = X[i]; X[i] = x + dt * (x - x * x * x) + sq * rng(); }
+      if (s % 10 === 0){ t.push(s * dt); rec(); }
+      for (const ts of [0.5, 1, 2, 3]) if (Math.abs(s * dt - ts) < dt / 2) snaps[ts] = Float64Array.from(X);
+    }
+    mcKey = key; return (mc = {t, m2, m4, snaps});
+  }
+  function closeLayers(lam, m, r, K){
+    const mm = m.slice();
+    for (const tgt of [K + 1, K + 2]){ const k = tgt - r + 1; let s = k * mm[k - 1]; for (let j = 1; j < r; j++) s -= j * lam[j - 1] * mm[k + j - 1]; mm.push(s / (r * lam[r - 1])); }
+    return mm;
+  }
+  function rhs(m, r, K, sig){
+    const lam = smFit(m, r); if (!lam) return null;
+    const mm = closeLayers(lam, m, r, K), d = new Array(K + 1).fill(0);
+    for (let k = 1; k <= K; k++) d[k] = k * mm[k] - k * mm[k + 2] + 0.5 * sig * sig * k * (k - 1) * (k >= 2 ? mm[k - 2] : 0);
+    return d.every(isFinite) ? d : null;
+  }
+  function runClosure(r, sig, mu0){
+    const K = 2 * r - 2; let m = [1, mu0]; for (let k = 1; k < K; k++) m.push(mu0 * m[k] + k * S0 * S0 * m[k - 1]); m = m.slice(0, K + 1);
+    const dt = 0.001, t = [0], m2 = [m[2]], m4 = [closeLayers(smFit(m, r), m, r, K)[4]], lamAt = {}, lead = {};
+    let blow = null;
+    for (let s = 1; s <= Math.round(TEND / dt); s++){
+      const k1 = rhs(m, r, K, sig); const k2 = k1 && rhs(m.map((v, i) => v + dt / 2 * k1[i]), r, K, sig);
+      const k3 = k2 && rhs(m.map((v, i) => v + dt / 2 * k2[i]), r, K, sig); const k4 = k3 && rhs(m.map((v, i) => v + dt * k3[i]), r, K, sig);
+      if (!k4){ blow = s * dt; break; }
+      m = m.map((v, i) => v + dt / 6 * (k1[i] + 2 * k2[i] + 2 * k3[i] + k4[i]));
+      if (!m.every(isFinite) || Math.abs(m[2]) > 20 || m[2] < 0){ blow = s * dt; break; }
+      if (s % 10 === 0){ t.push(s * dt); m2.push(m[2]); const lam = smFit(m, r); m4.push(lam ? closeLayers(lam, m, r, K)[4] : NaN); }
+      for (const ts of [0.5, 1, 2, 3]) if (Math.abs(s * dt - ts) < dt / 2) lamAt[ts] = smFit(m, r);
+      for (const ts of [0.05, 0.15, 1]) if (Math.abs(s * dt - ts) < dt / 2){ const l = smFit(m, r); lead[ts] = l ? l[r - 1] : NaN; }
+    }
+    return {t, m2, m4, blow, lamAt, lead};
+  }
+  function update(){
+    const sig = +$('dwSig').value, mu0 = +$('dwMu').value;
+    $('dwSigV').textContent = sig.toFixed(2); $('dwMuV').textContent = mu0.toFixed(2);
+    const M = runMC(sig, mu0), C = runClosure(r, sig, mu0);
+    const ymax = 1.25 * Math.max(...M.m2, ...M.m4);
+    const draw1 = () => plot($('dwMom'), { title: 'even moments over time', xlim: [0, TEND], ylim: [0, ymax], xlabel: 'time',
+      series: [{x: M.t, y: M.m2, color: '--ink', width: 1.8}, {x: M.t, y: M.m4, color: '--grey', width: 1.8},
+               {x: C.t, y: C.m2, color: '--c0', width: 2.2, dash: [6, 4]}, {x: C.t, y: C.m4, color: '--c1', width: 2.2, dash: [6, 4]}],
+      vlines: C.blow ? [{x: C.blow, color: '--bad', dash: [2, 3], label: 'closure diverges'}] : [] });
+    const snap = M.snaps[tSel], bins = 60, hist = new Array(bins).fill(0), lo = -2.5, hi = 2.5, bw = (hi - lo) / bins;
+    for (const x of snap) { const b = Math.floor((x - lo) / bw); if (b >= 0 && b < bins) hist[b]++; }
+    const hx = [], hy = []; for (let b = 0; b < bins; b++){ hx.push(lo + (b + 0.5) * bw); hy.push(hist[b] / (snap.length * bw)); }
+    const lam = C.lamAt[tSel], pd = lam && lam[r - 1] > 0 ? densityOnGrid(lam, xs) : null;
+    const ymx = 1.3 * Math.max(...hy, ...(pd ? Array.from(pd).map(v => Math.min(v, 2 * Math.max(...hy))) : [0]));
+    const draw2 = () => plot($('dwDens'), { title: `density at t = ${tSel}`, xlim: [lo, hi], ylim: [0, ymx], xlabel: 'x',
+      series: [{x: hx, y: hy, color: '--grey', fill: true, alpha: 0.3}, {x: hx, y: hy, color: '--grey', width: 1}, pd ? {x: Array.from(xs), y: Array.from(pd), color: '--c0', width: 2.2} : null].filter(Boolean),
+      texts: pd ? [{px: 60, py: 32, text: 'grey: Monte Carlo · blue: SM density from the closure moments', color: '--muted'}]
+                : [{px: 60, py: 32, text: C.blow && C.blow < tSel ? 'closure already diverged' : 'fitted λ not normalisable', color: '--bad', font: '600 11.5px -apple-system,sans-serif'}] });
+    draw1(); draw2(); redrawers[1] = () => { draw1(); draw2(); };
+    const iM = M.t.findIndex(v => v >= 3 - 1e-9), iC = C.t.length - 1;
+    $('dwRead').innerHTML = (C.blow ? `closed moment ODE <span class="bad">diverges at t = ${C.blow.toFixed(2)}</span>` : `closed moment ODE runs to t = 3`) +
+      ` · at t = ${C.t[iC].toFixed(2)}: closure m₂ = <b>${fmt(C.m2[iC])}</b>, Monte Carlo m₂ = <b>${fmt(M.m2[Math.min(M.t.findIndex(v => v >= C.t[iC] - 1e-9), M.m2.length - 1)])}</b>` +
+      ` · Monte Carlo m₂ at t = 3: <b>${fmt(M.m2[iM])}</b>` +
+      (r > 2 ? `<br>fitted leading coefficient λ<sub>${r}</sub>: ` + [0.05, 0.15, 1].filter(ts => ts in C.lead).map(ts => `t = ${ts}: <b>${fmt(C.lead[ts])}</b>`).join(' · ') + ' (it starts at 0: the initial density is Gaussian)' : '');
+  }
+  document.querySelectorAll('#dwR button').forEach(btn => btn.addEventListener('click', () => { r = +btn.dataset.r; document.querySelectorAll('#dwR button').forEach(x => x.classList.toggle('on', x === btn)); update(); }));
+  document.querySelectorAll('#dwT button').forEach(btn => btn.addEventListener('click', () => { tSel = +btn.dataset.t; document.querySelectorAll('#dwT button').forEach(x => x.classList.toggle('on', x === btn)); update(); }));
+  $('dwSig').addEventListener('change', update); $('dwMu').addEventListener('change', update);
+  $('dwSig').addEventListener('input', () => $('dwSigV').textContent = (+$('dwSig').value).toFixed(2));
+  $('dwMu').addEventListener('input', () => $('dwMuV').textContent = (+$('dwMu').value).toFixed(2));
+  return {update};
+})();
+
+// ================================================================ widget 3: the measurement update
+const UP = (() => {
+  let r = 2, passes = [];
+  const xs = linspace(-7, 7, 7001), TWO = [0.2, -1.0, 0, 0.25];
+  const pad = (l, r) => { const o = new Array(r).fill(0); l.forEach((v, i) => { if (i < r) o[i] = v; }); return o; };
+  function steinRecover(lam, r, c, s, zeroRow){        // Sec 5.2 in 1-D: rows k = (zeroRow ? 0 : 1)..K, unknowns m_1..m_K, truncate > K
+    const K = 2 * r - 2, lw = lamToW(lam, c, s), rows = [], rhs = [];
+    for (let k = zeroRow ? 0 : 1; k <= K; k++){
+      const row = new Array(K).fill(0); let cst = 0;               // sum_j j lw_j m_{k+j-1} - k m_{k-1} = 0
+      for (let j = 1; j <= r; j++){ const g = k + j - 1; if (g === 0) cst += j * lw[j - 1]; else if (g <= K) row[g - 1] += j * lw[j - 1]; }
+      if (k >= 1){ if (k - 1 === 0) cst -= k; else row[k - 2] -= k; }
+      rows.push(row); rhs.push(-cst);
+    }
+    const mw = [1, ...lstsq(rows, rhs)];
+    return momFromW(mw, c, s);
+  }
+  function recover(lam, r, method, prior){
+    const K = 2 * r - 2, p = densityOnGrid(lam, xs);
+    if (!p) return null;
+    const ex = moments(p, xs, K);
+    if (method === 'exact') return ex;
+    if (method === 'oracle') return steinRecover(lam, r, ex[1], 3.5 * Math.sqrt(ex[2] - ex[1] ** 2), false);
+    return steinRecover(lam, r, prior.mean, 3.5 * prior.sd, method === 'stein0');
+  }
+  function state(){
+    const priorKind = $('upPrior').value, sensor = $('upSensor').value, z = +$('upZ').value, R = +$('upR').value, mu0 = +$('upMu').value, s0 = +$('upSg').value;
+    const lamPrior = priorKind === 'gauss' ? [-mu0 / (s0 * s0), 0.5 / (s0 * s0)] : TWO.slice();
+    const lamLik = sensor === 'lin' ? [-z / R, 0.5 / R] : [0, -z / R, 0, 0.5 / R];
+    return {priorKind, sensor, z, R, mu0, s0, lamPrior, lamLik};
+  }
+  function update(){
+    const S = state(), method = $('upMethod').value;
+    ['upMu', 'upSg', 'upZ', 'upR'].forEach(id => $(id + 'V').textContent = (+$(id).value).toFixed(2));
+    $('upMuL').style.display = $('upSgL').style.display = S.priorKind === 'gauss' ? '' : 'none';
+    const need = Math.max(S.lamPrior.length, S.lamLik.length);
+    document.querySelectorAll('#upRr button').forEach(b => { b.disabled = +b.dataset.r < need; });
+    if (r < need){ r = need; document.querySelectorAll('#upRr button').forEach(b => b.classList.toggle('on', +b.dataset.r === r)); }
+    const lamP = pad(S.lamPrior, r), lamL = pad(S.lamLik, r), lamPost = lamP.map((v, i) => v + lamL[i]);
+    const pp = densityOnGrid(lamP, xs), mp = moments(pp, xs, 2), prior = {mean: mp[1], sd: Math.sqrt(mp[2] - mp[1] ** 2)};
+    const ppost = densityOnGrid(lamPost, xs), mpost = moments(ppost, xs, 2);
+    // pass 0 and any refinement passes
+    const hist = []; let lamCur = lamPost, mRec = null, lamFit = null, broke = '';
+    for (let k = 0; k <= passes.length; k++){
+      mRec = recover(lamCur, r, method, prior);
+      if (!mRec){ broke = 'the current λ is not normalisable'; break; }
+      const v = mRec[2] - mRec[1] ** 2;
+      hist.push({mean: mRec[1], v});
+      if (!(v > 0)){ broke = 'recovered variance is negative: not a distribution'; lamFit = null; break; }
+      lamFit = smFitStd(mRec, r);
+      if (!lamFit){ broke = 'score-matching refit failed'; break; }
+      if (k < passes.length) lamCur = lamFit.map((x, i) => x + lamL[i]);
+    }
+    const pfit = lamFit && lamFit[r - 1] > 0 ? densityOnGrid(lamFit, xs) : null;
+    // likelihood curve, scaled for display
+    const lik = Array.from(xs, x => Math.exp(-energy(lamL, x))), lmax = Math.max(...lik), pmax = Math.max(...pp);
+    const X = [], P0 = [], PL = [], PP = [], PF = []; for (let i = 0; i < xs.length; i += 5){ X.push(xs[i]); P0.push(pp[i]); PL.push(lik[i] / lmax * 0.9 * pmax); PP.push(ppost[i]); PF.push(pfit ? pfit[i] : NaN); }
+    let lo = -4.5, hi = 4.5; const ymax = 1.12 * Math.max(...P0, ...PP, ...(pfit ? PF.map(v => Math.min(v, 2.2 * Math.max(...PP))) : [0]));
+    const last = hist[hist.length - 1];
+    const draw = () => plot($('upCanvas'), { xlim: [lo, hi], ylim: [0, ymax], xlabel: 'x',
+      series: [{x: X, y: P0, color: '--grey', fill: true, alpha: 0.28}, {x: X, y: PL, color: '--ink', width: 1.3, dash: [4, 3]}, {x: X, y: PP, color: '--c0', width: 2.4}, pfit ? {x: X, y: PF, color: '--bad', width: 2.2} : null].filter(Boolean),
+      vlines: [{x: prior.mean, color: '--grey', dash: [2, 3], label: 'prior mean'}, {x: mpost[1], color: '--c0', dash: [5, 4], label: 'exact mean', dy: 14}].concat(last && isFinite(last.mean) ? [{x: last.mean, color: '--bad', dash: [5, 4], label: 'recovered mean', dy: 28}] : []) });
+    draw(); redrawers[2] = draw;
+    const shift = mpost[1] - prior.mean, gain = last ? (last.mean - prior.mean) / shift : NaN;
+    $('upRead').innerHTML = `exact posterior: mean <b>${fmt(mpost[1])}</b>, variance <b>${fmt(mpost[2] - mpost[1] ** 2)}</b>` +
+      ` · recovered after ${passes.length} refinement pass${passes.length === 1 ? '' : 'es'}: mean <b>${last ? fmt(last.mean) : '—'}</b>, variance <b>${last ? fmt(last.v) : '—'}</b>` +
+      (Math.abs(shift) > 1e-6 && last ? ` · step taken / correct step = <span class="${Math.abs(gain - 1) < 0.05 ? 'good' : 'bad'}">${sgn(gain)}</span>` : '') +
+      (broke ? `<br><span class="bad">${broke}</span>` : '') +
+      (hist.length > 1 ? `<br>recovered mean by pass: ${hist.map((h, i) => `${i}: ${fmt(h.mean)}`).join(' · ')}` : '');
+    // lambda table
+    const names = Array.from({length: r}, (_, i) => 'x' + (i ? '<sup>' + (i + 1) + '</sup>' : ''));
+    const row = (lab, l, hl) => `<tr${hl ? ' class="hl"' : ''}><th>${lab}</th>${l.map(v => `<td>${l === null ? '—' : fmt(v, 3)}</td>`).join('')}</tr>`;
+    $('upTable').innerHTML = `<table class="mx"><tr><th>λ, coefficient of</th>${names.map(n => `<th>${n}</th>`).join('')}</tr>` +
+      row('prior λ⁻', lamP) + row('likelihood λ<sub>lik</sub>(z)', lamL) + row('posterior λ⁺ = λ⁻ + λ<sub>lik</sub>', lamPost, true) +
+      (lamFit ? row('SM(recovered m⁺): what the filter carries', lamFit) : '') + '</table>';
+  }
+  const reset = () => { passes = []; update(); };
+  ['upPrior', 'upSensor', 'upMethod'].forEach(id => $(id).addEventListener('change', reset));
+  ['upMu', 'upSg', 'upZ', 'upR'].forEach(id => $(id).addEventListener('input', reset));
+  document.querySelectorAll('#upRr button').forEach(btn => btn.addEventListener('click', () => { if (btn.disabled) return; r = +btn.dataset.r; document.querySelectorAll('#upRr button').forEach(x => x.classList.toggle('on', x === btn)); reset(); }));
+  $('upPass').addEventListener('click', () => { if (passes.length < 12){ passes.push(1); update(); } });
+  $('upReset').addEventListener('click', reset);
+  $('upSensor').addEventListener('change', () => { if ($('upSensor').value === 'quad' && +$('upZ').value < 0) $('upZ').value = 2; });
+  return {update};
+})();
+
+// ================================================================ widget 4: the oscillator benchmark
+const BN = (() => {
+  const G = 0.3, A = 1, Bq = 0.6, KP = 0.3, SIG = 0.4, RSTD = 0.3, P0 = 0.15, DTP = 0.15, DTO = 0.005, STEPS = 25, SUB = 30;
+  const M0 = [0.3, -0.2, 0, 0];
+  const drift = x => [x[2], x[3], -G * x[2] - A * x[0] - Bq * x[0] * x[0] + KP * (x[1] - x[0]), -G * x[3] - A * x[1] - Bq * x[1] * x[1] + KP * (x[0] - x[1])];
+  const add = (a, b, s) => a.map((v, i) => v + s * b[i]);
+  function rk4(x, dt){ const k1 = drift(x), k2 = drift(add(x, k1, dt / 2)), k3 = drift(add(x, k2, dt / 2)), k4 = drift(add(x, k3, dt)); return x.map((v, i) => v + dt / 6 * (k1[i] + 2 * k2[i] + 2 * k3[i] + k4[i])); }
+  function truth(mode, seed){
+    const g = gaussGen(mulberry(1000 + seed * 7919 + (mode === 'sde' ? 17 : 0)));
+    let x = mode === 'det' ? M0.slice() : M0.map(v => v + P0 * g());
+    const xs = [], zs = [];
+    for (let k = 0; k < STEPS; k++){
+      for (let s = 0; s < SUB; s++){
+        if (mode === 'det') x = rk4(x, DTO);
+        else { const d = drift(x); x = add(x, d, DTO); x[2] += SIG * Math.sqrt(DTO) * g(); x[3] += SIG * Math.sqrt(DTO) * g(); }
+      }
+      xs.push(x.slice()); zs.push(x[0] + RSTD * g());
+    }
+    return {xs, zs};
+  }
+  function ekf(zs, trust){
+    let x = M0.slice(), P = [[P0 * P0, 0, 0, 0], [0, P0 * P0, 0, 0], [0, 0, P0 * P0, 0], [0, 0, 0, P0 * P0]];
+    const R = RSTD * RSTD / trust, out = [];
+    for (const z of zs){
+      for (let s = 0; s < SUB; s++){
+        const F = [[0, 0, 1, 0], [0, 0, 0, 1], [-A - 2 * Bq * x[0] - KP, KP, -G, 0], [KP, -A - 2 * Bq * x[1] - KP, 0, -G]];
+        x = rk4(x, DTO);
+        const FP = F.map(row => [0, 1, 2, 3].map(j => row.reduce((acc, f, k) => acc + f * P[k][j], 0)));
+        const Pn = P.map((row, i) => row.map((v, j) => v + DTO * (FP[i][j] + FP[j][i] + ((i === j && i >= 2) ? SIG * SIG : 0))));
+        P = Pn;
+      }
+      const S = P[0][0] + R, K = P.map(row => row[0] / S), inn = z - x[0];
+      x = x.map((v, i) => v + K[i] * inn);
+      const r0 = P[0].slice(); P = P.map((row, i) => row.map((v, j) => v - K[i] * r0[j]));
+      out.push(x.slice());
+    }
+    return out;
+  }
+  function pf(zs, seed, N = 5000){
+    const g = gaussGen(mulberry(424242 + seed)), rnd = mulberry(99 + seed);
+    let X = Array.from({length: N}, () => M0.map(v => v + P0 * g())), out = [];
+    for (const z of zs){
+      for (let s = 0; s < SUB; s++) for (const x of X){ const d = drift(x); for (let i = 0; i < 4; i++) x[i] += DTO * d[i]; x[2] += SIG * Math.sqrt(DTO) * g(); x[3] += SIG * Math.sqrt(DTO) * g(); }
+      const lw = X.map(x => -0.5 * (z - x[0]) ** 2 / (RSTD * RSTD)), mx = Math.max(...lw), w = lw.map(v => Math.exp(v - mx)), sw = w.reduce((a, b) => a + b, 0);
+      const est = [0, 0, 0, 0]; X.forEach((x, n) => { for (let i = 0; i < 4; i++) est[i] += w[n] / sw * x[i]; }); out.push(est);
+      const cum = []; let c = 0; for (const v of w){ c += v / sw; cum.push(c); }
+      const u0 = rnd() / N, Xn = []; let j = 0; for (let n = 0; n < N; n++){ const u = u0 + n / N; while (j < N - 1 && cum[j] < u) j++; Xn.push(X[j].slice()); } X = Xn;
+    }
+    return out;
+  }
+  const rmse = (est, xs) => est.reduce((acc, e, k) => acc + Math.sqrt(((e[0] - xs[k][0]) ** 2 + (e[1] - xs[k][1]) ** 2) / 2), 0) / est.length;
+  const TRUSTS = [100, 30, 10, 3, 1, 0.3, 0.1, 0.03, 0.01, 0.003, 0.001];
+  let curve = null, seed = 0, pfCache = {};
+  function computeCurve(){
+    curve = {};
+    for (const mode of ['det', 'sde']){
+      const runs = Array.from({length: 40}, (_, s) => truth(mode, s));
+      curve[mode] = TRUSTS.map(tr => runs.reduce((acc, T) => acc + rmse(ekf(T.zs, tr), T.xs), 0) / runs.length);
+    }
+  }
+  function update(){
+    if (!curve) computeCurve();
+    const mode = $('bnMode').value, trust = 10 ** (+$('bnTrust').value), showPF = $('bnPF').checked;
+    $('bnTrustV').textContent = trust >= 1 ? trust.toFixed(trust >= 10 ? 0 : 1) : trust.toPrecision(2);
+    const T = truth(mode, seed), e = ekf(T.zs, trust), e1 = ekf(T.zs, 1);
+    let p = null; if (showPF){ const key = mode + seed; p = pfCache[key] || (pfCache[key] = pf(T.zs, seed)); }
+    const t = Array.from({length: STEPS}, (_, k) => (k + 1) * DTP);
+    const td = [0, ...t];
+    const q = (arr, i) => arr.map(x => x[i]);
+    const allY = [...q(T.xs, 0), ...T.zs, ...q(e, 0), ...q(T.xs, 1), ...q(e, 1)], ymin = Math.min(...allY, -0.4) - 0.05, ymax = Math.max(...allY, 0.4) + 0.05;
+    const traces = (i) => [
+      {x: td, y: [M0[i], ...q(T.xs, i)], color: '--c2', width: 2, dash: [6, 4]},
+      {x: td, y: [M0[i], ...q(e1, i)], color: '--c1', width: 1.4, alpha: 0.75},
+      {x: td, y: [M0[i], ...q(e, i)], color: '--c0', width: 2.2},
+      p ? {x: td, y: [M0[i], ...q(p, i)], color: '--c3', width: 1.6} : null].filter(Boolean);
+    const draw = () => {
+      plot($('bnQ1'), {title: 'q₁ (observed)', xlim: [0, 3.75], ylim: [ymin, ymax], xlabel: 'time', series: traces(0), points: T.zs.map((z, k) => ({x: t[k], y: z, color: '--grey', r: 2.6, alpha: 0.8}))});
+      plot($('bnQ2'), {title: 'q₂ (unobserved)', xlim: [0, 3.75], ylim: [ymin, ymax], xlabel: 'time', series: traces(1)});
+      plot($('bnCurve'), {title: 'position RMSE against trust (log–log, 40 seeds)', xlim: [1000, 0.0006], ylim: [1e-4, 1.5], logx: true, logy: true, xlabel: 'trust (1 = correctly tuned; smaller = listens less)',
+        series: [{x: TRUSTS, y: curve.det, color: '--c0', width: 2.2}, {x: TRUSTS, y: curve.sde, color: '--c1', width: 2.2}],
+        points: [...TRUSTS.map((tr, i) => ({x: tr, y: curve.det[i], color: '--c0', r: 2.5})), ...TRUSTS.map((tr, i) => ({x: tr, y: curve.sde[i], color: '--c1', r: 2.5}))],
+        hlines: [{y: 0.0103, color: '--grey', label: 'paper SKF 0.0103', align: 'right'}, {y: 0.0727, color: '--grey', label: 'paper PF 0.0727', align: 'right'}],
+        vlines: [{x: trust, color: '--ink', dash: [2, 3], label: 'you are here'}]});
+    };
+    draw(); redrawers[3] = draw;
+    const interp = (arr) => { const lt = Math.log10(trust), L = TRUSTS.map(Math.log10); for (let i = 0; i < L.length - 1; i++) if (lt <= L[i] && lt >= L[i + 1]){ const f = (lt - L[i]) / (L[i + 1] - L[i]); return 10 ** ((1 - f) * Math.log10(arr[i]) + f * Math.log10(arr[i + 1])); } return NaN; };
+    $('bnRead').innerHTML = `this seed: EKF at trust ${$('bnTrustV').textContent} <b>${fmt(rmse(e, T.xs), 4)}</b> · EKF at trust 1 <b>${fmt(rmse(e1, T.xs), 4)}</b>` +
+      (p ? ` · PF <b>${fmt(rmse(p, T.xs), 4)}</b>` : '') +
+      ` · 40-seed mean at this trust: <b>${fmt(interp(curve[mode]), 4)}</b> (${mode === 'det' ? 'noise-free truth' : 'model-drawn truth'})`;
+  }
+  $('bnMode').addEventListener('change', update); $('bnTrust').addEventListener('input', update); $('bnPF').addEventListener('change', update);
+  document.querySelectorAll('#bnSeed button').forEach(btn => btn.addEventListener('click', () => { seed = +btn.dataset.s; document.querySelectorAll('#bnSeed button').forEach(x => x.classList.toggle('on', x === btn)); update(); }));
+  return {update};
+})();
+
+FIT.update(); REC.update(); UP.update(); BN.update();
+setTimeout(() => DW.update(), 30);   // the Monte Carlo reference takes a moment
+})();
+</script>
+</body>
+</html>

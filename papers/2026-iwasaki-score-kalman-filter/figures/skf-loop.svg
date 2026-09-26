@@ -1,0 +1,96 @@
+<svg viewBox="0 0 700 296" xmlns="http://www.w3.org/2000/svg" role="img">
+<title>The Score Kalman Filter loop</title>
+<desc>Four boxes in a row: posterior moments at step k, predicted moments at step k+1, prior score parameters lambda minus, posterior score parameters lambda plus. Arrows between them are labelled predict (the Dynkin moment ODE with a Stein closure), fit (score matching, one linear solve), and update (add the likelihood's lambda). A return arrow recovers moments from lambda plus by a least-squares Stein system and re-fits lambda. Below, one card per step; green dots mark exact steps, orange dots approximations: the closure and the moment recovery.</desc>
+<style>
+  text{font-family:ui-sans-serif,-apple-system,"Segoe UI",sans-serif;font-weight:400}
+  .lab{font-size:11px;fill:#57564f} .hd{font-size:13px;font-weight:500;fill:#1a1a19}
+  .sub{font-size:11.5px;fill:#57564f} .tiny{font-size:10px;fill:#57564f}
+  .ink{fill:#1a1a19}
+  .ax{stroke:#c3c2b7;stroke-width:0.8;fill:none} .gd{stroke:#e2e1da;stroke-width:0.6;fill:none;stroke-dasharray:3 3}
+  .box{fill:none;stroke:#e2e1da;stroke-width:1}
+  .tgt{fill:#8a8880;opacity:.22;stroke:none} .tgtl{stroke:#8a8880;stroke-width:1;fill:none}
+  .b{stroke:#2f6fb5;stroke-width:2;fill:none} .bf{fill:#2f6fb5}
+  .o{stroke:#c8702f;stroke-width:2;fill:none;stroke-dasharray:6 3} .of{fill:#c8702f}
+  .g{stroke:#2e7d4f;stroke-width:2;fill:none;stroke-dasharray:6 3} .gf{fill:#2e7d4f}
+  .r{stroke:#b42318;stroke-width:2;fill:none} .rf{fill:#b42318}
+  .k{stroke:#1a1a19;stroke-width:1.2;fill:none;stroke-dasharray:4 3}
+  .thin{stroke:#8a8880;stroke-width:0.9;fill:none;opacity:.75}
+  .soft{fill:#8a8880;opacity:.10}
+  .r1{stroke:#b42318;stroke-width:1.6;fill:none;opacity:.4} .r2{stroke:#b42318;stroke-width:1.6;fill:none;opacity:.65}
+  .r3{stroke:#b42318;stroke-width:1.8;fill:none;opacity:.95}
+  .p1{stroke:#2f6fb5;stroke-width:1.6;fill:none;opacity:.35} .p2{stroke:#2f6fb5;stroke-width:1.6;fill:none;opacity:.55}
+  .p3{stroke:#2f6fb5;stroke-width:1.6;fill:none;opacity:.75} .p4{stroke:#2f6fb5;stroke-width:1.8;fill:none;opacity:.95}
+  .node{fill:#ffffff;stroke:#c3c2b7;stroke-width:1} .nodeb{fill:#eef4fb;stroke:#2f6fb5;stroke-width:1.2}
+  .ex{fill:#2e7d4f} .ap{fill:#c8702f} .arr{stroke:#57564f;stroke-width:1.3;fill:none}
+  .arrh{fill:#57564f}
+  @media (prefers-color-scheme: dark){
+    .lab,.sub,.tiny{fill:#b6b4ab} .hd,.ink{fill:#eceae3} .ax{stroke:#4a4844} .gd,.box{stroke:#33312e}
+    .tgt{fill:#b6b4ab;opacity:.22} .tgtl{stroke:#b6b4ab}
+    .b{stroke:#7fb2e8} .bf{fill:#7fb2e8} .o{stroke:#e09a5f} .of{fill:#e09a5f}
+    .g{stroke:#4cc79a} .gf{fill:#4cc79a} .r{stroke:#ff7a6b} .rf{fill:#ff7a6b}
+    .k{stroke:#eceae3} .thin{stroke:#b6b4ab} .soft{fill:#b6b4ab}
+    .p1,.p2,.p3,.p4{stroke:#7fb2e8} .r1,.r2,.r3{stroke:#ff7a6b}
+    .node{fill:#1b1d21;stroke:#4a4844} .nodeb{fill:#1c2a3a;stroke:#7fb2e8}
+    .ex{fill:#4cc79a} .ap{fill:#e09a5f} .arr{stroke:#b6b4ab} .arrh{fill:#b6b4ab}
+  }
+</style>
+<text class="hd" x="20" y="24">One predict–update cycle of the SKF (Algorithm 1)</text>
+<text class="sub" x="20" y="41">The filter carries two descriptions of one belief: moments m and score parameters λ.</text>
+<text class="sub" x="20" y="56">Every arrow is a linear solve or an ODE step. None of them evaluates the normaliser Z.</text>
+<rect class="node" x="20" y="76" width="124" height="66" rx="9"/>
+<text class="hd" x="82.0" y="98" text-anchor="middle">moments m⁺</text>
+<text class="lab" x="82.0" y="115" text-anchor="middle">E[xᵅ], |α| ≤ 2r−2</text>
+<text class="lab" x="82.0" y="128" text-anchor="middle">posterior, step k</text>
+<rect class="node" x="200" y="76" width="124" height="66" rx="9"/>
+<text class="hd" x="262.0" y="98" text-anchor="middle">moments m⁻</text>
+<text class="lab" x="262.0" y="115" text-anchor="middle">predicted, step k+1</text>
+<rect class="nodeb" x="380" y="76" width="124" height="66" rx="9"/>
+<text class="hd" x="442.0" y="98" text-anchor="middle">λ⁻</text>
+<text class="lab" x="442.0" y="115" text-anchor="middle">prior score</text>
+<text class="lab" x="442.0" y="128" text-anchor="middle">s = −∇(λ⁻·φ)</text>
+<rect class="nodeb" x="556" y="76" width="124" height="66" rx="9"/>
+<text class="hd" x="618.0" y="98" text-anchor="middle">λ⁺</text>
+<text class="lab" x="618.0" y="115" text-anchor="middle">posterior score</text>
+<text class="lab" x="618.0" y="128" text-anchor="middle">s = −∇(λ⁺·φ)</text>
+<line class="arr" x1="144" y1="109.0" x2="193.0" y2="109.0"/>
+<path class="arrh" d="M200,109.0 L193.0,105.0 L193.0,113.0 Z"/>
+<text class="lab" x="172.0" y="101.0" text-anchor="middle">① predict</text>
+<line class="arr" x1="324" y1="109.0" x2="373.0" y2="109.0"/>
+<path class="arrh" d="M380,109.0 L373.0,105.0 L373.0,113.0 Z"/>
+<text class="lab" x="352.0" y="101.0" text-anchor="middle">② fit</text>
+<line class="arr" x1="504" y1="109.0" x2="549.0" y2="109.0"/>
+<path class="arrh" d="M556,109.0 L549.0,105.0 L549.0,113.0 Z"/>
+<text class="lab" x="530.0" y="101.0" text-anchor="middle">③ update</text>
+<path class="arr" d="M618.0,142 L618.0,164 L82.0,164 L82.0,150"/>
+<path class="arrh" d="M82.0,142 L78.0,150 L86.0,150 Z"/>
+<text class="lab" x="350.0" y="158" text-anchor="middle">④ recover the posterior moments from λ⁺, then re-fit λ</text>
+<text class="lab ink" x="20" y="194">① predict</text>
+<text class="lab" x="20" y="209">Dynkin moment ODE ṁ = E[𝒜xᵅ]</text>
+<text class="lab" x="20" y="222">Stein closure gives the moments</text>
+<text class="lab" x="20" y="235">of degree K+1 from λ (Prop 2)</text>
+<circle class="ap" cx="23.5" cy="254.5" r="3.5"/>
+<text class="tiny" x="31" y="258">approx.: p assumed in family</text>
+<text class="lab ink" x="192" y="194">② fit</text>
+<text class="lab" x="192" y="209">score matching (Prop 1)</text>
+<text class="lab" x="192" y="222">λ = A(m)⁻¹ b(m),</text>
+<text class="lab" x="192" y="235">every entry a moment</text>
+<circle class="ex" cx="195.5" cy="254.5" r="3.5"/>
+<text class="tiny" x="203" y="258">exact on the model (Thm 1)</text>
+<text class="lab ink" x="364" y="194">③ update</text>
+<text class="lab" x="364" y="209">Bayes' rule in score form</text>
+<text class="lab" x="364" y="222">λ⁺ = λ⁻ + λ_lik(z)  (Eq 14)</text>
+<text class="lab" x="364" y="235">no evidence, no Z</text>
+<circle class="ex" cx="367.5" cy="254.5" r="3.5"/>
+<text class="tiny" x="375" y="258">exact if likelihood fits basis</text>
+<text class="lab ink" x="536" y="194">④ recover</text>
+<text class="lab" x="536" y="209">Stein system (Eq 15), least</text>
+<text class="lab" x="536" y="222">squares; moments above</text>
+<text class="lab" x="536" y="235">degree K set to zero</text>
+<circle class="ap" cx="539.5" cy="254.5" r="3.5"/>
+<text class="tiny" x="547" y="258">approx.: truncation (see Doubts)</text>
+<circle class="ex" cx="23.5" cy="278.5" r="3.5"/>
+<text class="tiny" x="31" y="282">exact step</text>
+<circle class="ap" cx="113.5" cy="278.5" r="3.5"/>
+<text class="tiny" x="121" y="282">approximation</text>
+<text class="tiny" x="226" y="282">At r = 2 every step is exact and the loop is the information-form Kalman filter (App D).</text>
+</svg>
