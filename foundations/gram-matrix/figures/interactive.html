@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gram Matrices, Hands On</title>
+<style>
+:root{
+  --bg:#fbfaf7; --surface:#ffffff; --ink:#1c1d21; --muted:#5b5f68; --line:#e2dfd8; --soft:#f2f0ea;
+  --col:#2f6fb5; --null:#c2571a; --proj:#0f7a5a; --c3:#7c3aed; --radius:12px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#131417; --surface:#1b1d21; --ink:#ebebed; --muted:#a3a6ae; --line:#2e3138; --soft:#23262b;
+    --col:#7fb2e8; --null:#f0a070; --proj:#4cc79a; --c3:#b48cff;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#131417; --surface:#1b1d21; --ink:#ebebed; --muted:#a3a6ae; --line:#2e3138; --soft:#23262b;
+  --col:#7fb2e8; --null:#f0a070; --proj:#4cc79a; --c3:#b48cff;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,sans-serif;}
+main{max-width:900px;margin:0 auto;padding:40px 16px 80px}
+h1{font-size:2.1rem;line-height:1.2;margin:0 0 .4rem;letter-spacing:-.01em}
+h2{font-size:1.4rem;margin:3rem 0 .6rem;padding-top:.5rem;border-top:1px solid var(--line)}
+p{margin:.6rem 0}
+a{color:var(--col)}
+.lede{color:var(--muted);font-size:1.08rem;margin-bottom:1.4rem}
+nav.toc{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:12px 18px;font-size:.93rem}
+nav.toc ol{margin:.3rem 0;padding-left:1.2rem}
+nav.toc a{color:var(--ink);text-decoration:none;border-bottom:1px dotted var(--muted)}
+.widget{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:14px;margin:1rem 0 1.2rem}
+.controls{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;margin:.2rem 0 .6rem;font-size:.9rem}
+.controls label{display:flex;align-items:center;gap:6px;color:var(--muted)}
+button,select{font:inherit;font-size:.88rem;color:var(--ink);background:var(--soft);border:1px solid var(--line);border-radius:8px;padding:5px 11px;cursor:pointer}
+input[type=range]{accent-color:var(--col);width:120px}
+.readout{font-size:.9rem;color:var(--muted);margin-top:.5rem;font-variant-numeric:tabular-nums}
+.readout b{color:var(--ink)}
+.callout{border-left:3px solid var(--proj);background:var(--soft);padding:10px 14px;border-radius:0 8px 8px 0;margin:1rem 0;font-size:.95rem}
+canvas{display:block;width:100%;touch-action:none;border-radius:8px}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.pair .cap{font-size:.82rem;color:var(--muted);margin:0 0 4px}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:.82rem;color:var(--muted);margin-top:.4rem}
+.legend span::before{content:"";display:inline-block;width:14px;height:3px;margin-right:6px;vertical-align:3px;background:var(--c)}
+.kbd{font-family:ui-monospace,Menlo,monospace;font-size:.85em;background:var(--soft);padding:1px 5px;border-radius:4px}
+@media (max-width:640px){ h1{font-size:1.7rem} .pair{grid-template-columns:1fr} input[type=range]{width:96px} }
+</style>
+</head>
+<body>
+<main>
+
+<h1>Gram Matrices, Hands On</h1>
+<p class="lede"><a href="../index.html">← text notes</a> · Foundations › Linear algebra. Three widgets: a Gram matrix as a table of dot products, a kernel Gram matrix and its bandwidth, and the contrastive similarity matrix.</p>
+
+<nav class="toc"><b>Contents</b>
+<ol>
+  <li><a href="#s1">Points in, dot products out</a></li>
+  <li><a href="#s2">RBF kernel: how far does "similar" reach?</a></li>
+  <li><a href="#s3">The contrastive Gram matrix</a></li>
+</ol></nav>
+
+<!-- ============================================================ -->
+<h2 id="s1">1. Points in, dot products out</h2>
+<p>Each point x<sub>i</sub> is a row of X. The Gram matrix G = XXᵀ holds every dot product: <b>G<sub>ij</sub> = x<sub>i</sub> · x<sub>j</sub></b>. Its diagonal is the squared lengths. Drag the points and watch the table change. Then move the <b>rotate</b> slider, which turns the whole cloud: the points move and the Gram matrix does not change at all.</p>
+<p>The eigenvalues underneath are never negative. Line the points up along one line and all but one of them drop to zero: the rank of G is the number of independent directions the points span.</p>
+
+<div class="widget">
+  <div class="controls">
+    <label>rotate <input id="g1Rot" type="range" min="-180" max="180" step="1" value="0"></label>
+    <label><input id="g1Cen" type="checkbox"> centre (show HGH)</label>
+    <button id="g1Line">Put on a line</button>
+    <button id="g1Reset">↻ Reset</button>
+  </div>
+  <div class="pair">
+    <div><p class="cap">the points (drag them)</p><canvas id="g1Pts" height="380"></canvas></div>
+    <div><p class="cap">Gram matrix G, and its eigenvalues</p><canvas id="g1Mat" height="380"></canvas></div>
+  </div>
+  <div class="readout" id="g1Read"></div>
+</div>
+<div class="callout">Things to try. Drag two points until they are at right angles through the origin: their entry goes to 0. Drag a point further out: its whole row and column scale up. Tick <b>centre</b>: the mean is subtracted first, the cross marks the new origin, and every row of HGH sums to zero.</div>
+
+<!-- ============================================================ -->
+<h2 id="s2">2. RBF kernel: how far does "similar" reach?</h2>
+<p>Swap the dot product for the Gaussian kernel <b>K<sub>ij</sub> = exp(−‖x<sub>i</sub> − x<sub>j</sub>‖² / 2σ²)</b>. It is still a Gram matrix, of some hidden feature vectors φ(x<sub>i</sub>), so it is still PSD. The circle around the highlighted point has radius σ: roughly, points inside it count as "similar".</p>
+<p>Two clusters of eight points each, sorted so cluster A comes first. At a good σ the matrix is two bright blocks. Too small and it collapses to the identity; too large and it goes to all ones. Hover a point to highlight its row.</p>
+
+<div class="widget">
+  <div class="controls">
+    <label>σ <input id="g2Sig" type="range" min="-2.3" max="1.8" step="0.02" value="-0.3"></label>
+    <label>cluster gap <input id="g2Gap" type="range" min="0" max="4" step="0.05" value="2.2"></label>
+    <button id="g2Med">σ = median distance</button>
+  </div>
+  <div class="pair">
+    <div><p class="cap">the data (hover a point)</p><canvas id="g2Pts" height="320"></canvas></div>
+    <div><p class="cap">kernel Gram matrix K (16 × 16)</p><canvas id="g2Mat" height="320"></canvas></div>
+  </div>
+  <div class="readout" id="g2Read"></div>
+</div>
+<div class="callout">The readout's "block contrast" is mean K within clusters minus mean K between them. It peaks at a middle σ and falls to 0 at both ends. MMD and HSIC are built from exactly these block means, which is why they depend so much on σ.</div>
+
+<!-- ============================================================ -->
+<h2 id="s3">3. The contrastive Gram matrix</h2>
+<p>InfoNCE on a batch: four anchors a<sub>k</sub> and their four positives p<sub>k</sub> (two views of the same image), all normalised to the unit circle. The <b>logit matrix</b> is the Gram matrix between anchors and positives divided by a temperature, <b>S = A Pᵀ / τ</b>, i.e. cosine similarity over τ. Each row goes through a softmax, and the loss wants the diagonal (the true pair) to win.</p>
+<p>Drag the dots around the circle (anchors are filled, positives are rings of the same colour). Lower τ sharpens every row: small differences in angle become confident decisions, and the hardest negative dominates the loss.</p>
+
+<div class="widget">
+  <div class="controls">
+    <label>τ <input id="g3Tau" type="range" min="-3" max="0.7" step="0.02" value="-1.6"></label>
+    <button id="g3Shuf">Scramble</button>
+    <button id="g3Align">Align pairs</button>
+  </div>
+  <div class="pair">
+    <div><p class="cap">embeddings on the unit circle (drag)</p><canvas id="g3Pts" height="320"></canvas></div>
+    <div><p class="cap">row-softmax of S = APᵀ/τ</p><canvas id="g3Mat" height="320"></canvas></div>
+  </div>
+  <div class="readout" id="g3Read"></div>
+</div>
+<div class="callout">"Align pairs" puts each positive on its anchor and spreads the pairs evenly: the <b>alignment</b> and <b>uniformity</b> of Wang &amp; Isola at once. The diagonal goes bright and the loss approaches its floor, which is above 0 unless τ is small, because the negatives are never infinitely far away on a circle.</div>
+
+</main>
+<script>
+(() => {
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+function mulberry(seed){ return () => { seed|=0; seed=seed+0x6D2B79F5|0; let t=Math.imul(seed^seed>>>15,1|seed); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+function gauss(r){ let u=0,v=0; while(u===0) u=r(); v=r(); return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v); }
+function setupCanvas(cv){
+  if (!cv.dataset.h) cv.dataset.h = cv.getAttribute('height');
+  const dpr = window.devicePixelRatio||1, w = cv.clientWidth, h = +cv.dataset.h;
+  cv.style.height = h+'px'; cv.width = Math.round(w*dpr); cv.height = Math.round(h*dpr);
+  const ctx = cv.getContext('2d'); ctx.setTransform(dpr,0,0,dpr,0,0); return {ctx,w,h};
+}
+function frame(w, h, half, cx=0, cy=0){
+  const s = Math.min(w, h) / (2*half);
+  return { s, X: x => w/2 + (x-cx)*s, Y: y => h/2 - (y-cy)*s, ix: px => (px-w/2)/s + cx, iy: py => -(py-h/2)/s + cy };
+}
+const redrawers = [];
+window.addEventListener('resize', () => redrawers.forEach(f => f()));
+if (window.matchMedia) matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change', () => redrawers.forEach(f => f()));
+const fx = (v, d=2) => (Math.abs(v) < 5e-13 ? 0 : v).toFixed(d);
+function arrow(ctx, x1, y1, x2, y2, col, lw=2, head=9){
+  const dx=x2-x1, dy=y2-y1, L=Math.hypot(dx,dy); if (L < 1) return;
+  const ux=dx/L, uy=dy/L, bx=x2-head*ux, by=y2-head*uy;
+  ctx.strokeStyle=col; ctx.fillStyle=col; ctx.lineWidth=lw;
+  ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(bx,by); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(x2,y2); ctx.lineTo(bx-0.42*head*uy, by+0.42*head*ux); ctx.lineTo(bx+0.42*head*uy, by-0.42*head*ux); ctx.closePath(); ctx.fill();
+}
+function disc(ctx, x, y, r, col, ring=null){
+  ctx.fillStyle=col; ctx.beginPath(); ctx.arc(x,y,r,0,7); ctx.fill();
+  if (ring){ ctx.strokeStyle=ring; ctx.lineWidth=1.5; ctx.stroke(); }
+}
+function grid(ctx, f, w, h, step=1){
+  ctx.strokeStyle=css('--line'); ctx.lineWidth=0.6;
+  for (let x=Math.ceil(f.ix(0)); x<=f.ix(w); x+=step){ ctx.beginPath(); ctx.moveTo(f.X(x),0); ctx.lineTo(f.X(x),h); ctx.stroke(); }
+  for (let y=Math.ceil(f.iy(h)); y<=f.iy(0); y+=step){ ctx.beginPath(); ctx.moveTo(0,f.Y(y)); ctx.lineTo(w,f.Y(y)); ctx.stroke(); }
+  ctx.strokeStyle=css('--muted'); ctx.lineWidth=0.8;
+  ctx.beginPath(); ctx.moveTo(f.X(0),0); ctx.lineTo(f.X(0),h); ctx.moveTo(0,f.Y(0)); ctx.lineTo(w,f.Y(0)); ctx.stroke();
+}
+// symmetric eigenvalues by cyclic Jacobi
+function eigSym(M){
+  const n=M.length, A=M.map(r=>r.slice());
+  for (let sweep=0; sweep<60; sweep++){
+    let off=0; for (let i=0;i<n;i++) for (let j=i+1;j<n;j++) off+=A[i][j]*A[i][j];
+    if (off<1e-20) break;
+    for (let p=0;p<n;p++) for (let q=p+1;q<n;q++){
+      if (Math.abs(A[p][q])<1e-15) continue;
+      const th=(A[q][q]-A[p][p])/(2*A[p][q]), t=Math.sign(th||1)/(Math.abs(th)+Math.sqrt(th*th+1));
+      const c=1/Math.sqrt(t*t+1), s=t*c;
+      for (let k=0;k<n;k++){ const a=A[k][p], b=A[k][q]; A[k][p]=c*a-s*b; A[k][q]=s*a+c*b; }
+      for (let k=0;k<n;k++){ const a=A[p][k], b=A[q][k]; A[p][k]=c*a-s*b; A[q][k]=s*a+c*b; }
+    }
+  }
+  return A.map((r,i)=>r[i]).sort((a,b)=>b-a);
+}
+// hex/rgb colour + alpha
+function withAlpha(col, a){
+  const c=document.createElement('canvas').getContext('2d'); c.fillStyle=col; const h=c.fillStyle;
+  if (h[0]==='#'){ const r=parseInt(h.slice(1,3),16), g=parseInt(h.slice(3,5),16), b=parseInt(h.slice(5,7),16); return `rgba(${r},${g},${b},${a})`; }
+  return h.replace('rgb(','rgba(').replace(')',`,${a})`);
+}
+// heatmap: values mapped to alpha of a base colour; negatives use a second colour
+function heat(ctx, M, x0, y0, size, opts={}){
+  const n=M.length, c=size/n, vmax=opts.vmax ?? Math.max(1e-9,...M.flat().map(Math.abs));
+  const pos=opts.pos||css('--col'), neg=opts.neg||css('--null');
+  for (let i=0;i<n;i++) for (let j=0;j<n;j++){
+    const v=M[i][j], a=Math.min(1,Math.abs(v)/vmax);
+    ctx.fillStyle=css('--soft'); ctx.fillRect(x0+j*c, y0+i*c, c, c);
+    ctx.fillStyle=withAlpha(v>=0?pos:neg, 0.08+0.72*a); ctx.fillRect(x0+j*c, y0+i*c, c, c);
+    if (opts.hi!=null && (i===opts.hi)){ ctx.strokeStyle=css('--ink'); ctx.lineWidth=1.5; ctx.strokeRect(x0+0.5, y0+i*c+0.5, size-1, c-1); }
+    if (opts.labels){ ctx.fillStyle=css('--ink'); ctx.font=`${opts.font||13}px system-ui`; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(fx(v,opts.dp??2), x0+j*c+c/2, y0+i*c+c/2); }
+  }
+  ctx.strokeStyle=css('--line'); ctx.lineWidth=1; ctx.strokeRect(x0,y0,size,size);
+}
+function dragger(cv, getPts, toScreen, fromScreen, onMove, onHover){
+  let active=-1;
+  const pos = e => { const r=cv.getBoundingClientRect(); return [e.clientX-r.left, e.clientY-r.top]; };
+  cv.addEventListener('pointerdown', e => {
+    const [mx,my]=pos(e), P=getPts(); let best=-1, bd=22;
+    P.forEach((p,i)=>{ const [sx,sy]=toScreen(p,i); const d=Math.hypot(sx-mx,sy-my); if (d<bd){bd=d;best=i;} });
+    if (best>=0){ active=best; cv.setPointerCapture(e.pointerId); }
+  });
+  cv.addEventListener('pointermove', e => {
+    const [mx,my]=pos(e);
+    if (active>=0){ onMove(active, fromScreen(mx,my,active)); return; }
+    if (onHover){ const P=getPts(); let best=-1, bd=16; P.forEach((p,i)=>{ const [sx,sy]=toScreen(p,i); const d=Math.hypot(sx-mx,sy-my); if (d<bd){bd=d;best=i;} }); onHover(best); }
+  });
+  const up=()=>{active=-1;}; cv.addEventListener('pointerup',up); cv.addEventListener('pointercancel',up);
+}
+
+// ============================================================ widget 1
+(() => {
+  const cvP=document.getElementById('g1Pts'), cvM=document.getElementById('g1Mat'), rd=document.getElementById('g1Read');
+  const rot=document.getElementById('g1Rot'), cen=document.getElementById('g1Cen');
+  const init=[[1,0],[1,1],[0,2],[-1.2,0.6]];
+  let P=init.map(p=>p.slice());
+  const cols=()=>[css('--col'),css('--proj'),css('--null'),css('--c3')];
+  const names=['x₁','x₂','x₃','x₄'];
+  const rotated=()=>{ const t=rot.value*Math.PI/180, c=Math.cos(t), s=Math.sin(t); return P.map(([x,y])=>[c*x-s*y, s*x+c*y]); };
+  let f;
+  function draw(){
+    const {ctx,w,h}=setupCanvas(cvP); f=frame(w,h,2.8);
+    ctx.clearRect(0,0,w,h); grid(ctx,f,w,h);
+    let Q=rotated();
+    const mean=[Q.reduce((a,p)=>a+p[0],0)/Q.length, Q.reduce((a,p)=>a+p[1],0)/Q.length];
+    const origin = cen.checked ? mean : [0,0];
+    if (cen.checked){ ctx.strokeStyle=css('--ink'); ctx.lineWidth=1.5; const X=f.X(mean[0]), Y=f.Y(mean[1]); ctx.beginPath(); ctx.moveTo(X-7,Y); ctx.lineTo(X+7,Y); ctx.moveTo(X,Y-7); ctx.lineTo(X,Y+7); ctx.stroke(); }
+    const C=cols();
+    Q.forEach((p,i)=>{ arrow(ctx,f.X(origin[0]),f.Y(origin[1]),f.X(p[0]),f.Y(p[1]),C[i],2); disc(ctx,f.X(p[0]),f.Y(p[1]),6,C[i],css('--surface'));
+      ctx.fillStyle=C[i]; ctx.font='13px system-ui'; ctx.textAlign='left'; ctx.fillText(names[i], f.X(p[0])+9, f.Y(p[1])-9); });
+    // matrix
+    const V = Q.map(p=>[p[0]-origin[0], p[1]-origin[1]]);
+    const G = V.map(a=>V.map(b=>a[0]*b[0]+a[1]*b[1]));
+    const m=setupCanvas(cvM), c2=m.ctx; c2.clearRect(0,0,m.w,m.h);
+    const size=Math.min(m.w-40, m.h-125), x0=28, y0=18;
+    heat(c2,G,x0,y0,size,{labels:true,dp:2,font:Math.max(10,Math.min(14,size/18))});
+    c2.font='12px system-ui'; c2.textBaseline='middle';
+    for (let i=0;i<4;i++){ c2.fillStyle=C[i]; c2.textAlign='right'; c2.fillText(names[i], x0-5, y0+size/4*(i+.5)); c2.textAlign='center'; c2.fillText(names[i], x0+size/4*(i+.5), y0-9); }
+    const ev=eigSym(G), emax=Math.max(1e-9,ev[0]);
+    const by=y0+size+22, bw=(m.w-x0-20)/4;
+    c2.fillStyle=css('--muted'); c2.textAlign='left'; c2.fillText('eigenvalues of G', x0, by);
+    ev.forEach((e,i)=>{ const bh=Math.max(0,e)/emax*48; c2.fillStyle=css('--proj'); c2.fillRect(x0+i*bw+6, by+62-bh, bw-12, bh);
+      c2.fillStyle=css('--ink'); c2.textAlign='center'; c2.fillText(fx(e,2), x0+i*bw+bw/2, by+74); });
+    const rank=ev.filter(e=>e>1e-6*Math.max(1,emax)).length;
+    const rs=G.map(r=>r.reduce((a,b)=>a+b,0));
+    rd.innerHTML=`rank <b>${rank}</b> (points live in ℝ², so at most 2 of the 4 eigenvalues are nonzero) · smallest eigenvalue <b>${fx(ev[3],3)}</b> ≥ 0 · ‖x₁ − x₂‖² = G₁₁ + G₂₂ − 2G₁₂ = <b>${fx(G[0][0]+G[1][1]-2*G[0][1],3)}</b>`
+      + (cen.checked ? ` · row sums of HGH: <b>${rs.map(v=>fx(v,2)).join(', ')}</b>` : '');
+  }
+  dragger(cvP, rotated, p=>[f.X(p[0]),f.Y(p[1])], (mx,my)=>[f.ix(mx),f.iy(my)], (i,q)=>{
+    const t=-rot.value*Math.PI/180, c=Math.cos(t), s=Math.sin(t); P[i]=[c*q[0]-s*q[1], s*q[0]+c*q[1]]; draw(); });
+  rot.addEventListener('input',draw); cen.addEventListener('change',draw);
+  document.getElementById('g1Line').onclick=()=>{ P=[[0.6,0.3],[1.4,0.7],[-1.6,-0.8],[2.2,1.1]]; draw(); };
+  document.getElementById('g1Reset').onclick=()=>{ P=init.map(p=>p.slice()); rot.value=0; cen.checked=false; draw(); };
+  redrawers.push(draw); draw();
+})();
+
+// ============================================================ widget 2
+(() => {
+  const cvP=document.getElementById('g2Pts'), cvM=document.getElementById('g2Mat'), rd=document.getElementById('g2Read');
+  const sig=document.getElementById('g2Sig'), gap=document.getElementById('g2Gap');
+  const r=mulberry(7), base=[]; for (let i=0;i<16;i++) base.push([gauss(r)*0.45, gauss(r)*0.45]);
+  let hi=0, f;
+  const pts=()=>{ const g=+gap.value/2; return base.map((p,i)=>[p[0]+(i<8?-g:g), p[1]]); };
+  const sigma=()=>Math.exp(+sig.value);
+  function draw(){
+    const Q=pts(), s=sigma();
+    const {ctx,w,h}=setupCanvas(cvP); f=frame(w,h,3.2); ctx.clearRect(0,0,w,h); grid(ctx,f,w,h);
+    const p=Q[hi]; ctx.strokeStyle=css('--c3'); ctx.lineWidth=1.5; ctx.setLineDash([5,4]); ctx.beginPath(); ctx.arc(f.X(p[0]),f.Y(p[1]),s*f.s,0,7); ctx.stroke(); ctx.setLineDash([]);
+    const K=Q.map(a=>Q.map(b=>Math.exp(-((a[0]-b[0])**2+(a[1]-b[1])**2)/(2*s*s))));
+    Q.forEach((q,i)=>{ const col=i<8?css('--col'):css('--null'); ctx.globalAlpha=0.3+0.7*K[hi][i]; disc(ctx,f.X(q[0]),f.Y(q[1]),i===hi?7:5,col,i===hi?css('--ink'):null); ctx.globalAlpha=1; });
+    const m=setupCanvas(cvM), c2=m.ctx; c2.clearRect(0,0,m.w,m.h);
+    const size=Math.min(m.w-30,m.h-30), x0=(m.w-size)/2+8, y0=14;
+    heat(c2,K,x0,y0,size,{vmax:1,pos:css('--c3'),hi});
+    c2.fillStyle=css('--col'); c2.fillRect(x0-7,y0,4,size/2); c2.fillStyle=css('--null'); c2.fillRect(x0-7,y0+size/2,4,size/2);
+    c2.fillStyle=css('--col'); c2.fillRect(x0,y0+size+4,size/2,4); c2.fillStyle=css('--null'); c2.fillRect(x0+size/2,y0+size+4,size/2,4);
+    let win=0,btw=0; for (let i=0;i<16;i++) for (let j=0;j<16;j++){ if (i===j) continue; if ((i<8)===(j<8)) win+=K[i][j]; else btw+=K[i][j]; }
+    win/=112; btw/=128;
+    const ev=eigSym(K);
+    rd.innerHTML=`σ = <b>${fx(s,2)}</b> · mean K within clusters <b>${fx(win,3)}</b>, between <b>${fx(btw,3)}</b> · block contrast <b>${fx(win-btw,3)}</b> · top eigenvalues <b>${ev.slice(0,3).map(v=>fx(v,2)).join(', ')}</b> · smallest <b>${fx(ev[15],4)}</b> ≥ 0`;
+  }
+  dragger(cvP, pts, q=>[f.X(q[0]),f.Y(q[1])], ()=>null, ()=>{}, i=>{ if (i>=0 && i!==hi){ hi=i; draw(); } });
+  sig.addEventListener('input',draw); gap.addEventListener('input',draw);
+  document.getElementById('g2Med').onclick=()=>{ const Q=pts(), d=[]; for (let i=0;i<16;i++) for (let j=i+1;j<16;j++) d.push(Math.hypot(Q[i][0]-Q[j][0],Q[i][1]-Q[j][1])); d.sort((a,b)=>a-b); sig.value=Math.log(d[d.length>>1]); draw(); };
+  redrawers.push(draw); draw();
+})();
+
+// ============================================================ widget 3
+(() => {
+  const cvP=document.getElementById('g3Pts'), cvM=document.getElementById('g3Mat'), rd=document.getElementById('g3Read');
+  const tau=document.getElementById('g3Tau');
+  // angles: 0..3 anchors, 4..7 positives
+  let th=[0.3,1.9,3.4,4.9, 0.7,1.5,3.9,4.4];
+  const cols=()=>[css('--col'),css('--proj'),css('--null'),css('--c3')];
+  const R=2.2; let f;
+  const pts=()=>th.map(t=>[R*Math.cos(t),R*Math.sin(t)]);
+  function draw(){
+    const t=Math.exp(+tau.value), C=cols();
+    const {ctx,w,h}=setupCanvas(cvP); f=frame(w,h,2.9); ctx.clearRect(0,0,w,h);
+    ctx.strokeStyle=css('--line'); ctx.lineWidth=1.5; ctx.beginPath(); ctx.arc(f.X(0),f.Y(0),R*f.s,0,7); ctx.stroke();
+    pts().forEach((p,i)=>{ const k=i%4; if (i<4) disc(ctx,f.X(p[0]),f.Y(p[1]),8,C[k],css('--surface'));
+      else { ctx.strokeStyle=C[k]; ctx.lineWidth=3; ctx.beginPath(); ctx.arc(f.X(p[0]),f.Y(p[1]),8,0,7); ctx.stroke(); }
+      ctx.fillStyle=C[k]; ctx.font='12px system-ui'; ctx.textAlign='center'; ctx.textBaseline='middle';
+      const lx=f.X(p[0]*1.2), ly=f.Y(p[1]*1.2); ctx.fillText((i<4?'a':'p')+'₁₂₃₄'[k], lx+(i<4?-7:7), ly); });
+    const S=[...Array(4)].map((_,i)=>[...Array(4)].map((_,j)=>Math.cos(th[i]-th[4+j])/t));
+    const Pm=S.map(row=>{ const mx=Math.max(...row), e=row.map(v=>Math.exp(v-mx)), z=e.reduce((a,b)=>a+b,0); return e.map(v=>v/z); });
+    const m=setupCanvas(cvM), c2=m.ctx; c2.clearRect(0,0,m.w,m.h);
+    const size=Math.min(m.w-50,m.h-40), x0=(m.w-size)/2+12, y0=22;
+    heat(c2,Pm,x0,y0,size,{vmax:1,pos:css('--proj'),labels:true,dp:2});
+    c2.font='12px system-ui'; c2.textBaseline='middle';
+    for (let i=0;i<4;i++){ c2.fillStyle=C[i]; c2.textAlign='right'; c2.fillText('a'+'₁₂₃₄'[i], x0-6, y0+size/4*(i+.5)); c2.textAlign='center'; c2.fillText('p'+'₁₂₃₄'[i], x0+size/4*(i+.5), y0-10); }
+    c2.strokeStyle=css('--ink'); c2.lineWidth=1.2; c2.setLineDash([4,3]); c2.beginPath(); c2.moveTo(x0+3,y0+3); c2.lineTo(x0+size-3,y0+size-3); c2.stroke(); c2.setLineDash([]);
+    const loss=-Pm.reduce((a,row,i)=>a+Math.log(row[i]),0)/4, acc=Pm.filter((row,i)=>row.indexOf(Math.max(...row))===i).length;
+    rd.innerHTML=`τ = <b>${fx(t,3)}</b> · InfoNCE loss <b>${fx(loss,3)}</b> (chance level ln 4 = 1.386) · rows where the true pair wins <b>${acc}/4</b> · logits range over <b>±${fx(1/t,1)}</b>`;
+  }
+  dragger(cvP, pts, p=>[f.X(p[0]),f.Y(p[1])], (mx,my)=>Math.atan2(f.iy(my),f.ix(mx)), (i,a)=>{ th[i]=a; draw(); });
+  tau.addEventListener('input',draw);
+  const rr=mulberry(3);
+  document.getElementById('g3Shuf').onclick=()=>{ th=th.map(()=>rr()*2*Math.PI); draw(); };
+  document.getElementById('g3Align').onclick=()=>{ th=[0,1,2,3,0,1,2,3].map(k=>k*Math.PI/2+0.4); draw(); };
+  redrawers.push(draw); draw();
+})();
+})();
+</script>
+</body>
+</html>

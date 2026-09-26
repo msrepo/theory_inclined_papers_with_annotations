@@ -1,0 +1,86 @@
+<svg viewBox="0 0 700 320" xmlns="http://www.w3.org/2000/svg" role="img">
+<title>Three points and their Gram matrix</title>
+<desc>Left: three arrows from the origin, x1=(1,0), x2=(1,1), x3=(0,2). Right: their 3 by 3 Gram matrix G with entries G_ij = x_i dot x_j: rows 1,1,0 / 1,2,2 / 0,2,4. The diagonal holds squared lengths, the off-diagonal entries hold dot products; x1 and x3 are perpendicular so G_13 = 0.</desc>
+<style>
+  text{font-family:ui-sans-serif,-apple-system,"Segoe UI",sans-serif}
+  .lab{font-size:12px;fill:#57564f} .hd{font-size:13px;font-weight:500;fill:#1a1a19}
+  .v{font-size:15px;font-weight:500;fill:#1a1a19}
+  .ax{stroke:#c3c2b7;stroke-width:0.75;fill:none}
+  .gd{stroke:#e2e1da;stroke-width:0.5;fill:none}
+  .a1{stroke:#2f6fb5;fill:#2f6fb5} .a2{stroke:#0f7a5a;fill:#0f7a5a} .a3{stroke:#c2571a;fill:#c2571a}
+  .t1{fill:#2f6fb5} .t2{fill:#0f7a5a} .t3{fill:#c2571a}
+  .cell{fill:#2f6fb5} .frame{fill:none;stroke:#c3c2b7;stroke-width:0.8}
+  .diag{fill:none;stroke:#1a1a19;stroke-width:1.4;stroke-dasharray:4 3}
+  .ra{stroke:#57564f;stroke-width:0.9;fill:none}
+  @media (prefers-color-scheme: dark){
+    .lab{fill:#b6b4ab} .hd,.v{fill:#eceae3} .ax{stroke:#4a4844} .gd{stroke:#33312e}
+    .a1{stroke:#7fb2e8;fill:#7fb2e8} .a2{stroke:#4cc79a;fill:#4cc79a} .a3{stroke:#f0a070;fill:#f0a070}
+    .t1{fill:#7fb2e8} .t2{fill:#4cc79a} .t3{fill:#f0a070}
+    .cell{fill:#7fb2e8} .frame{stroke:#4a4844} .diag{stroke:#eceae3} .ra{stroke:#b6b4ab}
+  }
+</style>
+<text x="20" y="24" class="hd">The data: three points in the plane</text>
+<line x1="70" y1="262" x2="266.0" y2="262" class="gd"/>
+<line x1="90" y1="277" x2="90" y2="70.0" class="gd"/>
+<line x1="70" y1="182" x2="266.0" y2="182" class="gd"/>
+<line x1="170" y1="277" x2="170" y2="70.0" class="gd"/>
+<line x1="70" y1="102" x2="266.0" y2="102" class="gd"/>
+<line x1="250" y1="277" x2="250" y2="70.0" class="gd"/>
+<line x1="70" y1="262" x2="274.0" y2="262" class="ax"/>
+<line x1="90" y1="277" x2="90" y2="62.0" class="ax"/>
+<path d="M102,262 L102,250 L90,250" class="ra"/>
+<line x1="90" y1="262" x2="161.0" y2="262.0" class="a1" stroke-width="2"/>
+<polygon points="170.0,262.0 161.0,267.0 161.0,257.0" class="a1"/>
+<text x="182" y="280" class="lab t1">x₁ = (1, 0)</text>
+<line x1="90" y1="262" x2="163.6" y2="188.4" class="a2" stroke-width="2"/>
+<polygon points="170.0,182.0 167.2,191.9 160.1,184.8" class="a2"/>
+<text x="180" y="176" class="lab t2">x₂ = (1, 1)</text>
+<line x1="90" y1="262" x2="90.0" y2="111.0" class="a3" stroke-width="2"/>
+<polygon points="90.0,102.0 95.0,111.0 85.0,111.0" class="a3"/>
+<text x="100" y="106" class="lab t3">x₃ = (0, 2)</text>
+<text x="20" y="306" class="lab">x₁ ⟂ x₃ (right angle), so their dot product is 0</text>
+<text x="380" y="24" class="hd">Its Gram matrix G = X Xᵀ, entry (i, j) = xᵢ · xⱼ</text>
+<text x="406" y="106.0" class="lab t1" text-anchor="end">x₁</text>
+<text x="451.0" y="62" class="lab t1" text-anchor="middle">x₁</text>
+<rect x="420" y="70" width="62" height="62" class="cell" opacity="0.18"/>
+<rect x="420" y="70" width="62" height="62" class="frame"/>
+<text x="451.0" y="106.0" class="v" text-anchor="middle">1</text>
+<rect x="482" y="70" width="62" height="62" class="cell" opacity="0.18"/>
+<rect x="482" y="70" width="62" height="62" class="frame"/>
+<text x="513.0" y="106.0" class="v" text-anchor="middle">1</text>
+<rect x="544" y="70" width="62" height="62" class="cell" opacity="0.06"/>
+<rect x="544" y="70" width="62" height="62" class="frame"/>
+<text x="575.0" y="106.0" class="v" text-anchor="middle">0</text>
+<text x="406" y="168.0" class="lab t2" text-anchor="end">x₂</text>
+<text x="513.0" y="62" class="lab t2" text-anchor="middle">x₂</text>
+<rect x="420" y="132" width="62" height="62" class="cell" opacity="0.18"/>
+<rect x="420" y="132" width="62" height="62" class="frame"/>
+<text x="451.0" y="168.0" class="v" text-anchor="middle">1</text>
+<rect x="482" y="132" width="62" height="62" class="cell" opacity="0.31"/>
+<rect x="482" y="132" width="62" height="62" class="frame"/>
+<text x="513.0" y="168.0" class="v" text-anchor="middle">2</text>
+<rect x="544" y="132" width="62" height="62" class="cell" opacity="0.31"/>
+<rect x="544" y="132" width="62" height="62" class="frame"/>
+<text x="575.0" y="168.0" class="v" text-anchor="middle">2</text>
+<text x="406" y="230.0" class="lab t3" text-anchor="end">x₃</text>
+<text x="575.0" y="62" class="lab t3" text-anchor="middle">x₃</text>
+<rect x="420" y="194" width="62" height="62" class="cell" opacity="0.06"/>
+<rect x="420" y="194" width="62" height="62" class="frame"/>
+<text x="451.0" y="230.0" class="v" text-anchor="middle">0</text>
+<rect x="482" y="194" width="62" height="62" class="cell" opacity="0.31"/>
+<rect x="482" y="194" width="62" height="62" class="frame"/>
+<text x="513.0" y="230.0" class="v" text-anchor="middle">2</text>
+<rect x="544" y="194" width="62" height="62" class="cell" opacity="0.56"/>
+<rect x="544" y="194" width="62" height="62" class="frame"/>
+<text x="575.0" y="230.0" class="v" text-anchor="middle">4</text>
+<line x1="424" y1="74" x2="602" y2="252" class="diag"/>
+<text x="622" y="84" class="lab">diagonal = squared lengths</text>
+<text x="622" y="101" class="lab">‖x₁‖² = 1, ‖x₂‖² = 2, ‖x₃‖² = 4</text>
+<text x="622" y="118" class="lab"></text>
+<text x="622" y="135" class="lab">off-diagonal = dot products</text>
+<text x="622" y="152" class="lab">G₁₃ = 0: perpendicular</text>
+<text x="622" y="169" class="lab"></text>
+<text x="622" y="186" class="lab">symmetric, and never has</text>
+<text x="622" y="203" class="lab">a negative eigenvalue</text>
+<text x="380" y="290" class="lab">distance from G alone: ‖x₁ − x₃‖² = G₁₁ + G₃₃ − 2G₁₃ = 1 + 4 − 0 = 5</text>
+</svg>
