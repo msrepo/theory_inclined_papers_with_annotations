@@ -175,8 +175,8 @@ $$
 HGH = (HX)(HX)^\top = \text{Gram matrix of the mean-subtracted points}.
 $$
 
-Its rows sum to zero, so $\mathbf 1$ is always in its null space. $HGH$ is the object in HSIC,
-CKA and kernel PCA.
+Its rows sum to zero, so $\mathbf 1$ is always in its null space. $HGH$ is the object in
+[HSIC](../hsic/index.html), CKA and kernel PCA.
 
 ## 7. Kernels: a Gram matrix with a different "dot product"
 
@@ -195,8 +195,8 @@ $\sigma$ decides how far "similar" reaches:
 </figure>
 
 At either extreme the matrix stops depending on the data: near-identity means every point looks
-unrelated, near-all-ones means every point looks the same. This is why kernel scores (MMD, HSIC)
-are sensitive to $\sigma$ and why the "median distance" heuristic exists.
+unrelated, near-all-ones means every point looks the same. This is why kernel scores (MMD,
+[HSIC](../hsic/index.html)) are sensitive to $\sigma$ and why the "median distance" heuristic exists.
 
 **The NTK is a Gram matrix of gradients.** For a network $f(x;\theta)$, set
 $\phi(x)=\nabla_\theta f(x;\theta)$, one long vector per input. Then

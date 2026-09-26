@@ -1,0 +1,285 @@
+<svg viewBox="0 0 720 292" xmlns="http://www.w3.org/2000/svg" role="img">
+<title>HSIC as the agreement of two centred Gram matrices</title>
+<desc>Three 5 by 5 heatmaps for x = (-2,-1,0,1,2) and y = x squared with Gaussian kernels at the median bandwidths. Left: the centred x Gram matrix. Middle: the centred y Gram matrix. Right: their elementwise product, which is mostly positive: pairs that are unusually close in x are also unusually close in y. The 25 products sum to 0.309, giving HSIC = 0.0123; the average over all 120 shuffles of y is 0.0177.</desc>
+<style>
+  text{font-family:ui-sans-serif,-apple-system,"Segoe UI",sans-serif;font-weight:400}
+  .lab{font-size:12px;fill:#57564f} .hd{font-size:13px;font-weight:500;fill:#1a1a19}
+  .sm{font-size:11px;fill:#57564f} .v{font-size:11px;fill:#1a1a19}
+  .ax{stroke:#c3c2b7;stroke-width:0.75;fill:none}
+  .box{fill:none;stroke:#c3c2b7;stroke-width:0.8}
+  .dot{fill:#2f6fb5;opacity:.55}
+  .yes{fill:#0f7a5a;font-weight:500} .no{fill:#8a8880}
+  .pos{fill:#2f6fb5} .neg{fill:#c2571a} .bg{fill:#f4f3ee}
+  .bar{fill:#8a8880;opacity:.55}
+  .obs{stroke:#b42318;stroke-width:2} .obst{fill:#b42318;font-weight:500}
+  @media (prefers-color-scheme: dark){
+    .lab,.sm{fill:#b6b4ab} .hd,.v{fill:#eceae3} .ax,.box{stroke:#4a4844}
+    .dot{fill:#7fb2e8;opacity:.6} .yes{fill:#4cc79a} .no{fill:#85837b}
+    .pos{fill:#7fb2e8} .neg{fill:#f0a070} .bg{fill:#23262b}
+    .bar{fill:#85837b} .obs{stroke:#ff7a6b} .obst{fill:#ff7a6b}
+  }
+</style>
+<text x="10" y="20" class="hd">K̃: unusually close in x?</text>
+<text x="34" y="70.0" class="sm" text-anchor="end">-2</text>
+<text x="58.0" y="42" class="sm" text-anchor="middle">-2</text>
+<rect x="40" y="48" width="36" height="36" class="bg"/>
+<rect x="40" y="48" width="36" height="36" class="pos" opacity="0.70"/>
+<text x="58.0" y="70.0" class="v" text-anchor="middle">0.51</text>
+<rect x="76" y="48" width="36" height="36" class="bg"/>
+<rect x="76" y="48" width="36" height="36" class="pos" opacity="0.38"/>
+<text x="94.0" y="70.0" class="v" text-anchor="middle">0.24</text>
+<rect x="112" y="48" width="36" height="36" class="bg"/>
+<rect x="112" y="48" width="36" height="36" class="neg" opacity="0.19"/>
+<text x="130.0" y="70.0" class="v" text-anchor="middle">-0.09</text>
+<rect x="148" y="48" width="36" height="36" class="bg"/>
+<rect x="148" y="48" width="36" height="36" class="neg" opacity="0.46"/>
+<text x="166.0" y="70.0" class="v" text-anchor="middle">-0.31</text>
+<rect x="184" y="48" width="36" height="36" class="bg"/>
+<rect x="184" y="48" width="36" height="36" class="neg" opacity="0.51"/>
+<text x="202.0" y="70.0" class="v" text-anchor="middle">-0.35</text>
+<text x="34" y="106.0" class="sm" text-anchor="end">-1</text>
+<text x="94.0" y="42" class="sm" text-anchor="middle">-1</text>
+<rect x="40" y="84" width="36" height="36" class="bg"/>
+<rect x="40" y="84" width="36" height="36" class="pos" opacity="0.38"/>
+<text x="58.0" y="106.0" class="v" text-anchor="middle">0.24</text>
+<rect x="76" y="84" width="36" height="36" class="bg"/>
+<rect x="76" y="84" width="36" height="36" class="pos" opacity="0.34"/>
+<text x="94.0" y="106.0" class="v" text-anchor="middle">0.21</text>
+<rect x="112" y="84" width="36" height="36" class="bg"/>
+<rect x="112" y="84" width="36" height="36" class="pos" opacity="0.13"/>
+<text x="130.0" y="106.0" class="v" text-anchor="middle">0.04</text>
+<rect x="148" y="84" width="36" height="36" class="bg"/>
+<rect x="148" y="84" width="36" height="36" class="neg" opacity="0.30"/>
+<text x="166.0" y="106.0" class="v" text-anchor="middle">-0.18</text>
+<rect x="184" y="84" width="36" height="36" class="bg"/>
+<rect x="184" y="84" width="36" height="36" class="neg" opacity="0.46"/>
+<text x="202.0" y="106.0" class="v" text-anchor="middle">-0.31</text>
+<text x="34" y="142.0" class="sm" text-anchor="end">0</text>
+<text x="130.0" y="42" class="sm" text-anchor="middle">0</text>
+<rect x="40" y="120" width="36" height="36" class="bg"/>
+<rect x="40" y="120" width="36" height="36" class="neg" opacity="0.19"/>
+<text x="58.0" y="142.0" class="v" text-anchor="middle">-0.09</text>
+<rect x="76" y="120" width="36" height="36" class="bg"/>
+<rect x="76" y="120" width="36" height="36" class="pos" opacity="0.13"/>
+<text x="94.0" y="142.0" class="v" text-anchor="middle">0.04</text>
+<rect x="112" y="120" width="36" height="36" class="bg"/>
+<rect x="112" y="120" width="36" height="36" class="pos" opacity="0.20"/>
+<text x="130.0" y="142.0" class="v" text-anchor="middle">0.10</text>
+<rect x="148" y="120" width="36" height="36" class="bg"/>
+<rect x="148" y="120" width="36" height="36" class="pos" opacity="0.13"/>
+<text x="166.0" y="142.0" class="v" text-anchor="middle">0.04</text>
+<rect x="184" y="120" width="36" height="36" class="bg"/>
+<rect x="184" y="120" width="36" height="36" class="neg" opacity="0.19"/>
+<text x="202.0" y="142.0" class="v" text-anchor="middle">-0.09</text>
+<text x="34" y="178.0" class="sm" text-anchor="end">1</text>
+<text x="166.0" y="42" class="sm" text-anchor="middle">1</text>
+<rect x="40" y="156" width="36" height="36" class="bg"/>
+<rect x="40" y="156" width="36" height="36" class="neg" opacity="0.46"/>
+<text x="58.0" y="178.0" class="v" text-anchor="middle">-0.31</text>
+<rect x="76" y="156" width="36" height="36" class="bg"/>
+<rect x="76" y="156" width="36" height="36" class="neg" opacity="0.30"/>
+<text x="94.0" y="178.0" class="v" text-anchor="middle">-0.18</text>
+<rect x="112" y="156" width="36" height="36" class="bg"/>
+<rect x="112" y="156" width="36" height="36" class="pos" opacity="0.13"/>
+<text x="130.0" y="178.0" class="v" text-anchor="middle">0.04</text>
+<rect x="148" y="156" width="36" height="36" class="bg"/>
+<rect x="148" y="156" width="36" height="36" class="pos" opacity="0.34"/>
+<text x="166.0" y="178.0" class="v" text-anchor="middle">0.21</text>
+<rect x="184" y="156" width="36" height="36" class="bg"/>
+<rect x="184" y="156" width="36" height="36" class="pos" opacity="0.38"/>
+<text x="202.0" y="178.0" class="v" text-anchor="middle">0.24</text>
+<text x="34" y="214.0" class="sm" text-anchor="end">2</text>
+<text x="202.0" y="42" class="sm" text-anchor="middle">2</text>
+<rect x="40" y="192" width="36" height="36" class="bg"/>
+<rect x="40" y="192" width="36" height="36" class="neg" opacity="0.51"/>
+<text x="58.0" y="214.0" class="v" text-anchor="middle">-0.35</text>
+<rect x="76" y="192" width="36" height="36" class="bg"/>
+<rect x="76" y="192" width="36" height="36" class="neg" opacity="0.46"/>
+<text x="94.0" y="214.0" class="v" text-anchor="middle">-0.31</text>
+<rect x="112" y="192" width="36" height="36" class="bg"/>
+<rect x="112" y="192" width="36" height="36" class="neg" opacity="0.19"/>
+<text x="130.0" y="214.0" class="v" text-anchor="middle">-0.09</text>
+<rect x="148" y="192" width="36" height="36" class="bg"/>
+<rect x="148" y="192" width="36" height="36" class="pos" opacity="0.38"/>
+<text x="166.0" y="214.0" class="v" text-anchor="middle">0.24</text>
+<rect x="184" y="192" width="36" height="36" class="bg"/>
+<rect x="184" y="192" width="36" height="36" class="pos" opacity="0.70"/>
+<text x="202.0" y="214.0" class="v" text-anchor="middle">0.51</text>
+<rect x="40" y="48" width="180" height="180" class="box"/>
+<text x="246" y="20" class="hd">L̃: unusually close in y?</text>
+<text x="270" y="70.0" class="sm" text-anchor="end">4</text>
+<text x="294.0" y="42" class="sm" text-anchor="middle">4</text>
+<rect x="276" y="48" width="36" height="36" class="bg"/>
+<rect x="276" y="48" width="36" height="36" class="pos" opacity="0.70"/>
+<text x="294.0" y="70.0" class="v" text-anchor="middle">0.32</text>
+<rect x="312" y="48" width="36" height="36" class="bg"/>
+<rect x="312" y="48" width="36" height="36" class="neg" opacity="0.42"/>
+<text x="330.0" y="70.0" class="v" text-anchor="middle">-0.18</text>
+<rect x="348" y="48" width="36" height="36" class="bg"/>
+<rect x="348" y="48" width="36" height="36" class="neg" opacity="0.63"/>
+<text x="366.0" y="70.0" class="v" text-anchor="middle">-0.29</text>
+<rect x="384" y="48" width="36" height="36" class="bg"/>
+<rect x="384" y="48" width="36" height="36" class="neg" opacity="0.42"/>
+<text x="402.0" y="70.0" class="v" text-anchor="middle">-0.18</text>
+<rect x="420" y="48" width="36" height="36" class="bg"/>
+<rect x="420" y="48" width="36" height="36" class="pos" opacity="0.70"/>
+<text x="438.0" y="70.0" class="v" text-anchor="middle">0.32</text>
+<text x="270" y="106.0" class="sm" text-anchor="end">1</text>
+<text x="330.0" y="42" class="sm" text-anchor="middle">1</text>
+<rect x="276" y="84" width="36" height="36" class="bg"/>
+<rect x="276" y="84" width="36" height="36" class="neg" opacity="0.42"/>
+<text x="294.0" y="106.0" class="v" text-anchor="middle">-0.18</text>
+<rect x="312" y="84" width="36" height="36" class="bg"/>
+<rect x="312" y="84" width="36" height="36" class="pos" opacity="0.29"/>
+<text x="330.0" y="106.0" class="v" text-anchor="middle">0.11</text>
+<rect x="348" y="84" width="36" height="36" class="bg"/>
+<rect x="348" y="84" width="36" height="36" class="pos" opacity="0.35"/>
+<text x="366.0" y="106.0" class="v" text-anchor="middle">0.14</text>
+<rect x="384" y="84" width="36" height="36" class="bg"/>
+<rect x="384" y="84" width="36" height="36" class="pos" opacity="0.29"/>
+<text x="402.0" y="106.0" class="v" text-anchor="middle">0.11</text>
+<rect x="420" y="84" width="36" height="36" class="bg"/>
+<rect x="420" y="84" width="36" height="36" class="neg" opacity="0.42"/>
+<text x="438.0" y="106.0" class="v" text-anchor="middle">-0.18</text>
+<text x="270" y="142.0" class="sm" text-anchor="end">0</text>
+<text x="366.0" y="42" class="sm" text-anchor="middle">0</text>
+<rect x="276" y="120" width="36" height="36" class="bg"/>
+<rect x="276" y="120" width="36" height="36" class="neg" opacity="0.63"/>
+<text x="294.0" y="142.0" class="v" text-anchor="middle">-0.29</text>
+<rect x="312" y="120" width="36" height="36" class="bg"/>
+<rect x="312" y="120" width="36" height="36" class="pos" opacity="0.35"/>
+<text x="330.0" y="142.0" class="v" text-anchor="middle">0.14</text>
+<rect x="348" y="120" width="36" height="36" class="bg"/>
+<rect x="348" y="120" width="36" height="36" class="pos" opacity="0.63"/>
+<text x="366.0" y="142.0" class="v" text-anchor="middle">0.29</text>
+<rect x="384" y="120" width="36" height="36" class="bg"/>
+<rect x="384" y="120" width="36" height="36" class="pos" opacity="0.35"/>
+<text x="402.0" y="142.0" class="v" text-anchor="middle">0.14</text>
+<rect x="420" y="120" width="36" height="36" class="bg"/>
+<rect x="420" y="120" width="36" height="36" class="neg" opacity="0.63"/>
+<text x="438.0" y="142.0" class="v" text-anchor="middle">-0.29</text>
+<text x="270" y="178.0" class="sm" text-anchor="end">1</text>
+<text x="402.0" y="42" class="sm" text-anchor="middle">1</text>
+<rect x="276" y="156" width="36" height="36" class="bg"/>
+<rect x="276" y="156" width="36" height="36" class="neg" opacity="0.42"/>
+<text x="294.0" y="178.0" class="v" text-anchor="middle">-0.18</text>
+<rect x="312" y="156" width="36" height="36" class="bg"/>
+<rect x="312" y="156" width="36" height="36" class="pos" opacity="0.29"/>
+<text x="330.0" y="178.0" class="v" text-anchor="middle">0.11</text>
+<rect x="348" y="156" width="36" height="36" class="bg"/>
+<rect x="348" y="156" width="36" height="36" class="pos" opacity="0.35"/>
+<text x="366.0" y="178.0" class="v" text-anchor="middle">0.14</text>
+<rect x="384" y="156" width="36" height="36" class="bg"/>
+<rect x="384" y="156" width="36" height="36" class="pos" opacity="0.29"/>
+<text x="402.0" y="178.0" class="v" text-anchor="middle">0.11</text>
+<rect x="420" y="156" width="36" height="36" class="bg"/>
+<rect x="420" y="156" width="36" height="36" class="neg" opacity="0.42"/>
+<text x="438.0" y="178.0" class="v" text-anchor="middle">-0.18</text>
+<text x="270" y="214.0" class="sm" text-anchor="end">4</text>
+<text x="438.0" y="42" class="sm" text-anchor="middle">4</text>
+<rect x="276" y="192" width="36" height="36" class="bg"/>
+<rect x="276" y="192" width="36" height="36" class="pos" opacity="0.70"/>
+<text x="294.0" y="214.0" class="v" text-anchor="middle">0.32</text>
+<rect x="312" y="192" width="36" height="36" class="bg"/>
+<rect x="312" y="192" width="36" height="36" class="neg" opacity="0.42"/>
+<text x="330.0" y="214.0" class="v" text-anchor="middle">-0.18</text>
+<rect x="348" y="192" width="36" height="36" class="bg"/>
+<rect x="348" y="192" width="36" height="36" class="neg" opacity="0.63"/>
+<text x="366.0" y="214.0" class="v" text-anchor="middle">-0.29</text>
+<rect x="384" y="192" width="36" height="36" class="bg"/>
+<rect x="384" y="192" width="36" height="36" class="neg" opacity="0.42"/>
+<text x="402.0" y="214.0" class="v" text-anchor="middle">-0.18</text>
+<rect x="420" y="192" width="36" height="36" class="bg"/>
+<rect x="420" y="192" width="36" height="36" class="pos" opacity="0.70"/>
+<text x="438.0" y="214.0" class="v" text-anchor="middle">0.32</text>
+<rect x="276" y="48" width="180" height="180" class="box"/>
+<text x="500" y="20" class="hd">K̃ ⊙ L̃: do they agree?</text>
+<text x="524" y="70.0" class="sm" text-anchor="end">-2, 4</text>
+<text x="548.0" y="42" class="sm" text-anchor="middle">-2</text>
+<rect x="530" y="48" width="36" height="36" class="bg"/>
+<rect x="530" y="48" width="36" height="36" class="pos" opacity="0.70"/>
+<text x="548.0" y="70.0" class="v" text-anchor="middle">0.16</text>
+<rect x="566" y="48" width="36" height="36" class="bg"/>
+<rect x="566" y="48" width="36" height="36" class="neg" opacity="0.24"/>
+<text x="584.0" y="70.0" class="v" text-anchor="middle">-0.04</text>
+<rect x="602" y="48" width="36" height="36" class="bg"/>
+<rect x="602" y="48" width="36" height="36" class="pos" opacity="0.17"/>
+<text x="620.0" y="70.0" class="v" text-anchor="middle">0.03</text>
+<rect x="638" y="48" width="36" height="36" class="bg"/>
+<rect x="638" y="48" width="36" height="36" class="pos" opacity="0.29"/>
+<text x="656.0" y="70.0" class="v" text-anchor="middle">0.06</text>
+<rect x="674" y="48" width="36" height="36" class="bg"/>
+<rect x="674" y="48" width="36" height="36" class="neg" opacity="0.51"/>
+<text x="692.0" y="70.0" class="v" text-anchor="middle">-0.11</text>
+<text x="524" y="106.0" class="sm" text-anchor="end">-1, 1</text>
+<text x="584.0" y="42" class="sm" text-anchor="middle">-1</text>
+<rect x="530" y="84" width="36" height="36" class="bg"/>
+<rect x="530" y="84" width="36" height="36" class="neg" opacity="0.24"/>
+<text x="548.0" y="106.0" class="v" text-anchor="middle">-0.04</text>
+<rect x="566" y="84" width="36" height="36" class="bg"/>
+<rect x="566" y="84" width="36" height="36" class="pos" opacity="0.17"/>
+<text x="584.0" y="106.0" class="v" text-anchor="middle">0.02</text>
+<rect x="602" y="84" width="36" height="36" class="bg"/>
+<rect x="602" y="84" width="36" height="36" class="pos" opacity="0.10"/>
+<text x="620.0" y="106.0" class="v" text-anchor="middle">0.01</text>
+<rect x="638" y="84" width="36" height="36" class="bg"/>
+<rect x="638" y="84" width="36" height="36" class="neg" opacity="0.15"/>
+<text x="656.0" y="106.0" class="v" text-anchor="middle">-0.02</text>
+<rect x="674" y="84" width="36" height="36" class="bg"/>
+<rect x="674" y="84" width="36" height="36" class="pos" opacity="0.29"/>
+<text x="692.0" y="106.0" class="v" text-anchor="middle">0.06</text>
+<text x="524" y="142.0" class="sm" text-anchor="end">0, 0</text>
+<text x="620.0" y="42" class="sm" text-anchor="middle">0</text>
+<rect x="530" y="120" width="36" height="36" class="bg"/>
+<rect x="530" y="120" width="36" height="36" class="pos" opacity="0.17"/>
+<text x="548.0" y="142.0" class="v" text-anchor="middle">0.03</text>
+<rect x="566" y="120" width="36" height="36" class="bg"/>
+<rect x="566" y="120" width="36" height="36" class="pos" opacity="0.10"/>
+<text x="584.0" y="142.0" class="v" text-anchor="middle">0.01</text>
+<rect x="602" y="120" width="36" height="36" class="bg"/>
+<rect x="602" y="120" width="36" height="36" class="pos" opacity="0.19"/>
+<text x="620.0" y="142.0" class="v" text-anchor="middle">0.03</text>
+<rect x="638" y="120" width="36" height="36" class="bg"/>
+<rect x="638" y="120" width="36" height="36" class="pos" opacity="0.10"/>
+<text x="656.0" y="142.0" class="v" text-anchor="middle">0.01</text>
+<rect x="674" y="120" width="36" height="36" class="bg"/>
+<rect x="674" y="120" width="36" height="36" class="pos" opacity="0.17"/>
+<text x="692.0" y="142.0" class="v" text-anchor="middle">0.03</text>
+<text x="524" y="178.0" class="sm" text-anchor="end">1, 1</text>
+<text x="656.0" y="42" class="sm" text-anchor="middle">1</text>
+<rect x="530" y="156" width="36" height="36" class="bg"/>
+<rect x="530" y="156" width="36" height="36" class="pos" opacity="0.29"/>
+<text x="548.0" y="178.0" class="v" text-anchor="middle">0.06</text>
+<rect x="566" y="156" width="36" height="36" class="bg"/>
+<rect x="566" y="156" width="36" height="36" class="neg" opacity="0.15"/>
+<text x="584.0" y="178.0" class="v" text-anchor="middle">-0.02</text>
+<rect x="602" y="156" width="36" height="36" class="bg"/>
+<rect x="602" y="156" width="36" height="36" class="pos" opacity="0.10"/>
+<text x="620.0" y="178.0" class="v" text-anchor="middle">0.01</text>
+<rect x="638" y="156" width="36" height="36" class="bg"/>
+<rect x="638" y="156" width="36" height="36" class="pos" opacity="0.17"/>
+<text x="656.0" y="178.0" class="v" text-anchor="middle">0.02</text>
+<rect x="674" y="156" width="36" height="36" class="bg"/>
+<rect x="674" y="156" width="36" height="36" class="neg" opacity="0.24"/>
+<text x="692.0" y="178.0" class="v" text-anchor="middle">-0.04</text>
+<text x="524" y="214.0" class="sm" text-anchor="end">2, 4</text>
+<text x="692.0" y="42" class="sm" text-anchor="middle">2</text>
+<rect x="530" y="192" width="36" height="36" class="bg"/>
+<rect x="530" y="192" width="36" height="36" class="neg" opacity="0.51"/>
+<text x="548.0" y="214.0" class="v" text-anchor="middle">-0.11</text>
+<rect x="566" y="192" width="36" height="36" class="bg"/>
+<rect x="566" y="192" width="36" height="36" class="pos" opacity="0.29"/>
+<text x="584.0" y="214.0" class="v" text-anchor="middle">0.06</text>
+<rect x="602" y="192" width="36" height="36" class="bg"/>
+<rect x="602" y="192" width="36" height="36" class="pos" opacity="0.17"/>
+<text x="620.0" y="214.0" class="v" text-anchor="middle">0.03</text>
+<rect x="638" y="192" width="36" height="36" class="bg"/>
+<rect x="638" y="192" width="36" height="36" class="neg" opacity="0.24"/>
+<text x="656.0" y="214.0" class="v" text-anchor="middle">-0.04</text>
+<rect x="674" y="192" width="36" height="36" class="bg"/>
+<rect x="674" y="192" width="36" height="36" class="pos" opacity="0.70"/>
+<text x="692.0" y="214.0" class="v" text-anchor="middle">0.16</text>
+<rect x="530" y="48" width="180" height="180" class="box"/>
+<text x="20" y="262" class="lab">Rows and columns are the five samples, labelled by their x or y value. Blue: above average, orange: below.</text>
+<text x="20" y="282" class="lab">Sum of all 25 products = 0.309, so HSIC = 0.309 / 25 = 0.0123. Yet the 120 shuffles of y average 0.0177: five points are not enough.</text>
+</svg>

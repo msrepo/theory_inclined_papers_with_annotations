@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HSIC, Hands On</title>
+<style>
+:root{
+  --bg:#fbfaf7; --surface:#ffffff; --ink:#1c1d21; --muted:#5b5f68; --line:#e2dfd8; --soft:#f2f0ea;
+  --col:#2f6fb5; --null:#c2571a; --proj:#0f7a5a; --c3:#7c3aed; --obs:#b42318; --radius:12px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#131417; --surface:#1b1d21; --ink:#ebebed; --muted:#a3a6ae; --line:#2e3138; --soft:#23262b;
+    --col:#7fb2e8; --null:#f0a070; --proj:#4cc79a; --c3:#b48cff; --obs:#ff7a6b;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#131417; --surface:#1b1d21; --ink:#ebebed; --muted:#a3a6ae; --line:#2e3138; --soft:#23262b;
+  --col:#7fb2e8; --null:#f0a070; --proj:#4cc79a; --c3:#b48cff; --obs:#ff7a6b;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,sans-serif;}
+main{max-width:900px;margin:0 auto;padding:40px 16px 80px}
+h1{font-size:2.1rem;line-height:1.2;margin:0 0 .4rem;letter-spacing:-.01em}
+h2{font-size:1.4rem;margin:3rem 0 .6rem;padding-top:.5rem;border-top:1px solid var(--line)}
+p{margin:.6rem 0}
+a{color:var(--col)}
+.lede{color:var(--muted);font-size:1.08rem;margin-bottom:1.4rem}
+nav.toc{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:12px 18px;font-size:.93rem}
+nav.toc ol{margin:.3rem 0;padding-left:1.2rem}
+nav.toc a{color:var(--ink);text-decoration:none;border-bottom:1px dotted var(--muted)}
+.widget{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:14px;margin:1rem 0 1.2rem}
+.controls{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;margin:.2rem 0 .6rem;font-size:.9rem}
+.controls label{display:flex;align-items:center;gap:6px;color:var(--muted)}
+button,select{font:inherit;font-size:.88rem;color:var(--ink);background:var(--soft);border:1px solid var(--line);border-radius:8px;padding:5px 11px;cursor:pointer}
+input[type=range]{accent-color:var(--col);width:120px}
+.readout{font-size:.9rem;color:var(--muted);margin-top:.5rem;font-variant-numeric:tabular-nums}
+.readout b{color:var(--ink)}
+.callout{border-left:3px solid var(--proj);background:var(--soft);padding:10px 14px;border-radius:0 8px 8px 0;margin:1rem 0;font-size:.95rem}
+canvas{display:block;width:100%;touch-action:none;border-radius:8px}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.pair .cap{font-size:.82rem;color:var(--muted);margin:0 0 4px}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:.82rem;color:var(--muted);margin-top:.4rem}
+.legend span::before{content:"";display:inline-block;width:14px;height:3px;margin-right:6px;vertical-align:3px;background:var(--c)}
+.kbd{font-family:ui-monospace,Menlo,monospace;font-size:.85em;background:var(--soft);padding:1px 5px;border-radius:4px}
+@media (max-width:640px){ h1{font-size:1.7rem} .pair{grid-template-columns:1fr} input[type=range]{width:96px} }
+select:disabled,input:disabled{opacity:.45;cursor:default}
+.hint{font-size:.82rem;color:var(--muted);margin:.3rem 0 0}
+</style>
+</head>
+<body>
+<main>
+
+<h1>HSIC, Hands On</h1>
+<p class="lede"><a href="../index.html">← text notes</a> · Foundations › Linear algebra. Five widgets for the Hilbert–Schmidt independence criterion: where correlation fails, why more features help, HSIC as agreement between two Gram matrices, the permutation test and its bandwidth, and CKA for comparing representations.</p>
+
+<nav class="toc"><b>Contents</b>
+<ol>
+  <li><a href="#s1">Correlation misses it, HSIC does not</a></li>
+  <li><a href="#s2">More features, more chances</a></li>
+  <li><a href="#s3">Two similarity tables, and whether they agree</a></li>
+  <li><a href="#s4">The shuffle test, and the bandwidth</a></li>
+  <li><a href="#s5">CKA: comparing two representations</a></li>
+</ol></nav>
+
+<!-- ============================================================ -->
+<h2 id="s1">1. Correlation misses it, HSIC does not</h2>
+<p>Pick a data set. Two tests look for dependence between x and y. The first uses a <b>linear kernel</b>, which is exactly the same test as Pearson correlation: it only sees straight-line trends. The second uses a <b>Gaussian kernel</b>, which sees any dependence given enough points. Both are judged the same way: shuffle y 499 times, and ask how often a shuffle scores as high as the real data. That fraction is the p-value.</p>
+<p>A longer bar means stronger evidence. Past the dashed line means p &lt; 0.05. Choose <b>your own points</b> to click in any shape you like.</p>
+
+<div class="widget">
+  <div class="controls">
+    <label>data <select id="w1Kind">
+      <option value="line">line</option>
+      <option value="parabola" selected>parabola</option>
+      <option value="circle">circle</option>
+      <option value="funnel">funnel (spread depends on x)</option>
+      <option value="sine">sine wave</option>
+      <option value="xshape">X shape</option>
+      <option value="checker">checkerboard (5 × 5)</option>
+      <option value="independent">independent</option>
+      <option value="own">your own points (click)</option>
+    </select></label>
+    <label>n <input id="w1N" type="range" min="10" max="250" step="1" value="150"></label>
+    <label>noise <input id="w1Noise" type="range" min="0" max="2" step="0.05" value="1"></label>
+    <button id="w1New">New sample</button>
+    <button id="w1Clear" hidden>Clear points</button>
+  </div>
+  <div class="pair">
+    <div><p class="cap" id="w1Cap">the data</p><canvas id="w1Pts" height="320"></canvas></div>
+    <div><p class="cap">evidence of dependence (bar length: −log₁₀ p)</p><canvas id="w1Bars" height="320"></canvas></div>
+  </div>
+  <div class="readout" id="w1Read"></div>
+</div>
+<div class="callout">Things to try. Parabola, circle, funnel, X shape: correlation is near 0 and the linear bar stays short, while the Gaussian bar passes the line. Slide <b>n</b> down to 10–15 and press <b>New sample</b> a few times: the Gaussian test now misses about half the time or more. Dependence you can see by eye can still be too little evidence. <b>Checkerboard</b>: neither test finds it, because the median bandwidth is wider than a square (section 4 fixes that). <b>Independent</b>: both bars stay short, and about one sample in twenty will cross the line by chance. That is what p &lt; 0.05 means.</div>
+
+<!-- ============================================================ -->
+<h2 id="s2">2. More features, more chances</h2>
+<p>If x and y are independent, then <i>no</i> feature of x is correlated with <i>any</i> feature of y. So give each variable several features, here its powers x, x², …, and look at every correlation between a feature of x and a feature of y. Degree 1 is plain correlation, a single cell. Raise the degree and new cells appear. Each kind of dependence lights up its own cell.</p>
+<p>HSIC with a polynomial kernel adds up the squares of this table. The Gaussian kernel does the same with every power at once (§3 of the notes).</p>
+
+<div class="widget">
+  <div class="controls">
+    <label>data <select id="w2Kind">
+      <option value="line">line</option>
+      <option value="parabola" selected>parabola</option>
+      <option value="circle">circle</option>
+      <option value="funnel">funnel</option>
+      <option value="sine">sine wave</option>
+      <option value="independent">independent</option>
+    </select></label>
+    <label>highest power <input id="w2Deg" type="range" min="1" max="4" step="1" value="2"></label>
+    <button id="w2New">New sample</button>
+  </div>
+  <div class="pair">
+    <div><p class="cap">the data (n = 300)</p><canvas id="w2Pts" height="300"></canvas></div>
+    <div><p class="cap">correlation of each feature of x with each feature of y</p><canvas id="w2Mat" height="300"></canvas></div>
+  </div>
+  <div class="readout" id="w2Read"></div>
+</div>
+<div class="callout">Parabola: nothing at degree 1, then x² against y lights up at degree 2. Circle: x² against y², negative, because x² + y² ≈ 1. Sine wave: the powers up to 4 never catch it well, because a wiggle needs higher powers. That is the case for a kernel with <i>all</i> the powers in it. One thing to notice: the sum of squares grows with the degree even for the plain line. The features x and x³ are nearly the same curve, so the one straight-line dependence gets counted several times. That is why a raw HSIC value only means something next to its shuffles.</div>
+
+<!-- ============================================================ -->
+<h2 id="s3">3. Two similarity tables, and whether they agree</h2>
+<p>Forty points, sorted by x. <b>K̃</b> says how much more alike each pair of samples is in x than a typical pair: blue for more alike, orange for less. <b>L̃</b> says the same for y. The right-hand table multiplies them cell by cell: blue where x and y <i>agree</i> about a pair, orange where they disagree. <b>HSIC is the average of that last table.</b></p>
+<p>Hover over any table to see which pair a cell is. Then press <b>Shuffle y</b>. The x-table does not change, but the y-table is scrambled, the agreement table turns to noise, and its average drops.</p>
+
+<div class="widget">
+  <div class="controls">
+    <label>data <select id="w3Kind">
+      <option value="line">line</option>
+      <option value="parabola" selected>parabola</option>
+      <option value="circle">circle</option>
+      <option value="funnel">funnel</option>
+      <option value="independent">independent</option>
+    </select></label>
+    <button id="w3Shuf">Shuffle y</button>
+    <button id="w3Rest">Restore pairing</button>
+    <button id="w3New">New sample</button>
+  </div>
+  <div class="pair">
+    <div><p class="cap">the data (hovered pair joined)</p><canvas id="w3Pts" height="290"></canvas></div>
+    <div><p class="cap">K̃: alike in x?</p><canvas id="w3K" height="290"></canvas></div>
+  </div>
+  <div class="pair" style="margin-top:10px">
+    <div><p class="cap">L̃: alike in y?</p><canvas id="w3L" height="290"></canvas></div>
+    <div><p class="cap">K̃ ⊙ L̃: do they agree? (HSIC = its average)</p><canvas id="w3P" height="290"></canvas></div>
+  </div>
+  <div class="readout" id="w3Read"></div>
+</div>
+<div class="callout">For the parabola, look at the anti-diagonal of L̃: points at x and −x have the same y, so y calls them alike while x calls them far apart. Those cells are orange in the agreement table. The fold makes some pairs disagree, and HSIC comes out positive only because the neighbouring pairs near the diagonal agree more.</div>
+
+<!-- ============================================================ -->
+<h2 id="s4">4. The shuffle test, and the bandwidth</h2>
+<p>The left chart is the test itself. Grey is HSIC for 400 shuffles of y (the "independent world" built from your own data), and red is the real data. The right chart repeats the test at every bandwidth σ, from a thousandth of the median distance to a thousand times it. Its height says how many shuffle standard deviations the real data sit above the shuffle average.</p>
+<p>The checkerboard starts at the median bandwidth, where the test sees nothing. Drag σ to the left. Then try the parabola, whose curve peaks near the median, and notice that far to the right every curve settles on the dashed line: the linear kernel's answer.</p>
+
+<div class="widget">
+  <div class="controls">
+    <label>data <select id="w4Kind">
+      <option value="checker" selected>checkerboard (5 × 5)</option>
+      <option value="parabola">parabola</option>
+      <option value="circle">circle</option>
+      <option value="funnel">funnel</option>
+      <option value="sine">sine wave</option>
+      <option value="line">line</option>
+      <option value="independent">independent</option>
+    </select></label>
+    <label>σ <input id="w4Sig" type="range" min="-3" max="3" step="0.05" value="0"></label>
+    <button id="w4Med">σ = median</button>
+    <button id="w4New">New sample</button>
+  </div>
+  <div class="pair">
+    <div><p class="cap">HSIC under 400 shuffles (grey) and for the real data (red)</p><canvas id="w4Hist" height="300"></canvas></div>
+    <div><p class="cap">evidence at every bandwidth (n = 150)</p><canvas id="w4Curve" height="300"></canvas></div>
+  </div>
+  <div class="legend">
+    <span style="--c:var(--c3)">Gaussian kernel at bandwidth σ</span>
+    <span style="--c:var(--muted)">linear kernel (dashed)</span>
+    <span style="--c:var(--ink)">current σ</span>
+  </div>
+  <div class="readout" id="w4Read"></div>
+</div>
+<div class="callout">Far left, every point is similar only to itself, so every shuffle gives the same HSIC and the grey histogram collapses to a spike. Far right, the Gaussian kernel behaves like the linear one and goes blind to anything that is not a straight line. The median heuristic is a guess at the middle, and the checkerboard shows it can guess wrong.</div>
+
+<!-- ============================================================ -->
+<h2 id="s5">5. CKA: comparing two representations</h2>
+<p>Think of the left cloud as one network's embeddings of 90 inputs and the right cloud as another network's embeddings of the <i>same</i> inputs (colours mark which is which). <b>CKA</b> is HSIC normalised to lie between 0 and 1. It is the cosine of the angle between the two centred Gram matrices. Transform the right-hand representation and see what CKA ignores and what it notices.</p>
+
+<div class="widget">
+  <div class="controls">
+    <label>rotate <input id="w5Rot" type="range" min="-180" max="180" step="1" value="0"></label>
+    <label>scale <input id="w5Scale" type="range" min="-0.6" max="0.4" step="0.01" value="0"></label>
+    <label>squash one axis <input id="w5Str" type="range" min="0" max="0.97" step="0.01" value="0"></label>
+    <label>warp <input id="w5Warp" type="range" min="0" max="1" step="0.01" value="0"></label>
+    <label>noise <input id="w5Noise" type="range" min="0" max="1.5" step="0.01" value="0"></label>
+    <label><input id="w5Shuf" type="checkbox"> shuffle which point is which</label>
+    <button id="w5Reset">↻ Reset</button>
+  </div>
+  <div class="pair">
+    <div><p class="cap">representation X</p><canvas id="w5X" height="300"></canvas></div>
+    <div><p class="cap">representation Y (transformed)</p><canvas id="w5Y" height="300"></canvas></div>
+  </div>
+  <div class="readout" id="w5Read"></div>
+</div>
+<div class="callout">Rotate and scale as much as you like: both CKAs stay at 1, because Gram matrices do not see orientation and the normalisation removes scale. Squashing an axis lowers linear CKA only as far as that axis carried variance. Warping and noise lower both. Shuffling which point is which sends both near 0: CKA compares the <i>same inputs</i> across two representations, so the pairing is everything.</div>
+
+</main>
+<script>
+(() => {
+// ------------------------------------------------------------ utilities
+const $ = id => document.getElementById(id);
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+function mulberry(seed){ return () => { seed|=0; seed=seed+0x6D2B79F5|0; let t=Math.imul(seed^seed>>>15,1|seed); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+function gauss(r){ let u=0,v=0; while(u===0) u=r(); v=r(); return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v); }
+function setupCanvas(cv){
+  if (!cv.dataset.h) cv.dataset.h = cv.getAttribute('height');
+  const dpr = window.devicePixelRatio||1, w = cv.clientWidth, h = +cv.dataset.h;
+  cv.style.height = h+'px'; cv.width = Math.round(w*dpr); cv.height = Math.round(h*dpr);
+  const ctx = cv.getContext('2d'); ctx.setTransform(dpr,0,0,dpr,0,0); return {ctx,w,h};
+}
+const redrawers = [];
+window.addEventListener('resize', () => redrawers.forEach(f => f()));
+if (window.matchMedia) matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change', () => redrawers.forEach(f => f()));
+const fx = (v, d=2) => (Math.abs(v) < 0.5*Math.pow(10,-d) ? 0 : v).toFixed(d);
+const fmtP = p => p < 0.01 ? p.toFixed(3) : p.toFixed(2);
+const _rgb = new Map();
+function rgb(col){
+  if (_rgb.has(col)) return _rgb.get(col);
+  const c = document.createElement('canvas').getContext('2d'); c.fillStyle = col; const h = c.fillStyle;
+  const v = h[0]==='#' ? [1,3,5].map(k => parseInt(h.slice(k,k+2),16)) : h.match(/[\d.]+/g).slice(0,3).map(Number);
+  _rgb.set(col, v); return v;
+}
+const rgba = (col, a) => { const [r,g,b] = rgb(col); return `rgba(${r},${g},${b},${a})`; };
+function disc(ctx, x, y, r, col, ring=null){
+  ctx.fillStyle=col; ctx.beginPath(); ctx.arc(x,y,r,0,7); ctx.fill();
+  if (ring){ ctx.strokeStyle=ring; ctx.lineWidth=1.5; ctx.stroke(); }
+}
+// axis-aligned box fitted to the data (unequal aspect is fine for scatter plots)
+function boxFrame(w, h, xs, ys, pad=14){
+  let x0=Math.min(...xs), x1=Math.max(...xs), y0=Math.min(...ys), y1=Math.max(...ys);
+  if (x1-x0 < 1e-9){ x0-=1; x1+=1; } if (y1-y0 < 1e-9){ y0-=1; y1+=1; }
+  const mx=(x1-x0)*0.06, my=(y1-y0)*0.06; x0-=mx; x1+=mx; y0-=my; y1+=my;
+  return { X: v => pad+(v-x0)/(x1-x0)*(w-2*pad), Y: v => h-pad-(v-y0)/(y1-y0)*(h-2*pad),
+           ix: px => x0+(px-pad)/(w-2*pad)*(x1-x0), iy: py => y0+(h-pad-py)/(h-2*pad)*(y1-y0) };
+}
+function fixedFrame(w, h, half){
+  const s = Math.min(w, h)/(2*half);
+  return { s, X: x => w/2 + x*s, Y: y => h/2 - y*s, ix: px => (px-w/2)/s, iy: py => -(py-h/2)/s };
+}
+function axesBox(ctx, w, h){ ctx.strokeStyle=css('--line'); ctx.lineWidth=1; ctx.strokeRect(0.5,0.5,w-1,h-1); }
+
+// ------------------------------------------------------------ data
+function gen(kind, n, nz, r){
+  const P = [];
+  while (P.length < n){
+    let x = 2*r()-1, y;
+    switch (kind){
+      case 'line': y = x + 0.4*nz*gauss(r); break;
+      case 'parabola': y = x*x + 0.1*nz*gauss(r); break;
+      case 'circle': { const t = 2*Math.PI*r(); x = Math.cos(t) + 0.08*nz*gauss(r); y = Math.sin(t) + 0.08*nz*gauss(r); break; }
+      case 'funnel': y = x*gauss(r) + 0.05*nz*gauss(r); break;
+      case 'sine': y = Math.sin(3*Math.PI*x) + 0.3*nz*gauss(r); break;
+      case 'xshape': y = (r()<0.5 ? 1 : -1)*x + 0.08*nz*gauss(r); break;
+      case 'checker': {
+        y = 2*r()-1;
+        const i = Math.min(4, Math.floor((x+1)*2.5)), j = Math.min(4, Math.floor((y+1)*2.5));
+        if ((i+j)%2 !== 0 && r() > 0.08*nz) continue;   // keep dark squares, plus a few strays
+        break;
+      }
+      default: y = 2*r()-1;
+    }
+    P.push([x, y]);
+  }
+  return P;
+}
+function pearson(x, y){
+  const n=x.length, mx=x.reduce((a,b)=>a+b,0)/n, my=y.reduce((a,b)=>a+b,0)/n;
+  let sxy=0, sxx=0, syy=0;
+  for (let i=0;i<n;i++){ const a=x[i]-mx, b=y[i]-my; sxy+=a*b; sxx+=a*a; syy+=b*b; }
+  return sxx>0 && syy>0 ? sxy/Math.sqrt(sxx*syy) : 0;
+}
+function medianDist(v){  // v: array of numbers or of [a, b] points
+  const n=v.length, d=[];
+  for (let i=0;i<n;i++) for (let j=i+1;j<n;j++) d.push(dist(v[i], v[j]));
+  d.sort((a,b)=>a-b);
+  const m = d.length>>1;
+  return Math.max(1e-6, d.length%2 ? d[m] : 0.5*(d[m-1]+d[m]));
+}
+const dist = (a, b) => typeof a === 'number' ? Math.abs(a-b) : Math.hypot(a[0]-b[0], a[1]-b[1]);
+const dot = (a, b) => typeof a === 'number' ? a*b : a[0]*b[0]+a[1]*b[1];
+// centred Gram matrix, flat n*n. sigma = 0 means the linear kernel.
+function centredGram(v, sigma){
+  const n=v.length, K=new Float64Array(n*n), inv = sigma>0 ? 1/(2*sigma*sigma) : 0;
+  for (let i=0;i<n;i++) for (let j=i;j<n;j++){
+    const k = sigma>0 ? Math.exp(-inv*dist(v[i],v[j])**2) : dot(v[i],v[j]);
+    K[i*n+j]=k; K[j*n+i]=k;
+  }
+  const rm = new Float64Array(n); let g=0;
+  for (let i=0;i<n;i++){ let s=0; for (let j=0;j<n;j++) s+=K[i*n+j]; rm[i]=s/n; g+=s; }
+  g/=n*n;
+  for (let i=0;i<n;i++) for (let j=0;j<n;j++) K[i*n+j] -= rm[i]+rm[j]-g;
+  return K;
+}
+function hsicOf(Kc, Lc, n, perm){
+  let s=0;
+  if (!perm){ for (let t=0;t<n*n;t++) s+=Kc[t]*Lc[t]; }
+  else for (let i=0;i<n;i++){ const ki=i*n, pi=perm[i]*n; for (let j=0;j<n;j++) s+=Kc[ki+j]*Lc[pi+perm[j]]; }
+  return s/(n*n);
+}
+function shuffled(n, r){ const p=Int32Array.from({length:n},(_,i)=>i); for (let i=n-1;i>0;i--){ const j=Math.floor(r()*(i+1)); const t=p[i]; p[i]=p[j]; p[j]=t; } return p; }
+function permTest(Kc, Lc, n, B, r){
+  const obs = hsicOf(Kc, Lc, n), nul = new Float64Array(B);
+  let ge=0, m=0;
+  for (let b=0;b<B;b++){ nul[b]=hsicOf(Kc, Lc, n, shuffled(n, r)); if (nul[b] >= obs-1e-9*Math.abs(obs)) ge++; m+=nul[b]; }
+  m/=B; let v=0; for (let b=0;b<B;b++) v+=(nul[b]-m)**2;
+  const sd=Math.sqrt(v/B), z = sd > 1e-9*Math.max(1e-300, Math.abs(m)) ? (obs-m)/sd : 0;
+  return { obs, nul, p:(1+ge)/(1+B), mean:m, sd, z };
+}
+function debounce(f, ms=40){ let t=null; return () => { clearTimeout(t); t=setTimeout(f, ms); }; }
+// heatmap of an n x n table given as get(i, j); diverging blue / orange
+function heat(ctx, get, n, x0, y0, size, vmax, hov=null){
+  const c = size/n, pos=css('--col'), neg=css('--null');
+  ctx.fillStyle=css('--soft'); ctx.fillRect(x0,y0,size,size);
+  for (let i=0;i<n;i++) for (let j=0;j<n;j++){
+    const v=get(i,j), a=Math.min(1, Math.abs(v)/vmax);
+    ctx.fillStyle=rgba(v>=0?pos:neg, 0.06+0.84*a);
+    ctx.fillRect(x0+j*c, y0+i*c, Math.ceil(c), Math.ceil(c));
+  }
+  ctx.strokeStyle=css('--line'); ctx.lineWidth=1; ctx.strokeRect(x0,y0,size,size);
+  if (hov){ ctx.strokeStyle=css('--ink'); ctx.lineWidth=1.5; ctx.strokeRect(x0+hov[1]*c-1, y0+hov[0]*c-1, c+2, c+2);
+            ctx.strokeRect(x0+hov[0]*c-1, y0+hov[1]*c-1, c+2, c+2); }
+}
+
+// ============================================================ widget 1: correlation vs HSIC
+(() => {
+  const kind=$('w1Kind'), nIn=$('w1N'), nzIn=$('w1Noise'), cvP=$('w1Pts'), cvB=$('w1Bars'), rd=$('w1Read'), clr=$('w1Clear'), cap=$('w1Cap');
+  let seed=1, pts=[], own=[], res=null, fr=null;
+  const OWN_HALF=1.5;
+  function sample(){ pts = kind.value==='own' ? own : gen(kind.value, +nIn.value, +nzIn.value, mulberry(seed)); }
+  function compute(){
+    res=null;
+    if (pts.length >= 5){
+      const x=pts.map(p=>p[0]), y=pts.map(p=>p[1]), n=x.length, r=mulberry(7);
+      const lin=permTest(centredGram(x,0), centredGram(y,0), n, 499, r);
+      const sx=medianDist(x), sy=medianDist(y);
+      const gau=permTest(centredGram(x,sx), centredGram(y,sy), n, 499, r);
+      res={ r:pearson(x,y), lin, gau, sx, sy, n };
+    }
+    draw();
+  }
+  function bar(ctx, w, y, label, sub, p){
+    const left=14, bw=w-28, L=Math.log10(500), bh=18, by=y+30;
+    ctx.textAlign='left'; ctx.textBaseline='alphabetic';
+    ctx.fillStyle=css('--ink'); ctx.font='600 13px system-ui'; ctx.fillText(label, left, y);
+    ctx.fillStyle=css('--muted'); ctx.font='12px system-ui'; ctx.fillText(sub, left, y+18);
+    ctx.fillStyle=css('--soft'); ctx.fillRect(left, by, bw, bh);
+    if (p != null){
+      ctx.fillStyle = p < 0.05 ? css('--proj') : css('--muted');
+      ctx.fillRect(left, by, bw*Math.min(1, -Math.log10(p)/L), bh);
+    }
+    const tx = left + bw*(-Math.log10(0.05)/L);
+    ctx.strokeStyle=css('--ink'); ctx.lineWidth=1; ctx.setLineDash([4,3]);
+    ctx.beginPath(); ctx.moveTo(tx, by-5); ctx.lineTo(tx, by+bh+5); ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillStyle=css('--muted'); ctx.font='11px system-ui'; ctx.textAlign='center'; ctx.fillText('p = 0.05', tx, by+bh+16);
+    ctx.textAlign='left'; ctx.font='13px system-ui'; ctx.fillStyle = p!=null && p < 0.05 ? css('--proj') : css('--ink');
+    ctx.fillText(p==null ? '' : (p <= 0.002+1e-12 ? 'p = 0.002 (the smallest 499 shuffles allow)' : 'p = '+fmtP(p)), left, by+bh+36);
+  }
+  function draw(){
+    const own_ = kind.value==='own';
+    const {ctx,w,h} = setupCanvas(cvP); ctx.clearRect(0,0,w,h); axesBox(ctx,w,h);
+    fr = own_ ? fixedFrame(w,h,OWN_HALF) : (pts.length ? boxFrame(w,h,pts.map(p=>p[0]),pts.map(p=>p[1])) : fixedFrame(w,h,1.5));
+    if (own_){
+      ctx.strokeStyle=css('--line'); ctx.lineWidth=0.8; ctx.beginPath();
+      ctx.moveTo(fr.X(0),0); ctx.lineTo(fr.X(0),h); ctx.moveTo(0,fr.Y(0)); ctx.lineTo(w,fr.Y(0)); ctx.stroke();
+      if (pts.length < 5){ ctx.fillStyle=css('--muted'); ctx.font='14px system-ui'; ctx.textAlign='center';
+        ctx.fillText(pts.length ? `${5-pts.length} more point${pts.length===4?'':'s'} to start testing` : 'click to add points', w/2, 28); }
+    }
+    const col = rgba(css('--col'), 0.6);
+    for (const p of pts) disc(ctx, fr.X(p[0]), fr.Y(p[1]), own_ ? 4 : 2.6, col);
+    cap.textContent = own_ ? `your points (n = ${pts.length}); click to add more` : `the data (n = ${pts.length})`;
+    const b = setupCanvas(cvB), c2=b.ctx; c2.clearRect(0,0,b.w,b.h);
+    if (res){
+      bar(c2, b.w, 34, 'linear kernel (the same test as Pearson r)', `Pearson r = ${fx(res.r,3)} · HSIC = ${res.lin.obs.toPrecision(3)}`, res.lin.p);
+      bar(c2, b.w, 170, 'Gaussian kernel (median bandwidth)', `HSIC = ${res.gau.obs.toPrecision(3)} · shuffle average ${res.gau.mean.toPrecision(3)}`, res.gau.p);
+      const verdict = res.gau.p < 0.05 && res.lin.p >= 0.05 ? 'Only the Gaussian kernel finds the dependence.'
+        : res.gau.p < 0.05 ? 'Both tests find dependence.' : res.lin.p < 0.05 ? 'Only the linear test fires (rare: a straight-line trend the Gaussian test at this bandwidth misses).'
+        : 'Neither test finds evidence of dependence.';
+      rd.innerHTML = `<b>${verdict}</b> Gaussian bandwidths (median distances): σ<sub>x</sub> = ${fx(res.sx,3)}, σ<sub>y</sub> = ${fx(res.sy,3)}.`;
+    } else {
+      bar(c2, b.w, 34, 'linear kernel (the same test as Pearson r)', 'needs at least 5 points', null);
+      bar(c2, b.w, 170, 'Gaussian kernel (median bandwidth)', 'needs at least 5 points', null);
+      rd.innerHTML = 'Add points to run the tests.';
+    }
+  }
+  const later = debounce(() => { sample(); compute(); });
+  cvP.addEventListener('pointerdown', e => {
+    if (kind.value!=='own' || !fr) return;
+    const r=cvP.getBoundingClientRect(), x=fr.ix(e.clientX-r.left), y=fr.iy(e.clientY-r.top);
+    if (Math.abs(x) > OWN_HALF*1.6 || Math.abs(y) > OWN_HALF*1.6) return;
+    own.push([x, y]); pts=own; compute();
+  });
+  kind.addEventListener('change', () => { const o = kind.value==='own'; clr.hidden=!o; $('w1New').hidden=o; nIn.disabled=o; nzIn.disabled=o; later(); });
+  nIn.addEventListener('input', later); nzIn.addEventListener('input', later);
+  $('w1New').onclick = () => { seed++; later(); };
+  clr.onclick = () => { own=[]; pts=own; compute(); };
+  redrawers.push(draw); sample(); compute();
+})();
+
+// ============================================================ widget 2: polynomial features
+(() => {
+  const kind=$('w2Kind'), deg=$('w2Deg'), cvP=$('w2Pts'), cvM=$('w2Mat'), rd=$('w2Read');
+  const SUP=['', '', '²', '³', '⁴'];
+  let seed=3, pts=[];
+  const sample = () => { pts = gen(kind.value, 300, 1, mulberry(seed)); };
+  function draw(){
+    const D=+deg.value, x=pts.map(p=>p[0]), y=pts.map(p=>p[1]);
+    const R=[]; for (let a=1;a<=D;a++){ const row=[]; for (let b=1;b<=D;b++) row.push(pearson(x.map(v=>v**a), y.map(v=>v**b))); R.push(row); }
+    const {ctx,w,h}=setupCanvas(cvP); ctx.clearRect(0,0,w,h); axesBox(ctx,w,h);
+    const f=boxFrame(w,h,x,y), col=rgba(css('--col'),0.55);
+    for (const p of pts) disc(ctx, f.X(p[0]), f.Y(p[1]), 2.2, col);
+    const m=setupCanvas(cvM), c2=m.ctx; c2.clearRect(0,0,m.w,m.h);
+    const size=Math.min(m.w-60, m.h-50), x0=(m.w-size)/2+14, y0=30, c=size/D;
+    heat(c2, (i,j)=>R[i][j], D, x0, y0, size, 1);
+    c2.font=`${Math.max(11,Math.min(16,c/4.5))}px system-ui`; c2.textAlign='center'; c2.textBaseline='middle';
+    let best=[0,0], S=0;
+    for (let i=0;i<D;i++) for (let j=0;j<D;j++){
+      S+=R[i][j]**2; if (Math.abs(R[i][j])>Math.abs(R[best[0]][best[1]])) best=[i,j];
+      c2.fillStyle=css('--ink'); c2.fillText(fx(R[i][j],2), x0+j*c+c/2, y0+i*c+c/2);
+    }
+    c2.font='13px system-ui';
+    for (let i=0;i<D;i++){
+      c2.fillStyle=css('--muted'); c2.textAlign='right'; c2.fillText('x'+SUP[i+1], x0-8, y0+i*c+c/2);
+      c2.textAlign='center'; c2.fillText('y'+SUP[i+1], x0+i*c+c/2, y0-12);
+    }
+    const [bi,bj]=best;
+    rd.innerHTML = `sum of squared correlations <b>${fx(S,3)}</b> (degree 1 alone, Pearson r² = <b>${fx(R[0][0]**2,3)}</b>) · largest cell: <b>x${SUP[bi+1]} with y${SUP[bj+1]}</b>, ${fx(R[bi][bj],2)}`
+      + (kind.value==='independent' ? ' · for independent data every cell is sampling noise; at n = 300 a few cells reach ±0.15 by chance' : '');
+  }
+  kind.addEventListener('change', () => { sample(); draw(); });
+  deg.addEventListener('input', draw);
+  $('w2New').onclick = () => { seed++; sample(); draw(); };
+  redrawers.push(draw); sample(); draw();
+})();
+
+// ============================================================ widget 3: agreement of two Gram matrices
+(() => {
+  const kind=$('w3Kind'), cvP=$('w3Pts'), cvK=$('w3K'), cvL=$('w3L'), cvA=$('w3P'), rd=$('w3Read');
+  const n=40;
+  let seed=5, pts=[], Kc=null, Lc=null, perm=null, hov=null, nullMean=0, geo={};
+  function sample(){
+    pts = gen(kind.value, n, 1, mulberry(seed)).sort((a,b)=>a[0]-b[0]);
+    const x=pts.map(p=>p[0]), y=pts.map(p=>p[1]);
+    Kc=centredGram(x, medianDist(x)); Lc=centredGram(y, medianDist(y));
+    perm=Int32Array.from({length:n},(_,i)=>i);
+    const r=mulberry(11); let s=0; for (let b=0;b<300;b++) s+=hsicOf(Kc,Lc,n,shuffled(n,r)); nullMean=s/300;
+  }
+  const Lp = (i,j) => Lc[perm[i]*n+perm[j]];
+  function panel(cv, get, vmax, title){
+    const {ctx,w,h}=setupCanvas(cv); ctx.clearRect(0,0,w,h);
+    const size=Math.min(w-10, h-10), x0=(w-size)/2, y0=(h-size)/2;
+    heat(ctx, get, n, x0, y0, size, vmax, hov);
+    geo[cv.id]={x0,y0,size};
+  }
+  function draw(){
+    const {ctx,w,h}=setupCanvas(cvP); ctx.clearRect(0,0,w,h); axesBox(ctx,w,h);
+    const Q=pts.map((p,i)=>[p[0], pts[perm[i]][1]]);
+    const f=boxFrame(w,h,pts.map(p=>p[0]),pts.map(p=>p[1]));
+    if (hov){
+      const [i,j]=hov;
+      ctx.strokeStyle=css('--ink'); ctx.lineWidth=1.5; ctx.setLineDash([4,3]);
+      ctx.beginPath(); ctx.moveTo(f.X(Q[i][0]),f.Y(Q[i][1])); ctx.lineTo(f.X(Q[j][0]),f.Y(Q[j][1])); ctx.stroke(); ctx.setLineDash([]);
+    }
+    Q.forEach((q,i)=>{ const on = hov && (i===hov[0] || i===hov[1]);
+      disc(ctx, f.X(q[0]), f.Y(q[1]), on?6:3.2, on?css('--ink'):rgba(css('--col'),0.7), on?css('--surface'):null); });
+    let mk=0, ml=0, mp=0;
+    for (let t=0;t<n*n;t++){ mk=Math.max(mk,Math.abs(Kc[t])); ml=Math.max(ml,Math.abs(Lc[t])); }
+    for (let i=0;i<n;i++) for (let j=0;j<n;j++) mp=Math.max(mp, Math.abs(Kc[i*n+j]*Lp(i,j)));
+    panel(cvK, (i,j)=>Kc[i*n+j], mk);
+    panel(cvL, Lp, ml);
+    panel(cvA, (i,j)=>Kc[i*n+j]*Lp(i,j), mp);
+    const H=hsicOf(Kc,Lc,n,perm), real=hsicOf(Kc,Lc,n);
+    const shuf = perm.some((v,i)=>v!==i);
+    let s = `HSIC = average of the agreement table = <b>${H.toPrecision(3)}</b>` +
+      (shuf ? ` (real pairing: ${real.toPrecision(3)})` : '') + ` · average over 300 shuffles: <b>${nullMean.toPrecision(3)}</b>`;
+    if (hov){ const [i,j]=hov, a=Kc[i*n+j], b=Lp(i,j);
+      s = `pair (${i+1}, ${j+1}): x = ${fx(Q[i][0])}, ${fx(Q[j][0])}; y = ${fx(Q[i][1])}, ${fx(Q[j][1])} · K̃ = <b>${fx(a,3)}</b>, L̃ = <b>${fx(b,3)}</b>, product = <b>${fx(a*b,4)}</b> (${a*b>=0?'agree':'disagree'})<br>` + s; }
+    rd.innerHTML = s;
+  }
+  for (const cv of [cvK, cvL, cvA]){
+    cv.addEventListener('pointermove', e => {
+      const g=geo[cv.id]; if (!g) return; const r=cv.getBoundingClientRect();
+      const j=Math.floor((e.clientX-r.left-g.x0)/g.size*n), i=Math.floor((e.clientY-r.top-g.y0)/g.size*n);
+      const nh = (i>=0 && j>=0 && i<n && j<n) ? [i,j] : null;
+      if (String(nh)!==String(hov)){ hov=nh; draw(); }
+    });
+    cv.addEventListener('pointerleave', () => { hov=null; draw(); });
+  }
+  kind.addEventListener('change', () => { sample(); draw(); });
+  $('w3Shuf').onclick = () => { perm=shuffled(n, mulberry(Math.floor(Math.random()*1e9))); draw(); };
+  $('w3Rest').onclick = () => { perm=Int32Array.from({length:n},(_,i)=>i); draw(); };
+  $('w3New').onclick = () => { seed++; sample(); draw(); };
+  redrawers.push(draw); sample(); draw();
+})();
+
+// ============================================================ widget 4: permutation test and bandwidth
+(() => {
+  const kind=$('w4Kind'), sig=$('w4Sig'), cvH=$('w4Hist'), cvC=$('w4Curve'), rd=$('w4Read');
+  const n=150, GRID=[]; for (let t=-3; t<=3.0001; t+=0.2) GRID.push(+t.toFixed(2));
+  let seed=3, x=[], y=[], sx=1, sy=1, curve=[], zLin=0, cur=null;
+  function sample(){
+    const P=gen(kind.value, n, 1, mulberry(seed)); x=P.map(p=>p[0]); y=P.map(p=>p[1]);
+    sx=medianDist(x); sy=medianDist(y);
+    const r=mulberry(21);
+    zLin = permTest(centredGram(x,0), centredGram(y,0), n, 150, r).z;
+    curve = GRID.map(lm => { const m=10**lm; return permTest(centredGram(x,m*sx), centredGram(y,m*sy), n, 120, r).z; });
+  }
+  function current(){ const m=10**(+sig.value); cur=permTest(centredGram(x,m*sx), centredGram(y,m*sy), n, 400, mulberry(33)); draw(); }
+  function draw(){
+    if (!cur) return;
+    // histogram
+    const {ctx,w,h}=setupCanvas(cvH); ctx.clearRect(0,0,w,h);
+    const L=18, R=w-14, T=34, B=h-34, nul=cur.nul;
+    let lo=Math.min(cur.obs, ...nul), hi=Math.max(cur.obs, ...nul);
+    if (hi-lo < 1e-12*Math.max(1,Math.abs(hi))){ const c=hi; lo=c*(1-1e-3)-1e-12; hi=c*(1+1e-3)+1e-12; }
+    const pad=(hi-lo)*0.06; lo=Math.max(0, lo-pad); hi+=pad;   // the biased estimator is never negative
+    const X=v=>L+(v-lo)/(hi-lo)*(R-L), NB=36, cnt=new Array(NB).fill(0);
+    for (const v of nul){ const k=Math.min(NB-1, Math.max(0, Math.floor((v-lo)/(hi-lo)*NB))); cnt[k]++; }
+    const cm=Math.max(...cnt);
+    ctx.fillStyle=rgba(css('--muted'),0.55);
+    cnt.forEach((c,k)=>{ const bh=c/cm*(B-T); ctx.fillRect(L+k*(R-L)/NB+0.5, B-bh, (R-L)/NB-1, bh); });
+    ctx.strokeStyle=css('--line'); ctx.beginPath(); ctx.moveTo(L,B); ctx.lineTo(R,B); ctx.stroke();
+    const ox=X(cur.obs); ctx.strokeStyle=css('--obs');
+    ctx.lineWidth=2.5; ctx.beginPath(); ctx.moveTo(ox,T-8); ctx.lineTo(ox,B); ctx.stroke();
+    ctx.fillStyle=ctx.strokeStyle; ctx.font='12px system-ui'; ctx.textAlign = ox > (L+R)/2 ? 'right' : 'left';
+    ctx.fillText('real data', ox + (ox > (L+R)/2 ? -6 : 6), T-10);
+    ctx.fillStyle=css('--muted'); ctx.textAlign='left'; ctx.fillText(lo.toPrecision(3), L, B+16);
+    ctx.textAlign='right'; ctx.fillText(hi.toPrecision(3), R, B+16); ctx.textAlign='center'; ctx.fillText('HSIC', (L+R)/2, B+16);
+    // curve
+    const c=setupCanvas(cvC), g=c.ctx; g.clearRect(0,0,c.w,c.h);
+    const l=40, r=c.w-14, t=16, b=c.h-44;
+    const zs=curve.concat([zLin, 0, 3]), zmax=Math.max(...zs), zmin=Math.min(-1, ...zs);
+    const CX=lm=>l+(lm+3)/6*(r-l), CY=z=>b-(z-zmin)/(zmax-zmin)*(b-t);
+    g.strokeStyle=css('--line'); g.lineWidth=1; g.beginPath(); g.moveTo(l,CY(0)); g.lineTo(r,CY(0)); g.stroke();
+    g.strokeStyle=css('--muted'); g.setLineDash([5,4]); g.beginPath(); g.moveTo(l,CY(zLin)); g.lineTo(r,CY(zLin)); g.stroke(); g.setLineDash([]);
+    g.strokeStyle=css('--c3'); g.lineWidth=2; g.beginPath(); curve.forEach((z,k)=>{ const px=CX(GRID[k]), py=CY(z); k?g.lineTo(px,py):g.moveTo(px,py); }); g.stroke();
+    curve.forEach((z,k)=>disc(g, CX(GRID[k]), CY(z), 2.2, css('--c3')));
+    const lm=+sig.value; g.strokeStyle=css('--ink'); g.lineWidth=1.2; g.beginPath(); g.moveTo(CX(lm),t); g.lineTo(CX(lm),b); g.stroke();
+    disc(g, CX(lm), CY(cur.z), 5, css('--ink'), css('--surface'));
+    g.fillStyle=css('--muted'); g.font='11px system-ui'; g.textAlign='center';
+    for (const [v,lab] of [[-3,'÷1000'],[-2,'÷100'],[-1,'÷10'],[0,'median'],[1,'×10'],[2,'×100'],[3,'×1000']]){
+      if (c.w < 420 && Math.abs(v) === 2) continue;
+      g.textAlign = v===3 ? 'right' : 'center';
+      g.fillText(lab, v===3 ? CX(v)+4 : CX(v), b+16); g.strokeStyle=css('--line'); g.beginPath(); g.moveTo(CX(v),b); g.lineTo(CX(v),b+4); g.stroke(); }
+    g.textAlign='center'; g.fillText('bandwidth σ, as a multiple of the median distance', (l+r)/2, b+32);
+    g.textAlign='right'; g.textBaseline='middle';
+    for (const z of [0, Math.round(zmax/2), Math.round(zmax)]) if (z>zmin) g.fillText(String(z), l-6, CY(z));
+    g.textBaseline='alphabetic'; g.save(); g.translate(12,(t+b)/2); g.rotate(-Math.PI/2); g.textAlign='center';
+    g.fillText('shuffle SDs above the shuffle mean', 0, 0); g.restore();
+    const m=10**lm;
+    rd.innerHTML = `σ<sub>x</sub> = ${(m*sx).toPrecision(3)}, σ<sub>y</sub> = ${(m*sy).toPrecision(3)} (${m.toPrecision(2)} × median) · p = <b>${cur.p <= 1/401+1e-12 ? '0.0025 (the smallest 400 shuffles allow)' : fmtP(cur.p)}</b> · real data <b>${fx(cur.z,1)}</b> shuffle SDs above the shuffle mean` +
+      (cur.sd < 1e-3*Math.abs(cur.mean) ? ' · <b>the shuffles all score (almost) the same: this σ cannot tell pairings apart</b>' : '');
+  }
+  const later = debounce(current, 30);
+  sig.addEventListener('input', later);
+  kind.addEventListener('change', () => { sample(); current(); });
+  $('w4Med').onclick = () => { sig.value=0; current(); };
+  $('w4New').onclick = () => { seed++; sample(); current(); };
+  redrawers.push(draw); sample(); current();
+})();
+
+// ============================================================ widget 5: CKA
+(() => {
+  const ids=['w5Rot','w5Scale','w5Str','w5Warp','w5Noise'], el=Object.fromEntries(ids.map(i=>[i,$(i)])), shuf=$('w5Shuf'), rd=$('w5Read');
+  const n=90, r=mulberry(8), X=[], cl=[], E=[];
+  const centres=[[0,1.3],[-1.13,-0.65],[1.13,-0.65]];
+  for (let i=0;i<n;i++){ const k=i%3, u=gauss(r), v=gauss(r);
+    X.push([centres[k][0]+0.45*u*Math.cos(k)-0.2*v*Math.sin(k), centres[k][1]+0.45*u*Math.sin(k)+0.2*v*Math.cos(k)]); cl.push(k); E.push([gauss(r),gauss(r)]); }
+  const P=shuffled(n, mulberry(4));
+  const tone = X.map(p => 0.35 + 0.65*(p[0]+2.2)/4.4);
+  function transform(){
+    const t=(+el.w5Rot.value)*Math.PI/180, c=Math.cos(t), s=Math.sin(t), sc=10**(+el.w5Scale.value), sq=1-(+el.w5Str.value), wa=+el.w5Warp.value, nz=+el.w5Noise.value;
+    const a=3*wa+1e-6;
+    let Y=X.map(([u,v],i)=>{ let p=[c*u-s*v, s*u+c*v]; p[1]*=sq; if (wa>0) p=p.map(z=>Math.tanh(a*z)/a); return [sc*(p[0]+0.6*nz*E[i][0]), sc*(p[1]+0.6*nz*E[i][1])]; });
+    if (shuf.checked) Y=Y.map((_,i)=>Y[P[i]]);
+    return Y;
+  }
+  function linCKA(A, B){
+    const m=v=>[v.reduce((s,p)=>s+p[0],0)/n, v.reduce((s,p)=>s+p[1],0)/n], ma=m(A), mb=m(B);
+    const Ac=A.map(p=>[p[0]-ma[0],p[1]-ma[1]]), Bc=B.map(p=>[p[0]-mb[0],p[1]-mb[1]]);
+    const cross=(U,V)=>{ const M=[[0,0],[0,0]]; for (let i=0;i<n;i++) for (let a=0;a<2;a++) for (let b=0;b<2;b++) M[a][b]+=U[i][a]*V[i][b]; return M; };
+    const fro2=M=>M[0][0]**2+M[0][1]**2+M[1][0]**2+M[1][1]**2;
+    const d=Math.sqrt(fro2(cross(Ac,Ac))*fro2(cross(Bc,Bc)));
+    return d>0 ? fro2(cross(Ac,Bc))/d : 0;
+  }
+  function gaussCKA(A, B){
+    const K=centredGram(A, medianDist(A)), L=centredGram(B, medianDist(B));
+    let kl=0, kk=0, ll=0; for (let t=0;t<n*n;t++){ kl+=K[t]*L[t]; kk+=K[t]*K[t]; ll+=L[t]*L[t]; }
+    return kl/Math.sqrt(kk*ll);
+  }
+  function plot(cv, V, half){
+    const {ctx,w,h}=setupCanvas(cv); ctx.clearRect(0,0,w,h); axesBox(ctx,w,h);
+    const f=fixedFrame(w,h,half);
+    ctx.strokeStyle=css('--line'); ctx.lineWidth=0.8; ctx.beginPath(); ctx.moveTo(f.X(0),0); ctx.lineTo(f.X(0),h); ctx.moveTo(0,f.Y(0)); ctx.lineTo(w,f.Y(0)); ctx.stroke();
+    const cols=[css('--col'), css('--null'), css('--proj')];
+    V.forEach((p,i)=>{ const k = cv.id==='w5Y' && shuf.checked ? cl[P[i]] : cl[i], tn = cv.id==='w5Y' && shuf.checked ? tone[P[i]] : tone[i];
+      disc(ctx, f.X(p[0]), f.Y(p[1]), 3.6, rgba(cols[k], tn)); });
+  }
+  function draw(){
+    const Y=transform();
+    plot($('w5X'), X, 3.2); plot($('w5Y'), Y, 3.2);
+    const lc=linCKA(X,Y), gc=gaussCKA(X,Y);
+    rd.innerHTML = `linear CKA <b>${fx(lc,3)}</b> · Gaussian CKA (median bandwidths) <b>${fx(gc,3)}</b>`;
+  }
+  ids.forEach(i=>el[i].addEventListener('input', draw)); shuf.addEventListener('change', draw);
+  $('w5Reset').onclick = () => { el.w5Rot.value=0; el.w5Scale.value=0; el.w5Str.value=0; el.w5Warp.value=0; el.w5Noise.value=0; shuf.checked=false; draw(); };
+  redrawers.push(draw); draw();
+})();
+})();
+</script>
+</body>
+</html>
