@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Annotator Trace Explorer</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/contrib/auto-render.min.js"></script>
+<style>
+:root{
+  --bg:#fbfaf7; --surface:#ffffff; --ink:#1c1d21; --muted:#5b5f68; --faint:#8a8880; --line:#e2dfd8; --soft:#f2f0ea;
+  --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a; --s4:#eda100; --neg:#e34948; --radius:12px;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#131417; --surface:#1b1d21; --ink:#ebebed; --muted:#a3a6ae; --faint:#85837b; --line:#2e3138; --soft:#23262b;
+    --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500; --neg:#e66767;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#131417; --surface:#1b1d21; --ink:#ebebed; --muted:#a3a6ae; --faint:#85837b; --line:#2e3138; --soft:#23262b;
+  --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500; --neg:#e66767;
+  color-scheme: dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,sans-serif}
+main{max-width:920px;margin:0 auto;padding:36px 16px 80px}
+a{color:var(--s1)}
+h1{font-size:1.9rem;line-height:1.2;margin:0 0 .4rem}
+h2{font-size:1.3rem;margin:2.6rem 0 .5rem;padding-top:.5rem;border-top:1px solid var(--line)}
+.lede{color:var(--muted);margin-bottom:1.2rem}
+.widget{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:14px;margin:1rem 0}
+.controls{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;margin:.2rem 0 .7rem;font-size:.9rem}
+.controls label{display:flex;align-items:center;gap:6px;color:var(--muted)}
+.controls .seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.controls .seg button{border:0;border-radius:0;border-right:1px solid var(--line)}
+.controls .seg button:last-child{border-right:0}
+.controls .seg button[aria-pressed="true"]{background:var(--ink);color:var(--surface)}
+button,select{font:inherit;font-size:.88rem;color:var(--ink);background:var(--soft);border:1px solid var(--line);border-radius:8px;padding:5px 11px;cursor:pointer}
+button:focus-visible,input:focus-visible,select:focus-visible,canvas:focus-visible{outline:2px solid var(--s1);outline-offset:2px}
+input[type=range]{accent-color:var(--s1);width:170px}
+.readout{font-size:.9rem;color:var(--muted);margin-top:.5rem;font-variant-numeric:tabular-nums}
+.readout b{color:var(--ink)}
+.callout{border-left:3px solid var(--s1);background:var(--soft);padding:10px 14px;border-radius:0 8px 8px 0;margin:1rem 0}
+.grid2{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:14px;align-items:start}
+@media (max-width:720px){.grid2{grid-template-columns:1fr}}
+canvas{display:block;width:100%;height:auto;touch-action:none}
+.cap{font-size:.82rem;color:var(--muted);text-align:center}
+.mat{border-collapse:collapse;font-variant-numeric:tabular-nums;font-size:.9rem;margin:.2rem 0}
+.mat td,.mat th{border:1px solid var(--line);padding:3px 8px;text-align:center}
+.mat th{color:var(--muted);font-weight:500;font-size:.78rem}
+.pill{display:inline-block;padding:1px 8px;border-radius:999px;font-size:.78rem;border:1px solid var(--line);color:var(--muted);margin-left:4px}
+.pill.yes{color:var(--ink);border-color:var(--ink)}
+.imgs{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px;margin:.3rem 0 .6rem}
+@media (max-width:640px){.imgs{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.imgs canvas{image-rendering:pixelated;border:1px solid var(--line);border-radius:4px}
+.ann{display:grid;grid-template-columns:auto 1fr 1fr;gap:4px 12px;align-items:center;font-size:.86rem;margin:.4rem 0}
+.ann .key{display:flex;align-items:center;gap:6px;color:var(--ink)}
+.ann .key i{display:inline-block;width:18px;height:3px;border-radius:2px}
+.ann label{display:flex;align-items:center;gap:6px;color:var(--muted)}
+.ann input[type=range]{width:120px}
+.tip{position:fixed;pointer-events:none;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:6px 9px;font-size:.8rem;box-shadow:0 4px 16px rgba(0,0,0,.12);display:none;z-index:10;font-variant-numeric:tabular-nums}
+.tip .row{display:flex;align-items:center;gap:6px;white-space:nowrap}
+.tip .row i{display:inline-block;width:12px;height:2px;border-radius:1px}
+.tip b{font-weight:600}
+details{margin-top:.5rem;font-size:.86rem}
+details table{border-collapse:collapse;font-variant-numeric:tabular-nums;margin-top:.4rem}
+details td,details th{border-bottom:1px solid var(--line);padding:2px 10px;text-align:right}
+.formula{overflow-x:auto}
+.legend{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:.8rem;color:var(--muted);margin:.3rem 0}
+.legend span{display:inline-flex;align-items:center;gap:5px}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:3px}
+</style>
+</head>
+<body>
+<main>
+<h1>Annotator Trace Explorer</h1>
+<p class="lede"><a href="../index.html">← back to the notes</a> · Zhang, Tanno et al., <i>Learning from multiple annotators for medical image segmentation</i>, Pattern Recognition 2023. Three companions to §2.3–2.4: every explanation of one pixel's label and where the trace picks among them; the loss trained on a toy you can change; and the trace next to HSIC.</p>
+
+<div class="formula">$$\hat p^{(r)}(x)=\hat A^{(r)}(x)\,\hat p(x),\qquad \mathcal L=\sum_{n,r}\operatorname{CE}\big(\hat A^{(r)}\hat p,\ \tilde y^{(r)}_n\big)+\lambda\operatorname{tr}\hat A^{(r)} .$$</div>
+
+<h2>1. One pixel: every explanation of the same label</h2>
+<p>The pixel is lesion. Its annotator writes "lesion" with probability <i>t</i> and "background" with probability 1 − <i>t</i>, so the data at this pixel are the distribution $q=(1-t,\,t)$. A model explains it with a segmentation output $\hat p=(1-s,\,s)$ and a confusion matrix $\hat A=\begin{bmatrix}1-b&a\\ b&1-a\end{bmatrix}$ (column = truth, row = what is written). Cross-entropy only asks for $\hat A\hat p=q$. That leaves one free number once $s$ and $b$ are chosen, so <b>every point of the white band below is a perfect fit</b>. On the band the trace is $\operatorname{tr}\hat A=1+(t-b)/s$, and the level sets are straight lines through the circle at $(0,t)$.</p>
+<div class="widget">
+  <div class="controls">
+    <label>t = P(write lesion | lesion) <input id="ft" type="range" min="0.05" max="0.95" step="0.01" value="0.8"></label><b id="ftv"></b>
+    <span class="seg" role="group" aria-label="constraint on the confusion matrix">
+      <button data-mode="none" aria-pressed="false">no constraint</button>
+      <button data-mode="row" aria-pressed="false">row dominance (as stated)</button>
+      <button data-mode="col" aria-pressed="true">column dominance (as the proof uses)</button>
+    </span>
+    <button id="fplay">Lower the trace ▸</button>
+  </div>
+  <div class="grid2">
+    <div>
+      <canvas id="fcv" width="460" height="460" tabindex="0" aria-label="The fitting band in the plane of s against b, with equal-trace lines through the point (0, t), the allowed region for the chosen constraint, and the point where the trace is smallest. Move the pointer over the band to inspect a point; click to pin it."></canvas>
+      <div class="legend">
+        <span><i style="background:var(--soft);border:1px solid var(--line)"></i>impossible</span>
+        <span><i id="lgRow"></i>row-dominant</span>
+        <span><i id="lgCol"></i>also column-dominant</span>
+        <span><i style="background:var(--s4)"></i>rank one: Â = q1ᵀ</span>
+      </div>
+    </div>
+    <div>
+      <div id="fmin" class="readout"></div>
+      <div id="fpt" class="readout"></div>
+    </div>
+  </div>
+</div>
+<div class="callout">Things to try. (1) <b>No constraint</b>: the minimum is F, the anti-diagonal matrix with the segmentation inverted. The trace does not break the label-swap symmetry in favour of the truth; it breaks it against the truth. (2) <b>Row dominance</b>, the condition Theorem 1 states: the minimum slides onto the yellow line, where every column of Â equals q. The modelled annotator then ignores the truth, and s can be anything. (3) <b>Column dominance</b>, what the proof actually uses: the minimum is T, s = 1, which is the truth. (4) Drag t below ½ with column dominance on. The minimum jumps to s ≈ 0 and the pixel is called background. Per pixel, the trace does exactly what a majority vote would.</div>
+
+<h2>2. Train it: one careful and two sloppy annotators</h2>
+<p>The smallest problem where Eq 4 can be run as written: 48 × 48 pixels, each with a free segmentation logit (the limit of a very flexible network), one confusion matrix per annotator shared by all pixels, labels drawn from each annotator's (FPR, FNR). The loss is the paper's, $\sum_r$ mean cross-entropy $+\ \lambda\sum_r\operatorname{tr}\hat A^{(r)}$, trained with Adam. The warm-up start is what the paper describes: identity CMs, then 300 steps of <i>maximising</i> the trace.</p>
+<div class="widget">
+  <div class="controls">
+    <label>preset
+      <select id="preset">
+        <option value="sloppy" selected>one careful, two sloppy</option>
+        <option value="blank">careful, sloppy, blank</option>
+        <option value="equal">three equally good</option>
+      </select></label>
+    <label>λ <input id="lam" type="range" min="0" max="1" step="0.01" value="0.55"></label><b id="lamv"></b>
+    <label>start
+      <select id="init">
+        <option value="warm-up" selected>identity + warm-up (paper)</option>
+        <option value="identity">identity, no warm-up</option>
+        <option value="uniform">uniform (released code)</option>
+      </select></label>
+    <button id="run">Run ▸</button><button id="skip">Skip to step 8000</button><button id="reset">Reset</button><button id="resample">New labels</button>
+  </div>
+  <div class="ann" id="annCtl"></div>
+  <div class="imgs">
+    <div><canvas id="im0" width="48" height="48"></canvas><div class="cap">truth</div></div>
+    <div><canvas id="im1" width="48" height="48"></canvas><div class="cap">annotator 1</div></div>
+    <div><canvas id="im2" width="48" height="48"></canvas><div class="cap">annotator 2</div></div>
+    <div><canvas id="im3" width="48" height="48"></canvas><div class="cap">annotator 3</div></div>
+    <div><canvas id="im4" width="48" height="48"></canvas><div class="cap">majority vote</div></div>
+    <div><canvas id="im5" width="48" height="48"></canvas><div class="cap">model p̂ (lesion)</div></div>
+  </div>
+  <div class="legend">
+    <span><i style="background:var(--ink)"></i>lesion, correct</span>
+    <span><i style="background:var(--s2)"></i>background marked lesion</span>
+    <span><i style="background:var(--s1)"></i>lesion missed</span>
+  </div>
+  <div class="grid2">
+    <div><div class="cap" style="text-align:left">Dice of the model's segmentation against the truth</div><canvas id="dcv" width="520" height="250" tabindex="0" aria-label="Dice against training step, with the majority-vote and weighted-vote levels as reference lines. Hover for values."></canvas></div>
+    <div><div class="cap" style="text-align:left">Sum of the three traces, Σ tr Â⁽ʳ⁾</div><canvas id="tcv" width="420" height="250" tabindex="0" aria-label="Sum of the three traces against training step. Hover for values."></canvas></div>
+  </div>
+  <div id="fusRead" class="readout"></div>
+  <div id="cmTable"></div>
+  <details><summary>Show the numbers (every 250 steps)</summary><div id="histTable"></div></details>
+</div>
+<div class="callout">Things to try. (1) λ = 0: the model settles on "every annotator is perfect and the pixels are uncertain", and scores exactly the majority vote. (2) λ = 0.55 with the warm-up: Dice climbs to roughly the weighted vote, stays there for a while, then collapses to 0 as every label swaps. The right answer is somewhere training passes through, not where it ends. (3) The same λ without the warm-up swaps at once. (4) "Three equally good": majority vote is already optimal, and the trace only has room to do harm.</div>
+
+<h2>3. The trace next to HSIC, for one annotator</h2>
+<p>Treat the annotator's label ỹ and the true label y as random variables, with lesions a fraction π of pixels. The cross-covariance of their one-hot encodings is $C=\hat A\operatorname{diag}(\pi)-(\hat A\pi)\pi^\top$. HSIC with delta kernels is $\lVert C\rVert_F^2$. With the classes weighted equally, the paper's penalty is $\operatorname{tr}\hat A=1+L\operatorname{tr}C$. It is the same matrix, measured linearly instead of quadratically.</p>
+<div class="widget">
+  <div class="controls">
+    <label>FPR b <input id="hb" type="range" min="0" max="1" step="0.01" value="0.1"></label><b id="hbv"></b>
+    <label>FNR a <input id="ha" type="range" min="0" max="1" step="0.01" value="0.2"></label><b id="hav"></b>
+    <label>lesion fraction π <input id="hp" type="range" min="0.02" max="0.98" step="0.01" value="0.5"></label><b id="hpv"></b>
+    <button id="hswap" aria-pressed="false">Swap the true classes</button>
+  </div>
+  <div class="grid2">
+    <div id="hmat"></div>
+    <div id="hread" class="readout"></div>
+  </div>
+</div>
+<div class="callout">Press <b>Swap</b>: the trace jumps (1.70 → 0.30 at the default settings) and HSIC does not move. HSIC measures how much the label depends on the truth, whichever way round. The trace measures agreement and can go below 1, which is why it prefers anti-agreement unless something (the warm-up) points it the right way. Set b = 1 − a to make every column equal: the annotator then ignores the truth, and HSIC = 0 and tr Â = 1 together.</div>
+<div id="tip" class="tip" role="status" aria-live="polite"></div>
+</main>
+
+<script>
+(function(){
+"use strict";
+const $ = id => document.getElementById(id);
+const cssv = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+function rgb(hex){ hex = hex.replace('#',''); if(hex.length===3) hex = hex.split('').map(c=>c+c).join('');
+  const v = parseInt(hex,16); return [(v>>16)&255,(v>>8)&255,v&255]; }
+function mix(h1,h2,t){ const a=rgb(h1), b=rgb(h2); return a.map((x,i)=>Math.round(x*(1-t)+b[i]*t)); }
+function rgbStr(c){ return `rgb(${c[0]},${c[1]},${c[2]})`; }
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+function setup(cv){ const w=+cv.getAttribute('width'), h=+cv.getAttribute('height'); const dpr=Math.max(1,window.devicePixelRatio||1);
+  if(!cv._w){ cv._w=w; cv._h=h; cv.width=w*dpr; cv.height=h*dpr; } const ctx=cv.getContext('2d'); ctx.setTransform(dpr,0,0,dpr,0,0); return ctx; }
+function fmt(x,d=2){ return (Math.abs(x)<5e-4?0:x).toFixed(d); }
+const tip = $('tip');
+function showTip(e, nodes){ tip.textContent=''; nodes.forEach(n=>tip.appendChild(n)); tip.style.display='block';
+  const x=e.clientX+14, y=e.clientY+14; const r=tip.getBoundingClientRect();
+  tip.style.left=Math.min(x, window.innerWidth-r.width-8)+'px'; tip.style.top=Math.min(y, window.innerHeight-r.height-8)+'px'; }
+function hideTip(){ tip.style.display='none'; }
+function tipRow(colorVar, value, label){ const d=document.createElement('div'); d.className='row';
+  if(colorVar){ const i=document.createElement('i'); i.style.background=cssv(colorVar); d.appendChild(i); }
+  const b=document.createElement('b'); b.textContent=value; d.appendChild(b);
+  const s=document.createElement('span'); s.textContent=' '+label; d.appendChild(s); return d; }
+function matTable(M, rowNames, colNames, caption, shade){
+  const t=document.createElement('table'); t.className='mat';
+  if(caption){ const c=document.createElement('caption'); c.style.cssText='caption-side:top;text-align:left;font-size:.8rem;color:var(--muted)'; c.textContent=caption; t.appendChild(c); }
+  const hr=document.createElement('tr'); hr.appendChild(document.createElement('th'));
+  colNames.forEach(n=>{ const th=document.createElement('th'); th.textContent=n; hr.appendChild(th); }); t.appendChild(hr);
+  M.forEach((row,i)=>{ const tr=document.createElement('tr'); const th=document.createElement('th'); th.textContent=rowNames[i]; tr.appendChild(th);
+    row.forEach(v=>{ const td=document.createElement('td'); td.textContent=(v>=0?' ':'')+fmt(v,3); if(shade) shade(td,v); tr.appendChild(td); }); t.appendChild(tr); });
+  return t;
+}
+
+/* ---------------------------------------------------------------- 1. fibre */
+const F = { t:0.8, mode:'col', hover:null, pin:null, anim:null, cache:{} };
+const FW=460, FH=460, fx0=46, fy0=14, FP=390;
+const fX = s => fx0 + s*FP, fY = b => fy0 + (1-b)*FP;
+function fA(t,s,b){ return 1 - b - (t-b)/s; }
+function fFeasible(t,s,b){ if(s<=0) return false; const a=fA(t,s,b); return a>=0 && a<=1; }
+function fRow(t,s,b){ const a=fA(t,s,b); return a+b<1; }
+function fCol(t,s,b){ const a=fA(t,s,b); return a<0.5 && b<0.5; }
+function fMin(t, mode){
+  const key=t.toFixed(3)+mode; if(F.cache[key]) return F.cache[key];
+  let res;
+  if(mode==='none') res={s:1-t, b:1, tr:0, kind:'point'};
+  else if(mode==='row') res={s:null, b:t, tr:1, kind:'line'};
+  else { let best={tr:Infinity};
+    const n=500; for(let i=1;i<=n;i++){ const s=i/n; for(let j=0;j<n;j++){ const b=j/n*0.5;
+      if(!fFeasible(t,s,b) || !fCol(t,s,b)) continue; const tr=1+(t-b)/s; if(tr<best.tr) best={s,b,tr}; } }
+    res={...best, kind:'point'}; }
+  F.cache[key]=res; return res;
+}
+const fcv=$('fcv'); let fOff=null;
+function drawFibre(){
+  const ctx=setup(fcv), t=F.t; ctx.clearRect(0,0,FW,FH);
+  const surf=cssv('--surface'), soft=cssv('--soft'), s1=cssv('--s1');
+  const rowC=mix(surf,s1,0.10), colC=mix(surf,s1,0.24), softC=rgb(soft), surfC=rgb(surf);
+  $('lgRow').style.background=rgbStr(rowC); $('lgCol').style.background=rgbStr(colC);
+  const R=195; if(!fOff){ fOff=document.createElement('canvas'); fOff.width=R; fOff.height=R; }
+  const octx=fOff.getContext('2d'); const img=octx.createImageData(R,R);
+  for(let py=0;py<R;py++){ const b=1-(py+0.5)/R; for(let px=0;px<R;px++){ const s=(px+0.5)/R; let c;
+    if(!fFeasible(t,s,b)) c=softC; else if(fCol(t,s,b) && fRow(t,s,b)) c=colC; else if(fRow(t,s,b)) c=rowC; else c=surfC;
+    const k=4*(py*R+px); img.data[k]=c[0]; img.data[k+1]=c[1]; img.data[k+2]=c[2]; img.data[k+3]=255; } }
+  octx.putImageData(img,0,0); ctx.imageSmoothingEnabled=true; ctx.drawImage(fOff, fx0, fy0, FP, FP);
+  // band clip path
+  const band=new Path2D(); const N=240; band.moveTo(fX(0),fY(t));
+  for(let i=1;i<=N;i++){ const s=i/N; band.lineTo(fX(s), fY(Math.min(1, t/(1-s+1e-9)))); }
+  for(let i=N;i>=1;i--){ const s=i/N; band.lineTo(fX(s), fY(Math.max(0,(t-s)/(1-s+1e-9)))); }
+  band.closePath();
+  const ink=cssv('--ink'), muted=cssv('--muted'), faint=cssv('--faint');
+  // iso-trace lines
+  ctx.save(); ctx.clip(band); ctx.setLineDash([3,3]); ctx.lineWidth=1; ctx.strokeStyle=faint;
+  [0,0.5,1.5,2].forEach(c=>{ ctx.beginPath(); ctx.moveTo(fX(0),fY(t)); ctx.lineTo(fX(1),fY(t-(c-1))); ctx.stroke(); });
+  ctx.setLineDash([]);
+  // animated / current iso line
+  const cur = F.anim!==null ? F.anim : null;
+  if(cur!==null){ ctx.lineWidth=2; ctx.strokeStyle=ink; ctx.beginPath(); ctx.moveTo(fX(0),fY(t)); ctx.lineTo(fX(1),fY(t-(cur-1))); ctx.stroke(); }
+  ctx.restore();
+  // rank-one line b = t
+  ctx.lineWidth=2.5; ctx.strokeStyle=cssv('--s4'); ctx.beginPath(); ctx.moveTo(fX(0),fY(t)); ctx.lineTo(fX(1),fY(t)); ctx.stroke();
+  // b = 1/2
+  ctx.setLineDash([5,3]); ctx.lineWidth=1.2; ctx.strokeStyle=s1; ctx.beginPath(); ctx.moveTo(fX(0),fY(0.5)); ctx.lineTo(fX(1),fY(0.5)); ctx.stroke(); ctx.setLineDash([]);
+  // frame, ticks
+  ctx.strokeStyle=cssv('--line'); ctx.lineWidth=1; ctx.strokeRect(fx0,fy0,FP,FP);
+  ctx.fillStyle=muted; ctx.font='11px -apple-system,Segoe UI,sans-serif'; ctx.textAlign='center';
+  [0,0.25,0.5,0.75,1].forEach(v=>{ ctx.fillText(String(v), fX(v), fy0+FP+14); });
+  ctx.textAlign='right'; [0,0.25,0.5,0.75,1].forEach(v=>{ ctx.fillText(String(v), fx0-6, fY(v)+4); });
+  ctx.textAlign='center'; ctx.fillText('s = p̂(lesion)', fx0+FP/2, fy0+FP+30);
+  ctx.save(); ctx.translate(12, fy0+FP/2); ctx.rotate(-Math.PI/2); ctx.fillText('b = Â(write lesion | background)', 0, 0); ctx.restore();
+  // special points
+  function dot(s,b,col,r,label,align,dx,dy){ ctx.beginPath(); ctx.arc(fX(s),fY(b),r+2,0,2*Math.PI); ctx.fillStyle=cssv('--surface'); ctx.fill();
+    ctx.beginPath(); ctx.arc(fX(s),fY(b),r,0,2*Math.PI); ctx.fillStyle=col; ctx.fill();
+    if(label){ ctx.fillStyle=ink; ctx.font='12px -apple-system,Segoe UI,sans-serif'; ctx.textAlign=align; ctx.fillText(label, fX(s)+dx, fY(b)+dy); } }
+  ctx.beginPath(); ctx.arc(fX(0),fY(t),4,0,2*Math.PI); ctx.strokeStyle=ink; ctx.lineWidth=1.2; ctx.stroke();
+  dot(t,0,ink,4,'N: Â = I, p̂ = q (tr 2)', t>0.55?'right':'left', t>0.55?-8:8, -8);
+  dot(1,0.5,cssv('--s3'),5,'T: truth', 'right', -9, -9);
+  dot(1-t,1,cssv('--s2'),5,'F: swapped (tr 0)', (1-t)>0.6?'right':'left', (1-t)>0.6?-9:9, 16);
+  // minimiser
+  const m=fMin(t,F.mode);
+  if(m.kind==='line'){ ctx.lineWidth=6; ctx.strokeStyle=rgbStr(mix(cssv('--surface'),cssv('--s4'),0.45)); ctx.beginPath(); ctx.moveTo(fX(0.02),fY(t)); ctx.lineTo(fX(1),fY(t)); ctx.stroke();
+    ctx.lineWidth=2.5; ctx.strokeStyle=cssv('--s4'); ctx.beginPath(); ctx.moveTo(fX(0),fY(t)); ctx.lineTo(fX(1),fY(t)); ctx.stroke(); }
+  else { ctx.beginPath(); ctx.arc(fX(m.s),fY(m.b),9,0,2*Math.PI); ctx.lineWidth=2; ctx.strokeStyle=ink; ctx.stroke(); }
+  // hovered / pinned point
+  const p=F.pin||F.hover; if(p){ ctx.beginPath(); ctx.arc(fX(p.s),fY(p.b),4.5,0,2*Math.PI); ctx.fillStyle=ink; ctx.fill();
+    ctx.setLineDash([2,2]); ctx.strokeStyle=ink; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(fX(0),fY(t)); ctx.lineTo(fX(p.s),fY(p.b)); ctx.stroke(); ctx.setLineDash([]); }
+  writeFibre();
+}
+function fAmat(t,s,b){ const a=fA(t,s,b); return [[1-b,a],[b,1-a]]; }
+function writeFibre(){
+  const t=F.t, m=fMin(t,F.mode), box=$('fmin'); box.textContent='';
+  const h=document.createElement('div'); const hb=document.createElement('b');
+  const names={none:'No constraint', row:'Row dominance', col:'Column dominance'};
+  hb.textContent=names[F.mode]+': where the trace is smallest'; h.appendChild(hb); box.appendChild(h);
+  const d=document.createElement('div');
+  if(m.kind==='line'){ d.textContent=`Anywhere on the yellow line b = t (tr → 1; with strict inequalities it is approached, never reached). There every column of Â equals q = (${fmt(1-t)}, ${fmt(t)}), so Â p̂ = q whatever s is: the annotator ignores the truth, and the segmentation is unconstrained.`; }
+  else { const A=fAmat(t,m.s,m.b); box.appendChild(matTable(A,['write bg','write lesion'],['truth bg','truth lesion'],'Â at the minimum'));
+    const verdict = m.s>0.98 ? 'p̂ = lesion: the truth.' : (m.s<0.05 ? 'p̂ = background: the pixel is called background (the average annotator is wrong more often than right).' : (F.mode==='none' ? `p̂(lesion) = ${fmt(m.s)}: the segmentation is inverted and the annotator is modelled as always wrong.` : `p̂(lesion) = ${fmt(m.s)}.`));
+    d.textContent=`tr Â = ${fmt(m.tr,3)} at s = ${fmt(m.s)}, b = ${fmt(m.b)}. ${verdict}`; }
+  box.appendChild(d);
+  const pt=$('fpt'); pt.textContent=''; const p=F.pin||F.hover;
+  const hh=document.createElement('div'); const hb2=document.createElement('b'); hb2.textContent=p?(F.pin?'Pinned point':'Point under the pointer'):'Move the pointer over the band'; hh.appendChild(hb2); pt.appendChild(hh);
+  if(p){ const A=fAmat(t,p.s,p.b); pt.appendChild(matTable(A,['write bg','write lesion'],['truth bg','truth lesion'],`Â, with p̂ = (${fmt(1-p.s)}, ${fmt(p.s)})`));
+    const q0=A[0][0]*(1-p.s)+A[0][1]*p.s, q1=A[1][0]*(1-p.s)+A[1][1]*p.s;
+    const line=document.createElement('div');
+    const r=fRow(t,p.s,p.b), c=fCol(t,p.s,p.b)&&r;
+    line.textContent=`Â p̂ = (${fmt(q0,3)}, ${fmt(q1,3)}) = q.  tr Â = ${fmt(A[0][0]+A[1][1],3)}.`;
+    const pr=document.createElement('span'); pr.className='pill'+(r?' yes':''); pr.textContent=r?'row-dominant':'not row-dominant';
+    const pc=document.createElement('span'); pc.className='pill'+(c?' yes':''); pc.textContent=c?'column-dominant':'not column-dominant';
+    line.appendChild(pr); line.appendChild(pc); pt.appendChild(line); }
+}
+function fPos(e){ const r=fcv.getBoundingClientRect(); const x=(e.clientX-r.left)*FW/r.width, y=(e.clientY-r.top)*FH/r.height;
+  const s=(x-fx0)/FP, b=1-(y-fy0)/FP; return {s,b}; }
+fcv.addEventListener('pointermove', e=>{ const p=fPos(e); F.hover = (p.s>0.005 && p.s<=1 && p.b>=0 && p.b<=1 && fFeasible(F.t,p.s,p.b)) ? p : null; drawFibre(); });
+fcv.addEventListener('pointerleave', ()=>{ F.hover=null; drawFibre(); });
+fcv.addEventListener('click', e=>{ const p=fPos(e); if(p.s>0.005 && p.s<=1 && p.b>=0 && p.b<=1 && fFeasible(F.t,p.s,p.b)){ F.pin=p; } else F.pin=null; drawFibre(); });
+$('ft').addEventListener('input', e=>{ F.t=+e.target.value; $('ftv').textContent=F.t.toFixed(2); F.pin=null; F.anim=null; drawFibre(); });
+document.querySelectorAll('.seg button').forEach(b=>b.addEventListener('click',()=>{ F.mode=b.dataset.mode;
+  document.querySelectorAll('.seg button').forEach(x=>x.setAttribute('aria-pressed', String(x===b))); F.anim=null; drawFibre(); }));
+$('fplay').addEventListener('click', ()=>{ const target=fMin(F.t,F.mode).tr; let c=2; const t0=performance.now();
+  function step(now){ const u=Math.min(1,(now-t0)/1600); c=2-(2-target)*(1-Math.pow(1-u,2)); F.anim=c; drawFibre(); if(u<1) requestAnimationFrame(step); }
+  requestAnimationFrame(step); });
+$('ftv').textContent=F.t.toFixed(2);
+
+/* ---------------------------------------------------------------- 2. fusion toy */
+const S=48, N=S*S, R=3;
+const TRUTH=new Uint8Array(N);
+for(let y=0;y<S;y++) for(let x=0;x<S;x++){ const i=y*S+x; TRUTH[i]=((x-17)**2+(y-19)**2<=100 || (x-33)**2+(y-31)**2<=64)?1:0; }
+const PRESETS={ sloppy:[[0.02,0.02],[0.40,0.05],[0.40,0.05]], blank:[[0.02,0.02],[0.40,0.05],[0.0,1.0]], equal:[[0.10,0.10],[0.10,0.10],[0.10,0.10]] };
+const FUS={ rates:PRESETS.sloppy.map(r=>r.slice()), seed:11, lab:null, z:null, U:null, m:null, v:null, step:0, hist:[], running:false, maj:0, wv:0 };
+const MAXSTEP=8000, WARM=300, LR=0.05, EVERY=25;
+function dice(pred){ let inter=0, ps=0, ys=0; for(let i=0;i<N;i++){ inter+=pred[i]&TRUTH[i]; ps+=pred[i]; ys+=TRUTH[i]; } return 2*inter/(ps+ys); }
+function sampleLabels(){ const rnd=mulberry32(FUS.seed); FUS.lab=[]; for(let r=0;r<R;r++){ const [fpr,fnr]=FUS.rates[r]; const L=new Uint8Array(N);
+  for(let i=0;i<N;i++){ const pf=TRUTH[i]?1-fnr:fpr; L[i]=rnd()<pf?1:0; } FUS.lab.push(L); }
+  const maj=new Uint8Array(N), wv=new Uint8Array(N); const eps=1e-6;
+  for(let i=0;i<N;i++){ let votes=0, l1=0, l0=0; for(let r=0;r<R;r++){ const l=FUS.lab[r][i]; votes+=l; const [fpr,fnr]=FUS.rates[r];
+      l1+=l?Math.log(1-fnr+eps):Math.log(fnr+eps); l0+=l?Math.log(fpr+eps):Math.log(1-fpr+eps); }
+    maj[i]=votes*2>R?1:0; wv[i]=l1>l0?1:0; }
+  FUS.majMap=maj; FUS.maj=dice(maj); FUS.wv=dice(wv); }
+function resetModel(){ const rnd=mulberry32(12345); const gauss=()=>{ let u=0,v=0; while(u===0)u=rnd(); v=rnd(); return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v); };
+  FUS.z=new Float64Array(N); for(let i=0;i<N;i++) FUS.z[i]=0.01*gauss();
+  FUS.U=[]; for(let r=0;r<R;r++){ FUS.U.push([0.01*gauss(), 0.01*gauss()]); }
+  const init=$('init').value; if(init!=='uniform'){ FUS.U.forEach(u=>{ u[0]-=3; u[1]+=3; }); }
+  FUS.mz=new Float64Array(N); FUS.vz=new Float64Array(N); FUS.mU=[[0,0],[0,0],[0,0]]; FUS.vU=[[0,0],[0,0],[0,0]];
+  FUS.step=0; FUS.hist=[]; record(); }
+const sig=x=>1/(1+Math.exp(-x));
+function record(){ const pred=new Uint8Array(N); for(let i=0;i<N;i++) pred[i]=FUS.z[i]>0?1:0;
+  let tr=0, err=0; const est=[]; for(let r=0;r<R;r++){ const a10=sig(FUS.U[r][0]), a11=sig(FUS.U[r][1]); tr+=1-a10+a11; est.push([a10,1-a11]);
+    err+=Math.abs(a10-FUS.rates[r][0])+Math.abs(1-a11-FUS.rates[r][1]); }
+  FUS.hist.push({step:FUS.step, dice:dice(pred), tr, err:err/(2*R), est}); }
+const gz=new Float64Array(N), ds=new Float64Array(N), sv=new Float64Array(N);
+function trainStep(){
+  const lam=+$('lam').value, init=$('init').value; const lt=(init==='warm-up' && FUS.step<WARM)?-1:lam;
+  const z=FUS.z; for(let i=0;i<N;i++){ sv[i]=sig(z[i]); ds[i]=0; }
+  const gU=[];
+  for(let r=0;r<R;r++){ const a10=sig(FUS.U[r][0]), a11=sig(FUS.U[r][1]), L=FUS.lab[r]; let da10=0, da11=0; const diff=a11-a10;
+    for(let i=0;i<N;i++){ const s=sv[i]; const q=a10*(1-s)+a11*s; const dq=(L[i]?-1/(q+1e-12):1/(1-q+1e-12))/N; da10+=dq*(1-s); da11+=dq*s; ds[i]+=dq*diff; }
+    da10-=lt; da11+=lt; gU.push([da10*a10*(1-a10), da11*a11*(1-a11)]); }
+  const t=FUS.step+1, b1=0.9, b2=0.999, c1=1-Math.pow(b1,t), c2=1-Math.pow(b2,t);
+  for(let i=0;i<N;i++){ const g=ds[i]*sv[i]*(1-sv[i]); FUS.mz[i]=b1*FUS.mz[i]+(1-b1)*g; FUS.vz[i]=b2*FUS.vz[i]+(1-b2)*g*g;
+    z[i]-=LR*(FUS.mz[i]/c1)/(Math.sqrt(FUS.vz[i]/c2)+1e-8); }
+  for(let r=0;r<R;r++) for(let k=0;k<2;k++){ const g=gU[r][k]; FUS.mU[r][k]=b1*FUS.mU[r][k]+(1-b1)*g; FUS.vU[r][k]=b2*FUS.vU[r][k]+(1-b2)*g*g;
+    FUS.U[r][k]-=LR*(FUS.mU[r][k]/c1)/(Math.sqrt(FUS.vU[r][k]/c2)+1e-8); }
+  FUS.step=t; if(t%EVERY===0) record();
+}
+function paintLabel(cv, L){ const ctx=cv.getContext('2d'); const img=ctx.createImageData(S,S);
+  const tp=rgb(cssv('--ink')), fp=rgb(cssv('--s2')), fn=rgb(cssv('--s1')), tn=rgb(cssv('--soft'));
+  for(let i=0;i<N;i++){ const y=TRUTH[i], l=L?L[i]:y; const c = (l&&y)?tp:(l&&!y)?fp:(!l&&y)?fn:tn; img.data.set([c[0],c[1],c[2],255],4*i); }
+  ctx.putImageData(img,0,0); }
+function paintProb(cv){ const ctx=cv.getContext('2d'); const img=ctx.createImageData(S,S); const ink=rgb(cssv('--ink')), bg=rgb(cssv('--soft'));
+  for(let i=0;i<N;i++){ const p=sig(FUS.z[i]); img.data.set([bg[0]+(ink[0]-bg[0])*p, bg[1]+(ink[1]-bg[1])*p, bg[2]+(ink[2]-bg[2])*p, 255],4*i); }
+  ctx.putImageData(img,0,0); }
+function paintImages(){ paintLabel($('im0'),null); for(let r=0;r<R;r++) paintLabel($('im'+(r+1)),FUS.lab[r]); paintLabel($('im4'),FUS.majMap); paintProb($('im5')); }
+const dcv=$('dcv'), tcv=$('tcv'); let dHover=null, tHover=null;
+function lineChart(cv, key, ymax, hoverStep, refs){
+  const ctx=setup(cv), W=cv._w, H=cv._h, x0=40, y0=12, w=W-x0-12, h=H-y0-34; ctx.clearRect(0,0,W,H);
+  const X=st=>x0+st/MAXSTEP*w, Y=v=>y0+h-v/ymax*h;
+  ctx.strokeStyle=cssv('--line'); ctx.lineWidth=1; ctx.fillStyle=cssv('--muted'); ctx.font='11px -apple-system,Segoe UI,sans-serif';
+  const ticks = ymax===1?[0,0.25,0.5,0.75,1]:[0,2,4,6];
+  ticks.forEach(v=>{ ctx.beginPath(); ctx.moveTo(x0,Y(v)); ctx.lineTo(x0+w,Y(v)); ctx.stroke(); ctx.textAlign='right'; ctx.fillText(String(v), x0-5, Y(v)+4); });
+  ctx.textAlign='center'; [0,2000,4000,6000,8000].forEach(st=>ctx.fillText(String(st), X(st), y0+h+14)); ctx.fillText('training step', x0+w/2, y0+h+29);
+  (refs||[]).forEach(([v,label,above])=>{ ctx.setLineDash([4,3]); ctx.strokeStyle=cssv('--faint'); ctx.beginPath(); ctx.moveTo(x0,Y(v)); ctx.lineTo(x0+w,Y(v)); ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillStyle=cssv('--muted'); ctx.textAlign='right'; ctx.fillText(label+' '+v.toFixed(3), x0+w-4, Y(v)+(above?-5:13)); });
+  const H0=FUS.hist; if(H0.length){ ctx.strokeStyle=cssv('--s1'); ctx.lineWidth=2; ctx.lineJoin='round'; ctx.lineCap='round'; ctx.beginPath();
+    H0.forEach((p,i)=>{ const xx=X(p.step), yy=Y(p[key]); if(i) ctx.lineTo(xx,yy); else ctx.moveTo(xx,yy); }); ctx.stroke();
+    const last=H0[H0.length-1]; ctx.beginPath(); ctx.arc(X(last.step),Y(last[key]),4+2,0,2*Math.PI); ctx.fillStyle=cssv('--surface'); ctx.fill();
+    ctx.beginPath(); ctx.arc(X(last.step),Y(last[key]),4,0,2*Math.PI); ctx.fillStyle=cssv('--s1'); ctx.fill(); }
+  if(hoverStep!==null && H0.length){ const p=nearest(hoverStep); ctx.strokeStyle=cssv('--muted'); ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(X(p.step),y0); ctx.lineTo(X(p.step),y0+h); ctx.stroke(); }
+  cv._geom={x0,w}; }
+function nearest(st){ const H0=FUS.hist; let lo=0, hi=H0.length-1; while(hi-lo>1){ const mid=(lo+hi)>>1; if(H0[mid].step<st) lo=mid; else hi=mid; }
+  return Math.abs(H0[lo].step-st)<Math.abs(H0[hi].step-st)?H0[lo]:H0[hi]; }
+function drawCharts(){ lineChart(dcv,'dice',1,dHover,[[FUS.wv,'weighted vote (true CMs)',true],[FUS.maj,'majority vote',false]]); lineChart(tcv,'tr',6,tHover,[]); }
+function chartHover(cv, which){ cv.addEventListener('pointermove', e=>{ if(!FUS.hist.length) return; const r=cv.getBoundingClientRect(); const g=cv._geom;
+    const x=(e.clientX-r.left)*cv._w/r.width; const st=Math.max(0,Math.min(MAXSTEP,(x-g.x0)/g.w*MAXSTEP)); const p=nearest(st);
+    if(which==='d') dHover=st; else tHover=st; drawCharts();
+    showTip(e,[tipRow(null,'step '+p.step,''), tipRow('--s1',p.dice.toFixed(3),'Dice'), tipRow(null,p.tr.toFixed(2),'sum of traces'), tipRow(null,p.err.toFixed(3),'CM error')]); });
+  cv.addEventListener('pointerleave', ()=>{ dHover=null; tHover=null; hideTip(); drawCharts(); }); }
+chartHover(dcv,'d'); chartHover(tcv,'t');
+function writeFusion(){
+  const H0=FUS.hist, last=H0[H0.length-1]; const best=H0.reduce((a,b)=>b.dice>a.dice?b:a, H0[0]);
+  const el=$('fusRead'); el.textContent='';
+  const d1=document.createElement('div'); const b1=document.createElement('b'); b1.textContent=`step ${last.step}: Dice ${last.dice.toFixed(3)}`; d1.appendChild(b1);
+  d1.appendChild(document.createTextNode(` · sum of traces ${last.tr.toFixed(2)} · majority vote ${FUS.maj.toFixed(3)} · weighted vote with the true CMs ${FUS.wv.toFixed(3)}`)); el.appendChild(d1);
+  const d2=document.createElement('div'); d2.textContent=`Best so far: Dice ${best.dice.toFixed(3)} at step ${best.step}.` + (last.dice<0.1 && best.dice>0.5 ? ' Now every label is swapped. A validation set without ground truth has no way to know when the best step was.' : '');
+  el.appendChild(d2);
+  const t=$('cmTable'); t.textContent=''; const rows=[], names=[];
+  for(let r=0;r<R;r++){ rows.push([FUS.rates[r][0], last.est[r][0], FUS.rates[r][1], last.est[r][1]]); names.push('annotator '+(r+1)); }
+  t.appendChild(matTable(rows,names,['true FPR','estimated FPR','true FNR','estimated FNR'],'Confusion matrices: true and current estimate'));
+}
+function writeHistTable(){ const box=$('histTable'); box.textContent=''; const tb=document.createElement('table');
+  const hr=document.createElement('tr'); ['step','Dice','sum of traces','CM error'].forEach(n=>{ const th=document.createElement('th'); th.textContent=n; hr.appendChild(th); }); tb.appendChild(hr);
+  FUS.hist.filter(p=>p.step%250===0).forEach(p=>{ const tr=document.createElement('tr'); [String(p.step),p.dice.toFixed(3),p.tr.toFixed(2),p.err.toFixed(3)].forEach(v=>{ const td=document.createElement('td'); td.textContent=v; tr.appendChild(td); }); tb.appendChild(tr); });
+  box.appendChild(tb); }
+function renderFusion(){ paintImages(); drawCharts(); writeFusion(); }
+function loop(){ if(!FUS.running) return; for(let k=0;k<50 && FUS.step<MAXSTEP;k++) trainStep();
+  renderFusion(); if(FUS.step>=MAXSTEP){ FUS.running=false; $('run').textContent='Run ▸'; writeHistTable(); return; } requestAnimationFrame(loop); }
+$('run').addEventListener('click', ()=>{ if(FUS.running){ FUS.running=false; $('run').textContent='Run ▸'; writeHistTable(); return; }
+  if(FUS.step>=MAXSTEP) resetModel(); FUS.running=true; $('run').textContent='Pause ❚❚'; requestAnimationFrame(loop); });
+function fullReset(){ FUS.running=false; $('run').textContent='Run ▸'; resetModel(); renderFusion(); writeHistTable(); }
+$('reset').addEventListener('click', fullReset);
+$('skip').addEventListener('click', ()=>{ FUS.running=false; $('run').textContent='Run ▸'; if(FUS.step>=MAXSTEP) resetModel();
+  while(FUS.step<MAXSTEP) trainStep(); renderFusion(); writeHistTable(); });
+$('resample').addEventListener('click', ()=>{ FUS.seed=(FUS.seed*7919+13)%100003; sampleLabels(); fullReset(); });
+$('init').addEventListener('change', fullReset);
+$('lam').addEventListener('input', e=>{ $('lamv').textContent=(+e.target.value).toFixed(2); });
+$('lamv').textContent=(+$('lam').value).toFixed(2);
+$('preset').addEventListener('change', e=>{ FUS.rates=PRESETS[e.target.value].map(r=>r.slice()); buildAnnCtl(); sampleLabels(); fullReset(); });
+function buildAnnCtl(){ const box=$('annCtl'); box.textContent='';
+  for(let r=0;r<R;r++){ const key=document.createElement('div'); key.className='key'; key.textContent='annotator '+(r+1); box.appendChild(key);
+    [['FPR',0],['FNR',1]].forEach(([nm,k])=>{ const lab=document.createElement('label'); lab.appendChild(document.createTextNode(nm+' '));
+      const inp=document.createElement('input'); inp.type='range'; inp.min='0'; inp.max='1'; inp.step='0.01'; inp.value=String(FUS.rates[r][k]);
+      const out=document.createElement('b'); out.textContent=FUS.rates[r][k].toFixed(2);
+      inp.addEventListener('input',()=>{ FUS.rates[r][k]=+inp.value; out.textContent=(+inp.value).toFixed(2); });
+      inp.addEventListener('change',()=>{ sampleLabels(); fullReset(); });
+      lab.appendChild(inp); lab.appendChild(out); box.appendChild(lab); }); } }
+buildAnnCtl(); sampleLabels(); resetModel(); renderFusion(); writeHistTable();
+
+/* ---------------------------------------------------------------- 3. trace vs HSIC */
+const HS={ swap:false };
+function hsicUpdate(){
+  const b=+$('hb').value, a=+$('ha').value, pf=+$('hp').value; $('hbv').textContent=b.toFixed(2); $('hav').textContent=a.toFixed(2); $('hpv').textContent=pf.toFixed(2);
+  let A=[[1-b,a],[b,1-a]]; if(HS.swap) A=[[A[0][1],A[0][0]],[A[1][1],A[1][0]]];
+  const pi=[1-pf,pf];
+  const Api=[A[0][0]*pi[0]+A[0][1]*pi[1], A[1][0]*pi[0]+A[1][1]*pi[1]];
+  const C=[[A[0][0]*pi[0]-Api[0]*pi[0], A[0][1]*pi[1]-Api[0]*pi[1]],[A[1][0]*pi[0]-Api[1]*pi[0], A[1][1]*pi[1]-Api[1]*pi[1]]];
+  const hs=C.flat().reduce((s,v)=>s+v*v,0), tr=A[0][0]+A[1][1];
+  const u=[0.5,0.5], Au=[A[0][0]*0.5+A[0][1]*0.5, A[1][0]*0.5+A[1][1]*0.5];
+  const Cu=[[A[0][0]*0.5-Au[0]*0.5, A[0][1]*0.5-Au[0]*0.5],[A[1][0]*0.5-Au[1]*0.5, A[1][1]*0.5-Au[1]*0.5]];
+  const acc=A[0][0]*pi[0]+A[1][1]*pi[1];
+  const box=$('hmat'); box.textContent='';
+  box.appendChild(matTable(A,['write bg','write lesion'],['truth bg','truth lesion'], HS.swap?'Â with the true classes swapped':'Â (columns sum to 1)'));
+  const cmax=Math.max(1e-9,...C.flat().map(Math.abs));
+  const surf=cssv('--surface'), pos=cssv('--s1'), neg=cssv('--neg');
+  box.appendChild(matTable(C,['write bg','write lesion'],['truth bg','truth lesion'],'C = joint − product of marginals', (td,v)=>{ const t=0.45*Math.abs(v)/cmax; td.style.background=rgbStr(mix(surf, v>=0?pos:neg, t)); }));
+  const r=$('hread'); r.textContent='';
+  const lines=[
+    [`tr Â = ${tr.toFixed(3)}`, 'the paper\'s penalty'],
+    [`1 + L·tr C = ${(1+2*(Cu[0][0]+Cu[1][1])).toFixed(3)}`, 'with the classes weighted equally; always equal to tr Â'],
+    [`HSIC = ‖C‖²_F = ${hs.toFixed(4)}`, `delta kernels, lesion fraction ${pf.toFixed(2)}`],
+    [`accuracy = ${acc.toFixed(3)}`, `P(correct label) at this lesion fraction; tr Â / L = ${(tr/2).toFixed(3)}`]];
+  lines.forEach(([v,l])=>{ const d=document.createElement('div'); const bb=document.createElement('b'); bb.textContent=v; d.appendChild(bb); d.appendChild(document.createTextNode(' · '+l)); r.appendChild(d); });
+  const note=document.createElement('div'); note.style.marginTop='.4rem';
+  note.textContent = Math.abs(A[0][0]-A[0][1])<0.005 ? 'Both columns are equal: the written label ignores the truth. HSIC = 0 and tr Â = 1.' :
+    (tr<1 ? 'tr Â < 1: the annotator agrees with the truth less often than an annotator who ignored it (anti-agreement). HSIC cannot tell this from agreement.' : 'tr Â > 1: agreement beyond what an annotator who ignored the truth would show.');
+  r.appendChild(note);
+}
+['hb','ha','hp'].forEach(id=>$(id).addEventListener('input', hsicUpdate));
+$('hswap').addEventListener('click', e=>{ HS.swap=!HS.swap; e.target.setAttribute('aria-pressed', String(HS.swap)); e.target.textContent=HS.swap?'Unswap':'Swap the true classes'; hsicUpdate(); });
+hsicUpdate();
+
+/* ---------------------------------------------------------------- theme changes */
+function redrawAll(){ fOff=null; drawFibre(); renderFusion(); hsicUpdate(); }
+try{ window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', redrawAll); }catch(e){}
+new MutationObserver(redrawAll).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+drawFibre();
+document.addEventListener('DOMContentLoaded', ()=>{});
+window.addEventListener('load', ()=>{ if(window.renderMathInElement) renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]}); });
+})();
+</script>
+</body>
+</html>

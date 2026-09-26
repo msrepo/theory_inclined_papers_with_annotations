@@ -1,0 +1,83 @@
+<svg viewBox="0 0 920 300" xmlns="http://www.w3.org/2000/svg" role="img">
+<title>The two-headed model and its loss</title>
+<desc>Block diagram. The image goes through a shared U-Net. A segmentation head outputs p-hat, a probability vector over L classes at every pixel. R annotator heads output a column-stochastic L by L matrix at every pixel. For each annotator the per-pixel product A-hat times p-hat is compared with that annotator's label by cross-entropy, and lambda times the trace of A-hat is added. At test time only p-hat is used.</desc>
+<style>
+  text{font-family:ui-sans-serif,-apple-system,"Segoe UI",sans-serif;font-weight:400}
+  .lab{font-size:11px;fill:#57564f} .hd{font-size:13px;font-weight:500;fill:#1a1a19}
+  .sm{font-size:10.5px;fill:#57564f} .v{font-size:10.5px;fill:#1a1a19}
+  .ax{stroke:#8a8880;stroke-width:0.9;fill:none} .box{fill:none;stroke:#c9c7bf;stroke-width:1}
+  .gd{stroke:#e2e1da;stroke-width:0.6;fill:none}
+  .infeas{fill:#e9e7e0} .band{fill:#ffffff} .row{fill:#2a78d6;opacity:.08} .col{fill:#2a78d6;opacity:.16}
+  .iso{stroke:#8a8880;stroke-width:0.8;fill:none;stroke-dasharray:3 3}
+  .s1{stroke:#2a78d6} .s2{stroke:#eb6834} .s3{stroke:#1baf7a} .s4{stroke:#eda100}
+  .f1{fill:#2a78d6} .f2{fill:#eb6834} .f3{fill:#1baf7a} .f4{fill:#eda100}
+  .ln{stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+  .dash{stroke-width:1.2;fill:none;stroke-dasharray:5 3}
+  .ring{stroke:#fdfdfc;stroke-width:2}
+  .pt{fill:#1a1a19} .apex{fill:none;stroke:#1a1a19;stroke-width:1.2}
+  .tn{fill:#f4f3ee} .tp{fill:#6f6d66} .fp{fill:#eb6834} .fn{fill:#2a78d6}
+  .ref{stroke:#8a8880;stroke-width:1;stroke-dasharray:4 3;fill:none}
+  .node{fill:#ffffff;stroke:#b9b7ae;stroke-width:1} .node2{fill:#f2f0ea;stroke:#b9b7ae;stroke-width:1}
+  .arr{stroke:#6f6d66;stroke-width:1.2;fill:none} .arrh{fill:#6f6d66}
+  .acc{stroke:#6f6d66;stroke-width:1.2;fill:none;stroke-dasharray:4 3}
+  @media (prefers-color-scheme: dark){
+    .lab,.sm{fill:#b6b4ab} .hd,.v{fill:#eceae3} .ax{stroke:#85837b} .box{stroke:#4a4844} .gd{stroke:#33312e}
+    .infeas{fill:#2a2c30} .band{fill:#1b1d21} .row{fill:#3987e5;opacity:.10} .col{fill:#3987e5;opacity:.20}
+    .iso{stroke:#85837b}
+    .s1{stroke:#3987e5} .s2{stroke:#d95926} .s3{stroke:#199e70} .s4{stroke:#c98500}
+    .f1{fill:#3987e5} .f2{fill:#d95926} .f3{fill:#199e70} .f4{fill:#c98500}
+    .ring{stroke:#161615} .pt{fill:#eceae3} .apex{stroke:#eceae3}
+    .tn{fill:#1f2124} .tp{fill:#a3a19a} .fp{fill:#d95926} .fn{fill:#3987e5}
+    .ref{stroke:#85837b} .node{fill:#1b1d21;stroke:#4a4844} .node2{fill:#23262b;stroke:#4a4844}
+    .arr{stroke:#a3a6ae} .arrh{fill:#a3a6ae} .acc{stroke:#a3a6ae}
+  }
+</style>
+<text x="20" y="22" class="hd">The model of Fig. 1, one pixel at a time</text>
+<rect x="20" y="110" width="92" height="52" rx="7" class="node"/>
+<text x="66.0" y="128" class="lab" text-anchor="middle">image x</text>
+<text x="66.0" y="143" class="sm" text-anchor="middle">W × H × C</text>
+<rect x="150" y="100" width="130" height="72" rx="7" class="node2"/>
+<text x="215.0" y="118" class="lab" text-anchor="middle">shared U-Net</text>
+<text x="215.0" y="133" class="sm" text-anchor="middle">4 stages, 32–256 ch,</text>
+<text x="215.0" y="148" class="sm" text-anchor="middle">instance norm</text>
+<rect x="330" y="40" width="170" height="62" rx="7" class="node"/>
+<text x="415.0" y="58" class="lab" text-anchor="middle">segmentation head θ</text>
+<text x="415.0" y="73" class="sm" text-anchor="middle">1×1 conv, softmax</text>
+<text x="415.0" y="88" class="sm" text-anchor="middle">p̂(x): L numbers per pixel</text>
+<rect x="330" y="168" width="170" height="74" rx="7" class="node"/>
+<text x="415.0" y="186" class="lab" text-anchor="middle">annotator heads φ, r = 1..R</text>
+<text x="415.0" y="201" class="sm" text-anchor="middle">2 conv blocks, 1×1 conv,</text>
+<text x="415.0" y="216" class="sm" text-anchor="middle">softplus, columns normalised</text>
+<text x="415.0" y="231" class="sm" text-anchor="middle">Â⁽ʳ⁾(x): L × L per pixel</text>
+<rect x="552" y="104" width="150" height="62" rx="7" class="node"/>
+<text x="627.0" y="122" class="lab" text-anchor="middle">per pixel</text>
+<text x="627.0" y="137" class="v" text-anchor="middle">p̂⁽ʳ⁾ = Â⁽ʳ⁾ · p̂</text>
+<text x="627.0" y="152" class="sm" text-anchor="middle">annotator r's guess</text>
+<rect x="748" y="60" width="150" height="62" rx="7" class="node"/>
+<text x="823.0" y="78" class="lab" text-anchor="middle">cross-entropy</text>
+<text x="823.0" y="93" class="sm" text-anchor="middle">against annotator r's</text>
+<text x="823.0" y="108" class="sm" text-anchor="middle">label ỹ⁽ʳ⁾ (Eq 3)</text>
+<rect x="748" y="150" width="150" height="62" rx="7" class="node"/>
+<text x="823.0" y="168" class="lab" text-anchor="middle">+ λ · tr Â⁽ʳ⁾</text>
+<text x="823.0" y="183" class="sm" text-anchor="middle">push every modelled</text>
+<text x="823.0" y="198" class="sm" text-anchor="middle">annotator to be unreliable</text>
+<path d="M 112,136 L 148,136" class="arr"/>
+<path d="M 148.0,136.0 L 141.6,138.7 L 141.6,133.3 Z" class="arrh"/>
+<path d="M 280,124 L 328,78" class="arr"/>
+<path d="M 328.0,78.0 L 325.2,84.4 L 321.5,80.5 Z" class="arrh"/>
+<path d="M 280,148 L 328,198" class="arr"/>
+<path d="M 328.0,198.0 L 321.6,195.2 L 325.5,191.5 Z" class="arrh"/>
+<path d="M 500,78 L 550,124" class="arr"/>
+<path d="M 550.0,124.0 L 543.4,121.6 L 547.1,117.6 Z" class="arrh"/>
+<path d="M 500,200 L 550,150" class="arr"/>
+<path d="M 550.0,150.0 L 547.4,156.5 L 543.5,152.6 Z" class="arrh"/>
+<path d="M 702,128 L 746,96" class="arr"/>
+<path d="M 746.0,96.0 L 742.4,102.0 L 739.2,97.6 Z" class="arrh"/>
+<path d="M 500,226 L 746,190" class="arr"/>
+<path d="M 746.0,190.0 L 740.0,193.6 L 739.2,188.2 Z" class="arrh"/>
+<path d="M 500,56 H 560" class="acc"/>
+<text x="566" y="52" class="sm">test time: output p̂(x),</text>
+<text x="566" y="65" class="sm">annotator heads unused</text>
+<text x="20" y="276" class="sm">Â⁽ʳ⁾ is column-stochastic: entry (i, j) is P(annotator r says i | true class j, image x, pixel). The product is a mixture of its columns,</text>
+<text x="20" y="291" class="sm">weighted by p̂. Only the products are compared with data, so Â⁽ʳ⁾ and p̂ are not separately determined; the trace term chooses between them.</text>
+</svg>
