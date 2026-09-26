@@ -1,0 +1,1202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MICCAI 2026 IQA, Interactive</title>
+<style>
+:root{
+  --bg:#fbfaf7; --surface:#ffffff; --ink:#1c1d21; --muted:#5b5f68; --line:#e2dfd8; --soft:#f2f0ea;
+  --c0:#2f6fb5; --c1:#c2571a; --c2:#0f7a5a; --c3:#7c3aed; --c4:#b8860b;
+  --ll:#b42318; --bound:#2f6fb5; --radius:12px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#131417; --surface:#1b1d21; --ink:#ebebed; --muted:#a3a6ae; --line:#2e3138; --soft:#23262b;
+    --c0:#7fb2e8; --c1:#f0a070; --c2:#4cc79a; --c3:#b48cff; --c4:#e6c34d;
+    --ll:#ff7a6b; --bound:#7fb2e8;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#131417; --surface:#1b1d21; --ink:#ebebed; --muted:#a3a6ae; --line:#2e3138; --soft:#23262b;
+  --c0:#7fb2e8; --c1:#f0a070; --c2:#4cc79a; --c3:#b48cff; --c4:#e6c34d;
+  --ll:#ff7a6b; --bound:#7fb2e8;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,sans-serif;}
+main{max-width:860px;margin:0 auto;padding:40px 16px 80px}
+h1{font-size:2.1rem;line-height:1.2;margin:0 0 .4rem;letter-spacing:-.01em}
+h2{font-size:1.4rem;margin:3rem 0 .6rem;padding-top:.5rem;border-top:1px solid var(--line)}
+p{margin:.6rem 0}
+a{color:var(--c0)}
+.lede{color:var(--muted);font-size:1.08rem;margin-bottom:1.4rem}
+nav.toc{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:12px 18px;font-size:.93rem}
+nav.toc ol{margin:.3rem 0;padding-left:1.2rem}
+nav.toc a{color:var(--ink);text-decoration:none;border-bottom:1px dotted var(--muted)}
+.widget{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:14px;margin:1rem 0 1.2rem}
+.controls{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;margin:.2rem 0 .6rem;font-size:.9rem}
+.controls label{display:flex;align-items:center;gap:6px;color:var(--muted)}
+button,select{font:inherit;font-size:.88rem;color:var(--ink);background:var(--soft);border:1px solid var(--line);border-radius:8px;padding:5px 11px;cursor:pointer}
+button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+button.next{outline:2px solid var(--c2);outline-offset:1px}
+input[type=range]{accent-color:var(--c0);width:130px}
+.readout{font-size:.9rem;color:var(--muted);margin-top:.5rem;font-variant-numeric:tabular-nums}
+.readout b{color:var(--ink)}
+.callout{border-left:3px solid var(--c2);background:var(--soft);padding:10px 14px;border-radius:0 8px 8px 0;margin:1rem 0;font-size:.95rem}
+canvas{display:block;width:100%;touch-action:none}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:.82rem;color:var(--muted);margin-top:.3rem}
+.legend span::before{content:"";display:inline-block;width:14px;height:3px;margin-right:6px;vertical-align:3px;background:var(--c)}
+.kbd{font-family:ui-monospace,Menlo,monospace;font-size:.85em;background:var(--soft);padding:1px 5px;border-radius:4px}
+@media (max-width:600px){ h1{font-size:1.7rem} input[type=range]{width:100px} }
+</style>
+
+<style>h2{font-size:1.2rem} nav.toc li{margin:.15rem 0}</style>
+</head>
+<body>
+<main>
+
+<h1>MICCAI 2026 IQA, Interactive</h1>
+<p class="lede"><a href="../index.html">← text notes</a> · Misc › Image Quality Assessment. One widget per paper, each a playable version of that paper's core construct. Every widget runs on small toy numbers in your browser, not on the paper's data. Move the knobs and see where each construct holds and where it breaks. The callout under each widget names the one thing worth trying first.</p>
+
+<nav class="toc"><b>Contents</b>
+<ol>
+  <li><a href="#t-am-063">T-AM-063 · Cross-sectional self-consistency: a pair cannot say who is wrong, the median of all twins can</a></li>
+  <li><a href="#t-am-171">T-AM-171 · Learning to distort: the prototype hinge stops pulling at a fixed cosine gap</a></li>
+  <li><a href="#t-pm-174">T-PM-174 · Few-shot bpMRI IQA: prototypes, a b-value nuisance, and a probability that never leaves [0.12, 0.88]</a></li>
+  <li><a href="#w-am-041">W-AM-041 · MedQ-Engine: persistent failures, error-weighted budgets and confidence routing</a></li>
+  <li><a href="#w-am-042">W-AM-042 · LaST: a loss GMM separates hard-to-fit from easy-to-fit, and a uniform prior equalises phases</a></li>
+  <li><a href="#w-pm-008">W-PM-008 · GeoCAN: one pooling knob from min to max, and a "causal" matrix that is a tournament</a></li>
+  <li><a href="#w-pm-121">W-PM-121 · SlideGuard: Dice under class imbalance, and artefacts that vanish at the 25% patch rule</a></li>
+  <li><a href="#w-pm-123">W-PM-123 · DICOM series: a set encoder tells "missing" from "zero"; zero imputation cannot</a></li>
+  <li><a href="#w-pm-139">W-PM-139 · FunPiQ: the unbiased PU risk goes negative, and nnPU holds it at zero</a></li>
+  <li><a href="#w-pm-194">W-PM-194 · ICHOR: how much of masked reconstruction is plain interpolation</a></li>
+  <li><a href="#w-pm-212">W-PM-212 · AC-MIL: CORN's products stay ordered, and attention cosine punishes flatness</a></li>
+</ol></nav>
+
+<script>
+// Shared helpers for every widget on this page. Each widget is its own IIFE and
+// talks to the page only through window.IV and element ids prefixed with its board id.
+window.IV = (() => {
+  const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+  const col = i => css(['--c0','--c1','--c2','--c3','--c4'][i]);           // blue, orange, green, purple, gold
+  function rgba(hex, a){ hex = hex.replace('#',''); if (hex.length===3) hex = hex.split('').map(c=>c+c).join('');
+    const n = parseInt(hex,16); return `rgba(${n>>16&255},${n>>8&255},${n&255},${a})`; }
+  function rng(seed){ return () => { seed|=0; seed=seed+0x6D2B79F5|0; let t=Math.imul(seed^seed>>>15,1|seed);
+    t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+  function randn(r){ let u=0; while(u===0) u=r(); return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*r()); }
+  const sigmoid = x => 1/(1+Math.exp(-x));
+  function lse(a){ let m=-Infinity; for (const v of a) if (v>m) m=v; let s=0; for (const v of a) s+=Math.exp(v-m); return m+Math.log(s); }
+  // HiDPI canvas; the height attribute is the CSS height in px, width follows the container.
+  function setup(cv){
+    if (!cv.dataset.h) cv.dataset.h = cv.getAttribute('height');
+    const dpr = window.devicePixelRatio||1, w = cv.clientWidth, h = +cv.dataset.h;
+    cv.style.height = h+'px'; cv.width = Math.round(w*dpr); cv.height = Math.round(h*dpr);
+    const ctx = cv.getContext('2d'); ctx.setTransform(dpr,0,0,dpr,0,0);
+    ctx.font = '12px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif';
+    return {ctx, w, h};
+  }
+  // A linear map from data box [x0,x1]x[y0,y1] to pixel rect {l,t,w,h}; y points up.
+  function frame(ctx, rect, xr, yr){
+    const X = v => rect.l + (v-xr[0])/(xr[1]-xr[0])*rect.w;
+    const Y = v => rect.t + rect.h - (v-yr[0])/(yr[1]-yr[0])*rect.h;
+    function axes({xticks=[], yticks=[], xlabel='', ylabel='', fmt=v=>+v.toFixed(2)}={}){
+      ctx.save(); ctx.strokeStyle = css('--line'); ctx.lineWidth = 1;
+      ctx.strokeRect(rect.l, rect.t, rect.w, rect.h);
+      ctx.fillStyle = css('--muted'); ctx.textAlign='center'; ctx.textBaseline='top';
+      for (const v of xticks){ ctx.fillText(fmt(v), X(v), rect.t+rect.h+4); }
+      ctx.textAlign='right'; ctx.textBaseline='middle';
+      for (const v of yticks){ ctx.fillText(fmt(v), rect.l-5, Y(v)); }
+      ctx.textAlign='center'; ctx.textBaseline='top';
+      if (xlabel) ctx.fillText(xlabel, rect.l+rect.w/2, rect.t+rect.h+19);
+      if (ylabel){ ctx.translate(rect.l-34, rect.t+rect.h/2); ctx.rotate(-Math.PI/2); ctx.textBaseline='bottom'; ctx.fillText(ylabel,0,0); }
+      ctx.restore();
+    }
+    function line(xs, ys, color, width=2, dash=[]){
+      ctx.save(); ctx.strokeStyle=color; ctx.lineWidth=width; ctx.setLineDash(dash); ctx.beginPath();
+      xs.forEach((x,i)=>{ const px=X(x), py=Y(ys[i]); i?ctx.lineTo(px,py):ctx.moveTo(px,py); }); ctx.stroke(); ctx.restore();
+    }
+    function dot(x, y, color, r=3, ring=false){
+      ctx.save(); ctx.beginPath(); ctx.arc(X(x),Y(y),r,0,2*Math.PI);
+      if (ring){ ctx.strokeStyle=color; ctx.lineWidth=1.5; ctx.stroke(); } else { ctx.fillStyle=color; ctx.fill(); }
+      ctx.restore();
+    }
+    function clip(fn){ ctx.save(); ctx.beginPath(); ctx.rect(rect.l,rect.t,rect.w,rect.h); ctx.clip(); fn(); ctx.restore(); }
+    return {X, Y, axes, line, dot, clip, rect};
+  }
+  function text(ctx, s, x, y, {color=css('--ink'), align='left', base='alphabetic', size=12, bold=false}={}){
+    ctx.save(); ctx.fillStyle=color; ctx.textAlign=align; ctx.textBaseline=base;
+    ctx.font=`${bold?'600 ':''}${size}px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif`; ctx.fillText(s,x,y); ctx.restore();
+  }
+  const linspace = (a,b,n) => Array.from({length:n}, (_,i)=> a+(b-a)*i/(n-1));
+  // Redraw hooks: resize and light/dark switches repaint every widget.
+  const hooks = [];
+  const onRedraw = f => { hooks.push(f); f(); };
+  window.addEventListener('resize', () => hooks.forEach(f=>f()));
+  window.matchMedia?.('(prefers-color-scheme: dark)').addEventListener?.('change', () => hooks.forEach(f=>f()));
+  // Bind inputs by id; every 'input' event re-runs draw, and each <output for=id> shows the value.
+  function bind(ids, draw){
+    for (const id of ids){ const el = document.getElementById(id);
+      el.addEventListener('input', () => { const o=document.querySelector(`output[for="${id}"]`); if(o) o.textContent=el.value; draw(); }); }
+  }
+  const val = id => +document.getElementById(id).value;
+  return {css, col, rgba, rng, randn, sigmoid, lse, setup, frame, text, linspace, onRedraw, bind, val};
+})();
+</script>
+
+<h2 id="t-am-063">T-AM-063 · Cross-sectional self-consistency: a pair cannot say who is wrong, the median of all twins can</h2>
+<p>Top panel: each grey dot is a pair of near-identical cross-sectional patches from a toy dataset, placed by image distance d_I (MSE, in units of 10⁻³, so 1 is the retrieval threshold ε_I) and mask distance d_M = 1 − IoU. About 4% of the dataset's pairs involve a wrong mask. The blue band is the per-bin baseline μ_k ± σ_k. The coloured dots are the pairs one <b>query patch</b> forms with its twins: blue if the twin's own mask is clean, orange if the twin's mask is wrong.</p>
+<p>Bottom panel: each pair's residual r_ij = (μ_k − d_M)/(σ_k + ε). Strongly negative means "these masks disagree far more than masks of equally similar images usually do". The black line is the patch score R_i, the median of the query's residuals. The readout turns R_i into the voxel quality q = σ(R_i).</p>
+<div class="widget">
+  <div class="controls">
+    <label>query mask error <input type="range" id="t-am-063-err" min="0" max="0.5" step="0.01" value="0"><output for="t-am-063-err">0</output></label>
+    <label>share of twins with wrong masks <input type="range" id="t-am-063-share" min="0" max="0.8" step="0.02" value="0.2"><output for="t-am-063-share">0.2</output></label>
+    <label>twins <input type="range" id="t-am-063-n" min="5" max="60" step="1" value="25"><output for="t-am-063-n">25</output></label>
+    <label>baseline <select id="t-am-063-base">
+      <option value="paper" selected>mean / SD (paper)</option>
+      <option value="robust">median / MAD (robust)</option>
+    </select></label>
+    <button id="t-am-063-new">redraw twins</button>
+  </div>
+  <canvas id="t-am-063-cv1" height="280"></canvas>
+  <canvas id="t-am-063-cv2" height="130" style="margin-top:.4rem"></canvas>
+  <div class="readout" id="t-am-063-ro"></div>
+  <div class="legend"><span style="--c:var(--c0)">pair with a clean twin</span><span style="--c:var(--c1)">pair with a noisy twin</span><span style="--c:var(--ink)">median R_i</span></div>
+</div>
+<p class="callout">Keep the query clean and raise the share of noisy twins. R_i stays near 0 up to a share of about 0.48, then jumps once noisy twins are the majority (about −2.3 at 0.52, below −3 by 0.6), and a clean patch is blamed. That is the median's 50% breakdown point. Back at a share of 0.2, a query mask error of 0.3 pushes R_i below −3, because now the query disagrees with nearly every twin. Then switch the baseline to <b>median / MAD</b>. The 4% noisy pairs in the dataset were inflating every σ_k (0.070 against 0.030 in the middle bin), and the same query now scores about −12.5 instead of −3.7; even an error of 0.1 is flagged. Also note that a clean patch with R_i ≈ 0 gets q = σ(0) = 0.5, not 1.</p>
+<script>(() => {
+  const P = 't-am-063-', $ = id => document.getElementById(P + id);
+  const cv1 = $('cv1'), cv2 = $('cv2'), ro = $('ro');
+  const K = 10;                                   // display bins (the paper uses 100)
+  const mu0 = d => 0.03 + 0.07 * d, sd0 = d => 0.012 + 0.03 * d;   // clean-pair baseline vs d_I
+  // toy dataset of pairs; 4% involve a wrong mask
+  const rp = IV.rng(63), NP = 2500, pI = new Float32Array(NP), pM = new Float32Array(NP);
+  for (let i = 0; i < NP; i++) {
+    const d = rp(); let m = mu0(d) + sd0(d) * IV.randn(rp);
+    if (rp() < 0.04) m += 0.15 + 0.35 * rp();
+    pI[i] = d; pM[i] = Math.min(1, Math.max(0, m));
+  }
+  function binStats(robust) {
+    const mu = [], sd = [];
+    for (let k = 0; k < K; k++) {
+      const v = []; for (let i = 0; i < NP; i++) if (Math.min(K - 1, Math.floor(pI[i] * K)) === k) v.push(pM[i]);
+      v.sort((a, b) => a - b);
+      if (robust) {
+        const med = v[v.length >> 1], dev = v.map(x => Math.abs(x - med)).sort((a, b) => a - b);
+        mu.push(med); sd.push(1.4826 * dev[dev.length >> 1]);
+      } else {
+        const m = v.reduce((a, b) => a + b, 0) / v.length;
+        mu.push(m); sd.push(Math.sqrt(v.reduce((a, b) => a + (b - m) ** 2, 0) / (v.length - 1)));
+      }
+    }
+    return {mu, sd};
+  }
+  const ST = {paper: binStats(false), robust: binStats(true)};
+  let seed = 1, Z = [];
+  function redraw() { const r = IV.rng(1000 + seed); Z = Array.from({length: 60}, () => ({d: r(), z: IV.randn(r), u: r(), nz: 0.15 + 0.35 * r()})); }
+  redraw();
+  const median = a => { const s = [...a].sort((x, y) => x - y), n = s.length; return n % 2 ? s[n >> 1] : (s[n / 2 - 1] + s[n / 2]) / 2; };
+
+  function compute() {
+    const e = IV.val(P + 'err'), sh = IV.val(P + 'share'), n = IV.val(P + 'n'), st = ST[$('base').value];
+    const order = [...Array(n).keys()].sort((a, b) => Z[a].u - Z[b].u);
+    const noisy = new Set(order.slice(0, Math.round(sh * n)));
+    const out = [];
+    for (let j = 0; j < n; j++) {
+      const q = Z[j]; let m = mu0(q.d) + sd0(q.d) * q.z;
+      const nz = noisy.has(j); if (nz) m += q.nz;
+      m = Math.min(1, Math.max(0, m + e));
+      const k = Math.min(K - 1, Math.floor(q.d * K));
+      out.push({d: q.d, m, nz, r: (st.mu[k] - m) / (st.sd[k] + 0.001)});
+    }
+    return {out, st, R: median(out.map(o => o.r))};
+  }
+
+  function draw() {
+    const {out, st, R} = compute();
+    const c0 = IV.col(0), c1 = IV.col(1), mut = IV.css('--muted'), ink = IV.css('--ink');
+    // panel 1: p(d_M | d_I)
+    let {ctx, w, h} = IV.setup(cv1);
+    let rect = {l: 52, t: 10, w: w - 64, h: h - 50};
+    let f = IV.frame(ctx, rect, [0, 1], [0, 0.8]);
+    f.axes({xticks: [0, 0.2, 0.4, 0.6, 0.8, 1], yticks: [0, 0.2, 0.4, 0.6, 0.8], xlabel: 'image distance d_I (×10⁻³ MSE)', ylabel: 'd_M = 1 − IoU'});
+    f.clip(() => {
+      ctx.fillStyle = IV.rgba(mut, 0.28);
+      for (let i = 0; i < NP; i += 2) { ctx.beginPath(); ctx.arc(f.X(pI[i]), f.Y(pM[i]), 1.4, 0, 7); ctx.fill(); }
+      for (let k = 0; k < K; k++) {
+        const x0 = f.X(k / K), x1 = f.X((k + 1) / K);
+        ctx.fillStyle = IV.rgba(c0, 0.16); ctx.fillRect(x0, f.Y(st.mu[k] + st.sd[k]), x1 - x0, f.Y(st.mu[k] - st.sd[k]) - f.Y(st.mu[k] + st.sd[k]));
+        ctx.strokeStyle = c0; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(x0, f.Y(st.mu[k])); ctx.lineTo(x1, f.Y(st.mu[k])); ctx.stroke();
+      }
+      for (const o of out) f.dot(o.d, o.m, o.nz ? c1 : c0, 4);
+    });
+    IV.text(ctx, 'μ_k ± σ_k per bin', rect.l + rect.w - 6, rect.t + 14, {color: c0, align: 'right'});
+    // panel 2: residual strip
+    ({ctx, w, h} = IV.setup(cv2));
+    rect = {l: 52, t: 8, w: w - 64, h: h - 44};
+    f = IV.frame(ctx, rect, [-40, 8], [0, 1]);
+    f.clip(() => { ctx.fillStyle = IV.rgba(IV.col(1), 0.08); ctx.fillRect(rect.l, rect.t, f.X(-3) - rect.l, rect.h); });
+    f.axes({xticks: [-40, -30, -20, -10, -3, 0, 5], xlabel: 'pair residual r_ij (shaded: below −3)', fmt: v => String(v)});
+    const jr = IV.rng(7);
+    f.clip(() => { out.forEach(o => f.dot(Math.max(-39.5, Math.min(7.5, o.r)), 0.15 + 0.7 * jr(), o.nz ? c1 : c0, 3.5)); });
+    const xR = f.X(Math.max(-40, Math.min(8, R)));
+    ctx.save(); ctx.strokeStyle = ink; ctx.lineWidth = 2.5; ctx.beginPath(); ctx.moveTo(xR, rect.t); ctx.lineTo(xR, rect.t + rect.h); ctx.stroke(); ctx.restore();
+    IV.text(ctx, `R_i = ${R.toFixed(2)}`, Math.min(xR + 6, rect.l + rect.w - 70), rect.t + 12, {bold: true});
+    const q = IV.sigmoid(R), k5 = 5;
+    ro.innerHTML = `R_i = <b>${R.toFixed(2)}</b>${R < -3 ? ' · <b>flagged</b> (R_i &lt; −3)' : ''} · q = σ(R_i) = <b>${q.toFixed(3)}</b> · ` +
+      `loss weight next to the vessel (w = 1): Q = q = <b>${q.toFixed(3)}</b>; a background voxel keeps Q = 1 · ` +
+      `σ_k in the middle bin: mean/SD ${ST.paper.sd[k5].toFixed(3)} vs median/MAD ${ST.robust.sd[k5].toFixed(3)}`;
+  }
+  $('new').addEventListener('click', () => { seed++; redraw(); draw(); });
+  IV.bind(['err', 'share', 'n', 'base'].map(s => P + s), draw);
+  IV.onRedraw(draw);
+})();</script>
+
+
+<h2 id="t-am-171">T-AM-171 · Learning to distort: the prototype hinge stops pulling at a fixed cosine gap</h2>
+<p>Left: a slice through the IQA encoder's feature space, drawn as the unit circle because only cosines matter. p₀ is the undistorted prototype, p₁ the distorted one, and z is the encoder feature of a generated volume. <b>Drag z</b> around the circle. The prototype-guidance hinge is L = max(0, cos(z,p₀) − cos(z,p₁) + m). It is zero on the green arc, where z is already at least m more similar to p₁ than to p₀, and active on the orange arc. For comparison, a logistic (BCE) loss on the same cosine gap, −log σ(s·gap), stands in for the classifier-head loss of the ablation.</p>
+<p>Right: both losses and the size of their pull on z, |dL/dθ|, as z moves around the circle. Bottom: the weight w_k = ((k − k₀)/(K − k₀))² that each Euler step of the generated trajectory gets.</p>
+<div class="widget">
+  <div class="controls">
+    <label>margin m <input type="range" id="t-am-171-m" min="0" max="1" step="0.01" value="0.2"><output for="t-am-171-m">0.2</output></label>
+    <label>angle p₀–p₁ (°) <input type="range" id="t-am-171-d" min="5" max="180" step="1" value="120"><output for="t-am-171-d">120</output></label>
+    <label>BCE scale s <input type="range" id="t-am-171-s" min="1" max="20" step="0.5" value="5"><output for="t-am-171-s">5</output></label>
+  </div>
+  <canvas id="t-am-171-cv1" height="300"></canvas>
+  <div class="readout" id="t-am-171-ro"></div>
+  <div class="controls" style="margin-top:.8rem">
+    <label>Euler steps K <input type="range" id="t-am-171-K" min="10" max="40" step="1" value="20"><output for="t-am-171-K">20</output></label>
+    <label>first guided step k₀ <input type="range" id="t-am-171-k0" min="0" max="39" step="1" value="10"><output for="t-am-171-k0">10</output></label>
+  </div>
+  <canvas id="t-am-171-cv2" height="130"></canvas>
+  <div class="readout" id="t-am-171-ro2"></div>
+  <div class="legend"><span style="--c:var(--c1)">hinge (prototype guidance)</span><span style="--c:var(--c0)">logistic loss on the same gap</span><span style="--c:var(--c2)">hinge satisfied: L = 0</span></div>
+</div>
+<p class="callout">Drag z onto the green arc. The hinge and its pull are exactly zero once cos(z,p₁) − cos(z,p₀) ≥ m, while the logistic pull shrinks but never reaches zero. So prototype guidance does not keep pulling "deeper" into the distorted cluster; it stops at a cosine gap of m = 0.2. Then close the angle between the prototypes below about 11.5°. The green arc disappears because the largest possible gap, 2 sin(Δ/2), is now smaller than m, and the hinge never switches off.</p>
+<script>(() => {
+  const P = 't-am-171-', $ = id => document.getElementById(P + id);
+  const cv1 = $('cv1'), cv2 = $('cv2'), ro = $('ro'), ro2 = $('ro2');
+  let th = 30 * Math.PI / 180;           // angle of z
+  const deg = r => r * 180 / Math.PI, wrap = a => Math.atan2(Math.sin(a), Math.cos(a));
+  let geo = null;
+  function pars() { return {m: IV.val(P + 'm'), D: IV.val(P + 'd') * Math.PI / 180, s: IV.val(P + 's')}; }
+  const gap = (t, D) => Math.cos(t - D) - Math.cos(t);
+  const dgap = (t, D) => -Math.sin(t - D) + Math.sin(t);
+  const hinge = (t, p) => Math.max(0, p.m - gap(t, p.D));
+  const hgrad = (t, p) => (p.m - gap(t, p.D) > 0 ? Math.abs(dgap(t, p.D)) : 0);
+  const bce = (t, p) => Math.log1p(Math.exp(-p.s * gap(t, p.D)));
+  const bgrad = (t, p) => p.s * IV.sigmoid(-p.s * gap(t, p.D)) * Math.abs(dgap(t, p.D));
+
+  function draw() {
+    const wide = cv1.clientWidth > 620; cv1.dataset.h = wide ? 300 : 560;
+    const p = pars(), {ctx, w, h} = IV.setup(cv1);
+    const c0 = IV.col(0), c1 = IV.col(1), c2 = IV.col(2), mut = IV.css('--muted'), ink = IV.css('--ink');
+    const cw = wide ? Math.min(320, w * 0.42) : w, ch = wide ? h : 290;
+    // ---- circle ----
+    const R = Math.min(cw, ch) * 0.36, cx = cw / 2, cy = ch / 2;
+    geo = {cx, cy, R};
+    const N = 360;
+    for (let i = 0; i < N; i++) {
+      const a0 = i / N * 2 * Math.PI, a1 = (i + 1) / N * 2 * Math.PI, am = (a0 + a1) / 2;
+      ctx.strokeStyle = gap(am, p.D) >= p.m ? c2 : c1; ctx.lineWidth = 6;
+      ctx.beginPath(); ctx.arc(cx, cy, R, -a0, -a1, true); ctx.stroke();
+    }
+    // BCE boundary (gap = 0): bisector line
+    ctx.save(); ctx.strokeStyle = mut; ctx.setLineDash([4, 4]); ctx.lineWidth = 1;
+    const b = p.D / 2; ctx.beginPath(); ctx.moveTo(cx - 1.25 * R * Math.cos(b), cy + 1.25 * R * Math.sin(b)); ctx.lineTo(cx + 1.25 * R * Math.cos(b), cy - 1.25 * R * Math.sin(b)); ctx.stroke(); ctx.restore();
+    const arrow = (a, color, label) => {
+      const x = cx + R * Math.cos(a), y = cy - R * Math.sin(a);
+      ctx.save(); ctx.strokeStyle = color; ctx.fillStyle = color; ctx.lineWidth = 2.2;
+      ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(x, y); ctx.stroke();
+      ctx.beginPath(); ctx.arc(x, y, 4, 0, 7); ctx.fill(); ctx.restore();
+      IV.text(ctx, label, cx + (R + 18) * Math.cos(a), cy - (R + 18) * Math.sin(a) + 4, {color, align: 'center', bold: true});
+    };
+    arrow(0, c0, 'p₀'); arrow(p.D, c1, 'p₁');
+    const zx = cx + R * Math.cos(th), zy = cy - R * Math.sin(th);
+    ctx.save(); ctx.strokeStyle = ink; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(zx, zy); ctx.stroke();
+    ctx.fillStyle = ink; ctx.beginPath(); ctx.arc(zx, zy, 7, 0, 7); ctx.fill(); ctx.restore();
+    IV.text(ctx, 'z', zx + 10 * Math.cos(th) + 4, zy - 10 * Math.sin(th) + 4, {bold: true});
+    IV.text(ctx, 'dashed: logistic decision line (gap = 0)', 6, ch - 8, {color: mut, size: 11});
+    // ---- curves ----
+    const rect = wide ? {l: cw + 50, t: 12, w: w - cw - 62, h: h - 50} : {l: 50, t: ch + 10, w: w - 62, h: h - ch - 48};
+    if (rect) {
+      const xs = IV.linspace(-Math.PI, Math.PI, 361);
+      let gmax = 0; xs.forEach(t => { gmax = Math.max(gmax, hgrad(t, p), bgrad(t, p)); });
+      const lmax = Math.max(0.5, ...xs.map(t => Math.max(hinge(t, p), Math.min(bce(t, p), 3))));
+      const half = {l: rect.l, t: rect.t, w: rect.w, h: rect.h * 0.46};
+      const low = {l: rect.l, t: rect.t + rect.h * 0.54, w: rect.w, h: rect.h * 0.46};
+      const F1 = IV.frame(ctx, half, [-180, 180], [0, lmax]);
+      F1.axes({xticks: [], yticks: [0, +(lmax / 2).toFixed(1), +lmax.toFixed(1)], ylabel: 'loss'});
+      const xd = xs.map(deg);
+      F1.clip(() => { F1.line(xd, xs.map(t => Math.min(bce(t, p), lmax)), c0, 2); F1.line(xd, xs.map(t => hinge(t, p)), c1, 2.4); });
+      // log scale, so a small-but-nonzero pull stays visible and an exact zero drops off the floor
+      const top = Math.ceil(Math.log10(gmax * 1.2 || 1)), FL = -4, lg = v => Math.log10(Math.max(v, 1e-9));
+      const F2 = IV.frame(ctx, low, [-180, 180], [FL, top]);
+      const yt = []; for (let v = FL; v <= top; v += 2) yt.push(v);
+      F2.axes({xticks: [-180, -90, 0, 90, 180], yticks: [], xlabel: 'angle of z (°), p₀ at 0°', ylabel: '|pull| (log)', fmt: v => String(v)});
+      yt.forEach(v => IV.text(ctx, v === 0 ? '1' : '1e' + v, low.l - 5, F2.Y(v) + 4, {align: 'right', size: 11, color: mut}));
+      F2.clip(() => {
+        for (let i = 0; i < xs.length - 1; i++) if (gap(xs[i], p.D) >= p.m) { ctx.fillStyle = IV.rgba(c2, 0.12); ctx.fillRect(F2.X(xd[i]), low.t, F2.X(xd[i + 1]) - F2.X(xd[i]) + 0.5, low.h); }
+        F2.line(xd, xs.map(t => lg(bgrad(t, p))), c0, 2);
+        // hinge: draw only where the pull is non-zero
+        ctx.save(); ctx.strokeStyle = c1; ctx.lineWidth = 2.4; ctx.beginPath(); let on = false;
+        xs.forEach((t, i) => { const v = hgrad(t, p); if (v > 0) { const X = F2.X(xd[i]), Y = F2.Y(lg(v)); on ? ctx.lineTo(X, Y) : ctx.moveTo(X, Y); on = true; } else on = false; });
+        ctx.stroke(); ctx.restore();
+      });
+      IV.text(ctx, 'shaded: hinge pull exactly 0', low.l + 4, low.t + low.h - 4, {size: 10, color: c2});
+      const tz = deg(wrap(th));
+      for (const F of [F1, F2]) { ctx.save(); ctx.strokeStyle = ink; ctx.setLineDash([2, 3]); ctx.beginPath(); ctx.moveTo(F.X(tz), F.rect.t); ctx.lineTo(F.X(tz), F.rect.t + F.rect.h); ctx.stroke(); ctx.restore(); }
+    }
+    const g = gap(th, p.D), act = p.m - g > 0, maxg = 2 * Math.sin(p.D / 2);
+    ro.innerHTML = `z at ${deg(wrap(th)).toFixed(0)}° · cos(z,p₁) − cos(z,p₀) = <b>${g.toFixed(3)}</b> · hinge L = <b>${hinge(th, p).toFixed(3)}</b>, pull <b>${hgrad(th, p).toFixed(3)}</b>${act ? '' : ' (<b>switched off</b>)'} · ` +
+      `logistic pull <b>${bgrad(th, p).toFixed(3)}</b> · largest possible gap 2 sin(Δ/2) = ${maxg.toFixed(3)}${maxg < p.m ? ' &lt; m: <b>the hinge can never be satisfied</b>' : ''}`;
+    drawW();
+  }
+  function drawW() {
+    const K = IV.val(P + 'K'); let k0 = IV.val(P + 'k0');
+    const el = $('k0'); el.max = K - 1; if (k0 > K - 1) { k0 = K - 1; el.value = k0; document.querySelector(`output[for="${P}k0"]`).textContent = k0; }
+    const {ctx, w, h} = IV.setup(cv2), rect = {l: 52, t: 10, w: w - 64, h: h - 44};
+    const F = IV.frame(ctx, rect, [-0.5, K + 0.5], [0, 1.05]);
+    F.axes({xticks: [0, k0, K].filter((v, i, a) => a.indexOf(v) === i), yticks: [0, 0.5, 1], xlabel: 'Euler step k', ylabel: 'w_k', fmt: v => String(v)});
+    let sum = 0; const bw = Math.max(2, rect.w / (K + 1) * 0.7);
+    for (let k = 0; k <= K; k++) {
+      const wk = k >= k0 ? ((k - k0) / (K - k0)) ** 2 : 0; sum += wk;
+      ctx.fillStyle = k >= k0 ? IV.col(1) : IV.css('--line');
+      ctx.fillRect(F.X(k) - bw / 2, F.Y(wk), bw, F.Y(0) - F.Y(wk) + (k >= k0 ? 0 : 0));
+      if (k < k0) { ctx.fillRect(F.X(k) - bw / 2, F.Y(0) - 2, bw, 2); }
+    }
+    ro2.innerHTML = `${K - k0 + 1} guided steps (k = ${k0}…${K}), total weight Σw_k = <b>${sum.toFixed(2)}</b> · the first guided step has w = 0, and about half the weight sits in the last ${Math.max(1, Math.round((K - k0) * (1 - Math.pow(0.5, 1 / 3))))} step(s)`;
+  }
+  function pick(e) {
+    const r = cv1.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top;
+    if (!geo) return; const dx = x - geo.cx, dy = geo.cy - y;
+    if (Math.hypot(dx, dy) < 12 || Math.hypot(dx, dy) > geo.R * 1.6) return;
+    th = Math.atan2(dy, dx); draw();
+  }
+  let drag = false;
+  cv1.addEventListener('pointerdown', e => { drag = true; cv1.setPointerCapture(e.pointerId); pick(e); });
+  cv1.addEventListener('pointermove', e => { if (drag) pick(e); });
+  cv1.addEventListener('pointerup', () => { drag = false; });
+  IV.bind(['m', 'd', 's'].map(s => P + s), draw);
+  IV.bind(['K', 'k0'].map(s => P + s), drawW);
+  IV.onRedraw(draw);
+})();</script>
+
+
+<h2 id="t-pm-174">T-PM-174 · Few-shot bpMRI IQA: prototypes, a b-value nuisance, and a probability that never leaves [0.12, 0.88]</h2>
+<p>A 2-D picture of the frozen embedding. Blue dots are good-quality query scans, orange dots low-quality ones. Filled dots were acquired at b = 1400 and rings at b = 2000. The b-value tilts every embedding by ±ν/2, and that tilt is the acquisition bias the gradient-reversal adversary is meant to remove (ν = 0 is perfect invariance). The large outlined dots are the few curated <b>support</b> cases per class. The arrows are the prototypes, the means of the normalised support embeddings. The dashed line is the decision boundary: points on either side are closer in angle to one prototype or the other.</p>
+<p>The last slider turns the task into PI-QUAL. Only a share ψ of the low-quality exams are low because of DWI distortion. The rest have causes the distortion-trained embedding never learned, so they sit among the good scans.</p>
+<div class="widget">
+  <div class="controls">
+    <label>b-value tilt ν (°) <input type="range" id="t-pm-174-nu" min="0" max="60" step="1" value="30"><output for="t-pm-174-nu">30</output></label>
+    <label>support share at b = 2000 <input type="range" id="t-pm-174-mix" min="0" max="1" step="0.1" value="0"><output for="t-pm-174-mix">0</output></label>
+    <label>shots per class <input type="range" id="t-pm-174-k" min="1" max="10" step="1" value="5"><output for="t-pm-174-k">5</output></label>
+    <label>scale τ <input type="range" id="t-pm-174-tau" min="1" max="30" step="1" value="1"><output for="t-pm-174-tau">1</output></label>
+    <label>share of low quality due to distortion ψ <input type="range" id="t-pm-174-psi" min="0.3" max="1" step="0.05" value="1"><output for="t-pm-174-psi">1</output></label>
+    <button id="t-pm-174-new">redraw support</button>
+  </div>
+  <canvas id="t-pm-174-cv" height="330"></canvas>
+  <div class="readout" id="t-pm-174-ro"></div>
+  <div class="legend"><span style="--c:var(--c0)">good quality</span><span style="--c:var(--c1)">low quality</span><span style="--c:var(--muted)">decision boundary</span></div>
+</div>
+<p class="callout">With the tilt at ν = 30° and every support case taken at b = 1400 (the default), the prototypes inherit the tilt and the b = 2000 good scans fall across the boundary: specificity drops to about 0.52 and balanced accuracy to 0.76. Set ν = 0, which is what the adversary aims for, and balanced accuracy returns to 0.96 whatever the support mix. Then lower ψ to 0.6. Sensitivity falls to about 0.6 and stays there, because the frozen embedding places the other causes next to the good prototype. Finally, look at the probability range in the readout. At τ = 1 no query ever gets a probability outside [0.12, 0.88], so its loss never falls below 0.127.</p>
+<script>(() => {
+  const P = 't-pm-174-', $ = id => document.getElementById(P + id);
+  const cv = $('cv'), ro = $('ro');
+  const A_GOOD = 70, A_BAD = 110, SD = 11, rad = Math.PI / 180;
+  // fixed query population: 200 per class, half at each b-value
+  const rq = IV.rng(174), Q = [];
+  for (let c = 0; c < 2; c++) for (let i = 0; i < 200; i++) Q.push({c, b: i % 2, n: IV.randn(rq), r: 1 + 0.15 * IV.randn(rq), u: rq()});
+  let seed = 3, S = [];
+  function redraw() { const r = IV.rng(500 + seed); S = [0, 1].map(c => Array.from({length: 10}, () => ({c, n: IV.randn(r), r: 1 + 0.15 * IV.randn(r), u: r()}))); }
+  redraw();
+  function angle(s, b, nu, psi) {
+    const visible = s.c === 1 && s.u < psi;           // low quality AND caused by distortion
+    return (visible ? A_BAD : A_GOOD) + SD * s.n + (b ? nu / 2 : -nu / 2);
+  }
+  const vec = (a, r) => [r * Math.cos(a * rad), r * Math.sin(a * rad)];
+  const cos2 = (a, b) => (a[0] * b[0] + a[1] * b[1]) / (Math.hypot(...a) * Math.hypot(...b));
+
+  function draw() {
+    const nu = IV.val(P + 'nu'), mix = IV.val(P + 'mix'), K = IV.val(P + 'k'), tau = IV.val(P + 'tau'), psi = IV.val(P + 'psi');
+    const nb = Math.round(mix * K);
+    const sup = [0, 1].map(c => S[c].slice(0, K).map((s, i) => ({...s, b: i < nb ? 1 : 0})));
+    const proto = sup.map(ss => { let x = 0, y = 0; ss.forEach(s => { const a = angle(s, s.b, nu, psi); x += Math.cos(a * rad); y += Math.sin(a * rad); }); return [x / ss.length, y / ss.length]; });
+    let tp = 0, fn = 0, tn = 0, fp = 0, ce = 0;
+    const pts = Q.map(s => {
+      const z = vec(angle(s, s.b, nu, psi), s.r);
+      const g = cos2(z, proto[1]) - cos2(z, proto[0]), p1 = IV.sigmoid(tau * g);
+      const pred = g > 0 ? 1 : 0;
+      if (s.c === 1) { pred ? tp++ : fn++; ce -= Math.log(p1); } else { pred ? fp++ : tn++; ce -= Math.log(1 - p1); }
+      return {z, s};
+    });
+    const sens = tp / (tp + fn), spec = tn / (tn + fp);
+    // ---- draw ----
+    const {ctx, w, h} = IV.setup(cv);
+    const c0 = IV.col(0), c1 = IV.col(1), mut = IV.css('--muted'), ink = IV.css('--ink');
+    const yr = [-0.15, 1.55], sc = (h - 30) / (yr[1] - yr[0]), xr = (w - 20) / sc / 2;
+    const rect = {l: 10, t: 10, w: w - 20, h: h - 30}, F = IV.frame(ctx, rect, [-xr, xr], yr);
+    ctx.save(); ctx.strokeStyle = IV.css('--line'); ctx.lineWidth = 1; ctx.beginPath(); ctx.arc(F.X(0), F.Y(0), sc, Math.PI, 2 * Math.PI); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(F.X(-xr), F.Y(0)); ctx.lineTo(F.X(xr), F.Y(0)); ctx.stroke(); ctx.restore();
+    // boundary: perpendicular to (P1hat - P0hat)
+    const n0 = Math.hypot(...proto[0]), n1 = Math.hypot(...proto[1]);
+    const d = [proto[1][0] / n1 - proto[0][0] / n0, proto[1][1] / n1 - proto[0][1] / n0], bd = [-d[1], d[0]], bl = Math.hypot(...bd) || 1;
+    ctx.save(); ctx.strokeStyle = mut; ctx.setLineDash([5, 4]); ctx.lineWidth = 1.5; ctx.beginPath();
+    ctx.moveTo(F.X(-2 * bd[0] / bl), F.Y(-2 * bd[1] / bl)); ctx.lineTo(F.X(2 * bd[0] / bl), F.Y(2 * bd[1] / bl)); ctx.stroke(); ctx.restore();
+    F.clip(() => {
+      for (const {z, s} of pts) { const col = s.c ? c1 : c0; if (s.b) F.dot(z[0], z[1], IV.rgba(col, 0.75), 2.6, true); else F.dot(z[0], z[1], IV.rgba(col, 0.6), 2.4); }
+      for (const ss of sup) for (const s of ss) {
+        const z = vec(angle(s, s.b, nu, psi), s.r), col = s.c ? c1 : c0;
+        ctx.beginPath(); ctx.arc(F.X(z[0]), F.Y(z[1]), 6.5, 0, 7); ctx.fillStyle = s.b ? IV.css('--surface') : col; ctx.fill();
+        ctx.lineWidth = 2; ctx.strokeStyle = ink; ctx.stroke(); if (s.b) { ctx.beginPath(); ctx.arc(F.X(z[0]), F.Y(z[1]), 3, 0, 7); ctx.fillStyle = col; ctx.fill(); }
+      }
+    });
+    proto.forEach((pv, c) => {
+      const col = c ? c1 : c0, L = 1.35 / Math.hypot(...pv);
+      ctx.save(); ctx.strokeStyle = col; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(F.X(0), F.Y(0)); ctx.lineTo(F.X(pv[0] * L), F.Y(pv[1] * L)); ctx.stroke(); ctx.restore();
+      IV.text(ctx, c ? 'P_low' : 'P_good', F.X(pv[0] * L * 1.06), F.Y(pv[1] * L * 1.06), {color: col, align: 'center', bold: true});
+    });
+    IV.text(ctx, 'filled: b = 1400 · ring: b = 2000 · outlined: support', 12, h - 6, {color: mut, size: 11});
+    const lo = IV.sigmoid(-2 * tau), hi = IV.sigmoid(2 * tau);
+    ro.innerHTML = `sensitivity <b>${sens.toFixed(2)}</b> · specificity <b>${spec.toFixed(2)}</b> · balanced accuracy <b>${((sens + spec) / 2).toFixed(2)}</b> · ` +
+      `mean query loss ${(ce / Q.length).toFixed(3)} · with τ = ${tau}, every probability lies in [<b>${lo < 1e-4 ? lo.toExponential(1) : lo.toFixed(3)}</b>, <b>${hi > 0.9999 ? '≈1' : hi.toFixed(3)}</b>], so no query loss can fall below ${(-Math.log(hi)).toFixed(3)}`;
+  }
+  $('new').addEventListener('click', () => { seed++; redraw(); draw(); });
+  IV.bind(['nu', 'mix', 'k', 'tau', 'psi'].map(s => P + s), draw);
+  IV.onRedraw(draw);
+})();</script>
+
+
+<h2 id="w-am-041">W-AM-041 · MedQ-Engine: persistent failures, error-weighted budgets and confidence routing</h2>
+<p>Three rules from the data engine, each on its own toy. <b>Left:</b> a dev question is answered R times and enters the failure pool when more than a share γ of the answers are wrong. The curve is the chance of being flagged for a question whose per-answer error probability is p. <b>Right:</b> the annotation budget of B = 2000 samples is split over six capability cells in proportion to e_k^α, where e_k is the cell's dev error rate.</p>
+<p><b>Bottom:</b> the self-evolution routing for 1200 toy samples. Each dot is one new sample, placed by the student model's per-token negative log-likelihood of its own answer, H (the paper's "trajectory entropy"), and by its agreement δ with GPT-4o's answer. Right of τ_H, GPT-4o's label is adopted unreviewed. Top-left, where the student is confident and agrees, its own label is adopted. Bottom-left, where it is confident but disagrees, the sample goes to an expert. Colour shows what ends up in the training set. In the toy the student is right 72% of the time and GPT-4o 65%, close to its benchmark score.</p>
+<div class="widget">
+  <div class="controls">
+    <label>runs R <input type="range" id="w-am-041-R" min="1" max="10" step="1" value="5"><output for="w-am-041-R">5</output></label>
+    <label>error-rate threshold γ <input type="range" id="w-am-041-g" min="0" max="0.95" step="0.05" value="0.6"><output for="w-am-041-g">0.6</output></label>
+    <label>budget exponent α <input type="range" id="w-am-041-a" min="0" max="6" step="0.1" value="1"><output for="w-am-041-a">1</output></label>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px">
+    <canvas id="w-am-041-cv1" height="210"></canvas>
+    <canvas id="w-am-041-cv2" height="210"></canvas>
+  </div>
+  <div class="readout" id="w-am-041-ro1"></div>
+  <div class="controls" style="margin-top:.8rem">
+    <label>τ_H <input type="range" id="w-am-041-th" min="0.1" max="1.2" step="0.02" value="0.5"><output for="w-am-041-th">0.5</output></label>
+    <label>τ_ann <input type="range" id="w-am-041-ta" min="0.1" max="0.95" step="0.05" value="0.6"><output for="w-am-041-ta">0.6</output></label>
+    <label>shared errors ρ <input type="range" id="w-am-041-rho" min="0" max="1" step="0.05" value="0.2"><output for="w-am-041-rho">0.2</output></label>
+    <label>calibration c <input type="range" id="w-am-041-c" min="0" max="1" step="0.05" value="0.7"><output for="w-am-041-c">0.7</output></label>
+  </div>
+  <canvas id="w-am-041-cv3" height="300"></canvas>
+  <div class="readout" id="w-am-041-ro2"></div>
+  <div class="legend"><span style="--c:var(--c2)">correct label kept</span><span style="--c:var(--c1)">wrong label kept, unreviewed</span><span style="--c:var(--muted)">sent to an expert</span></div>
+</div>
+<p class="callout">Look at p = 0.5 on the left: a question the model gets right half the time is flagged only 19% of the time, so the pool holds persistent failures, not bad luck. In the routing panel, raise the shared-error share ρ. The review rate falls, because student and oracle agree more often, while the wrong labels kept through the top-left route rise: agreement is weak evidence exactly when the two models share their mistakes. Then lower the calibration c. Confidently wrong answers slide left of τ_H and are kept on the student's word or sent to the expert, depending only on whether GPT-4o happens to agree.</p>
+<script>(() => {
+  const P = 'w-am-041-', $ = id => document.getElementById(P + id);
+  const cv1 = $('cv1'), cv2 = $('cv2'), cv3 = $('cv3'), ro1 = $('ro1'), ro2 = $('ro2');
+  const choose = (n, k) => { let r = 1; for (let i = 1; i <= k; i++) r = r * (n - k + i) / i; return r; };
+  const flag = (p, R, g) => { const kmin = Math.floor(g * R + 1e-9) + 1; let s = 0; for (let k = kmin; k <= R; k++) s += choose(R, k) * p ** k * (1 - p) ** (R - k); return s; };
+  const E = [0.55, 0.42, 0.30, 0.22, 0.15, 0.08], LAB = ['What·histo', 'How·MRI', 'Y/N·fundus', 'What·CT', 'How·endo', 'Y/N·MRI'];
+  function drawTop() {
+    const R = IV.val(P + 'R'), g = IV.val(P + 'g'), a = IV.val(P + 'a');
+    let {ctx, w, h} = IV.setup(cv1);
+    let rect = {l: 44, t: 18, w: w - 56, h: h - 56};
+    let F = IV.frame(ctx, rect, [0, 1], [0, 1]);
+    F.axes({xticks: [0, 0.25, 0.5, 0.75, 1], yticks: [0, 0.5, 1], xlabel: 'per-answer error probability p', ylabel: 'P(flagged)'});
+    const xs = IV.linspace(0, 1, 101);
+    F.line(xs, xs.map(p => flag(p, R, g)), IV.col(0), 2.4);
+    const f5 = flag(0.5, R, g);
+    ctx.save(); ctx.strokeStyle = IV.css('--muted'); ctx.setLineDash([3, 3]); ctx.beginPath(); ctx.moveTo(F.X(0.5), F.Y(0)); ctx.lineTo(F.X(0.5), F.Y(f5)); ctx.lineTo(F.X(0), F.Y(f5)); ctx.stroke(); ctx.restore();
+    F.dot(0.5, f5, IV.css('--ink'), 4);
+    IV.text(ctx, `flag if > ${Math.floor(g * R + 1e-9)} of ${R} wrong`, rect.l + 4, 12, {size: 11, color: IV.css('--muted')});
+    // budget
+    ({ctx, w, h} = IV.setup(cv2));
+    rect = {l: 44, t: 18, w: w - 56, h: h - 56};
+    const wts = E.map(e => Math.pow(e, a)), sw = wts.reduce((x, y) => x + y, 0), alloc = wts.map(v => 2000 * v / sw);
+    const top = Math.max(...alloc) * 1.15;
+    F = IV.frame(ctx, rect, [-0.5, E.length - 0.5], [0, top]);
+    const stp = top > 1200 ? 500 : top > 500 ? 250 : 100, yt = []; for (let v = 0; v <= top; v += stp) yt.push(v);
+    F.axes({xticks: [], yticks: yt, ylabel: 'samples', fmt: v => String(Math.round(v))});
+    alloc.forEach((n, i) => {
+      const bw = rect.w / E.length * 0.62;
+      ctx.fillStyle = IV.rgba(IV.col(1), 0.35 + 0.6 * E[i] / E[0]); ctx.fillRect(F.X(i) - bw / 2, F.Y(n), bw, F.Y(0) - F.Y(n));
+      IV.text(ctx, String(Math.round(n)), F.X(i), F.Y(n) - 3, {align: 'center', size: 11});
+      IV.text(ctx, LAB[i], F.X(i), rect.t + rect.h + 12, {align: 'center', size: 10, color: IV.css('--muted')});
+      IV.text(ctx, `e=${E[i]}`, F.X(i), rect.t + rect.h + 24, {align: 'center', size: 10, color: IV.css('--muted')});
+    });
+    ro1.innerHTML = `P(flagged | p = 0.5) = <b>${f5.toFixed(3)}</b>, P(flagged | p = 0.8) = <b>${flag(0.8, R, g).toFixed(3)}</b> · ` +
+      `α = ${a}: the worst cell gets <b>${Math.round(alloc[0])}</b> of 2000 samples, the best <b>${Math.round(alloc[5])}</b>${a === 0 ? ' (uniform)' : ''}`;
+  }
+  // routing toy
+  const rn = IV.rng(41), N = 1200, S = Array.from({length: N}, () => ({us: rn(), uc: rn(), ug: rn(), usame: rn(), nH: IV.randn(rn), nD: IV.randn(rn)}));
+  function drawRoute() {
+    const tH = IV.val(P + 'th'), tA = IV.val(P + 'ta'), rho = IV.val(P + 'rho'), c = IV.val(P + 'c');
+    let rev = 0, wrongA = 0, wrongC = 0, nA = 0, nC = 0;
+    const pts = S.map(s => {
+      const sok = s.us < 0.72, copy = s.uc < rho;
+      const gok = copy ? sok : s.ug < 0.65;
+      const same = copy ? true : s.usame < 0.25;
+      const agree = (sok && gok) || (!sok && !gok && same);
+      const d = Math.min(1, Math.max(0, agree ? 0.82 + 0.08 * s.nD : 0.32 + 0.12 * s.nD));
+      const H = Math.max(0.02, 0.3 + c * (sok ? 0 : 0.35) + 0.12 * s.nH);
+      let route, ok;
+      if (H >= tH) { route = 'a'; ok = gok; nA++; if (!ok) wrongA++; }
+      else if (d < tA) { route = 'b'; ok = true; rev++; }
+      else { route = 'c'; ok = sok; nC++; if (!ok) wrongC++; }
+      return {H, d, route, ok};
+    });
+    const {ctx, w, h} = IV.setup(cv3), rect = {l: 52, t: 12, w: w - 64, h: h - 50};
+    const F = IV.frame(ctx, rect, [0, 1.3], [0, 1.05]);
+    F.axes({xticks: [0, 0.25, 0.5, 0.75, 1, 1.25], yticks: [0, 0.5, 1], xlabel: 'H: per-token NLL of the student\'s own answer', ylabel: 'agreement δ'});
+    const mut = IV.css('--muted');
+    F.clip(() => {
+      ctx.fillStyle = IV.rgba(IV.col(0), 0.05); ctx.fillRect(F.X(tH), rect.t, rect.l + rect.w - F.X(tH), rect.h);
+      for (const p of pts) {
+        const col = p.route === 'b' ? IV.rgba(mut, 0.45) : p.ok ? IV.rgba(IV.col(2), 0.55) : IV.col(1);
+        F.dot(p.H, p.d, col, p.ok ? 2.2 : 3);
+      }
+      ctx.strokeStyle = IV.css('--ink'); ctx.lineWidth = 1.5; ctx.setLineDash([5, 4]);
+      ctx.beginPath(); ctx.moveTo(F.X(tH), rect.t); ctx.lineTo(F.X(tH), rect.t + rect.h); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(rect.l, F.Y(tA)); ctx.lineTo(F.X(tH), F.Y(tA)); ctx.stroke();
+    });
+    const lab = (s, x, y, al) => IV.text(ctx, s, x, y, {size: 11, color: IV.css('--ink'), align: al, bold: true});
+    lab('(c) keep own label', rect.l + 6, rect.t + 14, 'left');
+    lab('(b) expert', rect.l + 6, rect.t + rect.h - 8, 'left');
+    lab('(a) adopt GPT-4o', rect.l + rect.w - 6, rect.t + 14, 'right');
+    const kept = nA + nC, wr = wrongA + wrongC;
+    ro2.innerHTML = `expert review rate <b>${(100 * rev / N).toFixed(0)}%</b> · wrong labels among the ${kept} kept without review: <b>${(100 * wr / Math.max(1, kept)).toFixed(1)}%</b> ` +
+      `(${wrongA} via (a), ${wrongC} via (c)) · for reference, adopting GPT-4o for everything keeps ~35% wrong labels`;
+  }
+  IV.bind(['R', 'g', 'a'].map(s => P + s), drawTop);
+  IV.bind(['th', 'ta', 'rho', 'c'].map(s => P + s), drawRoute);
+  IV.onRedraw(drawTop); IV.onRedraw(drawRoute);
+})();</script>
+
+
+<h2 id="w-am-042">W-AM-042 · LaST: a loss GMM separates hard-to-fit from easy-to-fit, and a uniform prior equalises phases</h2>
+<p><b>Top:</b> the per-frame losses of the 600 frames that carry one pseudo-label, as a stacked histogram. Blue frames have the right label. Orange frames have a wrong label that the small model still finds hard to fit. Purple frames have a wrong label from a <i>systematic</i> confusion of the foundation model, which the small model fits easily. A two-component Gaussian mixture is fitted to all the losses by EM (thin curves). The black curve is the posterior P(clean | ℓ) of the lower-mean component, and frames above the threshold τ are kept as clean.</p>
+<p><b>Bottom:</b> the class-balance prior. Grey bars are the true phase shares of a Cholec80-like video, with two long dissection phases. The loss D_KL(u ‖ p̄) pulls the video-average prediction p̄ towards uniform. If the only other pressure were a cross-entropy to the true shares q, the compromise would be p̄ = (q + λu)/(1 + λ) (orange). This is a simplification, since the real losses act frame by frame, but the direction of the pull is the same. LaST weights the two terms equally (λ = 1).</p>
+<div class="widget">
+  <div class="controls">
+    <label>noisy share η <input type="range" id="w-am-042-eta" min="0" max="0.6" step="0.02" value="0.3"><output for="w-am-042-eta">0.3</output></label>
+    <label>loss separation <input type="range" id="w-am-042-sep" min="0.2" max="3" step="0.1" value="1.4"><output for="w-am-042-sep">1.4</output></label>
+    <label>systematic share κ <input type="range" id="w-am-042-kap" min="0" max="1" step="0.05" value="0"><output for="w-am-042-kap">0</output></label>
+    <label>threshold τ <input type="range" id="w-am-042-tau" min="0.5" max="0.99" step="0.01" value="0.9"><output for="w-am-042-tau">0.9</output></label>
+  </div>
+  <canvas id="w-am-042-cv1" height="260"></canvas>
+  <div class="readout" id="w-am-042-ro1"></div>
+  <div class="controls" style="margin-top:.8rem">
+    <label>phase skew <input type="range" id="w-am-042-skew" min="0" max="1" step="0.05" value="1"><output for="w-am-042-skew">1</output></label>
+    <label>prior weight λ <input type="range" id="w-am-042-lam" min="0" max="3" step="0.1" value="1"><output for="w-am-042-lam">1</output></label>
+  </div>
+  <canvas id="w-am-042-cv2" height="200"></canvas>
+  <div class="readout" id="w-am-042-ro2"></div>
+  <div class="legend"><span style="--c:var(--c0)">clean label</span><span style="--c:var(--c1)">wrong, hard to fit</span><span style="--c:var(--c3)">wrong, systematic (easy to fit)</span><span style="--c:var(--ink)">P(clean | ℓ)</span></div>
+</div>
+<p class="callout">At the defaults the kept set is almost perfectly clean (99.6%). Now raise the systematic share κ. The purple frames have clean-looking losses, fall in the clean component and pass τ = 0.9, and the clean ratio drops to about 86% at κ = 0.3 and 79% at 0.6. The GMM separates labels that are hard to fit from labels that are easy to fit, not wrong labels from right ones. Lowering the loss separation, as early in training, lets hard wrong labels through as well (about 78% clean at 0.3). In the bottom panel, λ = 1 puts the predicted shares halfway between truth and uniform: the two long dissection phases shrink from about 39% and 35% to 27% and 25%.</p>
+<script>(() => {
+  const P = 'w-am-042-', $ = id => document.getElementById(P + id);
+  const cv1 = $('cv1'), cv2 = $('cv2'), ro1 = $('ro1'), ro2 = $('ro2');
+  const rn = IV.rng(42), N = 600, D = Array.from({length: N}, () => ({u: rn(), v: rn(), n: IV.randn(rn)}));
+  const npdf = (x, m, s) => Math.exp(-0.5 * ((x - m) / s) ** 2) / (s * Math.sqrt(2 * Math.PI));
+  function em(x) {
+    const s = [...x].sort((a, b) => a - b), q = f => s[Math.floor(f * (s.length - 1))];
+    let m = [q(0.2), q(0.8)], pi = [0.5, 0.5];
+    const mean = x.reduce((a, b) => a + b, 0) / x.length, sd = Math.sqrt(x.reduce((a, b) => a + (b - mean) ** 2, 0) / x.length);
+    let sg = [sd / 2, sd / 2];
+    for (let it = 0; it < 80; it++) {
+      const r = x.map(v => { const a = pi[0] * npdf(v, m[0], sg[0]), b = pi[1] * npdf(v, m[1], sg[1]); return a / (a + b + 1e-300); });
+      for (let k = 0; k < 2; k++) {
+        const wk = r.map(v => k ? 1 - v : v), sw = wk.reduce((a, b) => a + b, 0) + 1e-12;
+        m[k] = wk.reduce((a, v, i) => a + v * x[i], 0) / sw;
+        sg[k] = Math.max(1e-3, Math.sqrt(wk.reduce((a, v, i) => a + v * (x[i] - m[k]) ** 2, 0) / sw));
+        pi[k] = sw / x.length;
+      }
+    }
+    if (m[0] > m[1]) { m.reverse(); sg.reverse(); pi.reverse(); }
+    return {m, sg, pi, post: v => { const a = pi[0] * npdf(v, m[0], sg[0]), b = pi[1] * npdf(v, m[1], sg[1]); return a / (a + b + 1e-300); }};
+  }
+  function drawA() {
+    const eta = IV.val(P + 'eta'), sep = IV.val(P + 'sep'), kap = IV.val(P + 'kap'), tau = IV.val(P + 'tau');
+    const pts = D.map(d => {
+      const noisy = d.u < eta, sys = noisy && d.v < kap;
+      const l = noisy && !sys ? Math.exp(Math.log(0.25) + sep + 0.45 * d.n) : Math.exp(Math.log(0.25) + 0.5 * d.n);
+      return {l, kind: noisy ? (sys ? 2 : 1) : 0};
+    });
+    const x = pts.map(p => p.l), G = em(x);
+    const sorted = [...x].sort((a, b) => a - b), xmax = sorted[Math.floor(0.98 * (N - 1))] * 1.05;
+    const B = 40, bw = xmax / B, cnt = Array.from({length: B}, () => [0, 0, 0]);
+    pts.forEach(p => { const b = Math.min(B - 1, Math.floor(p.l / bw)); cnt[b][p.kind]++; });
+    const ymax = Math.max(...cnt.map(c => c[0] + c[1] + c[2])) * 1.1;
+    const {ctx, w, h} = IV.setup(cv1), rect = {l: 44, t: 10, w: w - 90, h: h - 48};
+    const F = IV.frame(ctx, rect, [0, xmax], [0, ymax]);
+    F.axes({xticks: IV.linspace(0, xmax, 5).map(v => +v.toFixed(2)), yticks: [0, Math.round(ymax / 2), Math.round(ymax)], xlabel: 'per-frame loss ℓ', ylabel: 'frames', fmt: v => String(v)});
+    const colK = [IV.col(0), IV.col(1), IV.col(3)];
+    F.clip(() => {
+      cnt.forEach((c, b) => { let y0 = 0; [0, 2, 1].forEach(k => { if (!c[k]) return; ctx.fillStyle = IV.rgba(colK[k], 0.55); ctx.fillRect(F.X(b * bw) + 0.5, F.Y(y0 + c[k]), F.X(bw) - F.X(0) - 1, F.Y(y0) - F.Y(y0 + c[k])); y0 += c[k]; }); });
+      const xs = IV.linspace(0.001, xmax, 200);
+      for (let k = 0; k < 2; k++) F.line(xs, xs.map(v => N * bw * G.pi[k] * npdf(v, G.m[k], G.sg[k])), IV.css('--muted'), 1.2, k ? [4, 3] : []);
+      // posterior on right axis
+      const Yp = v => rect.t + rect.h - v * rect.h;
+      ctx.save(); ctx.strokeStyle = IV.css('--ink'); ctx.lineWidth = 2; ctx.beginPath(); xs.forEach((v, i) => { const px = F.X(v), py = Yp(G.post(v)); i ? ctx.lineTo(px, py) : ctx.moveTo(px, py); }); ctx.stroke();
+      ctx.setLineDash([4, 4]); ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(rect.l, Yp(tau)); ctx.lineTo(rect.l + rect.w, Yp(tau)); ctx.stroke(); ctx.restore();
+    });
+    ctx.save(); ctx.fillStyle = IV.css('--muted'); ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+    [0, 0.5, 1].forEach(v => ctx.fillText(v.toFixed(1), rect.l + rect.w + 5, rect.t + rect.h - v * rect.h));
+    ctx.fillText('τ', rect.l + rect.w + 5, rect.t + rect.h - tau * rect.h - 10); ctx.restore();
+    IV.text(ctx, 'P(clean | ℓ)', rect.l + rect.w + 4, rect.t + 8, {size: 10, color: IV.css('--muted')});
+    let sel = 0, selClean = 0, selSys = 0, selHard = 0, clean = 0;
+    pts.forEach(p => { if (p.kind === 0) clean++; if (G.post(p.l) > tau) { sel++; if (p.kind === 0) selClean++; else if (p.kind === 2) selSys++; else selHard++; } });
+    ro1.innerHTML = `kept as clean: <b>${sel}</b> of ${N} · clean ratio of the kept set <b>${sel ? (100 * selClean / sel).toFixed(1) : '—'}%</b> · ` +
+      `share of truly clean frames kept <b>${(100 * selClean / Math.max(1, clean)).toFixed(0)}%</b> · wrong labels kept: ${selSys} systematic, ${selHard} hard · fitted means ${G.m[0].toFixed(2)} / ${G.m[1].toFixed(2)}`;
+  }
+  const DUR = [125, 954, 168, 857, 98, 178, 83], PH = ['prep', 'Calot', 'clip', 'GB diss.', 'pack', 'clean', 'retract'];
+  function drawB() {
+    const skew = IV.val(P + 'skew'), lam = IV.val(P + 'lam'), C = 7, u = 1 / C;
+    const qt = DUR.map(d => d / DUR.reduce((a, b) => a + b, 0)), q = qt.map(v => (1 - skew) * u + skew * v);
+    const pb = q.map(v => (v + lam * u) / (1 + lam));
+    const kl = q.reduce((a, v) => a + u * Math.log(u / v), 0);
+    const {ctx, w, h} = IV.setup(cv2), rect = {l: 44, t: 10, w: w - 56, h: h - 48};
+    const top = Math.max(0.45, ...q) * 1.05;
+    const F = IV.frame(ctx, rect, [-0.5, C - 0.5], [0, top]);
+    F.axes({xticks: [], yticks: [0, 0.2, 0.4].filter(v => v <= top), ylabel: 'share of frames'});
+    const bw = rect.w / C * 0.34;
+    for (let i = 0; i < C; i++) {
+      ctx.fillStyle = IV.rgba(IV.css('--muted'), 0.45); ctx.fillRect(F.X(i) - bw - 1, F.Y(q[i]), bw, F.Y(0) - F.Y(q[i]));
+      ctx.fillStyle = IV.col(1); ctx.fillRect(F.X(i) + 1, F.Y(pb[i]), bw, F.Y(0) - F.Y(pb[i]));
+      IV.text(ctx, PH[i], F.X(i), rect.t + rect.h + 14, {align: 'center', size: 10, color: IV.css('--muted')});
+    }
+    ctx.save(); ctx.strokeStyle = IV.css('--ink'); ctx.setLineDash([4, 3]); ctx.beginPath(); ctx.moveTo(rect.l, F.Y(u)); ctx.lineTo(rect.l + rect.w, F.Y(u)); ctx.stroke(); ctx.restore();
+    IV.text(ctx, 'uniform 1/7', rect.l + rect.w - 4, F.Y(u) - 4, {align: 'right', size: 10});
+    const i2 = 1, i4 = 3;
+    ro2.innerHTML = `D_KL(u ‖ q) at the true shares = <b>${kl.toFixed(3)}</b> nats, so the prior is never satisfied by the truth · with λ = ${lam}: Calot ${(100 * q[i2]).toFixed(0)}% → <b>${(100 * pb[i2]).toFixed(0)}%</b>, ` +
+      `GB dissection ${(100 * q[i4]).toFixed(0)}% → <b>${(100 * pb[i4]).toFixed(0)}%</b>, retraction ${(100 * q[6]).toFixed(1)}% → <b>${(100 * pb[6]).toFixed(1)}%</b>`;
+  }
+  IV.bind(['eta', 'sep', 'kap', 'tau'].map(s => P + s), drawA);
+  IV.bind(['skew', 'lam'].map(s => P + s), drawB);
+  IV.onRedraw(drawA); IV.onRedraw(drawB);
+})();</script>
+
+
+<h2 id="w-pm-008">W-PM-008 · GeoCAN: one pooling knob from min to max, and a "causal" matrix that is a tournament</h2>
+<p><b>Top:</b> the generalised Lehmer mean pools a spatial activation map (grey bars) into one number. It can be rewritten as GLM = (1/κ)·ln Σ_s π_s e^{κF(s)} with weights π = softmax(βκF) (blue bars) and κ = ln α. So β decides <i>which positions the pool listens to</i>, and κ how max-like the averaging over them is. The orange line is the pooled value, always between the min and the max.</p>
+<p><b>Bottom:</b> four factor maps on a 24 × 24 grid (<b>drag the blobs</b>). GeoCAN's matrix C_ij = GLM(F_i ⊙ F_j) / GLM(F_j) reads like P(i | j), "how much of j's activation also lies under i", using the pooling set above. Its antisymmetric part A = C − Cᵀ becomes a tournament P = σ(A/τ) with P_ij + P_ji = 1. Each factor's score is the second-order tournament score P²1, standardised into g, and each factor map is rescaled by 1 + r·tanh(g).</p>
+<div class="widget">
+  <div class="controls">
+    <label>log₁₀ κ <input type="range" id="w-pm-008-lk" min="-2" max="1.3" step="0.05" value="0"><output for="w-pm-008-lk">0</output></label>
+    <label>β <input type="range" id="w-pm-008-b" min="-10" max="10" step="0.5" value="0"><output for="w-pm-008-b">0</output></label>
+  </div>
+  <canvas id="w-pm-008-cv1" height="200"></canvas>
+  <div class="readout" id="w-pm-008-ro1"></div>
+  <div class="controls" style="margin-top:.8rem">
+    <label>tournament sharpness τ <input type="range" id="w-pm-008-tau" min="0.02" max="1" step="0.02" value="0.1"><output for="w-pm-008-tau">0.1</output></label>
+    <label>gain strength r <input type="range" id="w-pm-008-r" min="0" max="1" step="0.05" value="0.5"><output for="w-pm-008-r">0.5</output></label>
+  </div>
+  <canvas id="w-pm-008-cv2" height="250"></canvas>
+  <div class="readout" id="w-pm-008-ro2"></div>
+</div>
+<p class="callout">With the pooling near the mean, factor 2 sits inside factor 1, so C₁₂ is large and C₂₁ small, and factor 1 wins the tournament. Drag factor 2 out of factor 1 and C₁₂ collapses. Now set β = 8 (max-like pooling) and watch the same geometry give a different "causal" matrix: the direction of dominance depends on a pooling knob, not on any intervention. The readout also checks two identities. (1 − σ(A/τ))ᵀ equals σ(A/τ), so the second factor in the paper's Eq. (3) adds nothing. And the multi-hop matrix Σλⁿ(CCᵀ)ⁿ used by the ranking loss is exactly symmetric, so the direction is gone before the loss sees it.</p>
+<script>(() => {
+  const P = 'w-pm-008-', $ = id => document.getElementById(P + id);
+  const cv1 = $('cv1'), cv2 = $('cv2'), ro1 = $('ro1'), ro2 = $('ro2');
+  const kap = () => Math.pow(10, IV.val(P + 'lk')), bet = () => IV.val(P + 'b');
+  function glm(F, k, b) {                               // (1/κ)[LSE((β+1)κF) − LSE(βκF)]
+    const a = F.map(v => (b + 1) * k * v), c = F.map(v => b * k * v);
+    return (IV.lse(a) - IV.lse(c)) / k;
+  }
+  // panel A signal
+  const rn = IV.rng(8), S = 48;
+  const sig = Array.from({length: S}, (_, s) => Math.min(1, Math.max(0, 0.15 + 0.75 * Math.exp(-((s - 12) ** 2) / 8) + 0.45 * Math.exp(-((s - 33) ** 2) / 32) + 0.04 * IV.randn(rn))));
+  function drawA() {
+    const k = kap(), b = bet(), {ctx, w, h} = IV.setup(cv1);
+    const rect = {l: 44, t: 8, w: w - 56, h: (h - 36) * 0.64}, low = {l: 44, t: 8 + (h - 36) * 0.7, w: w - 56, h: (h - 36) * 0.3};
+    const F = IV.frame(ctx, rect, [-0.5, S - 0.5], [0, 1.05]);
+    F.axes({xticks: [], yticks: [0, 0.5, 1], ylabel: 'F(s)'});
+    const bw = rect.w / S * 0.8;
+    sig.forEach((v, s) => { ctx.fillStyle = IV.rgba(IV.css('--muted'), 0.45); ctx.fillRect(F.X(s) - bw / 2, F.Y(v), bw, F.Y(0) - F.Y(v)); });
+    const mn = Math.min(...sig), mx = Math.max(...sig), me = sig.reduce((x, y) => x + y, 0) / S, g = glm(sig, k, b);
+    const hl = (v, col, dash, lw, lab) => { ctx.save(); ctx.strokeStyle = col; ctx.lineWidth = lw; ctx.setLineDash(dash); ctx.beginPath(); ctx.moveTo(rect.l, F.Y(v)); ctx.lineTo(rect.l + rect.w, F.Y(v)); ctx.stroke(); ctx.restore();
+      IV.text(ctx, lab, rect.l + rect.w - 4, F.Y(v) - 3, {align: 'right', size: 10, color: col}); };
+    hl(mn, IV.css('--muted'), [2, 3], 1, 'min'); hl(me, IV.css('--muted'), [5, 3], 1, 'mean'); hl(mx, IV.css('--muted'), [2, 3], 1, 'max');
+    hl(g, IV.col(1), [], 2.5, '');
+    const wts = (() => { const a = sig.map(v => b * k * v), L = IV.lse(a); return a.map(v => Math.exp(v - L)); })();
+    const wm = Math.max(...wts);
+    const G = IV.frame(ctx, low, [-0.5, S - 0.5], [0, wm * 1.05]);
+    G.axes({xticks: [], yticks: [], ylabel: 'π_s'});
+    wts.forEach((v, s) => { ctx.fillStyle = IV.col(0); ctx.fillRect(G.X(s) - bw / 2, G.Y(v), bw, G.Y(0) - G.Y(v)); });
+    IV.text(ctx, 'spatial position s', low.l + low.w / 2, h - 4, {align: 'center', size: 11, color: IV.css('--muted')});
+    ro1.innerHTML = `κ = ln α = <b>${k.toFixed(k < 0.1 ? 3 : 2)}</b> (α = ${Math.exp(k) > 1e4 ? Math.exp(k).toExponential(1) : Math.exp(k).toFixed(2)}), β = ${b} · min ${mn.toFixed(3)} · mean ${me.toFixed(3)} · max ${mx.toFixed(3)} · <b>GLM = ${g.toFixed(3)}</b>`;
+    drawB();
+  }
+  // panel B factors
+  const G = 24, R = [6, 3.2, 2.5, 2.5], ctr = [[8, 12], [9.5, 13], [17.5, 6.5], [18, 17.5]];
+  const fmap = i => { const out = new Float64Array(G * G); for (let y = 0; y < G; y++) for (let x = 0; x < G; x++) { const d2 = (x - ctr[i][0]) ** 2 + (y - ctr[i][1]) ** 2; out[y * G + x] = Math.exp(-d2 / (2 * R[i] * R[i])); } return out; };
+  let lay = null;
+  function drawB() {
+    const k = kap(), b = bet(), tau = IV.val(P + 'tau'), r = IV.val(P + 'r'), n = 4;
+    const Fm = [0, 1, 2, 3].map(fmap);
+    const C = [...Array(n)].map((_, i) => [...Array(n)].map((_, j) => i === j ? 1 : glm(Array.from(Fm[i], (v, s) => v * Fm[j][s]), k, b) / (glm(Array.from(Fm[j]), k, b) + 1e-6)));
+    const Pm = C.map((row, i) => row.map((_, j) => IV.sigmoid((C[i][j] - C[j][i]) / tau)));
+    const P1 = Pm.map(row => row.reduce((a, v) => a + v, 0));
+    const s2 = Pm.map(row => row.reduce((a, v, j) => a + v * P1[j], 0));
+    const m = s2.reduce((a, v) => a + v, 0) / n, sd = Math.sqrt(s2.reduce((a, v) => a + (v - m) ** 2, 0) / n) || 1;
+    const g = s2.map(v => (v - m) / sd), gain = g.map(v => 1 + r * Math.tanh(v));
+    let idErr = 0; for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) idErr = Math.max(idErr, Math.abs((1 - Pm[j][i]) - Pm[i][j]));
+    const CC = C.map((_, i) => C.map((_, j) => C[i].reduce((a, v, t) => a + v * C[j][t], 0)));
+    const CC2 = CC.map((_, i) => CC.map((_, j) => CC[i].reduce((a, v, t) => a + v * CC[t][j], 0)));
+    const hop = CC.map((row, i) => row.map((v, j) => 0.5 * v + 0.25 * CC2[i][j]));
+    let asym = 0; for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) asym = Math.max(asym, Math.abs(hop[i][j] - hop[j][i]));
+    // draw
+    const wAll = cv2.clientWidth, narrow = wAll < 600; cv2.dataset.h = narrow ? 470 : 250;
+    const {ctx, w, h} = IV.setup(cv2);
+    const cols = [IV.col(0), IV.col(1), IV.col(2), IV.col(3)];
+    const gs = narrow ? Math.min(w * 0.55, 220) : Math.min(h - 30, w * 0.3), cell = gs / G, gx = 8, gy = 14;
+    lay = {gx, gy, cell};
+    ctx.fillStyle = IV.css('--soft'); ctx.fillRect(gx, gy, gs, gs);
+    for (let i = 0; i < n; i++) for (let y = 0; y < G; y++) for (let x = 0; x < G; x++) { const v = Fm[i][y * G + x]; if (v < 0.08) continue; ctx.fillStyle = IV.rgba(cols[i], 0.45 * v); ctx.fillRect(gx + x * cell, gy + y * cell, cell + 0.5, cell + 0.5); }
+    for (let i = 0; i < n; i++) { ctx.save(); ctx.strokeStyle = cols[i]; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.arc(gx + (ctr[i][0] + 0.5) * cell, gy + (ctr[i][1] + 0.5) * cell, 1.6 * R[i] * cell, 0, 7); ctx.stroke(); ctx.restore();
+      IV.text(ctx, String(i + 1), gx + (ctr[i][0] + 0.5) * cell, gy + (ctr[i][1] + 0.5) * cell + 4, {align: 'center', bold: true, color: IV.css('--ink')}); }
+    IV.text(ctx, 'drag the factors', gx, gy - 3, {size: 10, color: IV.css('--muted')});
+    const heat = (M, x0, y0, sz, title, lo, hi) => {
+      const c = sz / n; IV.text(ctx, title, x0, y0 - 4, {size: 11, bold: true});
+      for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) {
+        const t = (M[i][j] - lo) / (hi - lo); ctx.fillStyle = IV.rgba(IV.col(0), 0.08 + 0.8 * Math.max(0, Math.min(1, t))); ctx.fillRect(x0 + j * c, y0 + i * c, c - 1, c - 1);
+        IV.text(ctx, M[i][j].toFixed(2), x0 + (j + 0.5) * c, y0 + (i + 0.5) * c + 4, {align: 'center', size: 10, color: t > 0.6 ? IV.css('--surface') : IV.css('--ink')});
+      }
+      for (let i = 0; i < n; i++) { IV.text(ctx, String(i + 1), x0 - 8, y0 + (i + 0.5) * c + 4, {align: 'center', size: 10, color: cols[i]}); IV.text(ctx, String(i + 1), x0 + (i + 0.5) * c, y0 + sz + 12, {align: 'center', size: 10, color: cols[i]}); }
+    };
+    let hx, hy, hs, px, py, bx, by, bwid, bh;
+    if (!narrow) { hs = Math.min(h - 50, (w - gs - 60) / 3.2); hx = gx + gs + 34; hy = 30; px = hx + hs + 30; py = 30; bx = px + hs + 34; by = 30; bwid = w - bx - 8; bh = hs; }
+    else { hs = Math.min(150, (w - 60) / 2); hx = 22; hy = gs + 50; px = hx + hs + 30; py = hy; bx = gx + gs + 16; by = 30; bwid = w - bx - 8; bh = gs - 30; }
+    heat(C, hx, hy, hs, 'C_ij ≈ P(i | j)', 0, 1);
+    heat(Pm, px, py, hs, 'P = σ((C − Cᵀ)/τ)', 0, 1);
+    IV.text(ctx, 'gain 1 + r·tanh(g)', bx, by - 4, {size: 11, bold: true});
+    const bwd = bwid / n * 0.6;
+    for (let i = 0; i < n; i++) {
+      const x = bx + (i + 0.5) * bwid / n, y0 = by + bh, hh = (gain[i] / 2) * bh;
+      ctx.fillStyle = cols[i]; ctx.fillRect(x - bwd / 2, y0 - hh, bwd, hh);
+      IV.text(ctx, gain[i].toFixed(2), x, y0 - hh - 3, {align: 'center', size: 10});
+      IV.text(ctx, String(i + 1), x, y0 + 12, {align: 'center', size: 10, color: cols[i]});
+    }
+    ctx.save(); ctx.strokeStyle = IV.css('--muted'); ctx.setLineDash([3, 3]); ctx.beginPath(); ctx.moveTo(bx, by + bh / 2); ctx.lineTo(bx + bwid, by + bh / 2); ctx.stroke(); ctx.restore();
+    IV.text(ctx, '1', bx - 2, by + bh / 2 + 4, {align: 'right', size: 10, color: IV.css('--muted')});
+    const order = [0, 1, 2, 3].sort((a, c) => s2[c] - s2[a]).map(i => i + 1).join(' > ');
+    ro2.innerHTML = `C₁₂ = <b>${C[0][1].toFixed(2)}</b>, C₂₁ = <b>${C[1][0].toFixed(2)}</b> · tournament order ${order} · ` +
+      `max |(1 − σ(A/τ))ᵀ − σ(A/τ)| = <b>${idErr.toExponential(0)}</b> · max |hop − hopᵀ| = <b>${asym.toExponential(0)}</b> (symmetric)`;
+  }
+  let drag = -1;
+  function pos(e) { const r = cv2.getBoundingClientRect(); return [(e.clientX - r.left - lay.gx) / lay.cell - 0.5, (e.clientY - r.top - lay.gy) / lay.cell - 0.5]; }
+  cv2.addEventListener('pointerdown', e => { if (!lay) return; const [x, y] = pos(e); let best = -1, bd = 3.5;
+    [3, 2, 1, 0].forEach(i => { const d = Math.hypot(x - ctr[i][0], y - ctr[i][1]); if (d < bd) { bd = d; best = i; } });
+    if (best >= 0) { drag = best; cv2.setPointerCapture(e.pointerId); } });
+  cv2.addEventListener('pointermove', e => { if (drag < 0) return; const [x, y] = pos(e); ctr[drag] = [Math.max(0, Math.min(G - 1, x)), Math.max(0, Math.min(G - 1, y))]; drawB(); });
+  cv2.addEventListener('pointerup', () => { drag = -1; });
+  IV.bind(['lk', 'b'].map(s => P + s), drawA);
+  IV.bind(['tau', 'r'].map(s => P + s), drawB);
+  IV.onRedraw(drawA);
+})();</script>
+
+
+<h2 id="w-pm-121">W-PM-121 · SlideGuard: Dice under class imbalance, and artefacts that vanish at the 25% patch rule</h2>
+<p><b>Top:</b> a detector with fixed sensitivity and specificity, scored on tissue where artefacts cover a share π. The two curves are the benchmark's two scores, artefact Dice = 2TP/(2TP + FP + FN) and artefact-free Dice = 2TN/(2TN + FP + FN), as π changes. Nothing about the detector changes along the curves; only how rare the artefacts are.</p>
+<p><b>Bottom:</b> how a patch-level method is scored. A toy tissue region with a fold, an air bubble, an ink mark, two knife marks or scratches and some dust is cut into patches. A patch counts as artefact only if annotations cover more than a threshold share of it (25% in the paper). Solid colour marks artefact pixels that end up in an artefact patch. Grey marks artefact pixels that drop out of the patch-level ground truth altogether.</p>
+<div class="widget">
+  <div class="controls">
+    <label>sensitivity <input type="range" id="w-pm-121-s" min="0.5" max="1" step="0.01" value="0.8"><output for="w-pm-121-s">0.8</output></label>
+    <label>specificity <input type="range" id="w-pm-121-sp" min="0.9" max="0.999" step="0.001" value="0.98"><output for="w-pm-121-sp">0.98</output></label>
+    <label>log₁₀ π <input type="range" id="w-pm-121-lp" min="-3" max="-0.3" step="0.05" value="-1.7"><output for="w-pm-121-lp">-1.7</output></label>
+  </div>
+  <canvas id="w-pm-121-cv1" height="220"></canvas>
+  <div class="readout" id="w-pm-121-ro1"></div>
+  <div class="controls" style="margin-top:.8rem">
+    <label>patch size (px) <input type="range" id="w-pm-121-p" min="4" max="32" step="2" value="16"><output for="w-pm-121-p">16</output></label>
+    <label>coverage threshold <input type="range" id="w-pm-121-c" min="0.05" max="0.5" step="0.05" value="0.25"><output for="w-pm-121-c">0.25</output></label>
+  </div>
+  <canvas id="w-pm-121-cv2" height="260"></canvas>
+  <div class="readout" id="w-pm-121-ro2"></div>
+  <div class="legend"><span style="--c:var(--c1)">artefact Dice</span><span style="--c:var(--c0)">artefact-free Dice</span></div>
+</div>
+<p class="callout">At π = 2% (log₁₀ π = −1.7), 80% sensitivity and 98% specificity give an artefact Dice of 0.58 and an artefact-free Dice of 0.99. The false positives are only 2% of the clean tissue, but that is as much area as the artefacts themselves. Slide π up to 20% and the same detector scores 0.85, so a ceiling below 0.6 on rare artefacts says as much about the metric as about the tools. In the slide, at 16-pixel patches and the 25% rule, the knife marks, scratch and dust all but vanish from the patch ground truth while the fold, bubble and ink survive. Patch-level scores are computed on an easier task.</p>
+<script>(() => {
+  const P = 'w-pm-121-', $ = id => document.getElementById(P + id);
+  const cv1 = $('cv1'), cv2 = $('cv2'), ro1 = $('ro1'), ro2 = $('ro2');
+  function dice(pi, s, sp) { const f = 1 - sp, TP = pi * s, FN = pi * (1 - s), FP = (1 - pi) * f, TN = (1 - pi) * sp; return [2 * TP / (2 * TP + FP + FN), 2 * TN / (2 * TN + FP + FN)]; }
+  function drawA() {
+    const s = IV.val(P + 's'), sp = IV.val(P + 'sp'), lp = IV.val(P + 'lp'), pi = Math.pow(10, lp);
+    const {ctx, w, h} = IV.setup(cv1), rect = {l: 44, t: 10, w: w - 56, h: h - 48};
+    const F = IV.frame(ctx, rect, [-3, -0.3], [0, 1.02]);
+    F.axes({xticks: [-3, -2, -1.7, -1, -0.7, -0.3], yticks: [0, 0.5, 1], xlabel: 'artefact share of tissue π', fmt: v => { if (v >= 0) return String(v); const p = Math.pow(10, v) * 100; return (p < 1 ? p.toFixed(1) : p.toFixed(0)) + '%'; }});
+    const xs = IV.linspace(-3, -0.3, 200), d = xs.map(v => dice(Math.pow(10, v), s, sp));
+    F.line(xs, d.map(v => v[1]), IV.col(0), 2.4); F.line(xs, d.map(v => v[0]), IV.col(1), 2.4);
+    const cur = dice(pi, s, sp);
+    ctx.save(); ctx.strokeStyle = IV.css('--ink'); ctx.setLineDash([3, 3]); ctx.beginPath(); ctx.moveTo(F.X(lp), rect.t); ctx.lineTo(F.X(lp), rect.t + rect.h); ctx.stroke(); ctx.restore();
+    F.dot(lp, cur[0], IV.col(1), 5); F.dot(lp, cur[1], IV.col(0), 5);
+    const fpArea = (1 - pi) * (1 - sp);
+    ro1.innerHTML = `π = <b>${(100 * pi).toFixed(pi < 0.01 ? 2 : 1)}%</b> · artefact Dice <b>${cur[0].toFixed(3)}</b> · artefact-free Dice <b>${cur[1].toFixed(3)}</b> · ` +
+      `false-positive area ${(100 * fpArea).toFixed(2)}% of tissue vs artefact area ${(100 * pi).toFixed(2)}%`;
+  }
+  // toy slide raster: 0 background, 1 tissue; artefact types 2..7 painted over tissue
+  const W = 160, H = 100, TYPES = ['fold', 'bubble', 'ink', 'knife mark', 'scratch', 'dust'];
+  const tissue = new Uint8Array(W * H), art = new Uint8Array(W * H);
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) if (((x - 80) / 74) ** 2 + ((y - 50) / 44) ** 2 < 1) tissue[y * W + x] = 1;
+  const paint = (fn, t) => { for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) if (tissue[y * W + x] && fn(x, y)) art[y * W + x] = t; };
+  const rot = (x, y, cx, cy, a) => [(x - cx) * Math.cos(a) + (y - cy) * Math.sin(a), -(x - cx) * Math.sin(a) + (y - cy) * Math.cos(a)];
+  paint((x, y) => { const [u, v] = rot(x, y, 50, 36, 0.5); return (u / 18) ** 2 + (v / 5) ** 2 < 1; }, 1);
+  paint((x, y) => (x - 104) ** 2 + (y - 40) ** 2 < 64, 2);
+  paint((x, y) => (x - 128) ** 2 + (y - 66) ** 2 < 90, 3);
+  const segd = (x, y, x0, y0, x1, y1) => { const dx = x1 - x0, dy = y1 - y0, t = Math.max(0, Math.min(1, ((x - x0) * dx + (y - y0) * dy) / (dx * dx + dy * dy))); return Math.hypot(x - x0 - t * dx, y - y0 - t * dy); };
+  paint((x, y) => segd(x, y, 30, 60, 115, 88) < 1.0, 4);
+  paint((x, y) => segd(x, y, 70, 14, 96, 72) < 0.6, 5);
+  const rd = IV.rng(121), specks = Array.from({length: 14}, () => [60 + 30 * rd(), 50 + 22 * rd()]);
+  paint((x, y) => specks.some(([a, b]) => (x - a) ** 2 + (y - b) ** 2 < 1.3), 6);
+  function drawB() {
+    const p = IV.val(P + 'p'), thr = IV.val(P + 'c');
+    const nx = Math.ceil(W / p), ny = Math.ceil(H / p), lab = new Uint8Array(nx * ny);
+    for (let j = 0; j < ny; j++) for (let i = 0; i < nx; i++) {
+      let a = 0; for (let y = j * p; y < Math.min(H, (j + 1) * p); y++) for (let x = i * p; x < Math.min(W, (i + 1) * p); x++) if (art[y * W + x]) a++;
+      lab[j * nx + i] = a / (p * p) > thr ? 1 : 0;
+    }
+    const tot = new Array(7).fill(0), kept = new Array(7).fill(0);
+    const {ctx, w, h} = IV.setup(cv2), sc = Math.min((w - 16) / W, (h - 10) / H), ox = (w - W * sc) / 2, oy = 4;
+    const cols = [null, IV.col(1), IV.col(0), IV.col(3), IV.col(2), IV.col(4), IV.col(1)];
+    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+      const k = y * W + x; if (!tissue[k]) continue;
+      const t = art[k]; let c = IV.rgba(IV.col(3), 0.1);
+      if (t) { tot[t]++; const inP = lab[Math.floor(y / p) * nx + Math.floor(x / p)]; if (inP) { kept[t]++; c = cols[t]; } else c = IV.rgba(IV.css('--muted'), 0.75); }
+      ctx.fillStyle = c; ctx.fillRect(ox + x * sc, oy + y * sc, sc + 0.3, sc + 0.3);
+    }
+    ctx.save(); ctx.strokeStyle = IV.rgba(IV.css('--muted'), 0.35); ctx.lineWidth = 0.5;
+    for (let i = 0; i <= nx; i++) { ctx.beginPath(); ctx.moveTo(ox + Math.min(W, i * p) * sc, oy); ctx.lineTo(ox + Math.min(W, i * p) * sc, oy + H * sc); ctx.stroke(); }
+    for (let j = 0; j <= ny; j++) { ctx.beginPath(); ctx.moveTo(ox, oy + Math.min(H, j * p) * sc); ctx.lineTo(ox + W * sc, oy + Math.min(H, j * p) * sc); ctx.stroke(); }
+    ctx.strokeStyle = IV.css('--ink'); ctx.lineWidth = 1.6;
+    for (let j = 0; j < ny; j++) for (let i = 0; i < nx; i++) if (lab[j * nx + i]) ctx.strokeRect(ox + i * p * sc, oy + j * p * sc, Math.min(p, W - i * p) * sc, Math.min(p, H - j * p) * sc);
+    ctx.restore();
+    const all = tot.reduce((a, b) => a + b, 0), allK = kept.reduce((a, b) => a + b, 0);
+    ro2.innerHTML = `${lab.reduce((a, b) => a + b, 0)} artefact patches (outlined) · artefact pixels kept in the patch ground truth: <b>${(100 * allK / all).toFixed(0)}%</b> · ` +
+      TYPES.map((n, i) => `${n} <b>${(100 * kept[i + 1] / Math.max(1, tot[i + 1])).toFixed(0)}%</b>`).join(', ');
+  }
+  IV.bind(['s', 'sp', 'lp'].map(s => P + s), drawA);
+  IV.bind(['p', 'c'].map(s => P + s), drawB);
+  IV.onRedraw(drawA); IV.onRedraw(drawB);
+})();</script>
+
+
+<h2 id="w-pm-123">W-PM-123 · DICOM series: a set encoder tells "missing" from "zero"; zero imputation cannot</h2>
+<p>Five DICOM tags of one slice, in a 2-D toy of the sparse metadata encoder. Each tag has a learned identity vector e_f (faint arrow). Its value v rescales and shifts that vector by FiLM, ẽ_f = e_f ⊙ (1 + α(v)) + β(v) (coloured arrow). The slice's metadata embedding is the <b>mean over the tags that are present</b> (blue dot). A missing tag simply drops out of the mean. For comparison, the orange square is a dense encoder that fills missing tags with 0 and applies a linear map, as in the concatenation baselines.</p>
+<p>Pick a tag to compare. The hollow blue ring shows where the set encoder lands if that tag is <i>missing</i>, the small blue dot where it lands if the tag is <i>present with value 0</i>. For the dense encoder the two cases are the same input.</p>
+<div class="widget">
+  <div class="controls" id="w-pm-123-rows"></div>
+  <div class="controls">
+    <label>compare tag <select id="w-pm-123-k"></select></label>
+    <label>pooling <select id="w-pm-123-pool"><option value="mean" selected>mean (paper)</option><option value="sum">sum</option></select></label>
+  </div>
+  <canvas id="w-pm-123-cv" height="320"></canvas>
+  <div class="readout" id="w-pm-123-ro"></div>
+  <div class="legend"><span style="--c:var(--c0)">set encoder (mean of present tags)</span><span style="--c:var(--c1)">dense encoder, missing = 0</span></div>
+</div>
+<p class="callout">Choose "contrast agent" and read the two distances in the readout. The dense encoder cannot tell a missing tag from a present tag with value 0 (distance exactly 0), so imputation has to guess and the guess is baked in. The set encoder can, because a present tag still contributes its identity e_f even when its value is 0. Now switch pooling to <b>sum</b> and untick tags one by one. The embedding shrinks with the number of present tags. The mean discards that count, which is why the notes flag it: <i>how many</i> tags a vendor writes is itself a clue.</p>
+<script>(() => {
+  const P = 'w-pm-123-', $ = id => document.getElementById(P + id);
+  const cv = $('cv'), ro = $('ro');
+  const NAMES = ['echo time', 'flip angle', 'contrast agent', 'b-value', 'slice thickness'];
+  const ANG = [20, 80, 140, 205, 290].map(a => a * Math.PI / 180), A = [0.6, -0.5, 0.8, 0.4, -0.3], BS = [0.5, -0.4, 0.45, -0.5, 0.35];
+  const V0 = [0.5, -0.3, 0, 0.8, 0.2], OBS0 = [true, true, true, false, true];
+  const rows = $('rows'), ksel = $('k');
+  NAMES.forEach((n, i) => {
+    rows.insertAdjacentHTML('beforeend', `<label><input type="checkbox" id="${P}o${i}" ${OBS0[i] ? 'checked' : ''}> ${n} <input type="range" id="${P}v${i}" min="-1" max="1" step="0.05" value="${V0[i]}"><output for="${P}v${i}">${V0[i]}</output></label>`);
+    ksel.insertAdjacentHTML('beforeend', `<option value="${i}" ${i === 2 ? 'selected' : ''}>${n}</option>`);
+  });
+  const e = ANG.map(a => [Math.cos(a), Math.sin(a)]);
+  const film = (i, v) => { const s = 1 + A[i] * v, n = [-e[i][1], e[i][0]]; return [e[i][0] * s + BS[i] * v * n[0], e[i][1] * s + BS[i] * v * n[1]]; };
+  const Wd = e.map(([x, y]) => { const c = Math.cos(0.45), s = Math.sin(0.45); return [0.8 * (x * c - y * s), 0.8 * (x * s + y * c)]; });
+  function sme(obs, vals, pool) { let x = 0, y = 0, n = 0; obs.forEach((o, i) => { if (!o) return; const t = film(i, vals[i]); x += t[0]; y += t[1]; n++; }); if (!n) return [0, 0]; return pool === 'sum' ? [x, y] : [x / n, y / n]; }
+  function dense(obs, vals) { let x = 0.1, y = 0.1; obs.forEach((o, i) => { const v = o ? vals[i] : 0; x += v * Wd[i][0]; y += v * Wd[i][1]; }); return [x, y]; }
+  function draw() {
+    const obs = NAMES.map((_, i) => $('o' + i).checked), vals = NAMES.map((_, i) => IV.val(P + 'v' + i)), k = +ksel.value, pool = $('pool').value;
+    const cur = sme(obs, vals, pool), dn = dense(obs, vals);
+    const oM = [...obs], o0 = [...obs], v0 = [...vals]; oM[k] = false; o0[k] = true; v0[k] = 0;
+    const sM = sme(oM, vals, pool), s0 = sme(o0, v0, pool), dM = dense(oM, vals), d0 = dense(o0, v0);
+    const {ctx, w, h} = IV.setup(cv);
+    const span = pool === 'sum' ? 3.2 : 1.8, sc = (h - 20) / (2 * span), rect = {l: 10, t: 10, w: w - 20, h: h - 20};
+    const xr = rect.w / sc / 2, F = IV.frame(ctx, rect, [-xr, xr], [-span, span]);
+    ctx.save(); ctx.strokeStyle = IV.css('--line'); ctx.beginPath(); ctx.moveTo(F.X(-xr), F.Y(0)); ctx.lineTo(F.X(xr), F.Y(0)); ctx.moveTo(F.X(0), F.Y(-span)); ctx.lineTo(F.X(0), F.Y(span)); ctx.stroke();
+    ctx.beginPath(); ctx.arc(F.X(0), F.Y(0), sc, 0, 7); ctx.stroke(); ctx.restore();
+    const cols = [IV.col(0), IV.col(2), IV.col(3), IV.col(4), IV.col(1)];
+    const arrow = (v, col, lw, dash) => { ctx.save(); ctx.strokeStyle = col; ctx.lineWidth = lw; ctx.setLineDash(dash); ctx.beginPath(); ctx.moveTo(F.X(0), F.Y(0)); ctx.lineTo(F.X(v[0]), F.Y(v[1])); ctx.stroke(); ctx.restore(); };
+    NAMES.forEach((n, i) => {
+      arrow(e[i], IV.rgba(cols[i], 0.35), 1.2, [3, 3]);
+      if (obs[i]) { const t = film(i, vals[i]); arrow(t, cols[i], 2.2, []); F.dot(t[0], t[1], cols[i], 3); }
+      IV.text(ctx, n + (obs[i] ? '' : ' (missing)'), F.X(1.12 * e[i][0]), F.Y(1.12 * e[i][1]) + 4, {align: e[i][0] > 0.2 ? 'left' : e[i][0] < -0.2 ? 'right' : 'center', size: 11, color: obs[i] ? cols[i] : IV.css('--muted'), bold: i === k});
+    });
+    ctx.save(); ctx.strokeStyle = IV.col(0); ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(F.X(sM[0]), F.Y(sM[1]), 8, 0, 7); ctx.stroke(); ctx.restore();
+    F.dot(s0[0], s0[1], IV.col(0), 3.5);
+    F.dot(cur[0], cur[1], IV.col(0), 6.5);
+    ctx.fillStyle = IV.col(1); ctx.fillRect(F.X(dn[0]) - 6, F.Y(dn[1]) - 6, 12, 12);
+    ctx.save(); ctx.strokeStyle = IV.col(1); ctx.lineWidth = 1.5; ctx.strokeRect(F.X(dM[0]) - 9, F.Y(dM[1]) - 9, 18, 18); ctx.restore();
+    const dist = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1]);
+    ro.innerHTML = `${obs.filter(Boolean).length} of 5 tags present · "${NAMES[k]}": missing vs present-with-value-0 is <b>${dist(sM, s0).toFixed(3)}</b> apart for the set encoder, ` +
+      `<b>${dist(dM, d0).toFixed(3)}</b> for the dense zero-imputed encoder · |embedding| = ${Math.hypot(...cur).toFixed(2)} (${pool})`;
+  }
+  const ids = NAMES.flatMap((_, i) => [P + 'o' + i, P + 'v' + i]).concat([P + 'k', P + 'pool']);
+  IV.bind(ids, draw);
+  NAMES.forEach((_, i) => $('o' + i).addEventListener('change', draw));
+  IV.onRedraw(draw);
+})();</script>
+
+
+<h2 id="w-pm-139">W-PM-139 · FunPiQ: the unbiased PU risk goes negative, and nnPU holds it at zero</h2>
+<p>A 1-D toy of EFIQA-CP's training problem. Each pixel has one feature x; think of it as how visible the vessels are. Bad-quality pixels (positives) sit on the left and good ones on the right. We get 40 <b>labelled</b> bad pixels (orange bars) and 400 <b>unlabelled</b> pixels (grey bars), a mix in which a share π is bad.</p>
+<p>Rather than train a network, the widget shows what a flexible network is tempted to do. Start from the best possible classifier (the true posterior, dashed) and let it <b>memorise</b> the labelled pixels: add a narrow bump of height k to its logit at each one (blue curve). The bottom panel plots, against k, the three training objectives a network could minimise, each computed from the 40 + 400 training pixels, next to the true risk on fresh, correctly labelled pixels (black dashed). "PN" treats every unlabelled pixel as good. "uPU" is the unbiased PU risk π·R̂_p⁺ + R̂_u⁻ − π·R̂_p⁻. "nnPU" clamps its last two terms at zero, as in the paper's Eq. (1).</p>
+<div class="widget">
+  <div class="controls">
+    <label>memorisation k <input type="range" id="w-pm-139-k" min="0" max="12" step="0.25" value="0"><output for="w-pm-139-k">0</output></label>
+    <label>bump width <input type="range" id="w-pm-139-w" min="0.01" max="0.3" step="0.01" value="0.03"><output for="w-pm-139-w">0.03</output></label>
+    <label>labelled positives <select id="w-pm-139-sel"><option value="scar" selected>random (SCAR)</option><option value="strict">strict threshold (extreme tail)</option></select></label>
+    <label>true π <input type="range" id="w-pm-139-pi" min="0.05" max="0.5" step="0.05" value="0.2"><output for="w-pm-139-pi">0.2</output></label>
+    <label>assumed π <input type="range" id="w-pm-139-pa" min="0.05" max="0.5" step="0.05" value="0.2"><output for="w-pm-139-pa">0.2</output></label>
+    <button id="w-pm-139-new">new data</button>
+  </div>
+  <canvas id="w-pm-139-cv1" height="230"></canvas>
+  <canvas id="w-pm-139-cv2" height="200" style="margin-top:.4rem"></canvas>
+  <div class="readout" id="w-pm-139-ro"></div>
+  <div class="legend"><span style="--c:var(--c0)">uPU objective / classifier</span><span style="--c:var(--c2)">nnPU objective</span><span style="--c:var(--c3)">PN objective</span><span style="--c:var(--ink)">true risk / true posterior</span><span style="--c:var(--c1)">labelled bad pixels</span></div>
+</div>
+<p class="callout">Slide the memorisation k up with narrow bumps. The classifier only grows more confident on the 40 labelled pixels, yet the uPU objective keeps falling and crosses zero before k = 1, a negative value no real loss can take. Meanwhile the true risk climbs from about 0.19 to 1.6 and the test error from 8% to about 16%. A flexible network minimising uPU is rewarded for exactly this memorisation. The nnPU objective can fall only to zero, so the reward runs out. Widen the bumps to 0.15 and the uPU objective rises instead: only narrow, memorising bumps fool it. Last, set k = 0 and switch to <b>strict threshold</b>. Even the best possible classifier now gets a negative uPU value, because the labelled positives are no longer a random sample of the bad pixels, and the correction π·R̂_p⁻ subtracts too much.</p>
+<script>(() => {
+  const P = 'w-pm-139-', $ = id => document.getElementById(P + id);
+  const cv1 = $('cv1'), cv2 = $('cv2'), ro = $('ro');
+  const MP = -1.3, SP = 0.8, MN = 1.0, SN = 1.0, XL = -4, XR = 4;
+  const npdf = (x, m, s) => Math.exp(-0.5 * ((x - m) / s) ** 2) / (s * Math.sqrt(2 * Math.PI));
+  const sp = z => z > 30 ? z : Math.log1p(Math.exp(z));
+  let seed = 1, base = null, cache = null;
+  function newData() { const r = IV.rng(1390 + seed); base = {U: Array.from({length: 400}, () => ({u: r(), z: IV.randn(r)})), Z: Array.from({length: 800}, () => IV.randn(r))}; }
+  newData();
+  const GX = IV.linspace(-7, 7, 7001), DX = GX[1] - GX[0];
+  function prepare() {
+    const pi = IV.val(P + 'pi'), w = IV.val(P + 'w'), sel = $('sel').value;
+    const U = base.U.map(d => d.u < pi ? MP + SP * d.z : MN + SN * d.z);
+    const Xp = (sel === 'scar' ? base.Z.slice(0, 40) : base.Z.filter(z => z < -0.674).slice(0, 40)).map(z => MP + SP * z);
+    const g0 = x => Math.log(pi * npdf(x, MP, SP)) - Math.log((1 - pi) * npdf(x, MN, SN));
+    const bump = x => { let s = 0; for (const p of Xp) { const d = (x - p) / w; if (d * d < 60) s += Math.exp(-0.5 * d * d); } return s; };
+    const pre = xs => xs.map(x => [g0(x), bump(x)]);
+    cache = {pi, U, Xp, u: pre(U), p: pre(Xp), grid: pre(GX), pp: GX.map(x => pi * npdf(x, MP, SP)), pn: GX.map(x => (1 - pi) * npdf(x, MN, SN))};
+  }
+  function evalK(k) {
+    const {u, p, grid, pp, pn} = cache, pa = IV.val(P + 'pa');
+    let Rpp = 0, Rpm = 0, Rum = 0;
+    for (const [a, b] of p) { const g = a + k * b; Rpp += sp(-g); Rpm += sp(g); }
+    for (const [a, b] of u) Rum += sp(a + k * b);
+    Rpp /= p.length; Rpm /= p.length; Rum /= u.length;
+    let tr = 0, er = 0;
+    grid.forEach(([a, b], i) => { const g = a + k * b; tr += (pp[i] * sp(-g) + pn[i] * sp(g)) * DX; er += (g >= 0 ? pn[i] : pp[i]) * DX; });
+    const neg = Rum - pa * Rpm;
+    return {Rpp, Rpm, Rum, neg, upu: pa * Rpp + neg, nnpu: pa * Rpp + Math.max(0, neg), pn: pa * Rpp + (1 - pa) * Rum, tr, er};
+  }
+  function draw() {
+    if (!cache) prepare();
+    const k = IV.val(P + 'k'), {pi, U, Xp, grid} = cache, c0 = IV.col(0), c1 = IV.col(1), mut = IV.css('--muted'), ink = IV.css('--ink');
+    let {ctx, w, h} = IV.setup(cv1);
+    let rect = {l: 44, t: 10, w: w - 90, h: h - 46};
+    const B = 40, bw = (XR - XL) / B, cu = new Array(B).fill(0), cp = new Array(B).fill(0);
+    const bin = x => Math.max(0, Math.min(B - 1, Math.floor((x - XL) / bw)));
+    U.forEach(x => cu[bin(x)]++); Xp.forEach(x => cp[bin(x)]++);
+    const cmax = Math.max(...cu, ...cp) * 1.1;
+    let F = IV.frame(ctx, rect, [XL, XR], [0, cmax]);
+    F.axes({xticks: [-4, -2, 0, 2, 4], yticks: [0, Math.round(cmax / 2), Math.round(cmax)], xlabel: 'pixel feature x (left: vessels hidden)', ylabel: 'count', fmt: v => String(v)});
+    for (let b = 0; b < B; b++) {
+      const x0 = XL + b * bw;
+      ctx.fillStyle = IV.rgba(mut, 0.3); ctx.fillRect(F.X(x0) + 0.5, F.Y(cu[b]), F.X(bw) - F.X(0) - 1, F.Y(0) - F.Y(cu[b]));
+      ctx.fillStyle = IV.rgba(c1, 0.8); ctx.fillRect(F.X(x0 + bw * 0.25), F.Y(cp[b]), (F.X(bw) - F.X(0)) * 0.5, F.Y(0) - F.Y(cp[b]));
+    }
+    const Yp = v => rect.t + rect.h - v * rect.h;
+    const path = (fn, col, lw, dash) => { ctx.save(); ctx.strokeStyle = col; ctx.lineWidth = lw; ctx.setLineDash(dash); ctx.beginPath(); let first = true;
+      grid.forEach(([a, b], i) => { const x = GX[i]; if (x < XL || x > XR || i % 2) return; const y = Yp(fn(a, b)); first ? ctx.moveTo(F.X(x), y) : ctx.lineTo(F.X(x), y); first = false; }); ctx.stroke(); ctx.restore(); };
+    F.clip(() => { path((a, b) => IV.sigmoid(a + k * b), c0, 2, []); path(a => IV.sigmoid(a), ink, 1.6, [5, 4]); });
+    ctx.save(); ctx.fillStyle = mut; ctx.textAlign = 'left'; ctx.textBaseline = 'middle'; [0, 0.5, 1].forEach(v => ctx.fillText(v.toFixed(1), rect.l + rect.w + 5, Yp(v))); ctx.restore();
+    IV.text(ctx, 'P(bad | x)', rect.l + rect.w + 4, rect.t + 6, {size: 10, color: mut});
+    // objectives vs k
+    ({ctx, w, h} = IV.setup(cv2));
+    rect = {l: 52, t: 10, w: w - 64, h: h - 46};
+    const ks = IV.linspace(0, 12, 49), E = ks.map(evalK);
+    const all = E.flatMap(e => [e.upu, e.nnpu, e.pn, e.tr]);
+    const lo = Math.min(-0.2, ...all), hi = Math.min(Math.max(1, ...E.map(e => e.tr)) * 1.1, Math.max(...all) * 1.05);
+    F = IV.frame(ctx, rect, [0, 12], [lo, hi]);
+    F.axes({xticks: [0, 2, 4, 6, 8, 10, 12], yticks: [+lo.toFixed(1), 0, +hi.toFixed(1)], xlabel: 'memorisation strength k', ylabel: 'risk', fmt: v => String(v)});
+    ctx.save(); ctx.strokeStyle = ink; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(rect.l, F.Y(0)); ctx.lineTo(rect.l + rect.w, F.Y(0)); ctx.stroke(); ctx.restore();
+    F.clip(() => {
+      F.line(ks, E.map(e => e.pn), IV.col(3), 1.8);
+      F.line(ks, E.map(e => e.upu), c0, 2.4);
+      F.line(ks, E.map(e => e.nnpu), IV.col(2), 2.4, [6, 3]);
+      F.line(ks, E.map(e => e.tr), ink, 2, [4, 3]);
+    });
+    ctx.save(); ctx.strokeStyle = mut; ctx.setLineDash([2, 3]); ctx.beginPath(); ctx.moveTo(F.X(k), rect.t); ctx.lineTo(F.X(k), rect.t + rect.h); ctx.stroke(); ctx.restore();
+    const e = evalK(k);
+    ro.innerHTML = `k = ${k} · uPU objective <b>${e.upu.toFixed(3)}</b> (its negative-class part R̂_u⁻ − πR̂_p⁻ = ${e.neg.toFixed(3)}) · nnPU <b>${e.nnpu.toFixed(3)}</b> · PN ${e.pn.toFixed(3)} · ` +
+      `true risk <b>${e.tr.toFixed(3)}</b> · test error <b>${(100 * e.er).toFixed(1)}%</b> · mean x of the labelled positives ${(Xp.reduce((a, b) => a + b, 0) / Xp.length).toFixed(2)}`;
+  }
+  $('new').addEventListener('click', () => { seed++; newData(); prepare(); draw(); });
+  for (const id of ['w', 'sel', 'pi']) $(id).addEventListener('input', () => { const o = document.querySelector(`output[for="${P + id}"]`); if (o) o.textContent = $(id).value; prepare(); draw(); });
+  IV.bind([P + 'k', P + 'pa'], draw);
+  IV.onRedraw(draw);
+})();</script>
+
+
+<h2 id="w-pm-194">W-PM-194 · ICHOR: how much of masked reconstruction is plain interpolation</h2>
+<p>A 2-D stand-in for one slice of a CBF map: smooth perfusion blobs plus optional fine texture. It is cut into square patches, and a share ρ of them is hidden at random (grey), as in MAE pretraining. The third image fills the hidden patches with no learning at all, just a Gaussian-weighted average of the nearest visible pixels (normalised convolution). The readout compares that fill with the no-information guess, the mean of the visible pixels. The share of hidden-pixel variance that interpolation already explains is the part of the pretext task a network could solve by smoothness alone. The curve repeats the comparison for every masking ratio.</p>
+<div class="widget">
+  <div class="controls">
+    <label>mask ratio ρ <input type="range" id="w-pm-194-rho" min="0.1" max="0.9" step="0.05" value="0.5"><output for="w-pm-194-rho">0.5</output></label>
+    <label>patch size <select id="w-pm-194-p"><option value="4">4 px</option><option value="8" selected>8 px</option><option value="16">16 px</option></select></label>
+    <label>blob width <input type="range" id="w-pm-194-s" min="3" max="14" step="0.5" value="8"><output for="w-pm-194-s">8</output></label>
+    <label>fine texture <input type="range" id="w-pm-194-t" min="0" max="0.6" step="0.05" value="0.1"><output for="w-pm-194-t">0.1</output></label>
+    <button id="w-pm-194-new">new map and mask</button>
+  </div>
+  <canvas id="w-pm-194-cv1" height="210"></canvas>
+  <canvas id="w-pm-194-cv2" height="170" style="margin-top:.4rem"></canvas>
+  <div class="readout" id="w-pm-194-ro"></div>
+</div>
+<p class="callout">At ρ = 0.5 with smooth blobs, interpolation from the visible patches already explains most of the hidden-patch variance, so a large part of the pixel-MSE objective can be met by smoothing. Raise the fine texture and the share drops: what interpolation cannot explain is what the encoder actually has to learn. Push ρ towards 0.9 and interpolation fails too, because whole regions lose every visible neighbour. The paper's best downstream ratio, 0.5, sits where interpolation is still strong, which is one reason to ask how much of its pretext task is about perfusion patterns at all.</p>
+<script>(() => {
+  const P = 'w-pm-194-', $ = id => document.getElementById(P + id);
+  const cv1 = $('cv1'), cv2 = $('cv2'), ro = $('ro'), M = 64;
+  let seed = 1;
+  function blur(src, sg) {
+    const r = Math.min(M - 1, Math.ceil(3 * sg)), k = []; let ks = 0;
+    for (let i = -r; i <= r; i++) { const v = Math.exp(-0.5 * (i / sg) ** 2); k.push(v); ks += v; }
+    const tmp = new Float64Array(M * M), out = new Float64Array(M * M);
+    for (let y = 0; y < M; y++) for (let x = 0; x < M; x++) { let s = 0; for (let i = -r; i <= r; i++) { const xx = x + i; if (xx >= 0 && xx < M) s += k[i + r] * src[y * M + xx]; } tmp[y * M + x] = s / ks; }
+    for (let y = 0; y < M; y++) for (let x = 0; x < M; x++) { let s = 0; for (let i = -r; i <= r; i++) { const yy = y + i; if (yy >= 0 && yy < M) s += k[i + r] * tmp[yy * M + x]; } out[y * M + x] = s / ks; }
+    return out;
+  }
+  let img = null, perm = null, masks = null;
+  function makeMap() {
+    const r = IV.rng(1940 + seed), s = IV.val(P + 's'), t = IV.val(P + 't');
+    const a = new Float64Array(M * M), bl = Array.from({length: 9}, () => [6 + 52 * r(), 6 + 52 * r(), 0.3 + 0.7 * r(), s * (0.7 + 0.6 * r())]);
+    const noise = new Float64Array(M * M).map(() => IV.randn(r));
+    const tex = blur(noise, 0.9);
+    let tsd = 0; tex.forEach(v => tsd += v * v); tsd = Math.sqrt(tsd / tex.length);
+    for (let y = 0; y < M; y++) for (let x = 0; x < M; x++) { let v = 0; for (const [cx, cy, am, w] of bl) v += am * Math.exp(-((x - cx) ** 2 + (y - cy) ** 2) / (2 * w * w)); a[y * M + x] = v + t * tex[y * M + x] / tsd; }
+    let mn = Infinity, mx = -Infinity; a.forEach(v => { mn = Math.min(mn, v); mx = Math.max(mx, v); });
+    img = a.map(v => (v - mn) / (mx - mn));
+    const rm = IV.rng(7000 + seed); masks = [0, 1, 2].map(() => { const n = 256, p = [...Array(n).keys()]; for (let i = n - 1; i > 0; i--) { const j = Math.floor(rm() * (i + 1)); [p[i], p[j]] = [p[j], p[i]]; } return p; });
+    perm = masks[0];
+  }
+  function recon(pz, rho, order) {
+    const n = M / pz, N = n * n, nm = Math.round(rho * N), hidden = new Uint8Array(N);
+    order.filter(i => i < N).slice(0, nm).forEach(i => hidden[i] = 1);
+    const m = new Float64Array(M * M); for (let y = 0; y < M; y++) for (let x = 0; x < M; x++) m[y * M + x] = hidden[Math.floor(y / pz) * n + Math.floor(x / pz)] ? 0 : 1;
+    const im = img.map((v, i) => v * m[i]);
+    let sg = Math.max(1.5, 0.6 * pz), num = blur(im, sg), den = blur(m, sg);
+    const num2 = blur(im, 3 * sg), den2 = blur(m, 3 * sg);
+    const rec = new Float64Array(M * M); let vis = 0, nv = 0;
+    for (let i = 0; i < M * M; i++) { if (m[i]) { vis += img[i]; nv++; } rec[i] = m[i] ? img[i] : den[i] > 0.02 ? num[i] / den[i] : den2[i] > 1e-3 ? num2[i] / den2[i] : NaN; }
+    const mean = nv ? vis / nv : 0.5; for (let i = 0; i < M * M; i++) if (Number.isNaN(rec[i])) rec[i] = mean;
+    let e1 = 0, e0 = 0, nh = 0;
+    for (let i = 0; i < M * M; i++) if (!m[i]) { e1 += (rec[i] - img[i]) ** 2; e0 += (mean - img[i]) ** 2; nh++; }
+    return {m, rec, mseI: e1 / Math.max(1, nh), mse0: e0 / Math.max(1, nh), N, nm};
+  }
+  const CM = [[0, 0, 4], [59, 15, 112], [140, 41, 129], [222, 73, 104], [254, 159, 109], [252, 253, 191]];
+  const cmap = v => { v = Math.max(0, Math.min(1, v)) * (CM.length - 1); const i = Math.min(CM.length - 2, Math.floor(v)), f = v - i; return CM[i].map((c, j) => Math.round(c + f * (CM[i + 1][j] - c))); };
+  const off = document.createElement('canvas'); off.width = M; off.height = M; const octx = off.getContext('2d');
+  function paint(ctx, arr, mask, x, y, sz) {
+    const id = octx.createImageData(M, M);
+    for (let i = 0; i < M * M; i++) { const c = mask && !mask[i] ? [150, 150, 150] : cmap(arr[i]); id.data[4 * i] = c[0]; id.data[4 * i + 1] = c[1]; id.data[4 * i + 2] = c[2]; id.data[4 * i + 3] = 255; }
+    octx.putImageData(id, 0, 0); ctx.imageSmoothingEnabled = false; ctx.drawImage(off, x, y, sz, sz);
+  }
+  function draw() {
+    if (!img) makeMap();
+    const rho = IV.val(P + 'rho'), pz = +$('p').value;
+    const R = recon(pz, rho, perm);
+    let {ctx, w, h} = IV.setup(cv1);
+    const sz = Math.min(h - 26, (w - 40) / 3), gap = (w - 3 * sz) / 4;
+    const labs = ['CBF slice (toy)', `${R.nm} of ${R.N} patches hidden`, 'interpolation fill'];
+    [[img, null], [img, R.m], [R.rec, null]].forEach(([a, m], i) => { paint(ctx, a, m, gap + i * (sz + gap), 18, sz); IV.text(ctx, labs[i], gap + i * (sz + gap) + sz / 2, 12, {align: 'center', size: 11, color: IV.css('--muted')}); });
+    // curve over rho
+    ({ctx, w, h} = IV.setup(cv2));
+    const rect = {l: 52, t: 10, w: w - 64, h: h - 46}, F = IV.frame(ctx, rect, [0.1, 0.9], [0, 1]);
+    F.axes({xticks: [0.1, 0.25, 0.5, 0.75, 0.9], yticks: [0, 0.5, 1], xlabel: 'mask ratio ρ', ylabel: 'explained'});
+    const rs = IV.linspace(0.1, 0.9, 9), sh = rs.map(r => { let s = 0; masks.forEach(o => { const q = recon(pz, r, o); s += 1 - q.mseI / q.mse0; }); return s / masks.length; });
+    F.line(rs, sh, IV.col(0), 2.4); rs.forEach((r, i) => F.dot(r, sh[i], IV.col(0), 3));
+    const cur = 1 - R.mseI / R.mse0;
+    F.dot(rho, Math.max(0, cur), IV.col(1), 5);
+    ro.innerHTML = `${R.N} patches of ${pz}×${pz} px, ${R.nm} hidden · hidden-pixel MSE: visible-mean guess <b>${R.mse0.toFixed(4)}</b>, interpolation <b>${R.mseI.toFixed(4)}</b> · ` +
+      `share of hidden variance explained by interpolation alone: <b>${(100 * cur).toFixed(0)}%</b> (orange dot; blue curve: mean over three masks)`;
+  }
+  $('new').addEventListener('click', () => { seed++; img = null; draw(); });
+  for (const id of ['s', 't']) $(id).addEventListener('input', () => { document.querySelector(`output[for="${P + id}"]`).textContent = $(id).value; img = null; draw(); });
+  IV.bind([P + 'rho', P + 'p'], draw);
+  IV.onRedraw(draw);
+})();</script>
+
+
+<h2 id="w-pm-212">W-PM-212 · AC-MIL: CORN's products stay ordered, and attention cosine punishes flatness</h2>
+<p><b>Top:</b> ordinal grading with four quality grades. CORN has three binary heads, and head k estimates a <i>conditional</i> probability f_k = P(grade &gt; k | grade &gt; k − 1). The cumulative probabilities are products, P(grade &gt; k) = f₁·…·f_k, so they can only fall as k grows, and every grade probability (a difference of neighbours) is non-negative. Switch to "independent heads", where each head predicts P(grade &gt; k) directly, to see what the product structure prevents.</p>
+<p><b>Bottom:</b> the spatial attention diversity penalty. Two concept heads spread attention over 32 patches (softmax of a bump, one map drawn up and one down). L_SAD penalises the cosine similarity of the two maps; the paper's evaluation reports their Jensen–Shannon divergence instead.</p>
+<div class="widget">
+  <div class="controls">
+    <label>head 1 logit <input type="range" id="w-pm-212-l1" min="-4" max="4" step="0.1" value="2"><output for="w-pm-212-l1">2</output></label>
+    <label>head 2 logit <input type="range" id="w-pm-212-l2" min="-4" max="4" step="0.1" value="0.5"><output for="w-pm-212-l2">0.5</output></label>
+    <label>head 3 logit <input type="range" id="w-pm-212-l3" min="-4" max="4" step="0.1" value="-1"><output for="w-pm-212-l3">-1</output></label>
+    <label>heads <select id="w-pm-212-mode"><option value="corn" selected>CORN (conditional, chained)</option><option value="ind">independent cumulative</option></select></label>
+  </div>
+  <canvas id="w-pm-212-cv1" height="200"></canvas>
+  <div class="readout" id="w-pm-212-ro1"></div>
+  <div class="controls" style="margin-top:.8rem">
+    <label>centre A <input type="range" id="w-pm-212-m1" min="0" max="31" step="1" value="10"><output for="w-pm-212-m1">10</output></label>
+    <label>sharpness A <input type="range" id="w-pm-212-s1" min="0" max="12" step="0.5" value="4"><output for="w-pm-212-s1">4</output></label>
+    <label>centre B <input type="range" id="w-pm-212-m2" min="0" max="31" step="1" value="21"><output for="w-pm-212-m2">21</output></label>
+    <label>sharpness B <input type="range" id="w-pm-212-s2" min="0" max="12" step="0.5" value="4"><output for="w-pm-212-s2">4</output></label>
+  </div>
+  <canvas id="w-pm-212-cv2" height="190"></canvas>
+  <div class="readout" id="w-pm-212-ro2"></div>
+  <div class="legend"><span style="--c:var(--c0)">attention A (e.g. myocardium nulling)</span><span style="--c:var(--c1)">attention B (e.g. aorta and valves)</span></div>
+</div>
+<p class="callout">In the top panel, switch to independent heads and drag head 2's logit above head 1's. P(grade &gt; 2) now exceeds P(grade &gt; 1) and the probability of grade 2 goes negative, which CORN's chained products cannot produce whatever the logits. In the bottom panel, set both sharpness values to 0. Two uniform maps have cosine 1 even though neither attends to anything in particular, so L_SAD punishes flatness itself, not only overlap. Then sharpen them with the centres apart: the cosine falls towards 0 only once the two maps stop overlapping, while the JSD saturates at 1 bit.</p>
+<script>(() => {
+  const P = 'w-pm-212-', $ = id => document.getElementById(P + id);
+  const cv1 = $('cv1'), cv2 = $('cv2'), ro1 = $('ro1'), ro2 = $('ro2');
+  function drawA() {
+    const l = [1, 2, 3].map(i => IV.val(P + 'l' + i)), mode = $('mode').value, f = l.map(IV.sigmoid);
+    const cum = mode === 'corn' ? [f[0], f[0] * f[1], f[0] * f[1] * f[2]] : f;
+    const cls = [1 - cum[0], cum[0] - cum[1], cum[1] - cum[2], cum[2]];
+    const grade = 1 + cum.filter(v => v > 0.5).length;
+    const {ctx, w, h} = IV.setup(cv1), half = (w - 30) / 2;
+    const r1 = {l: 44, t: 16, w: half - 50, h: h - 50}, r2 = {l: half + 60, t: 16, w: half - 50, h: h - 50};
+    const lo = Math.min(-0.2, ...cls) , F1 = IV.frame(ctx, r1, [0.5, 3.5], [0, 1.05]), F2 = IV.frame(ctx, r2, [0.5, 4.5], [lo, 1.05]);
+    F1.axes({xticks: [], yticks: [0, 0.5, 1], ylabel: 'probability'}); F2.axes({xticks: [], yticks: [+lo.toFixed(1), 0, 0.5, 1]});
+    IV.text(ctx, 'P(grade > k)', r1.l, 11, {size: 11, bold: true}); IV.text(ctx, 'P(grade = k)', r2.l, 11, {size: 11, bold: true});
+    const bar = (F, x, v, col) => { const bw = F.rect.w / 5; ctx.fillStyle = col; const y0 = F.Y(0), y1 = F.Y(v); ctx.fillRect(F.X(x) - bw / 2, Math.min(y0, y1), bw, Math.abs(y1 - y0));
+      IV.text(ctx, v.toFixed(2), F.X(x), (v >= 0 ? y1 - 3 : y1 + 12), {align: 'center', size: 10}); };
+    cum.forEach((v, i) => { bar(F1, i + 1, v, IV.col(0)); IV.text(ctx, `k=${i + 1}`, F1.X(i + 1), r1.t + r1.h + 13, {align: 'center', size: 10, color: IV.css('--muted')}); });
+    ctx.save(); ctx.strokeStyle = IV.css('--muted'); ctx.setLineDash([3, 3]); ctx.beginPath(); ctx.moveTo(r1.l, F1.Y(0.5)); ctx.lineTo(r1.l + r1.w, F1.Y(0.5)); ctx.stroke(); ctx.restore();
+    cls.forEach((v, i) => { bar(F2, i + 1, v, v < 0 ? '#d23c3c' : IV.col(i + 1 === grade ? 1 : 2)); IV.text(ctx, `grade ${i + 1}`, F2.X(i + 1), r2.t + r2.h + 13, {align: 'center', size: 10, color: IV.css('--muted')}); });
+    ctx.save(); ctx.strokeStyle = IV.css('--ink'); ctx.beginPath(); ctx.moveTo(r2.l, F2.Y(0)); ctx.lineTo(r2.l + r2.w, F2.Y(0)); ctx.stroke(); ctx.restore();
+    const mono = cum[0] >= cum[1] && cum[1] >= cum[2];
+    ro1.innerHTML = `${mode === 'corn' ? 'conditional' : 'head'} probabilities ${f.map(v => v.toFixed(2)).join(', ')} · cumulative ${cum.map(v => v.toFixed(2)).join(', ')} · ` +
+      `${mono ? 'ordered' : '<b>not ordered</b>'} · predicted grade = 1 + #{P(grade &gt; k) &gt; 0.5} = <b>${grade}</b>${cls.some(v => v < 0) ? ' · <b>a grade probability is negative</b>' : ''}`;
+  }
+  const K = 32;
+  const att = (m, s) => { const a = [...Array(K)].map((_, k) => s * Math.exp(-((k - m) ** 2) / 8)), L = IV.lse(a); return a.map(v => Math.exp(v - L)); };
+  function drawB() {
+    const A = att(IV.val(P + 'm1'), IV.val(P + 's1')), B = att(IV.val(P + 'm2'), IV.val(P + 's2'));
+    const dot = A.reduce((s, v, i) => s + v * B[i], 0), cos = dot / (Math.hypot(...A) * Math.hypot(...B));
+    const Mx = A.map((v, i) => (v + B[i]) / 2), kl = (p, q) => p.reduce((s, v, i) => s + (v > 0 ? v * Math.log2(v / q[i]) : 0), 0);
+    const jsd = 0.5 * kl(A, Mx) + 0.5 * kl(B, Mx);
+    const {ctx, w, h} = IV.setup(cv2), rect = {l: 44, t: 10, w: w - 56, h: h - 36};
+    const top = Math.max(...A, ...B) * 1.1, F = IV.frame(ctx, rect, [-0.5, K - 0.5], [-top, top]);
+    F.axes({xticks: [], yticks: [-+top.toFixed(2), 0, +top.toFixed(2)], ylabel: 'attention', fmt: v => Math.abs(v).toFixed(2)});
+    const bw = rect.w / K * 0.75;
+    for (let k = 0; k < K; k++) { ctx.fillStyle = IV.col(0); ctx.fillRect(F.X(k) - bw / 2, F.Y(A[k]), bw, F.Y(0) - F.Y(A[k])); ctx.fillStyle = IV.col(1); ctx.fillRect(F.X(k) - bw / 2, F.Y(0), bw, F.Y(-B[k]) - F.Y(0)); }
+    IV.text(ctx, 'patch index (32 patches of one slice)', rect.l + rect.w / 2, h - 6, {align: 'center', size: 11, color: IV.css('--muted')});
+    ro2.innerHTML = `cosine similarity (the L_SAD term) <b>${cos.toFixed(3)}</b> · Jensen–Shannon divergence <b>${jsd.toFixed(3)}</b> bits (max 1) · ` +
+      `uniform attention would be ${(1 / K).toFixed(3)} per patch`;
+  }
+  IV.bind(['l1', 'l2', 'l3', 'mode'].map(s => P + s), drawA);
+  IV.bind(['m1', 's1', 'm2', 's2'].map(s => P + s), drawB);
+  IV.onRedraw(drawA); IV.onRedraw(drawB);
+})();</script>
+
+</main>
+</body>
+</html>

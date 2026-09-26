@@ -40,7 +40,7 @@ CATEGORIES: list[tuple[str, list[str]]] = [
     ("Gradient estimation", ["Theory"]),
     ("Transferability", ["Theory", "Applications"]),
     # "" first: untitled Misc pages must not render under the last subheading.
-    ("Misc", ["", "Domain Adaptation / Generalization"]),
+    ("Misc", ["", "Domain Adaptation / Generalization", "Image Quality Assessment"]),
 ]
 UNSORTED = "Unsorted"
 BUILD = ROOT / "build"
