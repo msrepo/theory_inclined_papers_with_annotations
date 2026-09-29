@@ -1,0 +1,53 @@
+<svg viewBox="0 0 720 310" xmlns="http://www.w3.org/2000/svg" role="img">
+<title>Hessian vs Fisher</title>
+<desc>Left, on log axes over training: the loss falls by five orders of magnitude, and the trace of the Fisher rises, peaks near step 100, and then falls with it. Right: the relative gap between Hessian and Fisher against the training loss; it drops while the network learns and then levels off near 4 percent for the last three decades of loss.</desc>
+<style>
+  text{font-family:ui-sans-serif,-apple-system,"Segoe UI",sans-serif;font-weight:400}
+  .lab{font-size:11px;fill:#57564f} .hd{font-size:13px;font-weight:500;fill:#1a1a19}
+  .sub{font-size:11.5px;fill:#57564f} .tiny{font-size:10px;fill:#57564f} .ink{fill:#1a1a19}
+  .ax{stroke:#c3c2b7;stroke-width:0.8;fill:none} .gd{stroke:#e2e1da;stroke-width:0.6;fill:none}
+  .c0{stroke:#2f6fb5;stroke-width:2;fill:none} .c0f{fill:#2f6fb5} .c0b{fill:#2f6fb5;opacity:.45}
+  .c1{stroke:#c2571a;stroke-width:2;fill:none} .c1f{fill:#c2571a} .c1b{fill:#c2571a;opacity:.45}
+  .c2{stroke:#0f7a5a;stroke-width:2;fill:none} .c2f{fill:#0f7a5a} .c2b{fill:#0f7a5a;opacity:.45}
+  .c3{stroke:#7c3aed;stroke-width:2;fill:none} .c3f{fill:#7c3aed} .c3b{fill:#7c3aed;opacity:.45}
+  .k{stroke:#1a1a19;stroke-width:1.1;fill:none;stroke-dasharray:4 3} .kf{fill:#1a1a19}
+  .k0{stroke:#1a1a19;stroke-width:1.2;fill:none}
+  .dash{stroke-dasharray:5 3}
+  @media (prefers-color-scheme: dark){
+    .lab,.sub,.tiny{fill:#b6b4ab} .hd,.ink{fill:#eceae3} .ax{stroke:#4a4844} .gd{stroke:#33312e}
+    .c0{stroke:#7fb2e8} .c0f{fill:#7fb2e8} .c0b{fill:#7fb2e8;opacity:.5}
+    .c1{stroke:#f0a070} .c1f{fill:#f0a070} .c1b{fill:#f0a070;opacity:.5}
+    .c2{stroke:#4cc79a} .c2f{fill:#4cc79a} .c2b{fill:#4cc79a;opacity:.5}
+    .c3{stroke:#b48cff} .c3f{fill:#b48cff} .c3b{fill:#b48cff;opacity:.5}
+    .k,.k0{stroke:#eceae3} .kf{fill:#eceae3}
+  }
+</style>
+<text class="hd" x="20" y="22">Lemma 2.4 on a real network: the Hessian–Fisher gap stops shrinking once the data are fitted</text>
+<text class="sub" x="20" y="39">2-16-16-1 tanh MLP on two moons, full-batch GD. Exact Hessian (finite differences) vs Fisher.</text>
+<line class="ax" x1="62" x2="332" y1="252" y2="252"/><line class="ax" x1="62" x2="62" y1="72" y2="252"/><text class="lab" x="197.0" y="280" text-anchor="middle">GD step</text><text class="lab" x="62" y="64">log scale</text>
+<text class="tiny" x="102.1" y="265" text-anchor="middle">100</text>
+<text class="tiny" x="178.7" y="265" text-anchor="middle">1000</text>
+<text class="tiny" x="255.4" y="265" text-anchor="middle">10000</text>
+<text class="tiny" x="332.0" y="265" text-anchor="middle">100000</text>
+<text class="tiny" x="57" y="255.0" text-anchor="end">1e-6</text>
+<line class="gd" x1="62" x2="332" y1="252.0" y2="252.0"/>
+<text class="tiny" x="57" y="203.6" text-anchor="end">1e-4</text>
+<line class="gd" x1="62" x2="332" y1="200.6" y2="200.6"/>
+<text class="tiny" x="57" y="152.1" text-anchor="end">0.01</text>
+<line class="gd" x1="62" x2="332" y1="149.1" y2="149.1"/>
+<text class="tiny" x="57" y="100.7" text-anchor="end">1</text>
+<line class="gd" x1="62" x2="332" y1="97.7" y2="97.7"/>
+<polyline class="c1" points="62.0,111.0 102.1,122.7 138.6,148.9 178.7,166.9 215.3,181.8 255.4,198.2 291.9,213.1 332.0,229.3"/>
+<circle class="c1f" cx="62.0" cy="111.0" r="2.8"/><circle class="c1f" cx="102.1" cy="122.7" r="2.8"/><circle class="c1f" cx="138.6" cy="148.9" r="2.8"/><circle class="c1f" cx="178.7" cy="166.9" r="2.8"/><circle class="c1f" cx="215.3" cy="181.8" r="2.8"/><circle class="c1f" cx="255.4" cy="198.2" r="2.8"/><circle class="c1f" cx="291.9" cy="213.1" r="2.8"/><circle class="c1f" cx="332.0" cy="229.3" r="2.8"/>
+<polyline class="c0" points="62.0,94.3 102.1,80.8 138.6,87.0 178.7,96.0 215.3,105.6 255.4,117.9 291.9,130.2 332.0,144.2"/>
+<circle class="c0f" cx="62.0" cy="94.3" r="2.8"/><circle class="c0f" cx="102.1" cy="80.8" r="2.8"/><circle class="c0f" cx="138.6" cy="87.0" r="2.8"/><circle class="c0f" cx="178.7" cy="96.0" r="2.8"/><circle class="c0f" cx="215.3" cy="105.6" r="2.8"/><circle class="c0f" cx="255.4" cy="117.9" r="2.8"/><circle class="c0f" cx="291.9" cy="130.2" r="2.8"/><circle class="c0f" cx="332.0" cy="144.2" r="2.8"/>
+<line class="c1" x1="72" x2="88" y1="288" y2="288"/><text class="tiny" x="93" y="291">training loss</text><line class="c0" x1="222" x2="238" y1="288" y2="288"/><text class="tiny" x="243" y="291">tr F (Fisher trace)</text>
+<line class="gd" x1="420" x2="690" y1="252.0" y2="252.0"/><text class="tiny" x="415" y="255.0" text-anchor="end">0</text><line class="gd" x1="420" x2="690" y1="216.0" y2="216.0"/><text class="tiny" x="415" y="219.0" text-anchor="end">0.1</text><line class="gd" x1="420" x2="690" y1="180.0" y2="180.0"/><text class="tiny" x="415" y="183.0" text-anchor="end">0.2</text><line class="gd" x1="420" x2="690" y1="144.0" y2="144.0"/><text class="tiny" x="415" y="147.0" text-anchor="end">0.3</text><line class="gd" x1="420" x2="690" y1="108.0" y2="108.0"/><text class="tiny" x="415" y="111.0" text-anchor="end">0.4</text><line class="gd" x1="420" x2="690" y1="72.0" y2="72.0"/><text class="tiny" x="415" y="75.0" text-anchor="end">0.5</text><line class="ax" x1="420" x2="690" y1="252" y2="252"/><line class="ax" x1="420" x2="420" y1="72" y2="252"/><text class="lab" x="555.0" y="280" text-anchor="middle">training loss (log scale, training runs right to left)</text><text class="lab" x="420" y="64">‖H − F‖ / ‖F‖</text>
+<text class="tiny" x="420.0" y="265" text-anchor="middle">1e-06</text>
+<text class="tiny" x="510.0" y="265" text-anchor="middle">0.0001</text>
+<text class="tiny" x="600.0" y="265" text-anchor="middle">0.01</text>
+<text class="tiny" x="690.0" y="265" text-anchor="middle">1</text>
+<polyline class="c2" points="666.7,105.6 646.3,189.3 600.4,227.7 568.9,235.7 542.8,237.8 514.1,238.1 488.0,237.8 459.8,237.2"/>
+<circle class="c2f" cx="666.7" cy="105.6" r="2.8"/><circle class="c2f" cx="646.3" cy="189.3" r="2.8"/><circle class="c2f" cx="600.4" cy="227.7" r="2.8"/><circle class="c2f" cx="568.9" cy="235.7" r="2.8"/><circle class="c2f" cx="542.8" cy="237.8" r="2.8"/><circle class="c2f" cx="514.1" cy="238.1" r="2.8"/><circle class="c2f" cx="488.0" cy="237.8" r="2.8"/><circle class="c2f" cx="459.8" cy="237.2" r="2.8"/>
+<line class="c2" x1="430" x2="446" y1="288" y2="288"/><text class="tiny" x="451" y="291">relative Hessian-Fisher gap</text>
+</svg>

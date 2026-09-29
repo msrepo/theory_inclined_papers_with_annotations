@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Information in the Weights, Interactive</title>
+<style>
+:root{
+  --bg:#fbfaf7; --surface:#ffffff; --ink:#1c1d21; --muted:#5b5f68; --line:#e2dfd8; --soft:#f2f0ea;
+  --c0:#2f6fb5; --c1:#c2571a; --c2:#0f7a5a; --c3:#7c3aed; --c4:#b8860b; --bad:#b42318; --grey:#8a8880;
+  --radius:12px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#131417; --surface:#1b1d21; --ink:#ebebed; --muted:#a3a6ae; --line:#2e3138; --soft:#23262b;
+    --c0:#7fb2e8; --c1:#f0a070; --c2:#4cc79a; --c3:#b48cff; --c4:#e6c34d; --bad:#ff7a6b; --grey:#8f9199;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#131417; --surface:#1b1d21; --ink:#ebebed; --muted:#a3a6ae; --line:#2e3138; --soft:#23262b;
+  --c0:#7fb2e8; --c1:#f0a070; --c2:#4cc79a; --c3:#b48cff; --c4:#e6c34d; --bad:#ff7a6b; --grey:#8f9199;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,sans-serif;}
+main{max-width:900px;margin:0 auto;padding:40px 16px 80px}
+h1{font-size:2.05rem;line-height:1.2;margin:0 0 .4rem;letter-spacing:-.01em}
+h2{font-size:1.38rem;margin:3rem 0 .6rem;padding-top:.5rem;border-top:1px solid var(--line)}
+p{margin:.6rem 0}
+a{color:var(--c0)}
+.lede{color:var(--muted);font-size:1.05rem;margin-bottom:1.4rem}
+nav.toc{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:12px 18px;font-size:.93rem}
+nav.toc ol{margin:.3rem 0;padding-left:1.2rem}
+nav.toc a{color:var(--ink);text-decoration:none;border-bottom:1px dotted var(--muted)}
+.widget{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:14px;margin:1rem 0 1.2rem}
+.controls{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;margin:.2rem 0 .6rem;font-size:.9rem}
+.controls label{display:flex;align-items:center;gap:6px;color:var(--muted)}
+button,select{font:inherit;font-size:.88rem;color:var(--ink);background:var(--soft);border:1px solid var(--line);border-radius:8px;padding:5px 11px;cursor:pointer}
+button:disabled{opacity:.4;cursor:not-allowed}
+input[type=range]{accent-color:var(--c0);width:130px}
+.readout{font-size:.9rem;color:var(--muted);margin-top:.5rem;font-variant-numeric:tabular-nums}
+.readout b{color:var(--ink);font-weight:600}
+.readout .bad{color:var(--bad);font-weight:600}
+.readout .good{color:var(--c2);font-weight:600}
+.callout{border-left:3px solid var(--c2);background:var(--soft);padding:10px 14px;border-radius:0 8px 8px 0;margin:1rem 0;font-size:.95rem}
+canvas{display:block;width:100%}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:680px){.grid2{grid-template-columns:1fr}}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:.82rem;color:var(--muted);margin:.3rem 0 0}
+.legend span::before{content:"";display:inline-block;width:16px;height:3px;margin-right:6px;vertical-align:3px;background:var(--c)}
+.legend span.dash::before{background:repeating-linear-gradient(90deg,var(--c) 0 5px,transparent 5px 8px)}
+.legend span.fill::before{height:9px;vertical-align:0;opacity:.45}
+table.mini{border-collapse:collapse;font-size:.88rem;margin-top:.4rem;font-variant-numeric:tabular-nums}
+table.mini td,table.mini th{padding:2px 10px;border-bottom:1px solid var(--line);text-align:right}
+table.mini th{color:var(--muted);font-weight:500}
+table.mini td:first-child,table.mini th:first-child{text-align:left}
+@media (max-width:600px){ h1{font-size:1.7rem} input[type=range]{width:100px} }
+</style>
+</head>
+<body>
+<main>
+
+<h1>Information in the Weights, Interactive</h1>
+<p class="lede"><a href="../index.html">← text notes</a> · Achille, Paolini &amp; Soatto, <i>Where is the Information in a Deep Neural Network?</i> Four widgets: the Information Lagrangian and its exact minimiser, what temperature does and does not do to flat against sharp minima, the paper's Figure 3 toy rerun in your browser, and which Fisher the activations actually see. Everything is computed on the page.</p>
+
+<nav class="toc"><b>Contents</b>
+<ol>
+  <li><a href="#il">The Information Lagrangian in one dimension</a></li>
+  <li><a href="#kr">Flat and sharp minima under temperature</a></li>
+  <li><a href="#toy">The Figure 3 toy, taken apart</a></li>
+  <li><a href="#act">Which Fisher do the activations see?</a></li>
+</ol></nav>
+
+<!-- ============================================================ -->
+<h2 id="il">1. The Information Lagrangian in one dimension</h2>
+<p>One weight <i>w</i>, a loss with two wells, and a code <i>P</i> = N(0, λ²). The page minimises <b>C<sub>β</sub>(Q) = E<sub>Q</sub>[L] + β KL(Q‖P)</b> exactly. The minimiser is the Gibbs distribution <i>Q</i>* ∝ <i>P</i>·e<sup>−L/β</sup>, computed on a grid. It is drawn against two Gaussians centred at the deeper minimum: the corrected Laplace approximation, with variance β/(h + β/λ²), and Proposition 2.5 as printed, with (β/2)/(h + β/2λ²). The right panel traces the optimal (rate, distortion) pairs over β. The <b>Information in the Weights</b> is the rate. The curve's slope at the current point is −β, so the rate is also d(min C)/dβ.</p>
+<div class="widget">
+  <div class="controls">
+    <label>β <input type="range" id="ilB" min="-2.6" max="0" step="0.02" value="-1.3"><span id="ilBV"></span></label>
+    <label>λ <input type="range" id="ilL" min="0.3" max="3" step="0.05" value="1.5"><span id="ilLV"></span></label>
+  </div>
+  <div class="controls">
+    <label>curvature, left well <input type="range" id="ilH1" min="0" max="2" step="0.05" value="1.3"><span id="ilH1V"></span></label>
+    <label>curvature, right well <input type="range" id="ilH2" min="0" max="2" step="0.05" value="0.3"><span id="ilH2V"></span></label>
+    <label>lift of right well <input type="range" id="ilD" min="-0.4" max="0.4" step="0.01" value="0.05"><span id="ilDV"></span></label>
+  </div>
+  <div class="grid2">
+    <canvas id="ilCv" height="300"></canvas>
+    <canvas id="ilRd" height="300"></canvas>
+  </div>
+  <div class="legend"><span style="--c:var(--ink)">loss L(w) (scaled)</span><span class="dash" style="--c:var(--grey)">code P</span><span class="fill" style="--c:var(--c2)">Gibbs Q* (exact optimum)</span><span style="--c:var(--c0)">Laplace, corrected</span><span class="dash" style="--c:var(--c1)">Proposition 2.5 as printed</span></div>
+  <div class="readout" id="ilRead"></div>
+</div>
+<div class="callout">Things to try. With a small β, the Gibbs curve and the corrected Laplace curve coincide, and the printed formula is visibly too narrow, about √2 times. Raise β and the optimum starts to spill into the other well. No Gaussian can follow that, and the readout shows the Gaussians' Lagrangian falling behind. Make the right well shallow in curvature but slightly <i>higher</i>, then raise β: the Gibbs mass moves to the flat well. That is the free energy L + (β/2) log h at work. Set the lift to 0 and the two wells share mass in the ratio √(h<sub>2</sub>/h<sub>1</sub>) at every small β.</div>
+
+<!-- ============================================================ -->
+<h2 id="kr">2. Flat and sharp minima under temperature</h2>
+<p>Overdamped Langevin dynamics d<i>w</i> = −V′(<i>w</i>) d<i>t</i> + √(2<i>T</i>) d<i>W</i> settles into the Gibbs density e<sup>−V/T</sup>. For two wells, the Eyring–Kramers law (Proposition 2.8) says the time to leave a well is (2π/|λ<sub>1</sub>|)·√(|V″<sub>saddle</sub>|/V″<sub>min</sub>)·e<sup>ΔV/T</sup>. The curvature sits in a prefactor that does not involve <i>T</i>. So when the wells are equally deep, the share of time spent in the sharp one is about √(h<sub>flat</sub>/h<sub>sharp</sub>) at every temperature. Temperature only matters through a difference in depth.</p>
+<div class="widget">
+  <div class="controls">
+    <label>sharp-well curvature <input type="range" id="krH" min="0.6" max="2.6" step="0.05" value="2"><span id="krHV"></span></label>
+    <label>lift of flat well <input type="range" id="krD" min="-0.3" max="0.4" step="0.01" value="0"><span id="krDV"></span></label>
+    <label>temperature T <input type="range" id="krT" min="-1.7" max="-0.3" step="0.02" value="-1"><span id="krTV"></span></label>
+  </div>
+  <div class="grid2">
+    <canvas id="krCv" height="280"></canvas>
+    <canvas id="krSh" height="280"></canvas>
+  </div>
+  <div class="legend"><span style="--c:var(--ink)">V(w)</span><span class="fill" style="--c:var(--c0)">Gibbs density at T</span><span style="--c:var(--c2)">share in the sharp well, exact</span><span class="dash" style="--c:var(--c1)">Laplace: √(h<sub>f</sub>/h<sub>s</sub>)·e<sup>−(V<sub>s</sub>−V<sub>f</sub>)/T</sup> share</span></div>
+  <div class="readout" id="krRead"></div>
+</div>
+<div class="callout">With the lift at 0, drag T across its whole range: the green curve on the right is flat. The Kramers law gives isotropic noise no extra preference for flat minima at higher temperature when the minima are equally good, which is the usual case at zero training loss. Now lift the flat well a little. Low T sends everything to the sharp, deeper well, and high T moves mass into the flat one. That trade of loss against volume is what the free energy L + (T/2) log|H| encodes.</div>
+
+<!-- ============================================================ -->
+<h2 id="toy">3. The Figure 3 toy, taken apart</h2>
+<p>This is the paper's experiment, as rebuilt in <code>code/sgd_toy.py</code> but smaller. A dataset is 100 draws from N(μ, 1) with μ ~ U[−0.8, 0.8], and the model predicts φ(θ). The zigzag φ has 20 linear pieces, steep near 0 and shallow outside, and each piece sweeps [−1, 1], so each holds one global minimum with the same loss. The page runs 120 datasets × 8 runs for 20 000 steps (learning rate 10<sup>−4</sup>), snaps each run to the minimiser of the piece it ends in, and computes three quantities. The first is <b>the paper's estimator</b>: one Gaussian N(θ*, 1/F) per run, KL to the pooled mixture. The second is <b>I(θ; D)</b>, with the runs of a dataset averaged out first (the piece probabilities are pooled over datasets with similar μ, to avoid small-sample bias). The third is <b>H(piece)</b>, the entropy of which piece a run reaches.</p>
+<div class="widget">
+  <div class="controls">
+    <label>noise <select id="tyN">
+      <option value="sgd">SGD minibatch noise</option>
+      <option value="lan">isotropic Langevin</option>
+    </select></label>
+    <label id="tyBL">batch size B <select id="tyB">
+      <option>1</option><option>4</option><option>16</option><option>64</option><option selected>100</option>
+    </select></label>
+    <label id="tyTL" style="display:none">temperature T <select id="tyT">
+      <option>0.01</option><option selected>0.04</option><option>0.16</option>
+    </select></label>
+    <label>start <select id="tyI">
+      <option value="0.5">centred, θ₀ ~ U[−0.5, 0.5]</option>
+      <option value="1.5">wide, θ₀ ~ U[−1.5, 1.5]</option>
+    </select></label>
+    <button id="tyGo">run</button>
+  </div>
+  <canvas id="tyCv" height="250"></canvas>
+  <div class="legend"><span class="fill" style="--c:var(--c0)">final θ, this run</span><span class="fill" style="--c:var(--grey)">plain GD (B = 100), same start</span><span class="dash" style="--c:var(--ink)">log Fisher of each piece</span></div>
+  <canvas id="tyBar" height="200"></canvas>
+  <div class="legend"><span class="fill" style="--c:var(--c0)">share of runs per piece (0 = steepest)</span><span class="dash" style="--c:var(--ink)">share of the width (isotropic Gibbs)</span></div>
+  <div class="readout" id="tyRead">Press <b>run</b>. It takes a second or two.</div>
+</div>
+<div class="callout">Run B = 100, then B = 1. The paper's estimator falls, which is the paper's Figure 3 (centre). But I(θ; D) does not fall at all, and may even rise. The whole drop is in the last column, estimator − I(θ; D), which is H(piece | D): the entropy of which equivalent minimum a run reaches once the data are known. Every piece carries the same 1.5 nats about the data, because in φ-coordinates every Gaussian N(θ*, 1/(N s²)) becomes N(x̄, 1/N) whatever the slope s. The estimator counts <i>which</i> equivalent minimum the seed led to as information. Switch to Langevin and the steep pieces keep their share at every temperature (from the wide start, which is already width-proportional). Only SGD, whose noise scales with the slope, empties them.</div>
+
+<!-- ============================================================ -->
+<h2 id="act">4. Which Fisher do the activations see?</h2>
+<p>This is Definition 3.1 in the smallest possible case. Two weights, one activation <i>z</i> = <i>x</i>·(<i>j</i><sub>1</sub><i>w</i><sub>1</sub> + <i>j</i><sub>2</sub><i>w</i><sub>2</sub>), with the readout direction <i>J</i> = (<i>j</i><sub>1</sub>, <i>j</i><sub>2</sub>) at an angle you choose, scaled by the input size |<i>x</i>|. Weight noise <i>n</i> ~ N(0, β<i>F</i><sup>−1</sup>) is the ellipse on the left. It reaches the activation as variance σ<sub>z</sub>² = β·<i>x</i>²·<i>J F</i><sup>−1</sup><i>J</i><sup>⊤</sup>, the shadow of the ellipse on the readout line. The information the activation carries about the input scales with the <b>precision 1/σ<sub>z</sub>²</b>. Proposition 3.2 as printed uses <i>x</i>²·<i>J F J</i><sup>⊤</sup>/β instead.</p>
+<div class="widget">
+  <div class="controls">
+    <label>correlation ρ <input type="range" id="acR" min="-0.995" max="0.995" step="0.005" value="0.9"><span id="acRV"></span></label>
+    <label>F₁₁ / F₂₂ <input type="range" id="acA" min="-2" max="2" step="0.05" value="0"><span id="acAV"></span></label>
+    <label>readout angle <input type="range" id="acP" min="0" max="180" step="1" value="0"><span id="acPV"></span></label>
+    <label>|x| <input type="range" id="acX" min="-1" max="1" step="0.02" value="0"><span id="acXV"></span></label>
+  </div>
+  <div class="grid2">
+    <canvas id="acCv" height="300"></canvas>
+    <canvas id="acBar" height="300"></canvas>
+  </div>
+  <div class="legend"><span class="fill" style="--c:var(--c0)">weight noise β F⁻¹ (1σ)</span><span style="--c:var(--c1)">readout direction J</span><span class="fill" style="--c:var(--c1)">its shadow ±σ_z/|x|</span></div>
+  <div class="readout" id="acRead"></div>
+</div>
+<div class="callout">At ρ = 0 and angle 0 the two formulas agree. Raise ρ towards 1 with the readout on <i>w</i><sub>1</sub>. The ellipse stretches along the redundant direction, the shadow grows, and the true precision falls like 1 − ρ² (a Schur complement). The printed formula does not move, because it only sees F<sub>11</sub>. Now drag |x|: doubling the input quarters the true precision (bigger input, bigger noise in z) and quadruples the printed one. Both do scale the same way when you shrink the whole Fisher, which is why the paper's qualitative claim (i) survives.</div>
+
+</main>
+<script>
+(function(){
+"use strict";
+const $ = id => document.getElementById(id);
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+function setup(cv){
+  if (!cv.dataset.h) cv.dataset.h = cv.getAttribute("height");
+  const r = window.devicePixelRatio || 1, w = cv.clientWidth, h = +cv.dataset.h;
+  cv.width = Math.round(w * r); cv.height = Math.round(h * r); cv.style.height = h + "px";
+  const g = cv.getContext("2d"); g.setTransform(r, 0, 0, r, 0, 0); return {g, w, h};
+}
+function axes(g, w, h, pad){
+  return {x0: pad.l, y0: pad.t, W: w - pad.l - pad.r, H: h - pad.t - pad.b};
+}
+function mapper(a, xl, yl){
+  return {X: x => a.x0 + (x - xl[0]) / (xl[1] - xl[0]) * a.W, Y: y => a.y0 + a.H - (y - yl[0]) / (yl[1] - yl[0]) * a.H};
+}
+function frame(g, a, m, xt, yt, xlab, ylab){
+  g.strokeStyle = css("--line"); g.fillStyle = css("--muted"); g.lineWidth = 1; g.font = "11px sans-serif";
+  g.textAlign = "center";
+  for (const t of xt){ const x = m.X(t[0]); g.fillText(t[1], x, a.y0 + a.H + 14); }
+  g.textAlign = "right";
+  for (const t of yt){ const y = m.Y(t[0]); g.beginPath(); g.moveTo(a.x0, y); g.lineTo(a.x0 + a.W, y); g.stroke(); g.fillText(t[1], a.x0 - 5, y + 3); }
+  g.strokeStyle = css("--grey"); g.beginPath(); g.moveTo(a.x0, a.y0 + a.H); g.lineTo(a.x0 + a.W, a.y0 + a.H); g.moveTo(a.x0, a.y0); g.lineTo(a.x0, a.y0 + a.H); g.stroke();
+  g.textAlign = "center"; if (xlab) g.fillText(xlab, a.x0 + a.W / 2, a.y0 + a.H + 30);
+  g.textAlign = "left"; if (ylab) g.fillText(ylab, a.x0, a.y0 - 7);
+}
+function line(g, m, xs, ys, col, lw, dash){
+  g.strokeStyle = col; g.lineWidth = lw || 2; g.setLineDash(dash || []); g.beginPath();
+  let pen = false;
+  for (let i = 0; i < xs.length; i++){
+    if (ys[i] === null || !isFinite(ys[i])){ pen = false; continue; }
+    const X = m.X(xs[i]), Y = m.Y(ys[i]); pen ? g.lineTo(X, Y) : g.moveTo(X, Y); pen = true;
+  }
+  g.stroke(); g.setLineDash([]);
+}
+function fillUnder(g, m, xs, ys, col, alpha){
+  g.globalAlpha = alpha; g.fillStyle = col; g.beginPath(); g.moveTo(m.X(xs[0]), m.Y(0));
+  for (let i = 0; i < xs.length; i++) g.lineTo(m.X(xs[i]), m.Y(ys[i]));
+  g.lineTo(m.X(xs[xs.length - 1]), m.Y(0)); g.closePath(); g.fill(); g.globalAlpha = 1;
+}
+const fmt = (v, d) => (Math.abs(v) >= 1e4 || (Math.abs(v) < 1e-3 && v !== 0)) ? v.toExponential(2) : v.toFixed(d === undefined ? 3 : d);
+
+// ---------------------------------------------------------------- 1. Information Lagrangian
+const IL = {};
+(function(){
+  const n = 1601, lo = -3, hi = 3, dw = (hi - lo) / (n - 1);
+  const w = new Float64Array(n); for (let i = 0; i < n; i++) w[i] = lo + i * dw;
+  function loss(h1, h2, d){
+    const L = new Float64Array(n), s = 0.02;
+    for (let i = 0; i < n; i++){
+      const qa = 0.5 * h1 * (w[i] + 1) ** 2, qb = 0.5 * h2 * (w[i] - 1) ** 2 + d;
+      const m = Math.min(qa, qb);
+      L[i] = m - s * Math.log(Math.exp(-(qa - m) / s) + Math.exp(-(qb - m) / s));
+    }
+    return L;
+  }
+  function prior(lam){ const P = new Float64Array(n); for (let i = 0; i < n; i++) P[i] = Math.exp(-w[i] * w[i] / (2 * lam * lam)) / Math.sqrt(2 * Math.PI) / lam; return P; }
+  function gibbs(L, P, beta){
+    let mn = Infinity; for (const v of L) mn = Math.min(mn, v);
+    const q = new Float64Array(n); let z = 0;
+    for (let i = 0; i < n; i++){ q[i] = P[i] * Math.exp(-(L[i] - mn) / beta); z += q[i]; }
+    for (let i = 0; i < n; i++) q[i] /= z * dw;
+    return q;
+  }
+  function stats(q, L, P){
+    let el = 0, kl = 0;
+    for (let i = 0; i < n; i++){ el += q[i] * L[i] * dw; if (q[i] > 1e-300) kl += q[i] * Math.log(q[i] / P[i]) * dw; }
+    return {el, kl};
+  }
+  function gauss(m, v){ const q = new Float64Array(n); for (let i = 0; i < n; i++) q[i] = Math.exp(-(((w[i] - m) ** 2)) / (2 * v)) / Math.sqrt(2 * Math.PI * v); return q; }
+  IL.draw = function(){
+    const beta = Math.pow(10, +$("ilB").value), lam = +$("ilL").value;
+    const h1 = Math.pow(10, +$("ilH1").value), h2 = Math.pow(10, +$("ilH2").value), d = +$("ilD").value;
+    $("ilBV").textContent = beta.toPrecision(2); $("ilLV").textContent = lam.toFixed(2);
+    $("ilH1V").textContent = h1.toPrecision(3); $("ilH2V").textContent = h2.toPrecision(3); $("ilDV").textContent = d.toFixed(2);
+    const L = loss(h1, h2, d), P = prior(lam), q = gibbs(L, P, beta), st = stats(q, L, P);
+    const left = d >= 0, wm = left ? -1 : 1, h = left ? h1 : h2;
+    const vt = beta / (h + beta / (lam * lam)), vp = (beta / 2) / (h + beta / (2 * lam * lam));
+    const qt = gauss(wm, vt), qp = gauss(wm, vp), st_t = stats(qt, L, P), st_p = stats(qp, L, P);
+    const {g, w: W, h: H} = setup($("ilCv"));
+    const a = axes(g, W, H, {l: 36, r: 10, t: 18, b: 36});
+    let ymax = 0; for (let i = 0; i < n; i++) ymax = Math.max(ymax, q[i], qt[i]);
+    ymax *= 1.1;
+    const m = mapper(a, [lo, hi], [0, ymax]);
+    frame(g, a, m, [[-3, "−3"], [-2, "−2"], [-1, "−1"], [0, "0"], [1, "1"], [2, "2"], [3, "3"]], [], "w", "density");
+    const xs = Array.from(w);
+    fillUnder(g, m, xs, Array.from(q), css("--c2"), 0.35);
+    line(g, m, xs, Array.from(q), css("--c2"), 2);
+    line(g, m, xs, Array.from(qt), css("--c0"), 2);
+    line(g, m, xs, Array.from(qp).map(v => Math.min(v, ymax * 1.5)), css("--c1"), 2, [5, 3]);
+    line(g, m, xs, Array.from(P).map(v => v / Math.max(...P) * ymax * 0.3), css("--grey"), 1.5, [4, 3]);
+    line(g, m, xs, Array.from(L).map(v => v > 0.8 ? null : v / 0.8 * ymax * 0.95), css("--ink"), 1.2);
+    // rate-distortion
+    const {g: g2, w: W2, h: H2} = setup($("ilRd"));
+    const a2 = axes(g2, W2, H2, {l: 44, r: 12, t: 18, b: 36});
+    const pts = [];
+    for (let e = -3; e <= 0.6; e += 0.05){ const b = Math.pow(10, e); const s = stats(gibbs(L, P, b), L, P); pts.push([s.kl, s.el, b]); }
+    const rmax = Math.max(...pts.map(p => p[0])) * 1.05 + 0.01;
+    const dmin = Math.min(...pts.map(p => p[1])), dmax = Math.max(...pts.map(p => p[1]));
+    const m2 = mapper(a2, [0, rmax], [dmin - 0.02 * (dmax - dmin + 0.01), dmax + 0.05 * (dmax - dmin + 0.01)]);
+    const xt = []; const step = rmax > 6 ? 2 : rmax > 3 ? 1 : 0.5; for (let v = 0; v <= rmax; v += step) xt.push([v, v.toFixed(step < 1 ? 1 : 0)]);
+    frame(g2, a2, m2, xt, [], "rate: KL(Q*‖P), nats", "distortion: E_Q*[L]");
+    line(g2, m2, pts.map(p => p[0]), pts.map(p => p[1]), css("--c2"), 2);
+    // tangent with slope -beta
+    const r0 = st.kl, d0 = st.el, ra = Math.max(0, r0 - 0.3 * rmax), rb = Math.min(rmax, r0 + 0.3 * rmax);
+    line(g2, m2, [ra, rb], [d0 - beta * (ra - r0), d0 - beta * (rb - r0)], css("--ink"), 1, [4, 3]);
+    g2.fillStyle = css("--c2"); g2.beginPath(); g2.arc(m2.X(r0), m2.Y(d0), 5, 0, 7); g2.fill();
+    const Ct = st.el + beta * st.kl, Cc = st_t.el + beta * st_t.kl, Cp = st_p.el + beta * st_p.kl;
+    const massLeft = (() => { let s = 0; for (let i = 0; i < n; i++) if (w[i] < 0) s += q[i] * dw; return s; })();
+    $("ilRead").innerHTML =
+      `Information in the Weights KL(Q*‖P) = <b>${fmt(st.kl)}</b> nats; E<sub>Q*</sub>[L] = ${fmt(st.el, 4)}; mass in the left well <b>${(100 * massLeft).toFixed(1)}%</b>.<br>` +
+      `Lagrangian C<sub>β</sub>: Gibbs <b>${fmt(Ct, 5)}</b> · corrected Laplace ${fmt(Cc, 5)} (+${fmt(Cc - Ct, 5)}) · as printed ${fmt(Cp, 5)} (+${fmt(Cp - Ct, 5)}).<br>` +
+      `Variance at the ${left ? "left" : "right"} well: corrected β/(h+β/λ²) = ${fmt(vt, 5)}, printed (β/2)/(h+β/2λ²) = ${fmt(vp, 5)}, ratio <b>${(vp / vt).toFixed(3)}</b>.`;
+  };
+  ["ilB", "ilL", "ilH1", "ilH2", "ilD"].forEach(id => $(id).addEventListener("input", IL.draw));
+})();
+
+// ---------------------------------------------------------------- 2. Kramers
+const KR = {};
+(function(){
+  const n = 3001, lo = -2.2, hi = 4.2, dw = (hi - lo) / (n - 1);
+  const w = new Float64Array(n); for (let i = 0; i < n; i++) w[i] = lo + i * dw;
+  const a = -1, b = 1.5, hf = 1;
+  function V(hs, d){
+    const out = new Float64Array(n);
+    for (let i = 0; i < n; i++){
+      const qa = 0.5 * hs * (w[i] - a) ** 2, qb = 0.5 * hf * (w[i] - b) ** 2;
+      out[i] = qa * qb / (qa + qb + 1e-300) + d * Math.exp(-((w[i] - b) ** 2) / 0.08);
+    }
+    return out;
+  }
+  function share(v, T){
+    let mn = Infinity; for (const x of v) mn = Math.min(mn, x);
+    // saddle: max between minima
+    let is = 0, vm = -Infinity; for (let i = 0; i < n; i++) if (w[i] > a && w[i] < b && v[i] > vm){ vm = v[i]; is = i; }
+    let s1 = 0, s = 0; for (let i = 0; i < n; i++){ const p = Math.exp(-(v[i] - mn) / T); s += p; if (i < is) s1 += p; }
+    return {share: s1 / s, is};
+  }
+  KR.draw = function(){
+    const hs = Math.pow(10, +$("krH").value), d = +$("krD").value, T = Math.pow(10, +$("krT").value);
+    $("krHV").textContent = hs.toPrecision(3); $("krDV").textContent = d.toFixed(2); $("krTV").textContent = T.toPrecision(2);
+    const v = V(hs, d), sh = share(v, T);
+    const {g, w: W, h: H} = setup($("krCv"));
+    const ax = axes(g, W, H, {l: 34, r: 10, t: 18, b: 36});
+    const m = mapper(ax, [lo, hi], [0, 1.6]);
+    frame(g, ax, m, [[-2, "−2"], [-1, "−1"], [0, "0"], [1, "1"], [2, "2"], [3, "3"], [4, "4"]], [[0, "0"], [0.5, "0.5"], [1, "1"], [1.5, "1.5"]], "w", "V(w)");
+    let mn = Infinity; for (const x of v) mn = Math.min(mn, x);
+    const p = Array.from(v).map(x => Math.exp(-(x - mn) / T));
+    const xs = Array.from(w);
+    fillUnder(g, m, xs, p.map(x => 1.4 * x), css("--c0"), 0.35);
+    line(g, m, xs, Array.from(v).map(x => x > 1.6 ? null : x), css("--ink"), 1.5);
+    // share vs T
+    const {g: g2, w: W2, h: H2} = setup($("krSh"));
+    const a2 = axes(g2, W2, H2, {l: 40, r: 12, t: 18, b: 36});
+    const Ts = [], ex = [], lap = [];
+    const vs = v[Math.round((a - lo) / dw)], vf = v[Math.round((b - lo) / dw)];
+    for (let e = -1.7; e <= -0.3 + 1e-9; e += 0.035){
+      const t = Math.pow(10, e); Ts.push(e); ex.push(share(v, t).share);
+      const r = Math.sqrt(hf / hs) * Math.exp(-(vs - vf) / t); lap.push(r / (1 + r));
+    }
+    const m2 = mapper(a2, [-1.7, -0.3], [0, 1]);
+    frame(g2, a2, m2, [[-1.7, "0.02"], [-1.3, "0.05"], [-1, "0.1"], [-0.7, "0.2"], [-0.3, "0.5"]], [[0, "0"], [0.25, "0.25"], [0.5, "0.5"], [0.75, "0.75"], [1, "1"]], "temperature T (log scale)", "share of Gibbs mass in the sharp well");
+    line(g2, m2, Ts, lap, css("--c1"), 2, [5, 3]);
+    line(g2, m2, Ts, ex, css("--c2"), 2.2);
+    g2.fillStyle = css("--c2"); g2.beginPath(); g2.arc(m2.X(Math.log10(T)), m2.Y(sh.share), 5, 0, 7); g2.fill();
+    const rule = Math.sqrt(hf / hs) / (1 + Math.sqrt(hf / hs));
+    $("krRead").innerHTML = `Share of mass in the sharp well at T = ${T.toPrecision(2)}: <b>${(100 * sh.share).toFixed(1)}%</b>. ` +
+      (Math.abs(d) < 0.005 ? `Equal depths: the curvature rule √(h<sub>f</sub>/h<sub>s</sub>) predicts <b>${(100 * rule).toFixed(1)}%</b> at every T.`
+       : `The flat well is ${d > 0 ? "higher" : "lower"} by ${Math.abs(d).toFixed(2)}, so T now matters: ${d > 0 ? "higher T moves mass into the flat well" : "the flat well wins at every T, more so at low T"}.`) +
+      ` Kramers escape-time ratio (sharp/flat) at equal depth ≈ √(h<sub>f</sub>/h<sub>s</sub>) = ${Math.sqrt(hf / hs).toFixed(3)}, independent of T.`;
+  };
+  ["krH", "krD", "krT"].forEach(id => $(id).addEventListener("input", KR.draw));
+})();
+
+// ---------------------------------------------------------------- 3. Toy
+const TY = {};
+(function(){
+  const N = 100, HALF = 1.5, NP = 10, G = 1.4, ETA = 1e-4, STEPS = 20000, M = 120, R = 8;
+  const w0 = HALF * (G - 1) / (Math.pow(G, NP) - 1);
+  const WID = [], KNK = [0], SL = [];
+  for (let j = 0; j < NP; j++){ WID.push(w0 * Math.pow(G, j)); KNK.push(KNK[j] + WID[j]); SL.push(2 / WID[j]); }
+  KNK[NP] = HALF;
+  function mulberry(a){ return function(){ a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+  function gaussRng(u){ let has = false, spare = 0; return function(){ if (has){ has = false; return spare; }
+    let a, b, r; do { a = 2 * u() - 1; b = 2 * u() - 1; r = a * a + b * b; } while (r >= 1 || r === 0);
+    const f = Math.sqrt(-2 * Math.log(r) / r); spare = b * f; has = true; return a * f; }; }
+  function pieceJ(a){ let j = 0; while (j < NP - 1 && a >= KNK[j + 1]) j++; return j; }
+  function phiSlope(th){
+    const a = Math.abs(th), j = pieceJ(a), start = j % 2 === 0 ? 1 : -1, ds = (j % 2 === 0 ? -1 : 1) * SL[j];
+    return [start + ds * (a - KNK[j]), ds * (th >= 0 ? 1 : -1), j];
+  }
+  function minimiser(sidePos, j, xbar){
+    const start = j % 2 === 0 ? 1 : -1, ds = (j % 2 === 0 ? -1 : 1) * SL[j];
+    let t = (xbar - start) / ds; t = Math.max(0, Math.min(WID[j], t));
+    const a = KNK[j] + t; return sidePos ? a : -a;
+  }
+  // data are fixed across runs
+  const ur = mulberry(12345), gr = gaussRng(ur);
+  const mu = new Float64Array(M), xbar = new Float64Array(M), s2 = new Float64Array(M);
+  for (let d = 0; d < M; d++){
+    mu[d] = -0.8 + 1.6 * ur(); let s = 0, ss = 0;
+    for (let i = 0; i < N; i++){ const x = mu[d] + gr(); s += x; ss += x * x; }
+    xbar[d] = s / N; s2[d] = (ss - N * xbar[d] * xbar[d]) / (N - 1);
+  }
+  function run(kind, B, T, lo, seed){
+    const u = mulberry(seed), gz = gaussRng(u), ui = mulberry(777 + Math.round(lo * 10)), out = [];
+    const sgd = kind === "sgd", E2 = 2 * ETA;
+    for (let d = 0; d < M; d++){
+      const nsd = kind === "sgd" ? Math.sqrt(s2[d] * (N - B) / (B * (N - 1))) : 0, lsd = Math.sqrt(2 * ETA * T);
+      for (let r = 0; r < R; r++){
+        let th = -lo + 2 * lo * ui();
+        const xb = xbar[d];
+        for (let t = 0; t < STEPS; t++){
+          const a = th < 0 ? -th : th;
+          let j = 0; while (j < NP - 1 && a >= KNK[j + 1]) j++;
+          const even = (j & 1) === 0, ds = even ? -SL[j] : SL[j];
+          const ph = (even ? 1 : -1) + ds * (a - KNK[j]), sl = th >= 0 ? ds : -ds;
+          if (sgd) th += E2 * (xb + (nsd > 0 ? nsd * gz() : 0) - ph) * sl;
+          else th += E2 * (xb - ph) * sl + lsd * gz();
+          if (th > HALF) th = 2 * HALF - th; else if (th < -HALF) th = -2 * HALF - th;
+        }
+        const j = phiSlope(th)[2], pos = th >= 0;
+        out.push({d, j, pos, ts: minimiser(pos, j, xbar[d]), F: N * SL[j] * SL[j]});
+      }
+    }
+    return out;
+  }
+  const NG = 24001, glo = -1.56, ghi = 1.56, dg = (ghi - glo) / (NG - 1);
+  function addGauss(arr, m, v, wt){
+    const sd = Math.sqrt(v), i0 = Math.max(0, Math.floor((m - 7 * sd - glo) / dg)), i1 = Math.min(NG - 1, Math.ceil((m + 7 * sd - glo) / dg));
+    const c = wt / Math.sqrt(2 * Math.PI * v);
+    for (let i = i0; i <= i1; i++){ const x = glo + i * dg; arr[i] += c * Math.exp(-(x - m) * (x - m) / (2 * v)); }
+  }
+  function crossLog(m, v, logq){
+    const sd = Math.sqrt(v), i0 = Math.max(0, Math.floor((m - 7 * sd - glo) / dg)), i1 = Math.min(NG - 1, Math.ceil((m + 7 * sd - glo) / dg));
+    const c = 1 / Math.sqrt(2 * Math.PI * v); let s = 0, z = 0;
+    for (let i = i0; i <= i1; i++){ const x = glo + i * dg, p = c * Math.exp(-(x - m) * (x - m) / (2 * v)); s += p * logq[i]; z += p; }
+    return s / z;
+  }
+  function analyse(res){
+    const qbar = new Float64Array(NG);
+    for (const r of res) addGauss(qbar, r.ts, 1 / r.F, 1 / res.length);
+    const logq = qbar.map(v => Math.log(Math.max(v, 1e-300)));
+    let ip = 0; for (const r of res) ip += -0.5 * Math.log(2 * Math.PI * Math.E / r.F) - crossLog(r.ts, 1 / r.F, logq);
+    ip /= res.length;
+    const key = r => (r.pos ? 1 : -1) * (r.j + 1);
+    const cnt = {}; for (const r of res) cnt[key(r)] = (cnt[key(r)] || 0) + 1;
+    let hp = 0; for (const k in cnt){ const p = cnt[k] / res.length; hp -= p * Math.log(p); }
+    // proper I(theta; D): pieces pooled within 6 mu-bins
+    const bin = d => Math.min(5, Math.floor((mu[d] + 0.8) / (1.6 / 6)));
+    const bc = [...Array(6)].map(() => ({})), bn = new Array(6).fill(0);
+    for (const r of res){ const b = bin(r.d); bc[b][key(r)] = (bc[b][key(r)] || 0) + 1; bn[b]++; }
+    let iproper = 0;
+    for (let d = 0; d < M; d++){
+      const b = bin(d), q = new Float64Array(NG);
+      for (const k in bc[b]){ const kk = +k, j = Math.abs(kk) - 1; addGauss(q, minimiser(kk > 0, j, xbar[d]), 1 / (N * SL[j] * SL[j]), bc[b][k] / bn[b]); }
+      let s = 0; for (let i = 0; i < NG; i++) if (q[i] > 1e-300) s += q[i] * (Math.log(q[i]) - logq[i]) * dg;
+      iproper += s / M;
+    }
+    let lf = 0; for (const r of res) lf += Math.log(r.F) / res.length;
+    const share = new Array(NP).fill(0); for (const r of res) share[r.j] += 1 / res.length;
+    return {ip, hp, iproper, lf, share};
+  }
+  let gdRef = {};
+  TY.draw = function(res, an, ref){
+    const {g, w: W, h: H} = setup($("tyCv"));
+    const ax = axes(g, W, H, {l: 34, r: 10, t: 14, b: 34});
+    const nb = 150, edges = [...Array(nb + 1)].map((_, i) => -1.5 + 3 * i / nb);
+    const hist = arr => { const h = new Array(nb).fill(0); for (const t of arr){ const k = Math.min(nb - 1, Math.max(0, Math.floor((t + 1.5) / 3 * nb))); h[k] += nb / 3 / arr.length; } return h; };
+    const hr = ref ? hist(ref.map(r => r.ts)) : null, hc = res ? hist(res.map(r => r.ts)) : null;
+    const ym = 3.2, m = mapper(ax, [-1.5, 1.5], [0, ym]);
+    frame(g, ax, m, [[-1.5, "−1.5"], [-1, "−1"], [-0.5, "−0.5"], [0, "0"], [0.5, "0.5"], [1, "1"], [1.5, "1.5"]], [[0, "0"], [1, "1"], [2, "2"], [3, "3"]], "final θ (snapped to its piece's minimiser)", "density");
+    const bars = (h, col, al) => { g.globalAlpha = al; g.fillStyle = col; for (let k = 0; k < nb; k++){ if (!h[k]) continue; const x0 = m.X(edges[k]), x1 = m.X(edges[k + 1]), y = m.Y(Math.min(h[k], ym)); g.fillRect(x0, y, Math.max(1, x1 - x0 - 0.3), m.Y(0) - y); } g.globalAlpha = 1; };
+    if (hr) bars(hr, css("--grey"), 0.45);
+    if (hc) bars(hc, css("--c0"), 0.55);
+    const xs = [], ys = [];
+    for (let i = 0; i <= 600; i++){ const t = -1.5 + 3 * i / 600, j = pieceJ(Math.abs(t)); xs.push(t); ys.push((Math.log(N * SL[j] * SL[j]) - 7.5) / (13.8 - 7.5) * 3); }
+    line(g, m, xs, ys, css("--ink"), 1.1, [4, 3]);
+    // bars per piece
+    const {g: g2, w: W2, h: H2} = setup($("tyBar"));
+    const a2 = axes(g2, W2, H2, {l: 34, r: 10, t: 14, b: 34});
+    const m2 = mapper(a2, [-0.5, 9.5], [0, 0.4]);
+    frame(g2, a2, m2, [...Array(10)].map((_, k) => [k, String(k)]), [[0, "0"], [0.1, "0.1"], [0.2, "0.2"], [0.3, "0.3"], [0.4, "0.4"]], "piece (0 = steepest, 9 = shallowest), both sides pooled", "share of runs");
+    if (an){ g2.fillStyle = css("--c0"); g2.globalAlpha = 0.6; for (let k = 0; k < NP; k++){ const y = m2.Y(Math.min(an.share[k], 0.4)); g2.fillRect(m2.X(k - 0.3), y, m2.X(k + 0.3) - m2.X(k - 0.3), m2.Y(0) - y); } g2.globalAlpha = 1; }
+    const tot = WID.reduce((s, v) => s + v, 0);
+    line(g2, m2, [...Array(NP)].map((_, k) => k), WID.map(v => v / tot), css("--ink"), 1.2, [4, 3]);
+  };
+  TY.go = function(){
+    const kind = $("tyN").value, B = +$("tyB").value, T = +$("tyT").value, lo = +$("tyI").value;
+    $("tyGo").disabled = true; $("tyRead").innerHTML = "running…";
+    setTimeout(() => {
+      const tStart = performance.now();
+      const refKey = String(lo);
+      if (!gdRef[refKey]){ const r = run("sgd", 100, 0, lo, 5); gdRef[refKey] = {res: r, an: analyse(r)}; }
+      const res = (kind === "sgd" && B === 100) ? gdRef[refKey].res : run(kind, B, T, lo, 9 + B);
+      const an = (kind === "sgd" && B === 100) ? gdRef[refKey].an : analyse(res);
+      const ref = gdRef[refKey].an;
+      TY.draw(res, an, gdRef[refKey].res);
+      const lab = kind === "sgd" ? `SGD, B = ${B}` : `Langevin, T = ${T}`;
+      $("tyRead").innerHTML =
+        `<table class="mini"><tr><th></th><th>E log F</th><th>H(piece)</th><th>paper's estimator</th><th>I(θ; D)</th><th>estimator − I(θ;D)</th></tr>` +
+        `<tr><td>plain GD</td><td>${ref.lf.toFixed(2)}</td><td>${ref.hp.toFixed(2)}</td><td>${ref.ip.toFixed(2)}</td><td>${ref.iproper.toFixed(2)}</td><td>${(ref.ip - ref.iproper).toFixed(2)}</td></tr>` +
+        `<tr><td><b>${lab}</b></td><td>${an.lf.toFixed(2)}</td><td>${an.hp.toFixed(2)}</td><td><b>${an.ip.toFixed(2)}</b></td><td><b>${an.iproper.toFixed(2)}</b></td><td>${(an.ip - an.iproper).toFixed(2)}</td></tr></table>` +
+        `The information inside any single piece is 1.51 nats (the same for every slope). With ${M} × ${R} runs the numbers wobble by a few hundredths; the notes' table uses 300 × 12. (${((performance.now() - tStart) / 1000).toFixed(1)} s)`;
+      $("tyGo").disabled = false;
+    }, 30);
+  };
+  $("tyGo").addEventListener("click", TY.go);
+  $("tyN").addEventListener("change", () => { const s = $("tyN").value === "sgd"; $("tyBL").style.display = s ? "" : "none"; $("tyTL").style.display = s ? "none" : ""; });
+})();
+
+// ---------------------------------------------------------------- 4. Activations
+const AC = {};
+(function(){
+  const beta = 0.2;
+  AC.draw = function(){
+    const rho = +$("acR").value, ar = Math.pow(10, +$("acA").value), phi = +$("acP").value * Math.PI / 180, xs = Math.pow(2, +$("acX").value);
+    $("acRV").textContent = rho.toFixed(3); $("acAV").textContent = ar.toPrecision(3); $("acPV").textContent = $("acP").value + "°"; $("acXV").textContent = xs.toFixed(2);
+    const f11 = Math.sqrt(ar), f22 = 1 / Math.sqrt(ar), f12 = rho * Math.sqrt(f11 * f22);
+    const det = f11 * f22 - f12 * f12, i11 = f22 / det, i22 = f11 / det, i12 = -f12 / det;
+    const j1 = Math.cos(phi), j2 = Math.sin(phi);
+    const jFinvj = j1 * j1 * i11 + 2 * j1 * j2 * i12 + j2 * j2 * i22, jFj = j1 * j1 * f11 + 2 * j1 * j2 * f12 + j2 * j2 * f22;
+    const varz = beta * xs * xs * jFinvj, correct = 1 / varz, paper = xs * xs * jFj / beta;
+    // ellipse of beta F^-1
+    const tr = beta * (i11 + i22), dt = beta * beta * (i11 * i22 - i12 * i12), l1 = tr / 2 + Math.sqrt(tr * tr / 4 - dt), l2 = tr / 2 - Math.sqrt(Math.max(0, tr * tr / 4 - dt));
+    const ang = 0.5 * Math.atan2(2 * i12, i11 - i22);
+    const {g, w: W, h: H} = setup($("acCv"));
+    const cx = W / 2, cy = H / 2, sc = Math.min(W, H) / 2 / Math.max(3.2, 1.15 * Math.sqrt(l1));
+    g.strokeStyle = css("--line"); g.lineWidth = 1; g.beginPath(); g.moveTo(10, cy); g.lineTo(W - 10, cy); g.moveTo(cx, 10); g.lineTo(cx, H - 10); g.stroke();
+    g.fillStyle = css("--muted"); g.font = "11px sans-serif"; g.fillText("w₁", W - 24, cy - 6); g.fillText("w₂", cx + 6, 20);
+    g.save(); g.translate(cx, cy); g.rotate(-ang); g.globalAlpha = 0.3; g.fillStyle = css("--c0"); g.beginPath(); g.ellipse(0, 0, sc * Math.sqrt(l1), sc * Math.sqrt(l2), 0, 0, 7); g.fill(); g.globalAlpha = 1; g.strokeStyle = css("--c0"); g.lineWidth = 1.5; g.stroke(); g.restore();
+    const L = Math.min(W, H) / 2 - 12;
+    g.strokeStyle = css("--c1"); g.lineWidth = 2; g.beginPath(); g.moveTo(cx - L * j1, cy + L * j2); g.lineTo(cx + L * j1, cy - L * j2); g.stroke();
+    const s = Math.sqrt(beta * jFinvj) * sc;          // shadow (per unit |x|)
+    g.lineWidth = 7; g.globalAlpha = 0.5; g.beginPath(); g.moveTo(cx - s * j1, cy + s * j2); g.lineTo(cx + s * j1, cy - s * j2); g.stroke(); g.globalAlpha = 1;
+    // bars
+    const {g: g2, w: W2, h: H2} = setup($("acBar"));
+    const a2 = axes(g2, W2, H2, {l: 44, r: 12, t: 22, b: 40});
+    const vals = [correct, paper], lv = vals.map(v => Math.log10(v));
+    const ymin = Math.min(-2, Math.floor(Math.min(...lv))), ymax = Math.max(2, Math.ceil(Math.max(...lv)));
+    const m2 = mapper(a2, [0, 2], [ymin, ymax]);
+    const yt = []; for (let e = ymin; e <= ymax; e++) yt.push([e, "10^" + e]);
+    frame(g2, a2, m2, [[0.5, "correct 1/σ_z²"], [1.5, "printed x²JFJᵀ/β"]], yt, "", "activation precision (log scale)");
+    [css("--c2"), css("--c1")].forEach((c, k) => { g2.fillStyle = c; g2.globalAlpha = 0.7; const y = m2.Y(lv[k]); const y0 = m2.Y(ymin); g2.fillRect(m2.X(k + 0.25), Math.min(y, y0), m2.X(k + 0.75) - m2.X(k + 0.25), Math.abs(y0 - y)); g2.globalAlpha = 1; });
+    $("acRead").innerHTML = `σ<sub>z</sub>² = β x² J F⁻¹ Jᵀ = ${fmt(varz, 4)} → correct precision <b>${fmt(correct, 4)}</b>; printed formula <b>${fmt(paper, 4)}</b>; ratio printed / correct = <b class="${paper / correct > 1.5 ? "bad" : "good"}">${fmt(paper / correct, 3)}</b>. ` +
+      `(With the readout on one weight, the correct value is (1 − ρ²)F<sub>11</sub>/(β x²): a Schur complement.)`;
+  };
+  ["acR", "acA", "acP", "acX"].forEach(id => $(id).addEventListener("input", AC.draw));
+})();
+
+function all(){ IL.draw(); KR.draw(); TY.draw(null, null, null); AC.draw(); }
+window.addEventListener("resize", all);
+if (window.matchMedia) window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", all);
+all();
+})();
+</script>
+</body>
+</html>
