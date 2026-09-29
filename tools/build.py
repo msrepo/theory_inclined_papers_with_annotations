@@ -7,6 +7,7 @@ flat subset (scalars and inline lists) that is parsed here directly.
 from __future__ import annotations
 
 import html
+import re
 import shutil
 import subprocess
 import sys
@@ -267,13 +268,18 @@ def _entry_html(meta: dict) -> str:
     )
 
 
+def _anchor(*parts: str) -> str:
+    """Stable id for an index heading, so notes can link to a section: "Transferability" -> "transferability"."""
+    return re.sub(r"[^a-z0-9]+", "-", "-".join(p for p in parts if p).lower()).strip("-")
+
+
 def render_index(entries: list[tuple[Path, dict]]) -> None:
     rows = []
     for cat, subs in _grouped(entries):
-        rows.append(f"<h2>{html.escape(cat)}</h2>")
+        rows.append(f'<h2 id="{_anchor(cat)}">{html.escape(cat)}</h2>')
         for sub, metas in subs:
             if sub:
-                rows.append(f"<h3>{html.escape(sub)}</h3>")
+                rows.append(f'<h3 id="{_anchor(cat, sub)}">{html.escape(sub)}</h3>')
             rows.append("<ul class='papers'>")
             rows += [_entry_html(m) for m in metas]
             rows.append("</ul>")

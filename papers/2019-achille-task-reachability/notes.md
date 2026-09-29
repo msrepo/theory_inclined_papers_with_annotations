@@ -32,6 +32,11 @@ status: read
   Kramers' law, detailed balance and the path weight used throughout, built up from scratch with
   simulations; and **[Inequalities and concentration](../inequalities-and-concentration/index.html)**, for
   the KL divergence and the Donsker–Varadhan formula, which is the identity that makes Section 6 work.
+- **[Transferability](../index.html#transferability)**: the site's section on estimating how well
+  fine-tuning from a source will work without running it (LEEP, NCE, LogME, H-score, SFDA, PAS, and two
+  evaluations on medical targets). Those scores and this paper ask the same question from opposite ends:
+  they score frozen features, and this paper models the fine-tuning dynamics. The question on
+  feature-only scores below places each of them against the paper's two factors.
 - The static distance of Section 4 comes from a companion paper, Achille, Paolini, Mbeng & Soatto,
   *The Information Complexity of Learning Tasks, their Structure and their Distance*
   ([arXiv:1904.03292](https://arxiv.org/abs/1904.03292)).
@@ -191,6 +196,24 @@ Both halves are right, and the second is worth separating by which quantity need
   factor that says least about speed anyway.
 
 That is a suggestion, not a result of the paper; it has not been tested here.
+
+**Where each score in the [Transferability](../index.html#transferability) section sits against the two
+factors.** All of them are *static* in the paper's sense: none models a path.
+
+| Score | What it measures | What it needs | Relation to this paper |
+|---|---|---|---|
+| [NCE](../2019-tran-nce-hardness/index.html) | conditional entropy of the target labels given the source model's predicted labels | source-model predictions and target labels | a data-level distance between label sets, with no training |
+| [LEEP](../2020-nguyen-leep/index.html) | likelihood of the target labels under a classifier built from the source model's soft predictions | the same | static, one hand-built classifier instead of the best one |
+| [LogME](../2021-you-logme/index.html) | evidence of the target labels for a Bayesian linear head on frozen features | features and target labels | **exactly the paper's complexity $\min_QC_\beta$ of the target task**, restricted to the last layer (at $\beta=1$ with a summed loss, $\beta=1/N$ with the paper's average; see the [task-complexity notes](../2020-achille-task-complexity/index.html)) |
+| [H-score](../2022-bao-hscore-transferability/index.html) | how much of the feature covariance the target class means explain | features and target labels | static |
+| [SFDA](../2022-shao-sfda/index.html) | class separability in a Fisher-discriminant projection, after deliberately making the target task harder | features and target labels | static, with a heuristic meant to imitate fine-tuning: the closest any of them comes to the dynamic factor |
+| [PAS](../2026-diniz-pas/index.html) | a nearest-centroid margin of the target features | features and target inputs, no target labels | static |
+| [Chaves et al.](../2023-chaves-medical-transferability/index.html), [Claßen et al.](../2026-classen-te-robustness/index.html) | evaluations of these scores on medical targets | — | the rankings do not carry over to medical tasks and are not stable across random seeds: evidence that frozen-feature scores miss part of what decides fine-tuning |
+
+Two differences from the paper's static distance stand out. The scores need only the target data, while
+$d_\beta(\mathcal D_1\to\mathcal D_2)$ also needs the source data. And LogME, the one that coincides with the
+paper's complexity, scores the target alone, $C_\beta(\mathcal D_2)$, not the *extra* complexity
+$C_\beta(\mathcal D_1\cup\mathcal D_2)-C_\beta(\mathcal D_1)$ on top of the source.
 
 ### The structure of a task, nuisance against task-relevant information, and eq. (2)
 
