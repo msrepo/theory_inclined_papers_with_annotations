@@ -1,0 +1,86 @@
+<svg viewBox="0 0 920 320" xmlns="http://www.w3.org/2000/svg" role="img">
+<title>ULA bias and MALA</title>
+<desc>Left: the variance of samples from the unadjusted Langevin algorithm (orange dots) on a standard normal target rises with the step size exactly as 1/(1 − η/2) and blows up at η = 2; the Metropolis-adjusted version (blue dots) stays at 1. Right: MALA's acceptance rate falls from near 1 at small steps as the step grows.</desc>
+<style>
+  text{font-family:ui-sans-serif,-apple-system,"Segoe UI",sans-serif;font-weight:400}
+  .lab{font-size:11px;fill:#57564f} .hd{font-size:13px;font-weight:500;fill:#1a1a19}
+  .sm{font-size:10.5px;fill:#57564f} .v{font-size:11px;fill:#1a1a19}
+  .ax{stroke:#8a8880;stroke-width:0.9;fill:none} .gd{stroke:#e2e1da;stroke-width:0.6;fill:none}
+  .s1{stroke:#2a78d6} .s2{stroke:#eb6834} .s3{stroke:#1baf7a} .s4{stroke:#eda100} .s0{stroke:#8a8880}
+  .f1{fill:#2a78d6} .f2{fill:#eb6834} .f3{fill:#1baf7a} .f4{fill:#eda100} .f0{fill:#8a8880}
+  .ln{stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+  .thin{stroke-width:1.1;fill:none;stroke-linejoin:round;opacity:.85}
+  .dash{stroke-width:1.4;fill:none;stroke-dasharray:5 3}
+  .band{opacity:.14} .bar{opacity:.35}
+  .ring{stroke:#fdfdfc;stroke-width:1.5}
+  @media (prefers-color-scheme: dark){
+    .lab,.sm{fill:#b6b4ab} .hd,.v{fill:#eceae3} .ax{stroke:#85837b} .gd{stroke:#33312e}
+    .s1{stroke:#3987e5} .s2{stroke:#d95926} .s3{stroke:#199e70} .s4{stroke:#c98500} .s0{stroke:#85837b}
+    .f1{fill:#3987e5} .f2{fill:#d95926} .f3{fill:#199e70} .f4{fill:#c98500} .f0{fill:#85837b}
+    .ring{stroke:#161615} .band{opacity:.22}
+  }
+</style>
+<line class="gd" x1="70" y1="245.0" x2="400" y2="245.0"/>
+<text class="sm" x="64" y="248.5" text-anchor="end">1</text>
+<line class="gd" x1="70" y1="195.0" x2="400" y2="195.0"/>
+<text class="sm" x="64" y="198.5" text-anchor="end">1.5</text>
+<line class="gd" x1="70" y1="145.0" x2="400" y2="145.0"/>
+<text class="sm" x="64" y="148.5" text-anchor="end">2</text>
+<line class="gd" x1="70" y1="95.0" x2="400" y2="95.0"/>
+<text class="sm" x="64" y="98.5" text-anchor="end">2.5</text>
+<line class="gd" x1="70" y1="45.0" x2="400" y2="45.0"/>
+<text class="sm" x="64" y="48.5" text-anchor="end">3</text>
+<text class="sm" x="70.0" y="280" text-anchor="middle">0</text>
+<text class="sm" x="152.5" y="280" text-anchor="middle">0.5</text>
+<text class="sm" x="235.0" y="280" text-anchor="middle">1</text>
+<text class="sm" x="317.5" y="280" text-anchor="middle">1.5</text>
+<text class="sm" x="400.0" y="280" text-anchor="middle">2</text>
+<line class="ax" x1="70" y1="265" x2="400" y2="265"/>
+<line class="ax" x1="70" y1="45" x2="70" y2="265"/>
+<text class="lab" x="235.0" y="297" text-anchor="middle">step size η</text>
+<text class="lab" transform="translate(30,155.0) rotate(-90)" text-anchor="middle">variance of the samples</text>
+<text class="hd" x="70" y="33">Sampling N(0, 1): the step-size bias</text>
+<polyline class="ln s2" points="70.0,245.0 73.2,244.0 76.5,243.0 79.8,242.0 83.0,240.9 86.2,239.8 89.5,238.7 92.8,237.6 96.0,236.4 99.2,235.3 102.5,234.1 105.8,232.9 109.0,231.6 112.2,230.3 115.5,229.0 118.8,227.7 122.0,226.3 125.2,224.9 128.5,223.5 131.8,222.0 135.0,220.5 138.2,218.9 141.5,217.3 144.8,215.7 148.0,214.0 151.2,212.3 154.5,210.6 157.8,208.8 161.0,206.9 164.2,205.0 167.5,203.1 170.8,201.1 174.0,199.0 177.2,196.9 180.5,194.7 183.8,192.4 187.0,190.1 190.2,187.7 193.5,185.2 196.8,182.6 200.0,180.0 203.2,177.3 206.5,174.5 209.8,171.5 213.0,168.5 216.2,165.4 219.5,162.2 222.7,158.8 226.0,155.3 229.2,151.7 232.5,148.0 235.7,144.1 239.0,140.0 242.2,135.8 245.5,131.4 248.8,126.8 252.0,122.0 255.2,117.0 258.5,111.8 261.8,106.3 265.0,100.6 268.2,94.5 271.5,88.2 274.8,81.5 278.0,74.5 281.2,67.1 284.5,59.3 287.8,51.0"/>
+<polyline class="dash s0" points="70.0,245.0 400.0,245.0"/>
+<circle class="f2 ring" cx="78.2" cy="242.1" r="4.5"/>
+<circle class="f1 ring" cx="78.2" cy="244.9" r="4.5"/>
+<circle class="f2 ring" cx="103.0" cy="233.6" r="4.5"/>
+<circle class="f1 ring" cx="103.0" cy="245.2" r="4.5"/>
+<circle class="f2 ring" cx="152.5" cy="211.9" r="4.5"/>
+<circle class="f1 ring" cx="152.5" cy="245.1" r="4.5"/>
+<circle class="f2 ring" cx="235.0" cy="145.2" r="4.5"/>
+<circle class="f1 ring" cx="235.0" cy="244.9" r="4.5"/>
+<circle class="f2 ring" cx="317.5" cy="-55.0" r="4.5"/>
+<circle class="f1 ring" cx="317.5" cy="244.9" r="4.5"/>
+<circle class="f2 ring" cx="383.5" cy="-1660.8" r="4.5"/>
+<circle class="f1 ring" cx="383.5" cy="244.8" r="4.5"/>
+<text class="sm" x="326.0" y="-159.0" text-anchor="end">ULA: 1/(1 − η/2)</text>
+<text class="sm" x="391.8" y="261.0" text-anchor="end">MALA</text>
+<line class="gd" x1="530" y1="265.0" x2="880" y2="265.0"/>
+<text class="sm" x="524" y="268.5" text-anchor="end">0</text>
+<line class="gd" x1="530" y1="210.0" x2="880" y2="210.0"/>
+<text class="sm" x="524" y="213.5" text-anchor="end">0.25</text>
+<line class="gd" x1="530" y1="155.0" x2="880" y2="155.0"/>
+<text class="sm" x="524" y="158.5" text-anchor="end">0.5</text>
+<line class="gd" x1="530" y1="100.0" x2="880" y2="100.0"/>
+<text class="sm" x="524" y="103.5" text-anchor="end">0.75</text>
+<line class="gd" x1="530" y1="45.0" x2="880" y2="45.0"/>
+<text class="sm" x="524" y="48.5" text-anchor="end">1</text>
+<text class="sm" x="530.0" y="280" text-anchor="middle">0</text>
+<text class="sm" x="617.5" y="280" text-anchor="middle">0.5</text>
+<text class="sm" x="705.0" y="280" text-anchor="middle">1</text>
+<text class="sm" x="792.5" y="280" text-anchor="middle">1.5</text>
+<text class="sm" x="880.0" y="280" text-anchor="middle">2</text>
+<line class="ax" x1="530" y1="265" x2="880" y2="265"/>
+<line class="ax" x1="530" y1="45" x2="530" y2="265"/>
+<text class="lab" x="705.0" y="297" text-anchor="middle">step size η</text>
+<text class="lab" transform="translate(490,155.0) rotate(-90)" text-anchor="middle">acceptance rate</text>
+<text class="hd" x="530" y="33">MALA's price: rejected moves</text>
+<polyline class="ln s1" points="538.8,45.5 565.0,49.4 617.5,62.4 705.0,92.6 792.5,125.6 862.5,149.6"/>
+<circle class="f1 ring" cx="538.8" cy="45.5" r="4.5"/>
+<circle class="f1 ring" cx="565.0" cy="49.4" r="4.5"/>
+<circle class="f1 ring" cx="617.5" cy="62.4" r="4.5"/>
+<circle class="f1 ring" cx="705.0" cy="92.6" r="4.5"/>
+<circle class="f1 ring" cx="792.5" cy="125.6" r="4.5"/>
+<circle class="f1 ring" cx="862.5" cy="149.6" r="4.5"/>
+</svg>

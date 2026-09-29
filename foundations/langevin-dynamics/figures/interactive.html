@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Langevin Dynamics Explorer</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/contrib/auto-render.min.js"></script>
+<style>
+:root{
+  --bg:#fbfaf7; --surface:#ffffff; --ink:#1c1d21; --muted:#5b5f68; --faint:#8a8880; --line:#e2dfd8; --soft:#f2f0ea;
+  --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a; --s4:#eda100; --neg:#e34948; --radius:12px;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#131417; --surface:#1b1d21; --ink:#ebebed; --muted:#a3a6ae; --faint:#85837b; --line:#2e3138; --soft:#23262b;
+    --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500; --neg:#e66767;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#131417; --surface:#1b1d21; --ink:#ebebed; --muted:#a3a6ae; --faint:#85837b; --line:#2e3138; --soft:#23262b;
+  --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500; --neg:#e66767;
+  color-scheme: dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,sans-serif}
+main{max-width:980px;margin:0 auto;padding:36px 16px 80px}
+a{color:var(--s1)}
+h1{font-size:1.9rem;line-height:1.2;margin:0 0 .4rem}
+h2{font-size:1.3rem;margin:2.6rem 0 .5rem;padding-top:.5rem;border-top:1px solid var(--line)}
+.lede{color:var(--muted);margin-bottom:1.2rem}
+.widget{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:14px;margin:1rem 0}
+.controls{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center;margin:.2rem 0 .7rem;font-size:.9rem}
+.controls label{display:flex;align-items:center;gap:6px;color:var(--muted)}
+.controls output{color:var(--ink);font-variant-numeric:tabular-nums;min-width:3.4em;display:inline-block}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;flex-wrap:wrap}
+.seg button{border:0;border-radius:0;border-right:1px solid var(--line)}
+.seg button:last-child{border-right:0}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--surface)}
+button{font:inherit;font-size:.88rem;color:var(--ink);background:var(--soft);border:1px solid var(--line);border-radius:8px;padding:5px 11px;cursor:pointer}
+button:focus-visible,input:focus-visible,canvas:focus-visible{outline:2px solid var(--s1);outline-offset:2px}
+input[type=range]{accent-color:var(--s1);width:150px}
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;align-items:start}
+@media (max-width:760px){.grid2{grid-template-columns:1fr}}
+canvas{display:block;width:100%;height:auto;border-radius:8px}
+.cap{font-size:.82rem;color:var(--muted)}
+.stats{display:flex;gap:10px;flex-wrap:wrap;margin:.5rem 0}
+.stats div{background:var(--soft);border-radius:8px;padding:6px 10px;font-variant-numeric:tabular-nums;font-size:.88rem;color:var(--muted)}
+.stats b{font-size:1.02rem;color:var(--ink)}
+.callout{border-left:3px solid var(--s1);background:var(--soft);padding:10px 14px;border-radius:0 8px 8px 0;margin:1rem 0}
+.key{display:flex;flex-wrap:wrap;gap:4px 16px;font-size:.8rem;color:var(--muted);margin:.4rem 0}
+.sw{display:inline-block;width:18px;height:0;border-top:2.5px solid;margin-right:6px;vertical-align:3px}
+.sw.dash{border-top-style:dashed}
+.blk{display:inline-block;width:12px;height:10px;margin-right:5px;vertical-align:-1px;border-radius:2px}
+</style>
+</head>
+<body>
+<main>
+<h1>Langevin dynamics, by hand</h1>
+<p class="lede">Companion to the foundations page <i>Langevin dynamics: gradient descent plus noise</i>. <a href="../index.html">Back to the notes</a>.</p>
+
+<p>Every widget below runs the same one-line update, $w\leftarrow w-\eta\,\nabla U(w)+\sqrt{2D\eta}\;\xi$ with $\xi$ a fresh standard Gaussian: gradient descent plus a kick. What changes is the potential $U$, the temperature $D$, and what we measure.</p>
+
+<h2>1. Particles settle onto the Gibbs law</h2>
+<p>1500 particles move in the potential you pick. The bars are where they are now (a running histogram); the curve is the Gibbs law $e^{-U/D}/Z$ for the current temperature. Set $D$ to zero for plain gradient descent: each particle stops in the valley it started in. Click the potential to drop all particles at one point.</p>
+<div class="widget" id="w1">
+  <div class="controls">
+    <span class="seg" id="w1pre"></span>
+  </div>
+  <div class="controls">
+    <label>temperature $D$ <input type="range" id="w1D" min="0" max="1" step="0.01" value="0.3"><output id="w1Do"></output></label>
+    <label>step $\eta$ <input type="range" id="w1e" min="0.001" max="0.06" step="0.001" value="0.005"><output id="w1eo"></output></label>
+    <button id="w1uni">Spread uniformly</button>
+  </div>
+  <div class="grid2">
+    <div><canvas id="w1U" width="460" height="260" tabindex="0" aria-label="Potential; click to place all particles"></canvas>
+      <div class="cap">The potential $U(w)$ and the particles on it (dots). Click to drop them all at one spot.</div></div>
+    <div><canvas id="w1H" width="460" height="260" aria-label="Histogram against the Gibbs density"></canvas>
+      <div class="key"><span><span class="blk" style="background:color-mix(in srgb,var(--s2) 40%,transparent)"></span>particles (recent)</span><span><span class="sw" style="border-color:var(--s1)"></span>Gibbs $e^{-U/D}/Z$</span></div></div>
+  </div>
+  <div class="stats" id="w1stats"></div>
+  <div class="callout">Try <b>Narrow vs wide</b> and click the narrow (deeper) well to drop every particle there. At $D=0.3$ they stay put: the barrier is $2.96$ above them and the mean escape time is about $5{,}400$ time units, although at equilibrium only $36\%$ of the mass belongs there. Raise $D$ to $0.8$: they leave within about $17$ time units and settle with roughly a quarter in the narrow well. Two separate questions, two separate answers: <i>where</i> the mass ends up is the Gibbs law, in which width counts by the factor $\sqrt{25}=5$; <i>how soon</i> is Kramers' law, set by the barrier. Then push $\eta$ up on <b>Quadratic</b> and watch the histogram come out wider than the curve (§9's step-size bias).</div>
+</div>
+
+<h2>2. The density flows: Fokker–Planck</h2>
+<p>Instead of particles, follow the density $p(w,t)$ itself, solved on a grid with the Fokker–Planck equation. Time runs on a log scale, so you can see both clocks: the fast one that fits the density to its valley, and the slow one that moves mass over the barrier. Click the plot to restart from a spike at that point.</p>
+<div class="widget" id="w2">
+  <div class="controls">
+    <span class="seg" id="w2pre"></span>
+    <label>temperature $D$ <input type="range" id="w2D" min="0.1" max="0.6" step="0.01" value="0.25"><output id="w2Do"></output></label>
+    <button id="w2restart">Restart</button>
+  </div>
+  <div class="grid2">
+    <div><canvas id="w2c" width="460" height="260" tabindex="0" aria-label="Density against the Gibbs law; click to set the starting spike"></canvas>
+      <div class="key"><span><span class="sw" style="border-color:var(--s2)"></span>$p(w,t)$</span><span><span class="sw dash" style="border-color:var(--s1)"></span>Gibbs</span><span><span class="sw" style="border-color:var(--faint)"></span>$U$ (scaled)</span></div></div>
+    <div><canvas id="w2m" width="460" height="260" aria-label="Mass in the left basin against log time"></canvas>
+      <div class="cap">Mass on the left of the barrier against time (log scale). Dashed: its equilibrium value.</div></div>
+  </div>
+  <div class="stats" id="w2stats"></div>
+</div>
+
+<h2>3. Sampling: the step-size bias and MALA</h2>
+<p>Here $U=-\log p$ for a target density $p$ and $D=1$, so Langevin should sample $p$. The <b>unadjusted</b> algorithm (ULA, orange) takes the step as it is. <b>MALA</b> (blue) treats it as a proposal and accepts it with the Metropolis–Hastings probability. 3000 chains each; histograms after a burn-in.</p>
+<div class="widget" id="w3">
+  <div class="controls">
+    <span class="seg" id="w3pre"></span>
+    <label>step $\eta$ <input type="range" id="w3e" min="0.01" max="2.4" step="0.01" value="0.5"><output id="w3eo"></output></label>
+  </div>
+  <canvas id="w3c" width="920" height="260" aria-label="ULA and MALA histograms against the target"></canvas>
+  <div class="key"><span><span class="blk" style="background:color-mix(in srgb,var(--s2) 45%,transparent)"></span>ULA samples</span><span><span class="sw" style="border-color:var(--s1)"></span>MALA samples</span><span><span class="sw dash" style="border-color:var(--ink)"></span>target $p$</span></div>
+  <div class="stats" id="w3stats"></div>
+</div>
+
+<h2>4. The shape of the noise</h2>
+<p>A quadratic loss with one stiff and one flat direction (curvatures $10s$ and $0.1s$, where $s$ is the sharpness slider). With <b>isotropic</b> noise the cloud is the Gibbs law, wide along the flat direction, and the average excess loss is $kD/2$ whatever the curvature. With noise shaped like the <b>Hessian</b> (roughly SGD's), the cloud is round and the excess loss is $c\operatorname{tr}H/2$, which grows with sharpness.</p>
+<div class="widget" id="w4">
+  <div class="controls">
+    <span class="seg" id="w4mode"><button data-v="iso" aria-pressed="true">Isotropic noise</button><button data-v="hess" aria-pressed="false">Noise ∝ Hessian</button></span>
+    <label>sharpness $s$ <input type="range" id="w4s" min="1" max="10" step="0.5" value="1"><output id="w4so"></output></label>
+  </div>
+  <canvas id="w4c" width="920" height="320" aria-label="Particle cloud on a quadratic loss"></canvas>
+  <div class="key"><span><span class="sw" style="border-color:var(--faint)"></span>loss contours</span><span><span class="sw dash" style="border-color:var(--s2)"></span>predicted 2-standard-deviation ellipse</span></div>
+  <div class="stats" id="w4stats"></div>
+</div>
+
+<h2>5. Score-based sampling, plain and annealed</h2>
+<p>The target is a mixture of three Gaussian blobs with weights $0.6$, $0.3$ and $0.1$. Langevin only needs the <b>score</b> $\nabla\log p$ (arrows). Plain Langevin, started uniformly, leaves each particle in whichever basin it began in, so the blob weights come out wrong. Annealed Langevin first samples a version smoothed by noise of size $\sigma$, where the blobs have merged, and lowers $\sigma$ step by step to $0$.</p>
+<div class="widget" id="w5">
+  <div class="controls">
+    <button id="w5plain">Run plain Langevin</button>
+    <button id="w5ann">Run annealed Langevin</button>
+    <label><input type="checkbox" id="w5arrows" checked> show the score field</label>
+  </div>
+  <canvas id="w5c" width="920" height="420" aria-label="Particles and the score field of a three-blob mixture"></canvas>
+  <div class="stats" id="w5stats"></div>
+</div>
+
+<p class="cap" style="margin-top:2rem">Everything runs in your browser. The same computations, with every number quoted in the notes, are in <code>code/langevin.py</code>.</p>
+</main>
+
+<script>
+(function(){
+"use strict";
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const $ = id => document.getElementById(id);
+function setupCanvas(c){
+  const r = window.devicePixelRatio || 1;
+  if(!c._w){ c._w = c.width; c._h = c.height; }
+  if(c._r !== r){ c.width = c._w*r; c.height = c._h*r; c._r = r; }
+  const g = c.getContext("2d"); g.setTransform(r,0,0,r,0,0); return g;
+}
+function gauss(){ let u=0; while(u===0) u=Math.random(); return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*Math.random()); }
+function niceTicks(a,b,n=5){ const raw=(b-a)/n, p=Math.pow(10,Math.floor(Math.log10(raw))), m=raw/p; const st=(m<1.5?1:m<3?2:m<7?5:10)*p;
+  const out=[]; for(let v=Math.ceil(a/st-1e-9)*st; v<=b+1e-9; v+=st) out.push(+v.toPrecision(6)); return out; }
+function frame(g,W,H,pad,xr,yr,xl,yl,xt,yt){
+  const X=x=>pad.l+(x-xr[0])/(xr[1]-xr[0])*(W-pad.l-pad.r), Y=y=>H-pad.b-(y-yr[0])/(yr[1]-yr[0])*(H-pad.t-pad.b);
+  g.clearRect(0,0,W,H); g.font="11px -apple-system,Segoe UI,sans-serif"; g.lineWidth=0.6; g.strokeStyle=css("--line"); g.fillStyle=css("--muted");
+  (yt||niceTicks(yr[0],yr[1],4)).forEach(y=>{ g.beginPath(); g.moveTo(pad.l,Y(y)); g.lineTo(W-pad.r,Y(y)); g.stroke(); g.textAlign="right"; g.fillText(String(y).replace("-","−"),pad.l-5,Y(y)+4); });
+  (xt||niceTicks(xr[0],xr[1],6)).forEach(x=>{ g.textAlign="center"; g.fillText(typeof x==="string"?x:String(x).replace("-","−"),X(typeof x==="string"?0:x),H-pad.b+14); });
+  g.strokeStyle=css("--faint"); g.lineWidth=0.9; g.beginPath(); g.moveTo(pad.l,pad.t); g.lineTo(pad.l,H-pad.b); g.lineTo(W-pad.r,H-pad.b); g.stroke();
+  g.textAlign="center"; g.fillText(xl,(pad.l+W-pad.r)/2,H-4);
+  if(yl){ g.save(); g.translate(12,(pad.t+H-pad.b)/2); g.rotate(-Math.PI/2); g.fillText(yl,0,0); g.restore(); }
+  return {X,Y};
+}
+function curve(g,xs,ys,T,color,dash,width,yr){
+  g.strokeStyle=color; g.lineWidth=width||2; g.setLineDash(dash?[5,3]:[]); g.beginPath(); let on=false;
+  for(let i=0;i<xs.length;i++){ const y=ys[i]; if(!isFinite(y) || (yr && (y<yr[0]-1e-9||y>yr[1]+1e-9))){ on=false; continue; }
+    const px=T.X(xs[i]), py=T.Y(y); if(!on){ g.moveTo(px,py); on=true; } else g.lineTo(px,py); }
+  g.stroke(); g.setLineDash([]);
+}
+function segButtons(el, items, onPick, initial){
+  el.innerHTML = items.map(([v,l])=>`<button data-v="${v}" aria-pressed="${v===initial}">${l}</button>`).join("");
+  el.querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>{ el.querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b)); onPick(b.dataset.v); }));
+}
+
+/* ---------------- potentials ---------------- */
+function softmin(ps){ // wells: [{m,h,a}]
+  return {
+    U: w => { const e=ps.map(p=>-(p.a+p.h*(w-p.m)**2/2)); const m=Math.max(...e); return -(m+Math.log(e.reduce((s,v)=>s+Math.exp(v-m),0))); },
+    Up: w => { const e=ps.map(p=>-(p.a+p.h*(w-p.m)**2/2)); const m=Math.max(...e); const r=e.map(v=>Math.exp(v-m)); const Z=r.reduce((s,v)=>s+v,0); return ps.reduce((s,p,i)=>s+r[i]/Z*p.h*(w-p.m),0); }
+  };
+}
+const NW = softmin([{m:-1.5,h:25,a:-0.3},{m:1.5,h:1,a:0}]);
+const POT = {
+  quad:  {label:"Quadratic", U:w=>2*w*w, Up:w=>4*w, lo:-2.5, hi:2.5, ymax:3, split:0},
+  dw:    {label:"Double well", U:w=>(w*w-1)**2, Up:w=>4*w*(w*w-1), lo:-2, hi:2, ymax:2.5, split:0},
+  tilt:  {label:"Tilted double well", U:w=>(w*w-1)**2+0.25*w, Up:w=>4*w*(w*w-1)+0.25, lo:-2, hi:2, ymax:2.5, split:0.063},
+  nw:    {label:"Narrow vs wide", U:NW.U, Up:NW.Up, lo:-3.5, hi:4.5, ymax:3, split:-0.9}
+};
+const PRESETS = Object.keys(POT).map(k=>[k,POT[k].label]);
+function gibbsCurve(P,D,n=400){
+  const xs=[], us=[]; for(let i=0;i<n;i++){ const x=P.lo+(P.hi-P.lo)*i/(n-1); xs.push(x); us.push(P.U(x)); }
+  if(D<=0) return {xs, ps:xs.map(()=>NaN), left:NaN};
+  const m=Math.min(...us), dx=xs[1]-xs[0]; const e=us.map(u=>Math.exp(-(u-m)/D)); const Z=e.reduce((s,v)=>s+v,0)*dx;
+  const ps=e.map(v=>v/Z); const left=xs.reduce((s,x,i)=>s+(x<P.split?ps[i]:0),0)*dx; return {xs,ps,left};
+}
+
+/* ---------------- widget 1: particles ---------------- */
+const W1={N:1500, key:"tilt", nb:60};
+function w1reset(where){
+  const P=POT[W1.key]; W1.x=new Float64Array(W1.N);
+  for(let i=0;i<W1.N;i++) W1.x[i]= where===undefined ? P.lo+(P.hi-P.lo)*(0.1+0.8*Math.random()) : where;
+  W1.hist=new Float64Array(W1.nb).fill(0); W1.t=0;
+}
+function w1params(){ W1.D=+$("w1D").value; W1.eta=+$("w1e").value; $("w1Do").textContent=W1.D.toFixed(2); $("w1eo").textContent=W1.eta.toFixed(3); W1.g=gibbsCurve(POT[W1.key],W1.D); }
+function w1step(){
+  const P=POT[W1.key], eta=W1.eta, s=Math.sqrt(2*W1.D*eta), K=Math.max(1,Math.min(200,Math.round(0.04/eta)));
+  for(let k=0;k<K;k++){ for(let i=0;i<W1.N;i++){ let x=W1.x[i]; x += -P.Up(x)*eta + s*gauss(); if(x<P.lo)x=P.lo; if(x>P.hi)x=P.hi; if(!isFinite(x)) x=0; W1.x[i]=x; } }
+  W1.t += K*eta;
+  const decay=0.97; for(let b=0;b<W1.nb;b++) W1.hist[b]*=decay;
+  for(const x of W1.x){ const b=Math.floor((x-P.lo)/(P.hi-P.lo)*W1.nb); if(b>=0&&b<W1.nb) W1.hist[b]+=1; }
+}
+function w1draw(){
+  const P=POT[W1.key];
+  let c=$("w1U"), g=setupCanvas(c), W=c._w, H=c._h, pad={l:40,r:10,t:10,b:32};
+  let us=[]; const xs=W1.g.xs; xs.forEach(x=>us.push(P.U(x))); const umin=Math.min(...us);
+  let T=frame(g,W,H,pad,[P.lo,P.hi],[umin-0.2,P.ymax],"w","U(w)");
+  curve(g,xs,us,T,css("--faint"),false,2,[umin-0.2,P.ymax]);
+  g.fillStyle=css("--s2"); g.globalAlpha=0.35;
+  for(let i=0;i<W1.N;i+=2){ const x=W1.x[i]; const y=Math.min(P.U(x),P.ymax); g.fillRect(T.X(x)-1.3,T.Y(y)-1.3-2*Math.random(),2.6,2.6); }
+  g.globalAlpha=1;
+  c=$("w1H"); g=setupCanvas(c); W=c._w; H=c._h;
+  const tot=W1.hist.reduce((s,v)=>s+v,0), bw=(P.hi-P.lo)/W1.nb; const dens=Array.from(W1.hist,v=>tot>0? v/(tot*bw):0);
+  const ymax=Math.max(0.5, ...W1.g.ps.filter(isFinite), ...dens)*1.08;
+  T=frame(g,W,H,pad,[P.lo,P.hi],[0,ymax],"w","density");
+  g.fillStyle=css("--s2"); g.globalAlpha=0.4;
+  for(let b=0;b<W1.nb;b++){ const x0=T.X(P.lo+b*bw), x1=T.X(P.lo+(b+1)*bw); g.fillRect(x0+0.5,T.Y(dens[b]),x1-x0-1,T.Y(0)-T.Y(dens[b])); }
+  g.globalAlpha=1; curve(g,W1.g.xs,W1.g.ps,T,css("--s1"),false,2.2);
+  let left=0; for(const x of W1.x) if(x<P.split) left++;
+  let tv=NaN; if(W1.D>0 && tot>0){ tv=0; for(let b=0;b<W1.nb;b++){ const xm=P.lo+(b+0.5)*bw; const i=Math.min(W1.g.xs.length-1,Math.round((xm-P.lo)/(P.hi-P.lo)*(W1.g.xs.length-1))); tv+=Math.abs(dens[b]-W1.g.ps[i])*bw; } tv/=2; }
+  $("w1stats").innerHTML=`<div>fraction left of the barrier <b>${(left/W1.N).toFixed(3)}</b></div>`+
+    `<div>Gibbs value <b>${W1.D>0?W1.g.left.toFixed(3):"— (D = 0)"}</b></div>`+
+    `<div>histogram vs Gibbs, total variation <b>${isFinite(tv)?tv.toFixed(3):"—"}</b></div><div>time <b>${W1.t.toFixed(1)}</b></div>`;
+}
+segButtons($("w1pre"),PRESETS,k=>{ W1.key=k; w1params(); w1reset(); },"tilt");
+["w1D","w1e"].forEach(id=>$(id).addEventListener("input",()=>{ w1params(); W1.hist.fill(0); }));
+$("w1uni").addEventListener("click",()=>w1reset());
+$("w1U").addEventListener("click",e=>{ const P=POT[W1.key], c=$("w1U"), r=c.getBoundingClientRect(); const px=(e.clientX-r.left)*c._w/r.width;
+  const x=P.lo+(px-40)/(c._w-50)*(P.hi-P.lo); w1reset(Math.max(P.lo,Math.min(P.hi,x))); });
+
+/* ---------------- widget 2: Fokker-Planck ---------------- */
+const W2={key:"tilt", n:260};
+function w2build(){
+  const P=POT[W2.key], n=W2.n, D=+$("w2D").value; $("w2Do").textContent=D.toFixed(2);
+  const h=(P.hi-P.lo)/(n-1); W2.h=h; W2.D=D; W2.xs=[]; const U=[];
+  for(let i=0;i<n;i++){ const x=P.lo+i*h; W2.xs.push(x); U.push(P.U(x)); }
+  W2.up=new Float64Array(n-1); W2.dn=new Float64Array(n-1);
+  for(let i=0;i<n-1;i++){ W2.up[i]=D/(h*h)*Math.exp(-(U[i+1]-U[i])/(2*D)); W2.dn[i]=D/(h*h)*Math.exp(-(U[i]-U[i+1])/(2*D)); }
+  const m=Math.min(...U); const e=U.map(u=>Math.exp(-(u-m)/D)); const Z=e.reduce((s,v)=>s+v,0); W2.pi=e.map(v=>v/Z); W2.U=U;
+  W2.eqLeft=W2.xs.reduce((s,x,i)=>s+(x<P.split?W2.pi[i]:0),0);
+}
+function w2start(x0){
+  const P=POT[W2.key]; if(x0===undefined) x0 = W2.key==="nw"? -1.5 : (W2.key==="quad"? 1.5 : 1.0); W2.x0=x0;
+  W2.p=new Float64Array(W2.n).fill(0); const i0=Math.max(0,Math.min(W2.n-1,Math.round((x0-P.lo)/W2.h))); W2.p[i0]=1; W2.t=0; W2.trace=[];
+}
+function w2implicit(dt){
+  // (I - dt Q^T) p_new = p_old, tridiagonal
+  const n=W2.n, up=W2.up, dn=W2.dn, a=new Float64Array(n), b=new Float64Array(n), c=new Float64Array(n), d=Float64Array.from(W2.p);
+  for(let i=0;i<n;i++){ const out=(i<n-1?up[i]:0)+(i>0?dn[i-1]:0); b[i]=1+dt*out; a[i]= i>0? -dt*up[i-1] : 0; c[i]= i<n-1? -dt*dn[i] : 0; }
+  for(let i=1;i<n;i++){ const w=a[i]/b[i-1]; b[i]-=w*c[i-1]; d[i]-=w*d[i-1]; }
+  const x=new Float64Array(n); x[n-1]=d[n-1]/b[n-1]; for(let i=n-2;i>=0;i--) x[i]=(d[i]-c[i]*x[i+1])/b[i];
+  W2.p=x;
+}
+function w2step(){
+  if(W2.t>=2000) return;
+  for(let k=0;k<3;k++){ const dt = W2.t<0.01? 0.001 : W2.t*0.012; w2implicit(dt); W2.t+=dt; }
+  const P=POT[W2.key]; W2.trace.push([W2.t, W2.xs.reduce((s,x,i)=>s+(x<P.split?W2.p[i]:0),0)]);
+}
+function w2draw(){
+  const P=POT[W2.key]; let c=$("w2c"), g=setupCanvas(c), W=c._w, H=c._h, pad={l:40,r:10,t:10,b:32};
+  const dens=Array.from(W2.p,v=>v/W2.h), pis=W2.pi.map(v=>v/W2.h);
+  const ymax=Math.max(1.2*Math.max(...pis), 0.5); const cap=ymax;
+  let T=frame(g,W,H,pad,[P.lo,P.hi],[0,ymax],"w","density");
+  const umin=Math.min(...W2.U); curve(g,W2.xs,W2.U.map(u=>(u-umin)/(P.ymax-umin)*ymax*0.9),T,css("--faint"),false,1.2,[0,ymax]);
+  curve(g,W2.xs,pis,T,css("--s1"),true,1.8);
+  curve(g,W2.xs,dens.map(v=>Math.min(v,cap)),T,css("--s2"),false,2.2);
+  c=$("w2m"); g=setupCanvas(c); W=c._w; H=c._h;
+  const lt0=-3, lt1=Math.log10(2000);
+  T=frame(g,W,H,pad,[lt0,lt1],[0,1],"time (log scale)","mass on the left",[-3,-2,-1,0,1,2,3],[0,0.25,0.5,0.75,1]);
+  g.clearRect(pad.l,H-pad.b+2,W-pad.l,14); g.fillStyle=css("--muted"); g.textAlign="center"; g.font="11px -apple-system,Segoe UI,sans-serif";
+  [-3,-2,-1,0,1,2,3].forEach(e=>g.fillText(e>=0? String(10**e) : "10"+["⁻³","⁻²","⁻¹"][e+3],T.X(e),H-pad.b+14));
+  curve(g,[lt0,lt1],[W2.eqLeft,W2.eqLeft],T,css("--s1"),true,1.4);
+  curve(g,W2.trace.map(p=>Math.log10(p[0])),W2.trace.map(p=>p[1]),T,css("--s2"),false,2.2);
+  const last=W2.trace.length? W2.trace[W2.trace.length-1][1] : 0;
+  $("w2stats").innerHTML=`<div>time <b>${W2.t<10?W2.t.toFixed(2):W2.t.toFixed(0)}</b></div><div>mass on the left <b>${last.toFixed(3)}</b></div><div>equilibrium <b>${W2.eqLeft.toFixed(3)}</b></div><div>started at w = <b>${W2.x0.toFixed(2)}</b></div>`;
+}
+segButtons($("w2pre"),PRESETS,k=>{ W2.key=k; w2build(); w2start(); },"tilt");
+$("w2D").addEventListener("input",()=>{ w2build(); w2start(W2.x0); });
+$("w2restart").addEventListener("click",()=>w2start(W2.x0));
+$("w2c").addEventListener("click",e=>{ const P=POT[W2.key], c=$("w2c"), r=c.getBoundingClientRect(); const px=(e.clientX-r.left)*c._w/r.width;
+  w2start(Math.max(P.lo,Math.min(P.hi,P.lo+(px-40)/(c._w-50)*(P.hi-P.lo)))); });
+
+/* ---------------- widget 3: ULA and MALA ---------------- */
+const TARGETS = {
+  g1:{label:"N(0, 1)", lp:x=>-x*x/2, glp:x=>-x, lo:-6, hi:6},
+  g05:{label:"N(0, 0.5²)", lp:x=>-2*x*x, glp:x=>-4*x, lo:-4, hi:4},
+  lap:{label:"smooth Laplace", lp:x=>-Math.sqrt(1+x*x), glp:x=>-x/Math.sqrt(1+x*x), lo:-8, hi:8}
+};
+const W3={key:"g1", N:3000, nb:70};
+function w3target(){
+  const T=TARGETS[W3.key], n=600, xs=[], ps=[]; for(let i=0;i<n;i++){ const x=T.lo+(T.hi-T.lo)*i/(n-1); xs.push(x); ps.push(Math.exp(T.lp(x))); }
+  const dx=xs[1]-xs[0], Z=ps.reduce((s,v)=>s+v,0)*dx; W3.tx=xs; W3.tp=ps.map(v=>v/Z);
+  W3.tvar = xs.reduce((s,x,i)=>s+x*x*W3.tp[i],0)*dx;
+}
+function w3reset(){
+  W3.eta=+$("w3e").value; $("w3eo").textContent=W3.eta.toFixed(2); w3target();
+  W3.u=new Float64Array(W3.N); W3.m=new Float64Array(W3.N); for(let i=0;i<W3.N;i++){ W3.u[i]=gauss()*Math.sqrt(W3.tvar); W3.m[i]=W3.u[i]; }
+  W3.hu=new Float64Array(W3.nb); W3.hm=new Float64Array(W3.nb); W3.steps=0; W3.acc=0; W3.prop=0; W3.su=0; W3.sm=0; W3.cnt=0; W3.div=false;
+}
+function w3step(){
+  const T=TARGETS[W3.key], eta=W3.eta, s=Math.sqrt(2*eta);
+  for(let k=0;k<4;k++){
+    W3.steps++;
+    for(let i=0;i<W3.N;i++){
+      let x=W3.u[i]; x = x + eta*T.glp(x) + s*gauss(); if(!isFinite(x)||Math.abs(x)>1e6){ x=Math.sign(x||1)*1e6; W3.div=true; } W3.u[i]=x;
+      const y=W3.m[i], mu=y+eta*T.glp(y), pr=mu+s*gauss(), mub=pr+eta*T.glp(pr);
+      const la = T.lp(pr) - T.lp(y) - (y-mub)**2/(4*eta) + (pr-mu)**2/(4*eta);
+      W3.prop++; if(Math.log(Math.random())<la){ W3.m[i]=pr; W3.acc++; }
+    }
+    if(W3.steps>60){
+      const bw=(T.hi-T.lo)/W3.nb;
+      for(let i=0;i<W3.N;i+=3){ const a=Math.floor((W3.u[i]-T.lo)/bw), b=Math.floor((W3.m[i]-T.lo)/bw); if(a>=0&&a<W3.nb)W3.hu[a]++; if(b>=0&&b<W3.nb)W3.hm[b]++; W3.su+=W3.u[i]*W3.u[i]; W3.sm+=W3.m[i]*W3.m[i]; W3.cnt++; }
+    }
+  }
+}
+function w3draw(){
+  const T=TARGETS[W3.key], c=$("w3c"), g=setupCanvas(c), W=c._w, H=c._h, pad={l:44,r:12,t:10,b:32};
+  const bw=(T.hi-T.lo)/W3.nb, nu=W3.hu.reduce((s,v)=>s+v,0), nm=W3.hm.reduce((s,v)=>s+v,0);
+  const du=Array.from(W3.hu,v=>nu? v/(nu*bw):0), dm=Array.from(W3.hm,v=>nm? v/(nm*bw):0);
+  const ymax=Math.max(...W3.tp)*1.35;
+  const Tr=frame(g,W,H,pad,[T.lo,T.hi],[0,ymax],"x","density");
+  g.fillStyle=css("--s2"); g.globalAlpha=0.4;
+  for(let b=0;b<W3.nb;b++){ const x0=Tr.X(T.lo+b*bw), x1=Tr.X(T.lo+(b+1)*bw), y=Math.min(du[b],ymax); g.fillRect(x0+0.5,Tr.Y(y),x1-x0-1,Tr.Y(0)-Tr.Y(y)); }
+  g.globalAlpha=1;
+  const mids=[]; for(let b=0;b<W3.nb;b++) mids.push(T.lo+(b+0.5)*bw);
+  curve(g,mids,dm,Tr,css("--s1"),false,2.2,[0,ymax]);
+  curve(g,W3.tx,W3.tp,Tr,css("--ink"),true,1.4);
+  const vu=W3.cnt? W3.su/W3.cnt : NaN, vm=W3.cnt? W3.sm/W3.cnt : NaN;
+  const gauss1 = W3.key!=="lap"; const s2 = W3.key==="g1"?1:0.25;
+  const pred = gauss1 ? (W3.eta<2*s2 ? s2/(1-W3.eta/(2*s2)) : Infinity) : NaN;
+  $("w3stats").innerHTML=`<div>target variance <b>${W3.tvar.toFixed(3)}</b></div>`+
+    `<div>ULA variance <b>${W3.div||vu>1e5?"diverged":(isFinite(vu)?vu.toFixed(3):"…")}</b></div>`+
+    (gauss1?`<div>ULA formula σ²/(1 − η/2σ²) <b>${isFinite(pred)?pred.toFixed(3):"∞ (unstable)"}</b></div>`:"")+
+    `<div>MALA variance <b>${isFinite(vm)?vm.toFixed(3):"…"}</b></div><div>MALA acceptance <b>${W3.prop?(W3.acc/W3.prop).toFixed(3):"…"}</b></div>`;
+}
+segButtons($("w3pre"),Object.keys(TARGETS).map(k=>[k,TARGETS[k].label]),k=>{ W3.key=k; w3reset(); },"g1");
+$("w3e").addEventListener("input",w3reset);
+
+/* ---------------- widget 4: noise shape ---------------- */
+const W4={N:900, mode:"iso", th:0.5, D:0.05};
+function w4H(s){ const c=Math.cos(W4.th), sn=Math.sin(W4.th), a=10*s, b=0.1*s; return [[a*c*c+b*sn*sn,(a-b)*c*sn],[(a-b)*c*sn,a*sn*sn+b*c*c]]; }
+function w4reset(){ W4.s=+$("w4s").value; $("w4so").textContent=W4.s.toFixed(1); W4.H=w4H(W4.s); W4.c=2*W4.D/10.1; // c fixed: matched to the s = 1 trace
+  W4.x=new Float64Array(W4.N); W4.y=new Float64Array(W4.N); W4.el=0; W4.cnt=0; W4.cov=[0,0,0]; W4.t=0; }
+function w4step(){
+  const H=W4.H, dt=0.005/W4.s, K=50;
+  const c=Math.cos(W4.th), sn=Math.sin(W4.th), la=Math.sqrt(10*W4.s), lb=Math.sqrt(0.1*W4.s); // H^{1/2} = R diag(sqrt) R^T
+  const S=[[la*c*c+lb*sn*sn,(la-lb)*c*sn],[(la-lb)*c*sn,la*sn*sn+lb*c*c]];
+  const amp = W4.mode==="iso"? Math.sqrt(2*W4.D*dt) : Math.sqrt(2*W4.c*dt);
+  for(let k=0;k<K;k++){ for(let i=0;i<W4.N;i++){
+    const x=W4.x[i], y=W4.y[i], z1=gauss(), z2=gauss();
+    const n1 = W4.mode==="iso"? z1 : S[0][0]*z1+S[0][1]*z2, n2 = W4.mode==="iso"? z2 : S[1][0]*z1+S[1][1]*z2;
+    W4.x[i]=x-(H[0][0]*x+H[0][1]*y)*dt+amp*n1; W4.y[i]=y-(H[1][0]*x+H[1][1]*y)*dt+amp*n2; } }
+  W4.t+=K*dt;
+  if(W4.t>25/W4.s){ for(let i=0;i<W4.N;i++){ const x=W4.x[i], y=W4.y[i]; W4.el+=0.5*(H[0][0]*x*x+2*H[0][1]*x*y+H[1][1]*y*y); W4.cov[0]+=x*x; W4.cov[1]+=x*y; W4.cov[2]+=y*y; W4.cnt++; } }
+}
+function eig2(a,b,d){ const tr=a+d, det=a*d-b*b, q=Math.sqrt(Math.max(0,tr*tr/4-det)); return [tr/2+q, tr/2-q]; }
+function w4draw(){
+  const c=$("w4c"), g=setupCanvas(c), W=c._w, H=c._h, pad={l:44,r:12,t:10,b:32};
+  const xr=[-2.4,2.4], yr=[-1.2,1.2];
+  const T=frame(g,W,H,pad,xr,yr,"w₁","w₂",[-2,-1,0,1,2],[-1,0,1]);
+  // loss contours
+  const Hm=W4.H, c0=Math.cos(W4.th), s0=Math.sin(W4.th), la=10*W4.s, lb=0.1*W4.s;
+  g.strokeStyle=css("--faint"); g.lineWidth=1;
+  for(const lev of [0.02,0.1,0.4]){ g.beginPath(); let pen=false; for(let k=0;k<=400;k++){ const a=2*Math.PI*k/400, u=Math.sqrt(2*lev/la)*Math.cos(a), v=Math.sqrt(2*lev/lb)*Math.sin(a);
+    const x=c0*u-s0*v, y=s0*u+c0*v; const inside=x>=xr[0]&&x<=xr[1]&&y>=yr[0]&&y<=yr[1];
+    if(!inside){ pen=false; continue; } if(!pen){ g.moveTo(T.X(x),T.Y(y)); pen=true; } else g.lineTo(T.X(x),T.Y(y)); } g.stroke(); }
+  // predicted covariance: iso -> D H^{-1}; hess -> c I
+  g.strokeStyle=css("--s2"); g.setLineDash([5,3]); g.lineWidth=1.6; g.beginPath(); let pen=false;
+  for(let k=0;k<=200;k++){ const a=2*Math.PI*k/200; let x,y;
+    if(W4.mode==="iso"){ const u=2*Math.sqrt(W4.D/la)*Math.cos(a), v=2*Math.sqrt(W4.D/lb)*Math.sin(a); x=c0*u-s0*v; y=s0*u+c0*v; }
+    else { x=2*Math.sqrt(W4.c)*Math.cos(a); y=2*Math.sqrt(W4.c)*Math.sin(a); }
+    const inside=x>=xr[0]&&x<=xr[1]&&y>=yr[0]&&y<=yr[1];
+    if(!inside){ pen=false; continue; } if(!pen){ g.moveTo(T.X(x),T.Y(y)); pen=true; } else g.lineTo(T.X(x),T.Y(y)); }
+  g.stroke(); g.setLineDash([]);
+  g.fillStyle=W4.mode==="iso"?css("--s1"):css("--s2"); g.globalAlpha=0.55;
+  for(let i=0;i<W4.N;i++){ const x=W4.x[i], y=W4.y[i]; if(x<xr[0]||x>xr[1]||y<yr[0]||y>yr[1]) continue; g.fillRect(T.X(x)-1.2,T.Y(y)-1.2,2.4,2.4); }
+  g.globalAlpha=1;
+  const n=W4.cnt; const ev = n? eig2(W4.cov[0]/n,W4.cov[1]/n,W4.cov[2]/n) : [NaN,NaN];
+  const trH=10.1*W4.s, pred = W4.mode==="iso"? W4.D : W4.c*trH/2;
+  $("w4stats").innerHTML=`<div>mean excess loss (simulated) <b>${n?(W4.el/n).toFixed(4):"…"}</b></div>`+
+    `<div>predicted ${W4.mode==="iso"?"k D / 2":"c tr H / 2"} <b>${pred.toFixed(4)}</b></div>`+
+    `<div>cloud variances <b>${n?ev[0].toFixed(4)+", "+ev[1].toFixed(4):"…"}</b></div>`+
+    `<div>predicted <b>${W4.mode==="iso"?(W4.D/lb).toFixed(4)+", "+(W4.D/la).toFixed(4):W4.c.toFixed(4)+", "+W4.c.toFixed(4)}</b></div>`;
+}
+$("w4mode").querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>{ W4.mode=b.dataset.v; $("w4mode").querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b)); w4reset(); }));
+$("w4s").addEventListener("input",w4reset);
+
+/* ---------------- widget 5: annealed Langevin ---------------- */
+const MIX5={mu:[[-3,-2],[3,-1.5],[0,3]], w:[0.6,0.3,0.1], s:0.6};
+const W5={N:2000, mode:"plain", sigma:0, level:0, stepInLevel:0};
+const SIG5=[]; for(let i=0;i<10;i++) SIG5.push(6*Math.pow(0.05/6,i/9)); SIG5.push(0);
+function score5(x,y,sig){
+  const v=MIX5.s*MIX5.s+sig*sig; let lw=[], m=-Infinity;
+  for(let k=0;k<3;k++){ const dx=x-MIX5.mu[k][0], dy=y-MIX5.mu[k][1]; const l=Math.log(MIX5.w[k])-(dx*dx+dy*dy)/(2*v); lw.push(l); if(l>m)m=l; }
+  let Z=0; const r=lw.map(l=>{ const e=Math.exp(l-m); Z+=e; return e; });
+  let gx=0, gy=0; for(let k=0;k<3;k++){ gx+=r[k]/Z*(MIX5.mu[k][0]-x)/v; gy+=r[k]/Z*(MIX5.mu[k][1]-y)/v; } return [gx,gy];
+}
+function w5reset(mode){
+  W5.mode=mode; W5.x=new Float64Array(W5.N); W5.y=new Float64Array(W5.N);
+  for(let i=0;i<W5.N;i++){ W5.x[i]=-6+12*Math.random(); W5.y[i]=-5+10*Math.random(); }
+  W5.level=0; W5.stepInLevel=0; W5.sigma = mode==="plain"? 0 : SIG5[0]; W5.t=0; W5.done=false;
+}
+function w5step(){
+  if(W5.done) return;
+  for(let k=0;k<6;k++){
+    const sig=W5.sigma, eta = W5.mode==="plain"? 0.01 : 0.1*(MIX5.s*MIX5.s+sig*sig), sq=Math.sqrt(2*eta);
+    for(let i=0;i<W5.N;i++){ const [gx,gy]=score5(W5.x[i],W5.y[i],sig); W5.x[i]+=eta*gx+sq*gauss(); W5.y[i]+=eta*gy+sq*gauss(); }
+    W5.t+=eta;
+    if(W5.mode==="annealed"){ W5.stepInLevel++; if(W5.stepInLevel>=150){ W5.stepInLevel=0; W5.level++; if(W5.level>=SIG5.length){ W5.done=true; W5.level=SIG5.length-1; break; } W5.sigma=SIG5[W5.level]; } }
+    else if(W5.t>40){ W5.done=true; break; }
+  }
+}
+function w5draw(){
+  const c=$("w5c"), g=setupCanvas(c), W=c._w, H=c._h, pad={l:44,r:12,t:10,b:32};
+  const xr=[-7.5,7.5], yr=[-5.5,5.5];
+  const T=frame(g,W,H,pad,xr,yr,"x₁","x₂",[-6,-4,-2,0,2,4,6],[-4,-2,0,2,4]);
+  // density shading of the target
+  g.fillStyle=css("--s1");
+  for(let i=0;i<60;i++) for(let j=0;j<44;j++){ const x=xr[0]+(i+0.5)*(xr[1]-xr[0])/60, y=yr[0]+(j+0.5)*(yr[1]-yr[0])/44; let p=0;
+    for(let k=0;k<3;k++){ const dx=x-MIX5.mu[k][0], dy=y-MIX5.mu[k][1]; p+=MIX5.w[k]*Math.exp(-(dx*dx+dy*dy)/(2*MIX5.s*MIX5.s))/(2*Math.PI*MIX5.s*MIX5.s); }
+    const a=Math.min(0.35,p*1.2); if(a<0.01) continue; g.globalAlpha=a; g.fillRect(T.X(x-(xr[1]-xr[0])/120),T.Y(y+(yr[1]-yr[0])/88),(W-pad.l-pad.r)/60+0.5,(H-pad.t-pad.b)/44+0.5); }
+  g.globalAlpha=1;
+  if($("w5arrows").checked){ g.strokeStyle=css("--faint"); g.lineWidth=1;
+    for(let i=0;i<=24;i++) for(let j=0;j<=16;j++){ const x=xr[0]+0.3+i*(xr[1]-xr[0]-0.6)/24, y=yr[0]+0.3+j*(yr[1]-yr[0]-0.6)/16; const [gx,gy]=score5(x,y,W5.sigma); const n=Math.hypot(gx,gy)||1; const L=Math.min(14, 5+3*Math.log1p(n));
+      const px=T.X(x), py=T.Y(y), ex=px+gx/n*L, ey=py-gy/n*L; g.beginPath(); g.moveTo(px,py); g.lineTo(ex,ey); g.stroke();
+      const ang=Math.atan2(ey-py,ex-px); g.beginPath(); g.moveTo(ex,ey); g.lineTo(ex-4*Math.cos(ang-0.5),ey-4*Math.sin(ang-0.5)); g.moveTo(ex,ey); g.lineTo(ex-4*Math.cos(ang+0.5),ey-4*Math.sin(ang+0.5)); g.stroke(); } }
+  g.fillStyle=css("--s2"); g.globalAlpha=0.6;
+  for(let i=0;i<W5.N;i++){ const x=W5.x[i], y=W5.y[i]; if(x<xr[0]||x>xr[1]||y<yr[0]||y>yr[1]) continue; g.fillRect(T.X(x)-1.2,T.Y(y)-1.2,2.4,2.4); }
+  g.globalAlpha=1;
+  const cnt=[0,0,0]; for(let i=0;i<W5.N;i++){ let best=0, bd=Infinity; for(let k=0;k<3;k++){ const d=(W5.x[i]-MIX5.mu[k][0])**2+(W5.y[i]-MIX5.mu[k][1])**2; if(d<bd){bd=d;best=k;} } cnt[best]++; }
+  $("w5stats").innerHTML=`<div>mode: <b>${W5.mode}</b>${W5.done?" (finished)":""}</div><div>σ now <b>${W5.sigma.toFixed(2)}</b></div>`+
+    cnt.map((v,k)=>`<div>blob ${k+1}: <b>${(v/W5.N).toFixed(3)}</b> (true ${MIX5.w[k]})</div>`).join("");
+}
+$("w5plain").addEventListener("click",()=>w5reset("plain"));
+$("w5ann").addEventListener("click",()=>w5reset("annealed"));
+
+/* ---------------- loop ---------------- */
+function loop(){
+  w1step(); w1draw();
+  w2step(); w2draw();
+  w3step(); w3draw();
+  w4step(); w4draw();
+  w5step(); w5draw();
+  requestAnimationFrame(loop);
+}
+function start(){
+  w1params(); w1reset(); w2build(); w2start(); w3reset(); w4reset(); w5reset("plain");
+  if(window.renderMathInElement) renderMathInElement(document.body,{delimiters:[{left:"$$",right:"$$",display:true},{left:"$",right:"$",display:false}]});
+  w1draw(); w2draw(); w3draw(); w4draw(); w5draw();   // one static frame, even before animation starts
+  requestAnimationFrame(loop);
+}
+window.addEventListener("load",start);
+})();
+</script>
+</body>
+</html>

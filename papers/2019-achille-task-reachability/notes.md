@@ -23,7 +23,9 @@ status: read
 - **[Runnable code](https://github.com/msrepo/theory_inclined_papers_with_annotations/blob/main/papers/2019-achille-task-reachability/code/reachability.py)**:
   every number on this page, and the five figures (`python3 reachability.py --figures`). `make verify`
   runs it, in about four seconds.
-- Background: **[Inequalities and concentration](../inequalities-and-concentration/index.html)**, for
+- Background: **[Langevin dynamics](../langevin-dynamics/index.html)**, for the Gibbs law, Fokker–Planck,
+  Kramers' law, detailed balance and the path weight used throughout, built up from scratch with
+  simulations; and **[Inequalities and concentration](../inequalities-and-concentration/index.html)**, for
   the KL divergence and the Donsker–Varadhan formula, which is the identity that makes Section 6 work.
 - The static distance of Section 4 comes from a companion paper, Achille, Paolini, Mbeng & Soatto,
   *The Information Complexity of Learning Tasks, their Structure and their Distance*
