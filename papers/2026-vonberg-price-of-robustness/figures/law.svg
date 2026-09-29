@@ -1,0 +1,143 @@
+<svg viewBox="0 0 700 330" xmlns="http://www.w3.org/2000/svg" role="img">
+<title>The law of robustness for classification</title>
+<desc>Left: the Corollary 6 ceiling on the class stability of any classifier that fits below the noise level, against parameters per nd on log axes, with K = 1, eps = 0.1, c = 1. The ceiling rises as the square root of p/(nd) above a floor that depends on d. Markers show p = n for MNIST and CIFAR-10, and bars show the range of the paper's MLPs: the CIFAR-10 models stay below 0.24 nd; only the widest MNIST model passes nd. Right: the toy experiment of rf_margin_toy.py. Mean distance to the boundary of an interpolating random-features classifier against p/n, for d = 5, 20, 50: the minimum is at p = n and it recovers as p grows.</desc>
+<style>
+  text{font-family:ui-sans-serif,-apple-system,"Segoe UI",sans-serif;font-weight:400}
+  .lab{font-size:11px;fill:#57564f} .hd{font-size:13px;font-weight:500;fill:#1a1a19}
+  .sub{font-size:11.5px;fill:#57564f} .tiny{font-size:10px;fill:#57564f} .ink{fill:#1a1a19}
+  .ax{stroke:#c3c2b7;stroke-width:0.8;fill:none} .gd{stroke:#e2e1da;stroke-width:0.6;fill:none;stroke-dasharray:3 3}
+  .box{fill:none;stroke:#e2e1da;stroke-width:1}
+  .pos{fill:#2f6fb5;opacity:.10} .neg{fill:#c8702f;opacity:.10}
+  .bd{stroke:#1a1a19;stroke-width:1.6;fill:none}
+  .band{stroke:#8a8880;opacity:.20;fill:none;stroke-linecap:round;stroke-linejoin:round}
+  .b{stroke:#2f6fb5;stroke-width:2;fill:none} .bf{fill:#2f6fb5}
+  .o{stroke:#c8702f;stroke-width:2;fill:none} .of{fill:#c8702f}
+  .od{stroke:#c8702f;stroke-width:2;fill:none;stroke-dasharray:6 3}
+  .g{stroke:#2e7d4f;stroke-width:2;fill:none} .gf{fill:#2e7d4f} .gd2{stroke:#2e7d4f;stroke-width:1.6;fill:none;stroke-dasharray:5 3}
+  .r{stroke:#b42318;stroke-width:2;fill:none} .rf{fill:#b42318} .rs{fill:#b42318;opacity:.10}
+  .k{stroke:#1a1a19;stroke-width:1.2;fill:none;stroke-dasharray:4 3} .kf{fill:#1a1a19}
+  .thin{stroke:#8a8880;stroke-width:1;fill:none}
+  @media (prefers-color-scheme: dark){
+    .lab,.sub,.tiny{fill:#b6b4ab} .hd,.ink{fill:#eceae3} .ax{stroke:#4a4844} .gd,.box{stroke:#33312e}
+    .pos{fill:#7fb2e8;opacity:.14} .neg{fill:#e09a5f;opacity:.14} .bd{stroke:#eceae3} .band{stroke:#b6b4ab;opacity:.22}
+    .b{stroke:#7fb2e8} .bf{fill:#7fb2e8} .o,.od{stroke:#e09a5f} .of{fill:#e09a5f}
+    .g,.gd2{stroke:#4cc79a} .gf{fill:#4cc79a} .r{stroke:#ff7a6b} .rf{fill:#ff7a6b} .rs{fill:#ff7a6b;opacity:.14}
+    .k{stroke:#eceae3} .kf{fill:#eceae3} .thin{stroke:#b6b4ab}
+  }
+</style>
+<text class="hd" x="20" y="22">Corollary 6: the ceiling on stability for a memoriser</text>
+<text class="sub" x="20" y="38">S* = max{ (3K/ε)√(c p/(nd)), √((8c/d) log(6K/ε)) }, K = 1, ε = 0.1, c = 1</text>
+<rect class="box" x="62" y="55" width="270" height="215"/>
+<line class="gd" x1="62" x2="332" y1="270.0" y2="270.0"/>
+<text class="lab" x="57" y="274.0" text-anchor="end">0.01</text>
+<line class="gd" x1="62" x2="332" y1="216.2" y2="216.2"/>
+<text class="lab" x="57" y="220.2" text-anchor="end">0.1</text>
+<line class="gd" x1="62" x2="332" y1="162.5" y2="162.5"/>
+<text class="lab" x="57" y="166.5" text-anchor="end">1</text>
+<line class="gd" x1="62" x2="332" y1="108.8" y2="108.8"/>
+<text class="lab" x="57" y="112.8" text-anchor="end">10</text>
+<line class="gd" x1="62" x2="332" y1="55.0" y2="55.0"/>
+<text class="lab" x="57" y="59.0" text-anchor="end">100</text>
+<line class="ax" x1="62.0" x2="62.0" y1="270" y2="274"/>
+<text class="lab" x="62.0" y="285" text-anchor="middle">1e-05</text>
+<line class="ax" x1="100.6" x2="100.6" y1="270" y2="274"/>
+<text class="lab" x="100.6" y="285" text-anchor="middle">0.0001</text>
+<line class="ax" x1="139.1" x2="139.1" y1="270" y2="274"/>
+<text class="lab" x="139.1" y="285" text-anchor="middle">0.001</text>
+<line class="ax" x1="177.7" x2="177.7" y1="270" y2="274"/>
+<text class="lab" x="177.7" y="285" text-anchor="middle">0.01</text>
+<line class="ax" x1="216.3" x2="216.3" y1="270" y2="274"/>
+<text class="lab" x="216.3" y="285" text-anchor="middle">0.1</text>
+<line class="ax" x1="254.9" x2="254.9" y1="270" y2="274"/>
+<text class="lab" x="254.9" y="285" text-anchor="middle">1</text>
+<line class="ax" x1="293.4" x2="293.4" y1="270" y2="274"/>
+<text class="lab" x="293.4" y="285" text-anchor="middle">10</text>
+<line class="ax" x1="332.0" x2="332.0" y1="270" y2="274"/>
+<text class="lab" x="332.0" y="285" text-anchor="middle">100</text>
+<text class="lab" x="197.0" y="300" text-anchor="middle">parameters p ÷ nd</text>
+<text class="lab" x="20" y="162.5" text-anchor="middle" transform="rotate(-90 20 162.5)">ceiling S* on S(f)</text>
+<clipPath id="cl"><rect x="62" y="55" width="270" height="215"/></clipPath>
+<path class="b" clip-path="url(#cl)" d="M62.0,199.6 L63.4,199.6 L64.7,199.6 L66.1,199.6 L67.4,199.6 L68.8,199.6 L70.1,199.6 L71.5,199.6 L72.9,199.6 L74.2,199.6 L75.6,199.6 L76.9,199.6 L78.3,199.6 L79.6,199.6 L81.0,199.6 L82.4,199.6 L83.7,199.6 L85.1,199.6 L86.4,199.6 L87.8,199.5 L89.1,198.6 L90.5,197.6 L91.8,196.7 L93.2,195.7 L94.6,194.8 L95.9,193.8 L97.3,192.9 L98.6,192.0 L100.0,191.0 L101.3,190.1 L102.7,189.1 L104.1,188.2 L105.4,187.2 L106.8,186.3 L108.1,185.3 L109.5,184.4 L110.8,183.4 L112.2,182.5 L113.6,181.6 L114.9,180.6 L116.3,179.7 L117.6,178.7 L119.0,177.8 L120.3,176.8 L121.7,175.9 L123.1,174.9 L124.4,174.0 L125.8,173.0 L127.1,172.1 L128.5,171.2 L129.8,170.2 L131.2,169.3 L132.6,168.3 L133.9,167.4 L135.3,166.4 L136.6,165.5 L138.0,164.5 L139.3,163.6 L140.7,162.6 L142.1,161.7 L143.4,160.8 L144.8,159.8 L146.1,158.9 L147.5,157.9 L148.8,157.0 L150.2,156.0 L151.5,155.1 L152.9,154.1 L154.3,153.2 L155.6,152.3 L157.0,151.3 L158.3,150.4 L159.7,149.4 L161.0,148.5 L162.4,147.5 L163.8,146.6 L165.1,145.6 L166.5,144.7 L167.8,143.7 L169.2,142.8 L170.5,141.9 L171.9,140.9 L173.3,140.0 L174.6,139.0 L176.0,138.1 L177.3,137.1 L178.7,136.2 L180.0,135.2 L181.4,134.3 L182.8,133.3 L184.1,132.4 L185.5,131.5 L186.8,130.5 L188.2,129.6 L189.5,128.6 L190.9,127.7 L192.3,126.7 L193.6,125.8 L195.0,124.8 L196.3,123.9 L197.7,122.9 L199.0,122.0 L200.4,121.1 L201.7,120.1 L203.1,119.2 L204.5,118.2 L205.8,117.3 L207.2,116.3 L208.5,115.4 L209.9,114.4 L211.2,113.5 L212.6,112.5 L214.0,111.6 L215.3,110.7 L216.7,109.7 L218.0,108.8 L219.4,107.8 L220.7,106.9 L222.1,105.9 L223.5,105.0 L224.8,104.0 L226.2,103.1 L227.5,102.1 L228.9,101.2 L230.2,100.3 L231.6,99.3 L233.0,98.4 L234.3,97.4 L235.7,96.5 L237.0,95.5 L238.4,94.6 L239.7,93.6 L241.1,92.7 L242.5,91.7 L243.8,90.8 L245.2,89.9 L246.5,88.9 L247.9,88.0 L249.2,87.0 L250.6,86.1 L251.9,85.1 L253.3,84.2 L254.7,83.2 L256.0,82.3 L257.4,81.3 L258.7,80.4 L260.1,79.5 L261.4,78.5 L262.8,77.6 L264.2,76.6 L265.5,75.7 L266.9,74.7 L268.2,73.8 L269.6,72.8 L270.9,71.9 L272.3,71.0 L273.7,70.0 L275.0,69.1 L276.4,68.1 L277.7,67.2 L279.1,66.2 L280.4,65.3 L281.8,64.3 L283.2,63.4 L284.5,62.4 L285.9,61.5 L287.2,60.6 L288.6,59.6 L289.9,58.7 L291.3,57.7 L292.7,56.8 L294.0,55.8 L295.4,54.9 L296.7,53.9 L298.1,53.0 L299.4,52.0 L300.8,51.1 L302.2,50.2 L303.5,49.2 L304.9,48.3 L306.2,47.3 L307.6,46.4 L308.9,45.4 L310.3,44.5 L311.6,43.5 L313.0,42.6 L314.4,41.6 L315.7,40.7 L317.1,39.8 L318.4,38.8 L319.8,37.9 L321.1,36.9 L322.5,36.0 L323.9,35.0 L325.2,34.1 L326.6,33.1 L327.9,32.2 L329.3,31.2 L330.6,30.3 L332.0,29.4"/>
+<circle class="bf" cx="143.2" cy="160.9" r="3.5"/>
+<path class="o" clip-path="url(#cl)" d="M62.0,215.5 L63.4,215.5 L64.7,215.5 L66.1,214.6 L67.4,213.7 L68.8,212.8 L70.1,211.8 L71.5,210.9 L72.9,209.9 L74.2,209.0 L75.6,208.0 L76.9,207.1 L78.3,206.1 L79.6,205.2 L81.0,204.2 L82.4,203.3 L83.7,202.4 L85.1,201.4 L86.4,200.5 L87.8,199.5 L89.1,198.6 L90.5,197.6 L91.8,196.7 L93.2,195.7 L94.6,194.8 L95.9,193.8 L97.3,192.9 L98.6,192.0 L100.0,191.0 L101.3,190.1 L102.7,189.1 L104.1,188.2 L105.4,187.2 L106.8,186.3 L108.1,185.3 L109.5,184.4 L110.8,183.4 L112.2,182.5 L113.6,181.6 L114.9,180.6 L116.3,179.7 L117.6,178.7 L119.0,177.8 L120.3,176.8 L121.7,175.9 L123.1,174.9 L124.4,174.0 L125.8,173.0 L127.1,172.1 L128.5,171.2 L129.8,170.2 L131.2,169.3 L132.6,168.3 L133.9,167.4 L135.3,166.4 L136.6,165.5 L138.0,164.5 L139.3,163.6 L140.7,162.6 L142.1,161.7 L143.4,160.8 L144.8,159.8 L146.1,158.9 L147.5,157.9 L148.8,157.0 L150.2,156.0 L151.5,155.1 L152.9,154.1 L154.3,153.2 L155.6,152.3 L157.0,151.3 L158.3,150.4 L159.7,149.4 L161.0,148.5 L162.4,147.5 L163.8,146.6 L165.1,145.6 L166.5,144.7 L167.8,143.7 L169.2,142.8 L170.5,141.9 L171.9,140.9 L173.3,140.0 L174.6,139.0 L176.0,138.1 L177.3,137.1 L178.7,136.2 L180.0,135.2 L181.4,134.3 L182.8,133.3 L184.1,132.4 L185.5,131.5 L186.8,130.5 L188.2,129.6 L189.5,128.6 L190.9,127.7 L192.3,126.7 L193.6,125.8 L195.0,124.8 L196.3,123.9 L197.7,122.9 L199.0,122.0 L200.4,121.1 L201.7,120.1 L203.1,119.2 L204.5,118.2 L205.8,117.3 L207.2,116.3 L208.5,115.4 L209.9,114.4 L211.2,113.5 L212.6,112.5 L214.0,111.6 L215.3,110.7 L216.7,109.7 L218.0,108.8 L219.4,107.8 L220.7,106.9 L222.1,105.9 L223.5,105.0 L224.8,104.0 L226.2,103.1 L227.5,102.1 L228.9,101.2 L230.2,100.3 L231.6,99.3 L233.0,98.4 L234.3,97.4 L235.7,96.5 L237.0,95.5 L238.4,94.6 L239.7,93.6 L241.1,92.7 L242.5,91.7 L243.8,90.8 L245.2,89.9 L246.5,88.9 L247.9,88.0 L249.2,87.0 L250.6,86.1 L251.9,85.1 L253.3,84.2 L254.7,83.2 L256.0,82.3 L257.4,81.3 L258.7,80.4 L260.1,79.5 L261.4,78.5 L262.8,77.6 L264.2,76.6 L265.5,75.7 L266.9,74.7 L268.2,73.8 L269.6,72.8 L270.9,71.9 L272.3,71.0 L273.7,70.0 L275.0,69.1 L276.4,68.1 L277.7,67.2 L279.1,66.2 L280.4,65.3 L281.8,64.3 L283.2,63.4 L284.5,62.4 L285.9,61.5 L287.2,60.6 L288.6,59.6 L289.9,58.7 L291.3,57.7 L292.7,56.8 L294.0,55.8 L295.4,54.9 L296.7,53.9 L298.1,53.0 L299.4,52.0 L300.8,51.1 L302.2,50.2 L303.5,49.2 L304.9,48.3 L306.2,47.3 L307.6,46.4 L308.9,45.4 L310.3,44.5 L311.6,43.5 L313.0,42.6 L314.4,41.6 L315.7,40.7 L317.1,39.8 L318.4,38.8 L319.8,37.9 L321.1,36.9 L322.5,36.0 L323.9,35.0 L325.2,34.1 L326.6,33.1 L327.9,32.2 L329.3,31.2 L330.6,30.3 L332.0,29.4"/>
+<circle class="of" cx="120.3" cy="176.8" r="3.5"/>
+<path class="rs" clip-path="url(#cl)" d="M62.0,199.6 L63.4,199.6 L64.7,199.6 L66.1,199.6 L67.4,199.6 L68.8,199.6 L70.1,199.6 L71.5,199.6 L72.9,199.6 L74.2,199.6 L75.6,199.6 L76.9,199.6 L78.3,199.6 L79.6,199.6 L81.0,199.6 L82.4,199.6 L83.7,199.6 L85.1,199.6 L86.4,199.6 L87.8,199.5 L89.1,198.6 L90.5,197.6 L91.8,196.7 L93.2,195.7 L94.6,194.8 L95.9,193.8 L97.3,192.9 L98.6,192.0 L100.0,191.0 L101.3,190.1 L102.7,189.1 L104.1,188.2 L105.4,187.2 L106.8,186.3 L108.1,185.3 L109.5,184.4 L110.8,183.4 L112.2,182.5 L113.6,181.6 L114.9,180.6 L116.3,179.7 L117.6,178.7 L119.0,177.8 L120.3,176.8 L121.7,175.9 L123.1,174.9 L124.4,174.0 L125.8,173.0 L127.1,172.1 L128.5,171.2 L129.8,170.2 L131.2,169.3 L132.6,168.3 L133.9,167.4 L135.3,166.4 L136.6,165.5 L138.0,164.5 L139.3,163.6 L140.7,162.6 L142.1,161.7 L143.4,160.8 L144.8,159.8 L146.1,158.9 L147.5,157.9 L148.8,157.0 L150.2,156.0 L151.5,155.1 L152.9,154.1 L154.3,153.2 L155.6,152.3 L157.0,151.3 L158.3,150.4 L159.7,149.4 L161.0,148.5 L162.4,147.5 L163.8,146.6 L165.1,145.6 L166.5,144.7 L167.8,143.7 L169.2,142.8 L170.5,141.9 L171.9,140.9 L173.3,140.0 L174.6,139.0 L176.0,138.1 L177.3,137.1 L178.7,136.2 L180.0,135.2 L181.4,134.3 L182.8,133.3 L184.1,132.4 L185.5,131.5 L186.8,130.5 L188.2,129.6 L189.5,128.6 L190.9,127.7 L192.3,126.7 L193.6,125.8 L195.0,124.8 L196.3,123.9 L197.7,122.9 L199.0,122.0 L200.4,121.1 L201.7,120.1 L203.1,119.2 L204.5,118.2 L205.8,117.3 L207.2,116.3 L208.5,115.4 L209.9,114.4 L211.2,113.5 L212.6,112.5 L214.0,111.6 L215.3,110.7 L216.7,109.7 L218.0,108.8 L219.4,107.8 L220.7,106.9 L222.1,105.9 L223.5,105.0 L224.8,104.0 L226.2,103.1 L227.5,102.1 L228.9,101.2 L230.2,100.3 L231.6,99.3 L233.0,98.4 L234.3,97.4 L235.7,96.5 L237.0,95.5 L238.4,94.6 L239.7,93.6 L241.1,92.7 L242.5,91.7 L243.8,90.8 L245.2,89.9 L246.5,88.9 L247.9,88.0 L249.2,87.0 L250.6,86.1 L251.9,85.1 L253.3,84.2 L254.7,83.2 L256.0,82.3 L257.4,81.3 L258.7,80.4 L260.1,79.5 L261.4,78.5 L262.8,77.6 L264.2,76.6 L265.5,75.7 L266.9,74.7 L268.2,73.8 L269.6,72.8 L270.9,71.9 L272.3,71.0 L273.7,70.0 L275.0,69.1 L276.4,68.1 L277.7,67.2 L279.1,66.2 L280.4,65.3 L281.8,64.3 L283.2,63.4 L284.5,62.4 L285.9,61.5 L287.2,60.6 L288.6,59.6 L289.9,58.7 L291.3,57.7 L292.7,56.8 L294.0,55.8 L295.4,54.9 L296.7,53.9 L298.1,53.0 L299.4,52.0 L300.8,51.1 L302.2,50.2 L303.5,49.2 L304.9,48.3 L306.2,47.3 L307.6,46.4 L308.9,45.4 L310.3,44.5 L311.6,43.5 L313.0,42.6 L314.4,41.6 L315.7,40.7 L317.1,39.8 L318.4,38.8 L319.8,37.9 L321.1,36.9 L322.5,36.0 L323.9,35.0 L325.2,34.1 L326.6,33.1 L327.9,32.2 L329.3,31.2 L330.6,30.3 L332.0,29.4 L332,55 L62,55 Z"/>
+<text class="lab" x="73.6" y="76.5">no memoriser has stability up here</text>
+<text class="tiny" x="150.4" y="164.9">p = n, MNIST (d = 784)</text>
+<text class="tiny" x="126.2" y="191.8">p = n, CIFAR (d = 3072)</text>
+<line class="o" style="stroke-width:4;opacity:.6" x1="157.5" x2="230.5" y1="245.8" y2="245.8"/>
+<text class="tiny" x="153.5" y="249.3" text-anchor="end">CIFAR-10 MLPs</text>
+<line class="b" style="stroke-width:4;opacity:.6" x1="157.5" x2="316.7" y1="257.8" y2="257.8"/>
+<text class="tiny" x="153.5" y="261.3" text-anchor="end">MNIST MLPs</text>
+<line class="k" x1="254.9" x2="254.9" y1="55" y2="270"/>
+<text class="tiny" x="258.9" y="210">p = nd</text>
+<text class="hd" x="390" y="22">Toy: interpolating random features</text>
+<text class="sub" x="390" y="38">n = 100 points on a sphere, 15% labels flipped</text>
+<rect class="box" x="420" y="55" width="260" height="215"/>
+<line class="gd" x1="420" x2="680" y1="239.3" y2="239.3"/>
+<text class="lab" x="415" y="243.3" text-anchor="end">0.1</text>
+<line class="gd" x1="420" x2="680" y1="177.9" y2="177.9"/>
+<text class="lab" x="415" y="181.9" text-anchor="end">0.2</text>
+<line class="gd" x1="420" x2="680" y1="116.4" y2="116.4"/>
+<text class="lab" x="415" y="120.4" text-anchor="end">0.3</text>
+<line class="gd" x1="420" x2="680" y1="55.0" y2="55.0"/>
+<text class="lab" x="415" y="59.0" text-anchor="end">0.4</text>
+<line class="ax" x1="420.0" x2="420.0" y1="270" y2="274"/>
+<text class="lab" x="420.0" y="285" text-anchor="middle">0.2</text>
+<line class="ax" x1="467.5" x2="467.5" y1="270" y2="274"/>
+<text class="lab" x="467.5" y="285" text-anchor="middle">0.5</text>
+<line class="ax" x1="503.5" x2="503.5" y1="270" y2="274"/>
+<text class="lab" x="503.5" y="285" text-anchor="middle">1</text>
+<line class="ax" x1="539.5" x2="539.5" y1="270" y2="274"/>
+<text class="lab" x="539.5" y="285" text-anchor="middle">2</text>
+<line class="ax" x1="587.0" x2="587.0" y1="270" y2="274"/>
+<text class="lab" x="587.0" y="285" text-anchor="middle">5</text>
+<line class="ax" x1="623.0" x2="623.0" y1="270" y2="274"/>
+<text class="lab" x="623.0" y="285" text-anchor="middle">10</text>
+<line class="ax" x1="680.0" x2="680.0" y1="270" y2="274"/>
+<text class="lab" x="680.0" y="285" text-anchor="middle">30</text>
+<text class="lab" x="550.0" y="300" text-anchor="middle">p ÷ n</text>
+<text class="lab" x="384" y="162.5" text-anchor="middle" transform="rotate(-90 384 162.5)">S(f), mean distance to boundary</text>
+<line class="k" x1="503.5" x2="503.5" y1="55" y2="270"/>
+<text class="tiny" x="507.5" y="67">p = n</text>
+<path class="g" d="M420.0,79.1 L467.5,185.3 L491.9,203.3 L500.9,214.5 L503.5,217.6 L506.0,211.4 L513.0,212.9 L539.5,192.4 L575.4,188.0 L623.0,151.5 L680.0,160.3"/>
+<circle cx="420.0" cy="79.1" r="3" fill="none" class="g" style="stroke-width:1.3"/>
+<circle cx="467.5" cy="185.3" r="3" fill="none" class="g" style="stroke-width:1.3"/>
+<circle cx="491.9" cy="203.3" r="3" fill="none" class="g" style="stroke-width:1.3"/>
+<circle class="gf" cx="500.9" cy="214.5" r="2.6"/>
+<circle class="gf" cx="503.5" cy="217.6" r="2.6"/>
+<circle class="gf" cx="506.0" cy="211.4" r="2.6"/>
+<circle class="gf" cx="513.0" cy="212.9" r="2.6"/>
+<circle class="gf" cx="539.5" cy="192.4" r="2.6"/>
+<circle class="gf" cx="575.4" cy="188.0" r="2.6"/>
+<circle class="gf" cx="623.0" cy="151.5" r="2.6"/>
+<circle class="gf" cx="680.0" cy="160.3" r="2.6"/>
+<text class="lab" x="678.0" y="153.3" text-anchor="end">d = 5</text>
+<path class="b" d="M420.0,204.3 L467.5,214.9 L491.9,223.4 L500.9,219.7 L503.5,225.8 L506.0,220.3 L513.0,215.2 L539.5,212.6 L575.4,206.9 L623.0,198.4 L680.0,205.5"/>
+<circle cx="420.0" cy="204.3" r="3" fill="none" class="b" style="stroke-width:1.3"/>
+<circle cx="467.5" cy="214.9" r="3" fill="none" class="b" style="stroke-width:1.3"/>
+<circle class="bf" cx="491.9" cy="223.4" r="2.6"/>
+<circle class="bf" cx="500.9" cy="219.7" r="2.6"/>
+<circle class="bf" cx="503.5" cy="225.8" r="2.6"/>
+<circle class="bf" cx="506.0" cy="220.3" r="2.6"/>
+<circle class="bf" cx="513.0" cy="215.2" r="2.6"/>
+<circle class="bf" cx="539.5" cy="212.6" r="2.6"/>
+<circle class="bf" cx="575.4" cy="206.9" r="2.6"/>
+<circle class="bf" cx="623.0" cy="198.4" r="2.6"/>
+<circle class="bf" cx="680.0" cy="205.5" r="2.6"/>
+<text class="lab" x="678.0" y="198.5" text-anchor="end">d = 20</text>
+<path class="o" d="M420.0,237.7 L467.5,242.3 L491.9,246.3 L500.9,247.7 L503.5,248.0 L506.0,249.2 L513.0,247.5 L539.5,244.3 L575.4,238.1 L623.0,234.1 L680.0,231.0"/>
+<circle cx="420.0" cy="237.7" r="3" fill="none" class="o" style="stroke-width:1.3"/>
+<circle cx="467.5" cy="242.3" r="3" fill="none" class="o" style="stroke-width:1.3"/>
+<circle cx="491.9" cy="246.3" r="3" fill="none" class="o" style="stroke-width:1.3"/>
+<circle class="of" cx="500.9" cy="247.7" r="2.6"/>
+<circle class="of" cx="503.5" cy="248.0" r="2.6"/>
+<circle class="of" cx="506.0" cy="249.2" r="2.6"/>
+<circle class="of" cx="513.0" cy="247.5" r="2.6"/>
+<circle class="of" cx="539.5" cy="244.3" r="2.6"/>
+<circle class="of" cx="575.4" cy="238.1" r="2.6"/>
+<circle class="of" cx="623.0" cy="234.1" r="2.6"/>
+<circle class="of" cx="680.0" cy="231.0" r="2.6"/>
+<text class="lab" x="678.0" y="224.0" text-anchor="end">d = 50</text>
+<text class="tiny" x="426" y="262">open: not interpolating (train error &gt; 0)</text>
+</svg>
