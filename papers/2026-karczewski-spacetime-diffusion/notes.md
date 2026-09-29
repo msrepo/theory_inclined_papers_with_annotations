@@ -25,6 +25,9 @@ status: read
 - **[Runnable checks](https://github.com/msrepo/theory_inclined_papers_with_annotations/tree/main/papers/2026-karczewski-spacetime-diffusion/code)**:
   `spacetime_checks.py` verifies every proposition and lemma numerically, on the paper's own toy data (App G.1),
   and prints every number quoted below. `make verify` runs it (about 2.5 minutes).
+- **[Fisher information](../fisher-information/index.html)**: background for the Fisher–Rao metric used throughout: the Fisher matrix as the
+  local shape of the KL divergence, why path lengths do not depend on the parameterisation, and the Gaussians as a
+  hyperbolic half-plane whose geodesics widen before they move.
 - **[Optimal transport and the Wasserstein distance](../optimal-transport/index.html)**: the other way to put a
   geometry on distributions. The contrast matters in doubt 4: Fisher–Rao *reweights* mass, Wasserstein *moves* it.
 - **[The Gram matrix](../gram-matrix/index.html)**: the pullback metric $J^\top J$ of Section 4 is the Gram matrix of

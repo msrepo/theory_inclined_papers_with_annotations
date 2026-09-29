@@ -35,6 +35,8 @@ status: read
 - **[Langevin dynamics](../langevin-dynamics/index.html)**: background for Section 6.2 (SGD as a local learning
   algorithm, Eq 6): the Gibbs law $e^{-U/D}$ that makes the temperature the price of information, Kramers'
   law for escaping a basin, and the path weight behind the SGD path integral.
+- **[Fisher information](../fisher-information/index.html)**: background for Section 5 and "Is the Hessian N times the Fisher?": the score,
+  the per-sample against total information, Hessian = Fisher + residual, and the empirical Fisher.
 - **Companion papers in this collection**: [Dynamics and Reachability of Learning Tasks](../2019-achille-task-reachability/index.html)
   (the source of Eq 6, the SGD path integral) and [Where is the Information in a Deep Neural Network?](../2020-achille-information-in-weights/index.html)
   (the same Lagrangian applied to the weights and activations of one network).

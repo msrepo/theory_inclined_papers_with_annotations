@@ -34,6 +34,7 @@ status: read
   under nothing but a change of random seed.
 - **[Shao 2022 — SFDA](../2022-shao-sfda/index.html)** — the measure that imitates
   fine-tuning dynamics rather than scoring a static representation.
+- **[Achille 2019 — task reachability](../2019-achille-task-reachability/index.html#transferability-scores-use-only-features-open-weight-models-come-without-data)** — a dynamics-based view of the same question. LEEP is static in that paper's sense: one hand-built classifier on frozen predictions, with nothing about whether fine-tuning can reach a good solution from the source weights. The linked section places LEEP and the other scores against the paper's two factors.
 - **[Runnable code](https://github.com/msrepo/theory_inclined_papers_with_annotations/blob/main/papers/2020-nguyen-leep/code/leep.py)** —
   the two exact limits, where Property 1's slack actually goes, Property 2 across six regimes
   together with why the obvious derivation misses it, and the temperature sensitivity.

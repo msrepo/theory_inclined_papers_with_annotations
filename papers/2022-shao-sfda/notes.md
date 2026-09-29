@@ -24,6 +24,7 @@ status: read
   producing NaNs on medical targets, "due to all source models being assigned the same score".
 - **[LDA / Fisher discriminant](../lda-fisher-discriminant/index.html)** and
   **[principal angles](../principal-angles-subspaces/index.html)** — the background this leans on.
+- **[Achille 2019 — task reachability](../2019-achille-task-reachability/index.html#transferability-scores-use-only-features-open-weight-models-come-without-data)** — models fine-tuning directly, as noisy gradient descent from the source weights. SFDA's self-challenging step is the one heuristic among these scores meant to imitate those dynamics. The linked section compares every score here with the paper's static and dynamic factors.
 - **[Runnable code](https://github.com/msrepo/theory_inclined_papers_with_annotations/blob/main/papers/2022-shao-sfda/code/sfda.py)** —
   ConfMix as a difficulty amplifier, the $D'=\min(D,C-1)$ collapse on binary targets, the three
   incompatible statements of $\lambda$, and what $\lambda=1$ costs. `make verify` runs it.

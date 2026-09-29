@@ -25,6 +25,7 @@ status: read
   takes up directly.
 - **[Shao 2022 — SFDA](../2022-shao-sfda/index.html)** — the measure that imitates
   fine-tuning dynamics rather than scoring a static representation.
+- **[Achille 2019 — task reachability](../2019-achille-task-reachability/index.html#transferability-scores-use-only-features-open-weight-models-come-without-data)** — one account of why rankings from frozen features can be fragile. They measure a static fit, while fine-tuning also depends on whether SGD reaches a good solution from the source weights. The linked section places each score against the paper's two factors.
 - **[Runnable code](https://github.com/msrepo/theory_inclined_papers_with_annotations/blob/main/papers/2026-classen-te-robustness/code/robustness.py)** —
   not a reproduction, which is not possible here, but the mechanisms: where the rank
   correlations disagree, how stability falls with subset size, and the sharp $n\approx k$

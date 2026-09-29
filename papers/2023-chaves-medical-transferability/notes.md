@@ -26,6 +26,7 @@ status: read
   evaluation-metric question this one leaves open.
 - **[Shao 2022 — SFDA](../2022-shao-sfda/index.html)** — the measure that imitates
   fine-tuning dynamics rather than scoring a static representation.
+- **[Achille 2019 — task reachability](../2019-achille-task-reachability/index.html#transferability-scores-use-only-features-open-weight-models-come-without-data)** — one account of what frozen-feature scores leave out. Fine-tuning success also depends on whether SGD can reach a good target solution from the source weights (that paper's reachability factor), which none of the scores measures. The linked section places each score against the paper's two factors.
 - **[Runnable code](https://github.com/msrepo/theory_inclined_papers_with_annotations/blob/main/papers/2023-chaves-medical-transferability/code/power.py)** —
   not a reproduction, which is impossible here, but the statistical resolution of their Table 2:
   what a rank correlation over ten architectures can and cannot detect. `make verify` runs it.

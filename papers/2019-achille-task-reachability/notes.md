@@ -32,6 +32,9 @@ status: read
   Kramers' law, detailed balance and the path weight used throughout, built up from scratch with
   simulations; and **[Inequalities and concentration](../inequalities-and-concentration/index.html)**, for
   the KL divergence and the Donsker–Varadhan formula, which is the identity that makes Section 6 work.
+- **[Fisher information](../fisher-information/index.html)**: background for the Fisher matrix used in eq. (4) in place of the
+  Hessian: the score, Cramér–Rao, the local KL expansion, Hessian against Fisher against empirical Fisher,
+  and natural gradient.
 - **[Transferability](../index.html#transferability)**: the site's section on estimating how well
   fine-tuning from a source will work without running it (LEEP, NCE, LogME, H-score, SFDA, PAS, and two
   evaluations on medical targets). Those scores and this paper ask the same question from opposite ends:
@@ -366,7 +369,7 @@ The code checks each claim on one-input logistic models with 400 points:
   the Hessian and $1.035$ with the Fisher.
 
 Two cautions. The "empirical Fisher", with the true labels in place of $y\sim p_w$, is a different matrix and
-not guaranteed to be close to $H$. And on a trained network the relative gap between $H$ and $F$ stops
+not guaranteed to be close to $H$ (the **[Fisher information](../fisher-information/index.html)** page, §8, measures how far it strays). And on a trained network the relative gap between $H$ and $F$ stops
 shrinking at a few percent; the **[information-in-the-weights notes](../2020-achille-information-in-weights/index.html)**
 measure it (about 4%) in their section on Lemma 2.4. A bonus of the Fisher: because $y$ is drawn from the
 model, it depends on the data only through the inputs, which is why it can be computed on a target task

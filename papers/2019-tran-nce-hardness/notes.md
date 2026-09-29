@@ -31,6 +31,7 @@ status: read
 - **[Claßen 2026 — TE robustness](../2026-classen-te-robustness/index.html)** — benchmarks
   this measure against the others on medical imaging targets, and finds the rankings move
   under nothing but a change of random seed.
+- **[Achille 2019 — task reachability](../2019-achille-task-reachability/index.html#transferability-scores-use-only-features-open-weight-models-come-without-data)** — a dynamics-based view of the same question. Its static task distance is built from information stored in the weights rather than from label entropies, and it adds a factor NCE cannot see: whether fine-tuning can actually reach a good target solution from the source weights. The linked section places NCE and the other scores against the paper's two factors.
 - **[Runnable code](https://github.com/msrepo/theory_inclined_papers_with_annotations/blob/main/papers/2019-tran-nce-hardness/code/nce.py)** —
   the identity Theorem 1 turns on, the theorem itself, the hardness bound, what $H(Y\mid Z)$
   measures on constructed cases, and a source-selection setting where dropping the

@@ -27,6 +27,7 @@ status: read
   LogME among others on medical targets.
 - **[Shao 2022 — SFDA](../2022-shao-sfda/index.html)** — the measure that imitates
   fine-tuning dynamics rather than scoring a static representation.
+- **[Achille 2019 — task reachability](../2019-achille-task-reachability/index.html#transferability-scores-use-only-features-open-weight-models-come-without-data)** — LogME's evidence is exactly that paper's task complexity $\min_QC_\beta$, restricted to a linear head on frozen features (at $\beta=1$ with a summed loss). The paper's static distance is the *extra* complexity of the target on top of the source, and its dynamic factor, whether SGD can reach the target solution, is what no frozen-feature score sees. The linked section compares all the scores here.
 - **[Runnable code](https://github.com/msrepo/theory_inclined_papers_with_annotations/blob/main/papers/2021-you-logme/code/logme.py)** —
   Eq. 2 against an independent derivation, the fixed point against a grid search, $\gamma$
   spanning $[0,D]$, and the $D>n$ table that is the whole argument for the method.

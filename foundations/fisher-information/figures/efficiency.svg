@@ -1,0 +1,208 @@
+<svg viewBox="0 0 920 300" xmlns="http://www.w3.org/2000/svg" role="img">
+<title>Cramér–Rao and efficiency</title>
+<desc>Histograms of 40000 sample means (blue) and sample medians (orange) of 101 standard normal draws. The mean's spread matches the Cramér–Rao curve 1/(N I) exactly; the median's is about π/2 times wider, an efficiency of 2/π.</desc>
+<style>
+  text{font-family:ui-sans-serif,-apple-system,"Segoe UI",sans-serif;font-weight:400}
+  .lab{font-size:11px;fill:#57564f} .hd{font-size:13px;font-weight:500;fill:#1a1a19}
+  .sm{font-size:10.5px;fill:#57564f} .v{font-size:11px;fill:#1a1a19}
+  .ax{stroke:#8a8880;stroke-width:0.9;fill:none} .gd{stroke:#e2e1da;stroke-width:0.6;fill:none}
+  .s1{stroke:#2a78d6} .s2{stroke:#eb6834} .s3{stroke:#1baf7a} .s4{stroke:#eda100} .s0{stroke:#8a8880}
+  .f1{fill:#2a78d6} .f2{fill:#eb6834} .f3{fill:#1baf7a} .f4{fill:#eda100} .f0{fill:#8a8880}
+  .ln{stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+  .thin{stroke-width:1;fill:none}
+  .dash{stroke-width:1.4;fill:none;stroke-dasharray:5 3}
+  .bar{opacity:.35} .pt{opacity:.35}
+  .ring{stroke:#fdfdfc;stroke-width:1.5}
+  @media (prefers-color-scheme: dark){
+    .lab,.sm{fill:#b6b4ab} .hd,.v{fill:#eceae3} .ax{stroke:#85837b} .gd{stroke:#33312e}
+    .s1{stroke:#3987e5} .s2{stroke:#d95926} .s3{stroke:#199e70} .s4{stroke:#c98500} .s0{stroke:#85837b}
+    .f1{fill:#3987e5} .f2{fill:#d95926} .f3{fill:#199e70} .f4{fill:#c98500} .f0{fill:#85837b}
+    .ring{stroke:#161615}
+  }
+</style>
+<line class="gd" x1="90" y1="245.0" x2="870" y2="245.0"/>
+<text class="sm" x="84" y="248.5" text-anchor="end">0</text>
+<line class="gd" x1="90" y1="206.5" x2="870" y2="206.5"/>
+<text class="sm" x="84" y="210.0" text-anchor="end">1</text>
+<line class="gd" x1="90" y1="168.1" x2="870" y2="168.1"/>
+<text class="sm" x="84" y="171.6" text-anchor="end">2</text>
+<line class="gd" x1="90" y1="129.6" x2="870" y2="129.6"/>
+<text class="sm" x="84" y="133.1" text-anchor="end">3</text>
+<line class="gd" x1="90" y1="91.2" x2="870" y2="91.2"/>
+<text class="sm" x="84" y="94.7" text-anchor="end">4</text>
+<line class="gd" x1="90" y1="52.7" x2="870" y2="52.7"/>
+<text class="sm" x="84" y="56.2" text-anchor="end">5</text>
+<text class="sm" x="90.0" y="260" text-anchor="middle">−0.4</text>
+<text class="sm" x="285.0" y="260" text-anchor="middle">−0.2</text>
+<text class="sm" x="480.0" y="260" text-anchor="middle">0</text>
+<text class="sm" x="675.0" y="260" text-anchor="middle">0.2</text>
+<text class="sm" x="870.0" y="260" text-anchor="middle">0.4</text>
+<line class="ax" x1="90" y1="245" x2="870" y2="245"/>
+<line class="ax" x1="90" y1="45" x2="90" y2="245"/>
+<text class="lab" x="480.0" y="277" text-anchor="middle">estimate of μ (true value 0)</text>
+<text class="lab" transform="translate(50,145.0) rotate(-90)" text-anchor="middle">density</text>
+<text class="hd" x="90" y="33">Two estimators of a Gaussian mean, N = 101</text>
+<rect class="f1 bar" x="90.4" y="245.0" width="9.0" height="0.0"/>
+<rect class="f1 bar" x="100.2" y="245.0" width="8.9" height="0.0"/>
+<rect class="f1 bar" x="109.9" y="244.8" width="9.0" height="0.2"/>
+<rect class="f1 bar" x="119.7" y="244.8" width="8.9" height="0.2"/>
+<rect class="f1 bar" x="129.4" y="244.7" width="9.0" height="0.3"/>
+<rect class="f1 bar" x="139.2" y="244.6" width="8.9" height="0.4"/>
+<rect class="f1 bar" x="148.9" y="244.6" width="8.9" height="0.4"/>
+<rect class="f1 bar" x="158.7" y="244.0" width="8.9" height="1.0"/>
+<rect class="f1 bar" x="168.4" y="244.2" width="8.9" height="0.8"/>
+<rect class="f1 bar" x="178.1" y="244.2" width="8.9" height="0.8"/>
+<rect class="f1 bar" x="187.9" y="242.6" width="9.0" height="2.4"/>
+<rect class="f1 bar" x="197.7" y="242.5" width="8.9" height="2.5"/>
+<rect class="f1 bar" x="207.4" y="241.2" width="8.9" height="3.8"/>
+<rect class="f1 bar" x="217.2" y="240.3" width="8.9" height="4.7"/>
+<rect class="f1 bar" x="226.9" y="238.9" width="9.0" height="6.1"/>
+<rect class="f1 bar" x="236.7" y="238.3" width="8.9" height="6.7"/>
+<rect class="f1 bar" x="246.4" y="234.1" width="8.9" height="10.9"/>
+<rect class="f1 bar" x="256.1" y="233.4" width="8.9" height="11.6"/>
+<rect class="f1 bar" x="265.9" y="231.2" width="8.9" height="13.8"/>
+<rect class="f1 bar" x="275.6" y="228.0" width="8.9" height="17.0"/>
+<rect class="f1 bar" x="285.4" y="222.1" width="8.9" height="22.9"/>
+<rect class="f1 bar" x="295.1" y="220.1" width="8.9" height="24.9"/>
+<rect class="f1 bar" x="304.9" y="215.5" width="8.9" height="29.5"/>
+<rect class="f1 bar" x="314.6" y="207.3" width="8.9" height="37.7"/>
+<rect class="f1 bar" x="324.4" y="198.1" width="8.9" height="46.9"/>
+<rect class="f1 bar" x="334.1" y="192.8" width="8.9" height="52.2"/>
+<rect class="f1 bar" x="343.9" y="185.4" width="8.9" height="59.6"/>
+<rect class="f1 bar" x="353.6" y="171.5" width="8.9" height="73.5"/>
+<rect class="f1 bar" x="363.4" y="169.5" width="8.9" height="75.5"/>
+<rect class="f1 bar" x="373.1" y="155.5" width="8.9" height="89.5"/>
+<rect class="f1 bar" x="382.9" y="143.6" width="8.9" height="101.4"/>
+<rect class="f1 bar" x="392.6" y="135.3" width="9.0" height="109.7"/>
+<rect class="f1 bar" x="402.4" y="135.9" width="8.9" height="109.1"/>
+<rect class="f1 bar" x="412.1" y="118.0" width="8.9" height="127.0"/>
+<rect class="f1 bar" x="421.9" y="114.3" width="8.9" height="130.7"/>
+<rect class="f1 bar" x="431.6" y="105.9" width="8.9" height="139.1"/>
+<rect class="f1 bar" x="441.4" y="101.7" width="9.0" height="143.3"/>
+<rect class="f1 bar" x="451.1" y="91.0" width="8.9" height="154.0"/>
+<rect class="f1 bar" x="460.9" y="93.6" width="8.9" height="151.4"/>
+<rect class="f1 bar" x="470.6" y="103.1" width="8.9" height="141.9"/>
+<rect class="f1 bar" x="480.4" y="88.6" width="8.9" height="156.4"/>
+<rect class="f1 bar" x="490.1" y="92.6" width="8.9" height="152.4"/>
+<rect class="f1 bar" x="499.9" y="95.6" width="9.0" height="149.4"/>
+<rect class="f1 bar" x="509.6" y="104.1" width="8.9" height="140.9"/>
+<rect class="f1 bar" x="519.4" y="104.2" width="8.9" height="140.8"/>
+<rect class="f1 bar" x="529.1" y="109.8" width="8.9" height="135.2"/>
+<rect class="f1 bar" x="538.9" y="116.2" width="8.9" height="128.8"/>
+<rect class="f1 bar" x="548.6" y="133.8" width="8.9" height="111.2"/>
+<rect class="f1 bar" x="558.4" y="131.7" width="8.9" height="113.3"/>
+<rect class="f1 bar" x="568.1" y="140.8" width="8.9" height="104.2"/>
+<rect class="f1 bar" x="577.9" y="157.1" width="8.9" height="87.9"/>
+<rect class="f1 bar" x="587.6" y="168.7" width="8.9" height="76.3"/>
+<rect class="f1 bar" x="597.4" y="172.4" width="8.9" height="72.6"/>
+<rect class="f1 bar" x="607.1" y="181.9" width="8.9" height="63.1"/>
+<rect class="f1 bar" x="616.9" y="190.9" width="8.9" height="54.1"/>
+<rect class="f1 bar" x="626.6" y="198.2" width="8.9" height="46.8"/>
+<rect class="f1 bar" x="636.4" y="204.2" width="8.9" height="40.8"/>
+<rect class="f1 bar" x="646.1" y="210.3" width="8.9" height="34.7"/>
+<rect class="f1 bar" x="655.9" y="219.0" width="9.0" height="26.0"/>
+<rect class="f1 bar" x="665.6" y="223.9" width="8.9" height="21.1"/>
+<rect class="f1 bar" x="675.4" y="226.3" width="9.0" height="18.7"/>
+<rect class="f1 bar" x="685.1" y="230.9" width="8.9" height="14.1"/>
+<rect class="f1 bar" x="694.9" y="230.7" width="9.0" height="14.3"/>
+<rect class="f1 bar" x="704.6" y="235.8" width="8.9" height="9.2"/>
+<rect class="f1 bar" x="714.4" y="237.2" width="8.9" height="7.8"/>
+<rect class="f1 bar" x="724.1" y="240.2" width="8.9" height="4.8"/>
+<rect class="f1 bar" x="733.9" y="240.4" width="8.9" height="4.6"/>
+<rect class="f1 bar" x="743.6" y="241.2" width="8.9" height="3.8"/>
+<rect class="f1 bar" x="753.4" y="241.8" width="8.9" height="3.2"/>
+<rect class="f1 bar" x="763.1" y="243.2" width="8.9" height="1.8"/>
+<rect class="f1 bar" x="772.9" y="243.8" width="8.9" height="1.2"/>
+<rect class="f1 bar" x="782.6" y="244.1" width="8.9" height="0.9"/>
+<rect class="f1 bar" x="792.4" y="244.7" width="9.0" height="0.3"/>
+<rect class="f1 bar" x="802.1" y="244.0" width="8.9" height="1.0"/>
+<rect class="f1 bar" x="811.9" y="244.6" width="8.9" height="0.4"/>
+<rect class="f1 bar" x="821.6" y="244.6" width="8.9" height="0.4"/>
+<rect class="f1 bar" x="831.4" y="244.9" width="8.9" height="0.1"/>
+<rect class="f1 bar" x="841.1" y="244.7" width="8.9" height="0.3"/>
+<rect class="f1 bar" x="850.9" y="245.0" width="8.9" height="0.0"/>
+<rect class="f1 bar" x="860.6" y="244.9" width="8.9" height="0.1"/>
+<rect class="f2 bar" x="90.4" y="244.6" width="9.0" height="0.4"/>
+<rect class="f2 bar" x="100.2" y="243.4" width="8.9" height="1.6"/>
+<rect class="f2 bar" x="109.9" y="243.7" width="9.0" height="1.3"/>
+<rect class="f2 bar" x="119.7" y="243.6" width="8.9" height="1.4"/>
+<rect class="f2 bar" x="129.4" y="242.8" width="9.0" height="2.2"/>
+<rect class="f2 bar" x="139.2" y="242.6" width="8.9" height="2.4"/>
+<rect class="f2 bar" x="148.9" y="240.3" width="8.9" height="4.7"/>
+<rect class="f2 bar" x="158.7" y="240.6" width="8.9" height="4.4"/>
+<rect class="f2 bar" x="168.4" y="240.1" width="8.9" height="4.9"/>
+<rect class="f2 bar" x="178.1" y="238.9" width="8.9" height="6.1"/>
+<rect class="f2 bar" x="187.9" y="236.5" width="9.0" height="8.5"/>
+<rect class="f2 bar" x="197.7" y="236.6" width="8.9" height="8.4"/>
+<rect class="f2 bar" x="207.4" y="234.4" width="8.9" height="10.6"/>
+<rect class="f2 bar" x="217.2" y="233.0" width="8.9" height="12.0"/>
+<rect class="f2 bar" x="226.9" y="227.3" width="9.0" height="17.7"/>
+<rect class="f2 bar" x="236.7" y="227.4" width="8.9" height="17.6"/>
+<rect class="f2 bar" x="246.4" y="226.3" width="8.9" height="18.7"/>
+<rect class="f2 bar" x="256.1" y="224.4" width="8.9" height="20.6"/>
+<rect class="f2 bar" x="265.9" y="220.1" width="8.9" height="24.9"/>
+<rect class="f2 bar" x="275.6" y="208.7" width="8.9" height="36.3"/>
+<rect class="f2 bar" x="285.4" y="211.0" width="8.9" height="34.0"/>
+<rect class="f2 bar" x="295.1" y="203.1" width="8.9" height="41.9"/>
+<rect class="f2 bar" x="304.9" y="200.7" width="8.9" height="44.3"/>
+<rect class="f2 bar" x="314.6" y="193.0" width="8.9" height="52.0"/>
+<rect class="f2 bar" x="324.4" y="189.9" width="8.9" height="55.1"/>
+<rect class="f2 bar" x="334.1" y="187.7" width="8.9" height="57.3"/>
+<rect class="f2 bar" x="343.9" y="174.1" width="8.9" height="70.9"/>
+<rect class="f2 bar" x="353.6" y="168.6" width="8.9" height="76.4"/>
+<rect class="f2 bar" x="363.4" y="165.3" width="8.9" height="79.7"/>
+<rect class="f2 bar" x="373.1" y="156.6" width="8.9" height="88.4"/>
+<rect class="f2 bar" x="382.9" y="152.1" width="8.9" height="92.9"/>
+<rect class="f2 bar" x="392.6" y="150.0" width="9.0" height="95.0"/>
+<rect class="f2 bar" x="402.4" y="149.3" width="8.9" height="95.7"/>
+<rect class="f2 bar" x="412.1" y="137.0" width="8.9" height="108.0"/>
+<rect class="f2 bar" x="421.9" y="136.3" width="8.9" height="108.7"/>
+<rect class="f2 bar" x="431.6" y="130.9" width="8.9" height="114.1"/>
+<rect class="f2 bar" x="441.4" y="128.4" width="9.0" height="116.6"/>
+<rect class="f2 bar" x="451.1" y="122.2" width="8.9" height="122.8"/>
+<rect class="f2 bar" x="460.9" y="124.2" width="8.9" height="120.8"/>
+<rect class="f2 bar" x="470.6" y="118.1" width="8.9" height="126.9"/>
+<rect class="f2 bar" x="480.4" y="118.5" width="8.9" height="126.5"/>
+<rect class="f2 bar" x="490.1" y="122.3" width="8.9" height="122.7"/>
+<rect class="f2 bar" x="499.9" y="119.7" width="9.0" height="125.3"/>
+<rect class="f2 bar" x="509.6" y="123.9" width="8.9" height="121.1"/>
+<rect class="f2 bar" x="519.4" y="131.7" width="8.9" height="113.3"/>
+<rect class="f2 bar" x="529.1" y="139.3" width="8.9" height="105.7"/>
+<rect class="f2 bar" x="538.9" y="138.7" width="8.9" height="106.3"/>
+<rect class="f2 bar" x="548.6" y="144.4" width="8.9" height="100.6"/>
+<rect class="f2 bar" x="558.4" y="145.7" width="8.9" height="99.3"/>
+<rect class="f2 bar" x="568.1" y="148.5" width="8.9" height="96.5"/>
+<rect class="f2 bar" x="577.9" y="159.5" width="8.9" height="85.5"/>
+<rect class="f2 bar" x="587.6" y="164.1" width="8.9" height="80.9"/>
+<rect class="f2 bar" x="597.4" y="166.5" width="8.9" height="78.5"/>
+<rect class="f2 bar" x="607.1" y="175.7" width="8.9" height="69.3"/>
+<rect class="f2 bar" x="616.9" y="180.9" width="8.9" height="64.1"/>
+<rect class="f2 bar" x="626.6" y="187.3" width="8.9" height="57.7"/>
+<rect class="f2 bar" x="636.4" y="190.6" width="8.9" height="54.4"/>
+<rect class="f2 bar" x="646.1" y="198.1" width="8.9" height="46.9"/>
+<rect class="f2 bar" x="655.9" y="205.1" width="9.0" height="39.9"/>
+<rect class="f2 bar" x="665.6" y="208.7" width="8.9" height="36.3"/>
+<rect class="f2 bar" x="675.4" y="215.1" width="9.0" height="29.9"/>
+<rect class="f2 bar" x="685.1" y="215.9" width="8.9" height="29.1"/>
+<rect class="f2 bar" x="694.9" y="219.7" width="9.0" height="25.3"/>
+<rect class="f2 bar" x="704.6" y="222.8" width="8.9" height="22.2"/>
+<rect class="f2 bar" x="714.4" y="227.8" width="8.9" height="17.2"/>
+<rect class="f2 bar" x="724.1" y="227.5" width="8.9" height="17.5"/>
+<rect class="f2 bar" x="733.9" y="231.1" width="8.9" height="13.9"/>
+<rect class="f2 bar" x="743.6" y="235.0" width="8.9" height="10.0"/>
+<rect class="f2 bar" x="753.4" y="235.2" width="8.9" height="9.8"/>
+<rect class="f2 bar" x="763.1" y="239.1" width="8.9" height="5.9"/>
+<rect class="f2 bar" x="772.9" y="238.5" width="8.9" height="6.5"/>
+<rect class="f2 bar" x="782.6" y="241.1" width="8.9" height="3.9"/>
+<rect class="f2 bar" x="792.4" y="240.6" width="9.0" height="4.4"/>
+<rect class="f2 bar" x="802.1" y="241.0" width="8.9" height="4.0"/>
+<rect class="f2 bar" x="811.9" y="241.7" width="8.9" height="3.3"/>
+<rect class="f2 bar" x="821.6" y="243.7" width="8.9" height="1.3"/>
+<rect class="f2 bar" x="831.4" y="243.4" width="8.9" height="1.6"/>
+<rect class="f2 bar" x="841.1" y="243.8" width="8.9" height="1.2"/>
+<rect class="f2 bar" x="850.9" y="243.8" width="8.9" height="1.2"/>
+<rect class="f2 bar" x="860.6" y="244.3" width="8.9" height="0.7"/>
+<polyline class="ln s1" points="90.0,245.0 92.0,244.9 93.9,244.9 95.9,244.9 97.8,244.9 99.8,244.9 101.7,244.9 103.7,244.9 105.6,244.9 107.6,244.9 109.5,244.9 111.5,244.9 113.5,244.9 115.4,244.9 117.4,244.9 119.3,244.8 121.3,244.8 123.2,244.8 125.2,244.8 127.1,244.8 129.1,244.8 131.1,244.8 133.0,244.7 135.0,244.7 136.9,244.7 138.9,244.7 140.8,244.7 142.8,244.6 144.7,244.6 146.7,244.6 148.6,244.5 150.6,244.5 152.6,244.5 154.5,244.4 156.5,244.4 158.4,244.4 160.4,244.3 162.3,244.3 164.3,244.2 166.2,244.2 168.2,244.1 170.2,244.1 172.1,244.0 174.1,243.9 176.0,243.9 178.0,243.8 179.9,243.7 181.9,243.6 183.8,243.5 185.8,243.4 187.7,243.3 189.7,243.2 191.7,243.1 193.6,243.0 195.6,242.9 197.5,242.8 199.5,242.6 201.4,242.5 203.4,242.4 205.3,242.2 207.3,242.0 209.2,241.9 211.2,241.7 213.2,241.5 215.1,241.3 217.1,241.1 219.0,240.9 221.0,240.6 222.9,240.4 224.9,240.1 226.8,239.9 228.8,239.6 230.8,239.3 232.7,239.0 234.7,238.7 236.6,238.4 238.6,238.0 240.5,237.7 242.5,237.3 244.4,236.9 246.4,236.5 248.3,236.1 250.3,235.6 252.3,235.2 254.2,234.7 256.2,234.2 258.1,233.7 260.1,233.2 262.0,232.6 264.0,232.1 265.9,231.5 267.9,230.9 269.8,230.2 271.8,229.6 273.8,228.9 275.7,228.2 277.7,227.5 279.6,226.7 281.6,226.0 283.5,225.2 285.5,224.3 287.4,223.5 289.4,222.6 291.4,221.7 293.3,220.8 295.3,219.8 297.2,218.9 299.2,217.9 301.1,216.8 303.1,215.8 305.0,214.7 307.0,213.6 308.9,212.4 310.9,211.2 312.9,210.0 314.8,208.8 316.8,207.6 318.7,206.3 320.7,205.0 322.6,203.6 324.6,202.3 326.5,200.9 328.5,199.4 330.5,198.0 332.4,196.5 334.4,195.0 336.3,193.5 338.3,192.0 340.2,190.4 342.2,188.8 344.1,187.2 346.1,185.5 348.0,183.9 350.0,182.2 352.0,180.5 353.9,178.7 355.9,177.0 357.8,175.2 359.8,173.4 361.7,171.7 363.7,169.8 365.6,168.0 367.6,166.2 369.5,164.3 371.5,162.5 373.5,160.6 375.4,158.8 377.4,156.9 379.3,155.0 381.3,153.1 383.2,151.2 385.2,149.3 387.1,147.5 389.1,145.6 391.1,143.7 393.0,141.8 395.0,140.0 396.9,138.1 398.9,136.3 400.8,134.5 402.8,132.7 404.7,130.9 406.7,129.1 408.6,127.3 410.6,125.6 412.6,123.9 414.5,122.2 416.5,120.6 418.4,118.9 420.4,117.3 422.3,115.8 424.3,114.2 426.2,112.7 428.2,111.3 430.2,109.9 432.1,108.5 434.1,107.2 436.0,105.9 438.0,104.6 439.9,103.4 441.9,102.3 443.8,101.1 445.8,100.1 447.7,99.1 449.7,98.1 451.7,97.2 453.6,96.4 455.6,95.6 457.5,94.9 459.5,94.2 461.4,93.6 463.4,93.0 465.3,92.5 467.3,92.1 469.2,91.7 471.2,91.4 473.2,91.2 475.1,91.0 477.1,90.9 479.0,90.8 481.0,90.8 482.9,90.9 484.9,91.0 486.8,91.2 488.8,91.4 490.8,91.7 492.7,92.1 494.7,92.5 496.6,93.0 498.6,93.6 500.5,94.2 502.5,94.9 504.4,95.6 506.4,96.4 508.3,97.2 510.3,98.1 512.3,99.1 514.2,100.1 516.2,101.1 518.1,102.3 520.1,103.4 522.0,104.6 524.0,105.9 525.9,107.2 527.9,108.5 529.8,109.9 531.8,111.3 533.8,112.7 535.7,114.2 537.7,115.8 539.6,117.3 541.6,118.9 543.5,120.6 545.5,122.2 547.4,123.9 549.4,125.6 551.4,127.3 553.3,129.1 555.3,130.9 557.2,132.7 559.2,134.5 561.1,136.3 563.1,138.1 565.0,140.0 567.0,141.8 568.9,143.7 570.9,145.6 572.9,147.5 574.8,149.3 576.8,151.2 578.7,153.1 580.7,155.0 582.6,156.9 584.6,158.8 586.5,160.6 588.5,162.5 590.5,164.3 592.4,166.2 594.4,168.0 596.3,169.8 598.3,171.7 600.2,173.4 602.2,175.2 604.1,177.0 606.1,178.7 608.0,180.5 610.0,182.2 612.0,183.9 613.9,185.5 615.9,187.2 617.8,188.8 619.8,190.4 621.7,192.0 623.7,193.5 625.6,195.0 627.6,196.5 629.5,198.0 631.5,199.4 633.5,200.9 635.4,202.3 637.4,203.6 639.3,205.0 641.3,206.3 643.2,207.6 645.2,208.8 647.1,210.0 649.1,211.2 651.1,212.4 653.0,213.6 655.0,214.7 656.9,215.8 658.9,216.8 660.8,217.9 662.8,218.9 664.7,219.8 666.7,220.8 668.6,221.7 670.6,222.6 672.6,223.5 674.5,224.3 676.5,225.2 678.4,226.0 680.4,226.7 682.3,227.5 684.3,228.2 686.2,228.9 688.2,229.6 690.2,230.2 692.1,230.9 694.1,231.5 696.0,232.1 698.0,232.6 699.9,233.2 701.9,233.7 703.8,234.2 705.8,234.7 707.7,235.2 709.7,235.6 711.7,236.1 713.6,236.5 715.6,236.9 717.5,237.3 719.5,237.7 721.4,238.0 723.4,238.4 725.3,238.7 727.3,239.0 729.2,239.3 731.2,239.6 733.2,239.9 735.1,240.1 737.1,240.4 739.0,240.6 741.0,240.9 742.9,241.1 744.9,241.3 746.8,241.5 748.8,241.7 750.8,241.9 752.7,242.0 754.7,242.2 756.6,242.4 758.6,242.5 760.5,242.6 762.5,242.8 764.4,242.9 766.4,243.0 768.3,243.1 770.3,243.2 772.3,243.3 774.2,243.4 776.2,243.5 778.1,243.6 780.1,243.7 782.0,243.8 784.0,243.9 785.9,243.9 787.9,244.0 789.8,244.1 791.8,244.1 793.8,244.2 795.7,244.2 797.7,244.3 799.6,244.3 801.6,244.4 803.5,244.4 805.5,244.4 807.4,244.5 809.4,244.5 811.4,244.5 813.3,244.6 815.3,244.6 817.2,244.6 819.2,244.7 821.1,244.7 823.1,244.7 825.0,244.7 827.0,244.7 828.9,244.8 830.9,244.8 832.9,244.8 834.8,244.8 836.8,244.8 838.7,244.8 840.7,244.8 842.6,244.9 844.6,244.9 846.5,244.9 848.5,244.9 850.5,244.9 852.4,244.9 854.4,244.9 856.3,244.9 858.3,244.9 860.2,244.9 862.2,244.9 864.1,244.9 866.1,244.9 868.0,244.9 870.0,245.0"/>
+<text class="sm" x="528.8" y="91.2" text-anchor="start">sample mean: variance = the Cramér–Rao bound 1/(N I) (curve)</text>
+<text class="sm" x="597.0" y="145.0" text-anchor="start">sample median: 1.57× the bound (≈ π/2)</text>
+</svg>

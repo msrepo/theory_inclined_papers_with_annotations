@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fisher Information Explorer</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/contrib/auto-render.min.js"></script>
+<style>
+:root{
+  --bg:#fbfaf7; --surface:#ffffff; --ink:#1c1d21; --muted:#5b5f68; --faint:#8a8880; --line:#e2dfd8; --soft:#f2f0ea;
+  --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a; --s4:#eda100; --radius:12px;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#131417; --surface:#1b1d21; --ink:#ebebed; --muted:#a3a6ae; --faint:#85837b; --line:#2e3138; --soft:#23262b;
+    --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#131417; --surface:#1b1d21; --ink:#ebebed; --muted:#a3a6ae; --faint:#85837b; --line:#2e3138; --soft:#23262b;
+  --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500;
+  color-scheme: dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,sans-serif}
+main{max-width:980px;margin:0 auto;padding:36px 16px 80px}
+a{color:var(--s1)}
+h1{font-size:1.9rem;line-height:1.2;margin:0 0 .4rem}
+h2{font-size:1.3rem;margin:2.6rem 0 .5rem;padding-top:.5rem;border-top:1px solid var(--line)}
+.lede{color:var(--muted);margin-bottom:1.2rem}
+.widget{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:14px;margin:1rem 0}
+.controls{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center;margin:.2rem 0 .7rem;font-size:.9rem}
+.controls label{display:flex;align-items:center;gap:6px;color:var(--muted)}
+.controls output{color:var(--ink);font-variant-numeric:tabular-nums;min-width:3.4em;display:inline-block}
+button{font:inherit;font-size:.88rem;color:var(--ink);background:var(--soft);border:1px solid var(--line);border-radius:8px;padding:5px 11px;cursor:pointer}
+button:focus-visible,input:focus-visible,canvas:focus-visible{outline:2px solid var(--s1);outline-offset:2px}
+input[type=range]{accent-color:var(--s1);width:150px}
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;align-items:start}
+@media (max-width:760px){.grid2{grid-template-columns:1fr}}
+canvas{display:block;width:100%;height:auto;border-radius:8px;touch-action:none}
+.cap{font-size:.82rem;color:var(--muted)}
+.stats{display:flex;gap:10px;flex-wrap:wrap;margin:.5rem 0}
+.stats div{background:var(--soft);border-radius:8px;padding:6px 10px;font-variant-numeric:tabular-nums;font-size:.88rem;color:var(--muted)}
+.stats b{font-size:1.02rem;color:var(--ink)}
+.callout{border-left:3px solid var(--s1);background:var(--soft);padding:10px 14px;border-radius:0 8px 8px 0;margin:1rem 0}
+.key{display:flex;flex-wrap:wrap;gap:4px 16px;font-size:.8rem;color:var(--muted);margin:.4rem 0}
+.sw{display:inline-block;width:18px;height:0;border-top:2.5px solid;margin-right:6px;vertical-align:3px}
+.sw.dash{border-top-style:dashed}
+.blk{display:inline-block;width:12px;height:10px;margin-right:5px;vertical-align:-1px;border-radius:2px}
+</style>
+</head>
+<body>
+<main>
+<h1>Fisher information, by hand</h1>
+<p class="lede">Companion to the foundations page <i>The Fisher information matrix: how sharply data pin down parameters</i>. <a href="../index.html">Back to the notes</a>.</p>
+
+<h2>1. How much does one flip tell you?</h2>
+<p>A coin with probability $\theta$ of heads. The left plot is the average log-likelihood of a guess $t$ when the data come from $\theta$: its peak is at $t=\theta$, and its curvature there is the Fisher information $I(\theta)=1/(\theta(1-\theta))$ (dashed parabola). The right plot simulates 4000 experiments of $N$ flips each and histograms the estimate, the fraction of heads, against the normal curve with variance $1/(N I)$.</p>
+<div class="widget" id="w1">
+  <div class="controls">
+    <label>true $\theta$ <input type="range" id="w1t" min="0.01" max="0.99" step="0.01" value="0.2"><output id="w1to"></output></label>
+    <label>flips $N$ <input type="range" id="w1n" min="5" max="500" step="5" value="50"><output id="w1no"></output></label>
+  </div>
+  <div class="grid2">
+    <div><canvas id="w1a" width="460" height="270" aria-label="Average log-likelihood and its curvature"></canvas>
+      <div class="key"><span><span class="sw" style="border-color:var(--s1)"></span>average log-likelihood</span><span><span class="sw dash" style="border-color:var(--s2)"></span>parabola of curvature $I(\theta)$</span></div></div>
+    <div><canvas id="w1b" width="460" height="270" aria-label="Histogram of the estimate"></canvas>
+      <div class="key"><span><span class="blk" style="background:color-mix(in srgb,var(--s1) 40%,transparent)"></span>estimates from 4000 experiments</span><span><span class="sw" style="border-color:var(--s2)"></span>normal, variance $1/(NI)$</span></div></div>
+  </div>
+  <div class="stats" id="w1s"></div>
+</div>
+
+<h2>2. The distance between two coins, three ways</h2>
+<p>Two coins, $\theta_1$ and $\theta_2$. Their distance in $\theta$ and in log-odds $\eta$ depends on the coordinates. The <b>Fisher–Rao distance</b> $2\lvert\arcsin\sqrt{\theta_1}-\arcsin\sqrt{\theta_2}\rvert$ does not. The ticks on the axis are spaced $0.1$ apart in Fisher–Rao distance: they crowd near 0 and 1, where coins are easy to tell apart.</p>
+<div class="widget" id="w2">
+  <div class="controls">
+    <label>$\theta_1$ <input type="range" id="w2a" min="0.005" max="0.995" step="0.005" value="0.5"><output id="w2ao"></output></label>
+    <label>$\theta_2$ <input type="range" id="w2b" min="0.005" max="0.995" step="0.005" value="0.6"><output id="w2bo"></output></label>
+  </div>
+  <canvas id="w2c" width="920" height="130" aria-label="Two coins on the theta axis with Fisher-Rao ticks"></canvas>
+  <div class="stats" id="w2s"></div>
+  <div class="callout">Keep the gap at $0.1$ and slide both coins to the left edge: the Fisher–Rao distance more than doubles, from $0.201$ for $0.5\to0.6$ to $0.476$ for $0.01\to0.11$, and the KL divergence grows with it. The local approximation $\frac12 I\,\Delta\theta^2$ tracks the KL only while the step is small compared with $1/\sqrt{I}$.</div>
+</div>
+
+<h2>3. Gaussians live in a hyperbolic half-plane</h2>
+<p>Each point of the plane is a normal distribution $\mathcal N(\mu,\sigma^2)$. Drag the two orange points. The dashed segment is the straight path; the blue arch is the <b>geodesic</b>, the shortest path in the Fisher–Rao metric $ds^2=(d\mu^2+2\,d\sigma^2)/\sigma^2$. Slide along it to see the distributions in between.</p>
+<div class="widget" id="w3">
+  <div class="controls">
+    <label>position along the geodesic <input type="range" id="w3p" min="0" max="1" step="0.01" value="0.5"><output id="w3po"></output></label>
+    <button id="w3reset">Reset to N(−2, 1) and N(2, 1)</button>
+  </div>
+  <div class="grid2">
+    <div><canvas id="w3a" width="460" height="320" tabindex="0" aria-label="The (mu, sigma) half-plane; drag the two points"></canvas>
+      <div class="cap">Horizontal: mean $\mu$. Vertical: standard deviation $\sigma$. The geodesic rises: widening the distribution first makes the mean cheap to move.</div></div>
+    <div><canvas id="w3b" width="460" height="320" aria-label="Densities of the two end points and the current point"></canvas>
+      <div class="key"><span><span class="sw" style="border-color:var(--s2)"></span>the two end points</span><span><span class="sw" style="border-color:var(--s1)"></span>the point on the geodesic</span></div></div>
+  </div>
+  <div class="stats" id="w3s"></div>
+</div>
+
+<h2>4. Natural gradient against plain gradient</h2>
+<p>Fitting $\mathcal N(\mu,\sigma^2)$ to data with mean $2$ and standard deviation $0.5$. Shading shows the negative log-likelihood. Click anywhere to start all three optimisers there: plain gradient descent in $(\mu,\sigma)$, plain gradient descent in $(\mu,\log\sigma)$, and natural gradient, which rescales the gradient by $F^{-1}$ and so takes the same path in any coordinates.</p>
+<div class="widget" id="w4">
+  <div class="controls">
+    <label>step size <input type="range" id="w4e" min="0.005" max="0.2" step="0.005" value="0.05"><output id="w4eo"></output></label>
+    <button id="w4run">Run again</button>
+  </div>
+  <canvas id="w4c" width="920" height="380" tabindex="0" aria-label="Loss landscape with three optimisation paths; click to set the start"></canvas>
+  <div class="key"><span><span class="sw" style="border-color:var(--s2)"></span>plain, in $(\mu,\sigma)$</span><span><span class="sw dash" style="border-color:var(--s2)"></span>plain, in $(\mu,\log\sigma)$</span><span><span class="sw" style="border-color:var(--s1)"></span>natural gradient</span></div>
+  <div class="stats" id="w4s"></div>
+</div>
+
+<p class="cap" style="margin-top:2rem">Everything runs in your browser. The same computations, with every number quoted in the notes, are in <code>code/fisher.py</code>.</p>
+</main>
+
+<script>
+(function(){
+"use strict";
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const $ = id => document.getElementById(id);
+function setupCanvas(c){
+  const r = window.devicePixelRatio || 1;
+  if(!c._w){ c._w = c.width; c._h = c.height; }
+  if(c._r !== r){ c.width = c._w*r; c.height = c._h*r; c._r = r; }
+  const g = c.getContext("2d"); g.setTransform(r,0,0,r,0,0); return g;
+}
+function niceTicks(a,b,n=5){ const raw=(b-a)/n, p=Math.pow(10,Math.floor(Math.log10(raw))), m=raw/p; const st=(m<1.5?1:m<3?2:m<7?5:10)*p;
+  const out=[]; for(let v=Math.ceil(a/st-1e-9)*st; v<=b+1e-9; v+=st) out.push(+v.toPrecision(6)); return out; }
+function frame(g,W,H,pad,xr,yr,xl,yl,xt,yt){
+  const X=x=>pad.l+(x-xr[0])/(xr[1]-xr[0])*(W-pad.l-pad.r), Y=y=>H-pad.b-(y-yr[0])/(yr[1]-yr[0])*(H-pad.t-pad.b);
+  g.clearRect(0,0,W,H); g.font="11px -apple-system,Segoe UI,sans-serif"; g.lineWidth=0.6; g.strokeStyle=css("--line"); g.fillStyle=css("--muted");
+  (yt||niceTicks(yr[0],yr[1],4)).forEach(y=>{ g.beginPath(); g.moveTo(pad.l,Y(y)); g.lineTo(W-pad.r,Y(y)); g.stroke(); g.textAlign="right"; g.fillText(String(y).replace("-","−"),pad.l-5,Y(y)+4); });
+  (xt||niceTicks(xr[0],xr[1],6)).forEach(x=>{ g.textAlign="center"; g.fillText(String(x).replace("-","−"),X(x),H-pad.b+14); });
+  g.strokeStyle=css("--faint"); g.lineWidth=0.9; g.beginPath(); g.moveTo(pad.l,pad.t); g.lineTo(pad.l,H-pad.b); g.lineTo(W-pad.r,H-pad.b); g.stroke();
+  g.textAlign="center"; g.fillText(xl,(pad.l+W-pad.r)/2,H-4);
+  if(yl){ g.save(); g.translate(12,(pad.t+H-pad.b)/2); g.rotate(-Math.PI/2); g.fillText(yl,0,0); g.restore(); }
+  return {X,Y};
+}
+function curve(g,xs,ys,T,color,dash,width,xr,yr){
+  g.strokeStyle=color; g.lineWidth=width||2; g.setLineDash(dash?[5,3]:[]); g.beginPath(); let on=false;
+  for(let i=0;i<xs.length;i++){ const x=xs[i], y=ys[i];
+    if(!isFinite(y) || (yr && (y<yr[0]-1e-9||y>yr[1]+1e-9)) || (xr && (x<xr[0]-1e-9||x>xr[1]+1e-9))){ on=false; continue; }
+    const px=T.X(x), py=T.Y(y); if(!on){ g.moveTo(px,py); on=true; } else g.lineTo(px,py); }
+  g.stroke(); g.setLineDash([]);
+}
+function dot(g,x,y,color,r){ g.fillStyle=color; g.strokeStyle=css("--surface"); g.lineWidth=1.5; g.beginPath(); g.arc(x,y,r||5,0,7); g.fill(); g.stroke(); }
+function gauss(){ let u=0; while(u===0) u=Math.random(); return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*Math.random()); }
+const f3 = v => Math.abs(v)<1e-3 && v!==0 ? v.toExponential(2) : v.toFixed(3);
+
+/* ---------------- widget 1: a coin ---------------- */
+function w1(){
+  const th=+$("w1t").value, N=+$("w1n").value; $("w1to").textContent=th.toFixed(2); $("w1no").textContent=N;
+  const I=1/(th*(1-th));
+  let c=$("w1a"), g=setupCanvas(c), W=c._w, H=c._h, pad={l:44,r:10,t:10,b:34};
+  const ts=[], ll=[], pb=[]; const ll0=th*Math.log(th)+(1-th)*Math.log(1-th);
+  for(let i=1;i<400;i++){ const t=i/400; ts.push(t); ll.push(th*Math.log(t)+(1-th)*Math.log(1-t)-ll0); pb.push(-0.5*I*(t-th)**2); }
+  let T=frame(g,W,H,pad,[0,1],[-1.2,0.05],"guess t","log-likelihood minus its peak",[0,0.25,0.5,0.75,1],[-1,-0.5,0]);
+  curve(g,ts,ll,T,css("--s1"),false,2.2,null,[-1.2,0.05]); curve(g,ts,pb,T,css("--s2"),true,1.8,null,[-1.2,0.05]);
+  dot(g,T.X(th),T.Y(0),css("--s1"),4);
+  // simulate
+  const R=4000, est=new Float64Array(R); for(let r=0;r<R;r++){ let k=0; for(let i=0;i<N;i++) if(Math.random()<th) k++; est[r]=k/N; }
+  let m=0; for(const e of est) m+=e; m/=R; let v=0; for(const e of est) v+=(e-m)**2; v/=R;
+  const sd=1/Math.sqrt(N*I), lo=Math.max(0,th-4.5*sd), hi=Math.min(1,th+4.5*sd);
+  // the estimate lives on the lattice k/N: one bin per group of lattice points, so no bin is half empty
+  const kmin=Math.floor(lo*N), kmax=Math.ceil(hi*N), gsz=Math.max(1,Math.ceil((kmax-kmin+1)/50)), nb=Math.ceil((kmax-kmin+1)/gsz);
+  const h=new Float64Array(nb); for(const e of est){ const b=Math.floor((Math.round(e*N)-kmin)/gsz); if(b>=0&&b<nb) h[b]++; }
+  const bw=gsz/N, dens=Array.from(h,x=>x/(R*bw)); const peak=1/(sd*Math.sqrt(2*Math.PI));
+  c=$("w1b"); g=setupCanvas(c); W=c._w; H=c._h;
+  const ymax=Math.max(peak,...dens)*1.1;
+  T=frame(g,W,H,pad,[lo,hi],[0,ymax],"fraction of heads","density");
+  g.fillStyle=css("--s1"); g.globalAlpha=0.35; for(let b=0;b<nb;b++){ const k0=kmin+b*gsz; const x0=T.X(Math.max(lo,(k0-0.5)/N)), x1=T.X(Math.min(hi,(k0+gsz-0.5)/N)); if(x1<=x0) continue; g.fillRect(x0+0.5,T.Y(dens[b]),Math.max(x1-x0-1,0.5),T.Y(0)-T.Y(dens[b])); } g.globalAlpha=1;
+  const xs=[],ys=[]; for(let i=0;i<=300;i++){ const x=lo+(hi-lo)*i/300; xs.push(x); ys.push(peak*Math.exp(-((x-th)**2)/(2*sd*sd))); }
+  curve(g,xs,ys,T,css("--s2"),false,2);
+  $("w1s").innerHTML=`<div>Fisher information $I(\\theta)$ <b>${I.toFixed(3)}</b></div><div>predicted spread $1/\\sqrt{NI}$ <b>${sd.toFixed(4)}</b></div>`+
+    `<div>simulated spread <b>${Math.sqrt(v).toFixed(4)}</b></div><div>$N\\,\\mathrm{Var}\\cdot I$ <b>${(N*v*I).toFixed(3)}</b></div>`;
+  if(window.renderMathInElement) renderMathInElement($("w1s"),{delimiters:[{left:"$",right:"$",display:false}]});
+}
+["w1t","w1n"].forEach(id=>$(id).addEventListener("input",w1));
+
+/* ---------------- widget 2: two coins ---------------- */
+const fr = (a,b) => 2*Math.abs(Math.asin(Math.sqrt(a))-Math.asin(Math.sqrt(b)));
+const klb = (a,b) => a*Math.log(a/b)+(1-a)*Math.log((1-a)/(1-b));
+const logit = t => Math.log(t/(1-t));
+function w2(){
+  const a=+$("w2a").value, b=+$("w2b").value; $("w2ao").textContent=a.toFixed(3); $("w2bo").textContent=b.toFixed(3);
+  const c=$("w2c"), g=setupCanvas(c), W=c._w, H=c._h; g.clearRect(0,0,W,H);
+  const X=t=>30+t*(W-60), y=60;
+  g.strokeStyle=css("--faint"); g.lineWidth=1; g.beginPath(); g.moveTo(X(0),y); g.lineTo(X(1),y); g.stroke();
+  const total=Math.PI; // FR length of the whole interval [0,1]
+  g.strokeStyle=css("--line"); g.fillStyle=css("--muted"); g.font="10px -apple-system,Segoe UI,sans-serif"; g.textAlign="center";
+  for(let k=0;k*0.1<=total+1e-9;k++){ const t=Math.sin(k*0.1/2)**2; g.strokeStyle=css("--faint"); g.beginPath(); g.moveTo(X(t),y-7); g.lineTo(X(t),y+7); g.stroke(); }
+  [0,0.25,0.5,0.75,1].forEach(t=>g.fillText(String(t),X(t),y+26));
+  dot(g,X(a),y,css("--s2"),6); dot(g,X(b),y,css("--s1"),6);
+  g.fillStyle=css("--muted"); g.textAlign="left"; g.fillText("ticks: every 0.1 of Fisher–Rao distance",30,20);
+  const I=1/(a*(1-a));
+  $("w2s").innerHTML=`<div>|Δθ| <b>${Math.abs(a-b).toFixed(3)}</b></div><div>|Δη| (log-odds) <b>${Math.abs(logit(a)-logit(b)).toFixed(3)}</b></div>`+
+    `<div>Fisher–Rao distance <b>${fr(a,b).toFixed(3)}</b></div><div>KL(θ₁‖θ₂) <b>${f3(klb(a,b))}</b></div><div>KL(θ₂‖θ₁) <b>${f3(klb(b,a))}</b></div>`+
+    `<div>½ I(θ₁) Δθ² <b>${f3(0.5*I*(a-b)**2)}</b></div>`;
+}
+["w2a","w2b"].forEach(id=>$(id).addEventListener("input",w2));
+
+/* ---------------- widget 3: Gaussian half-plane ---------------- */
+const W3={p:[[-2,1],[2,1]], drag:-1};
+const frG=(m1,s1,m2,s2)=>Math.SQRT2*Math.acosh(1+((m1-m2)**2/2+(s1-s2)**2)/(2*s1*s2));
+const klG=(m1,s1,m2,s2)=>Math.log(s2/s1)+(s1*s1+(m1-m2)**2)/(2*s2*s2)-0.5;
+function geo(s){ // point at fraction s (uniform in Fisher-Rao distance) along the geodesic from p0 to p1
+  const [m1,s1]=W3.p[0], [m2,s2]=W3.p[1]; const u1=m1/Math.SQRT2, u2=m2/Math.SQRT2;
+  if(Math.abs(u1-u2)<1e-9){ const ls=Math.log(s1)+s*(Math.log(s2)-Math.log(s1)); return [m1,Math.exp(ls)]; }
+  const c=((u2*u2+s2*s2)-(u1*u1+s1*s1))/(2*(u2-u1)), r=Math.hypot(u1-c,s1);
+  const p1=Math.atan2(s1,u1-c), p2=Math.atan2(s2,u2-c), L1=Math.log(Math.tan(p1/2)), L2=Math.log(Math.tan(p2/2));
+  const ph=2*Math.atan(Math.exp(L1+s*(L2-L1))); return [Math.SQRT2*(c+r*Math.cos(ph)), r*Math.sin(ph)];
+}
+const XR3=[-4.5,4.5], YR3=[0,3.2], PAD3={l:44,r:10,t:10,b:34};
+function w3(){
+  const s=+$("w3p").value; $("w3po").textContent=s.toFixed(2);
+  let c=$("w3a"), g=setupCanvas(c), W=c._w, H=c._h;
+  let T=frame(g,W,H,PAD3,XR3,YR3,"mean μ","standard deviation σ",[-4,-2,0,2,4],[0,1,2,3]); W3.T=T;
+  const [m1,s1]=W3.p[0], [m2,s2]=W3.p[1];
+  curve(g,[m1,m2],[s1,s2],T,css("--faint"),true,1.6);
+  const gx=[],gy=[]; for(let i=0;i<=300;i++){ const q=geo(i/300); gx.push(q[0]); gy.push(q[1]); }
+  curve(g,gx,gy,T,css("--s1"),false,2.4,XR3,YR3);
+  W3.p.forEach(q=>dot(g,T.X(q[0]),T.Y(q[1]),css("--s2"),7));
+  const cur=geo(s); dot(g,T.X(cur[0]),T.Y(Math.min(cur[1],YR3[1])),css("--s1"),5);
+  c=$("w3b"); g=setupCanvas(c); W=c._w; H=c._h;
+  const pdf=(x,m,sd)=>Math.exp(-((x-m)**2)/(2*sd*sd))/(sd*Math.sqrt(2*Math.PI));
+  const ymax=1.1*Math.max(pdf(0,0,s1),pdf(0,0,s2),pdf(0,0,cur[1]));
+  const T2=frame(g,W,H,PAD3,[-7,7],[0,ymax],"x","density",[-6,-4,-2,0,2,4,6]);
+  const xs=[]; for(let i=0;i<=400;i++) xs.push(-7+14*i/400);
+  curve(g,xs,xs.map(x=>pdf(x,m1,s1)),T2,css("--s2"),false,2); curve(g,xs,xs.map(x=>pdf(x,m2,s2)),T2,css("--s2"),false,2);
+  curve(g,xs,xs.map(x=>pdf(x,cur[0],cur[1])),T2,css("--s1"),false,2.4);
+  let straight=0; const n=2000; for(let i=0;i<n;i++){ const a=i/n, b=(i+1)/n; const mA=m1+a*(m2-m1), mB=m1+b*(m2-m1), sA=s1+a*(s2-s1), sB=s1+b*(s2-s1); straight+=Math.sqrt((mB-mA)**2+2*(sB-sA)**2)/((sA+sB)/2); }
+  $("w3s").innerHTML=`<div>Fisher–Rao distance <b>${frG(m1,s1,m2,s2).toFixed(3)}</b></div><div>length of the straight path <b>${straight.toFixed(3)}</b></div>`+
+    `<div>KL(1‖2) <b>${klG(m1,s1,m2,s2).toFixed(3)}</b></div><div>KL(2‖1) <b>${klG(m2,s2,m1,s1).toFixed(3)}</b></div>`+
+    `<div>optimal transport W₂ <b>${Math.hypot(m1-m2,s1-s2).toFixed(3)}</b></div><div>current point <b>N(${cur[0].toFixed(2)}, ${cur[1].toFixed(2)}²)</b></div>`;
+}
+function w3pos(e){ const c=$("w3a"), r=c.getBoundingClientRect(); const px=(e.clientX-r.left)*c._w/r.width, py=(e.clientY-r.top)*c._h/r.height;
+  const m=XR3[0]+(px-PAD3.l)/(c._w-PAD3.l-PAD3.r)*(XR3[1]-XR3[0]); const s=YR3[0]+(c._h-PAD3.b-py)/(c._h-PAD3.t-PAD3.b)*(YR3[1]-YR3[0]); return {px,py,m,s}; }
+$("w3a").addEventListener("pointerdown",e=>{ const q=w3pos(e); let best=-1, bd=400; W3.p.forEach((p,i)=>{ const d=(W3.T.X(p[0])-q.px)**2+(W3.T.Y(p[1])-q.py)**2; if(d<bd){bd=d;best=i;} }); W3.drag=best; if(best>=0) $("w3a").setPointerCapture(e.pointerId); });
+$("w3a").addEventListener("pointermove",e=>{ if(W3.drag<0) return; const q=w3pos(e); W3.p[W3.drag]=[Math.max(-4.2,Math.min(4.2,q.m)),Math.max(0.15,Math.min(3.0,q.s))]; w3(); });
+$("w3a").addEventListener("pointerup",()=>{ W3.drag=-1; });
+$("w3p").addEventListener("input",w3);
+$("w3reset").addEventListener("click",()=>{ W3.p=[[-2,1],[2,1]]; w3(); });
+
+/* ---------------- widget 4: natural gradient ---------------- */
+const MH=2.0, SH=0.5, XR4=[-2,4], YR4=[0.1,3.6], PAD4={l:44,r:12,t:10,b:34};
+const W4={start:[-1,3], paths:null, k:0};
+function nllGrad(m,s){ return [(m-MH)/(s*s), 1/s-(SH*SH+(MH-m)**2)/(s*s*s)]; }
+function w4paths(){
+  const eta=+$("w4e").value; $("w4eo").textContent=eta.toFixed(3);
+  const K=20000, P=[[],[],[]], hit=[null,null,null];
+  let a=W4.start.slice(), b=[W4.start[0],Math.log(W4.start[1])], c=W4.start.slice();
+  for(let k=0;k<=K;k++){
+    P[0].push(a.slice()); P[1].push([b[0],Math.exp(b[1])]); P[2].push(c.slice());
+    [[a[0],a[1]],[b[0],Math.exp(b[1])],[c[0],c[1]]].forEach((q,i)=>{ if(hit[i]===null && Math.hypot(q[0]-MH,q[1]-SH)<0.01) hit[i]=k; });
+    let g=nllGrad(a[0],a[1]); a=[a[0]-eta*g[0], Math.max(0.02,a[1]-eta*g[1])];
+    const sb=Math.exp(b[1]); g=nllGrad(b[0],sb); b=[b[0]-eta*g[0], b[1]-eta*g[1]*sb];
+    g=nllGrad(c[0],c[1]); c=[c[0]-eta*c[1]*c[1]*g[0], Math.max(0.02,c[1]-eta*0.5*c[1]*c[1]*g[1])];
+    if(!isFinite(a[0]+a[1]+b[0]+b[1]+c[0]+c[1])) break;
+  }
+  W4.paths=P; W4.hit=hit; W4.k=0;
+}
+function w4draw(){
+  const c=$("w4c"), g=setupCanvas(c), W=c._w, H=c._h;
+  const T=frame(g,W,H,PAD4,XR4,YR4,"mean μ","standard deviation σ",[-2,-1,0,1,2,3,4],[0.5,1,1.5,2,2.5,3,3.5]);
+  if(!W4.bg){ W4.bg=[]; for(let i=0;i<90;i++) for(let j=0;j<50;j++){ const m=XR4[0]+(i+0.5)*(XR4[1]-XR4[0])/90, s=YR4[0]+(j+0.5)*(YR4[1]-YR4[0])/50;
+      const v=Math.log(s)+(SH*SH+(MH-m)**2)/(2*s*s)-(Math.log(SH)+0.5); W4.bg.push([m,s,v]); } }
+  g.fillStyle=css("--s1");
+  for(const [m,s,v] of W4.bg){ const a=0.38*Math.exp(-v/1.2); if(a<0.01) continue; g.globalAlpha=a;
+    g.fillRect(T.X(m-(XR4[1]-XR4[0])/180),T.Y(s+(YR4[1]-YR4[0])/100),(W-PAD4.l-PAD4.r)/90+0.5,(H-PAD4.t-PAD4.b)/50+0.5); }
+  g.globalAlpha=1;
+  const cols=[[css("--s2"),false],[css("--s2"),true],[css("--s1"),false]];
+  W4.paths.forEach((p,i)=>{ const q=p.slice(0,Math.min(p.length,W4.k+1)); curve(g,q.map(v=>v[0]),q.map(v=>v[1]),T,cols[i][0],cols[i][1],2.2,XR4,YR4); });
+  dot(g,T.X(W4.start[0]),T.Y(W4.start[1]),css("--faint"),5); dot(g,T.X(MH),T.Y(SH),css("--s3"),5);
+  const lab=["plain (μ, σ)","plain (μ, log σ)","natural"];
+  $("w4s").innerHTML=`<div>step <b>${Math.min(W4.k,W4.paths[0].length-1)}</b></div>`+W4.hit.map((h,i)=>`<div>${lab[i]}: within 0.01 after <b>${h===null?"> 20000":h}</b> steps</div>`).join("");
+}
+function w4loop(){ if(W4.k < 20000){ W4.k += Math.max(1, Math.round(W4.k*0.03)); w4draw(); } requestAnimationFrame(w4loop); }
+$("w4c").addEventListener("click",e=>{ const c=$("w4c"), r=c.getBoundingClientRect(); const px=(e.clientX-r.left)*c._w/r.width, py=(e.clientY-r.top)*c._h/r.height;
+  const m=XR4[0]+(px-PAD4.l)/(c._w-PAD4.l-PAD4.r)*(XR4[1]-XR4[0]); const s=YR4[0]+(c._h-PAD4.b-py)/(c._h-PAD4.t-PAD4.b)*(YR4[1]-YR4[0]);
+  W4.start=[Math.max(XR4[0],Math.min(XR4[1],m)), Math.max(0.15,Math.min(YR4[1],s))]; w4paths(); });
+$("w4e").addEventListener("input",w4paths);
+$("w4run").addEventListener("click",()=>{ W4.k=0; });
+
+function start(){
+  if(window.renderMathInElement) renderMathInElement(document.body,{delimiters:[{left:"$$",right:"$$",display:true},{left:"$",right:"$",display:false}]});
+  w1(); w2(); w3(); w4paths(); w4draw(); requestAnimationFrame(w4loop);
+}
+window.addEventListener("load",start);
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change",()=>{ w1(); w2(); w3(); W4.bg=null; w4draw(); });
+})();
+</script>
+</body>
+</html>

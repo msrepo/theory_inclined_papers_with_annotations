@@ -1,0 +1,71 @@
+<svg viewBox="0 0 920 250" xmlns="http://www.w3.org/2000/svg" role="img">
+<title>Equal steps in Fisher–Rao distance</title>
+<desc>Eleven coins spaced equally in Fisher–Rao distance, from θ = 0.01 to 0.99. On the θ axis (top) they bunch up near 0 and 1, where a small change in θ is easy to detect; on the log-odds axis (bottom) they bunch up near 0 instead. Neither axis is right: the spacing is a property of the distributions, and each parameterisation stretches it differently.</desc>
+<style>
+  text{font-family:ui-sans-serif,-apple-system,"Segoe UI",sans-serif;font-weight:400}
+  .lab{font-size:11px;fill:#57564f} .hd{font-size:13px;font-weight:500;fill:#1a1a19}
+  .sm{font-size:10.5px;fill:#57564f} .v{font-size:11px;fill:#1a1a19}
+  .ax{stroke:#8a8880;stroke-width:0.9;fill:none} .gd{stroke:#e2e1da;stroke-width:0.6;fill:none}
+  .s1{stroke:#2a78d6} .s2{stroke:#eb6834} .s3{stroke:#1baf7a} .s4{stroke:#eda100} .s0{stroke:#8a8880}
+  .f1{fill:#2a78d6} .f2{fill:#eb6834} .f3{fill:#1baf7a} .f4{fill:#eda100} .f0{fill:#8a8880}
+  .ln{stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+  .thin{stroke-width:1;fill:none}
+  .dash{stroke-width:1.4;fill:none;stroke-dasharray:5 3}
+  .bar{opacity:.35} .pt{opacity:.35}
+  .ring{stroke:#fdfdfc;stroke-width:1.5}
+  @media (prefers-color-scheme: dark){
+    .lab,.sm{fill:#b6b4ab} .hd,.v{fill:#eceae3} .ax{stroke:#85837b} .gd{stroke:#33312e}
+    .s1{stroke:#3987e5} .s2{stroke:#d95926} .s3{stroke:#199e70} .s4{stroke:#c98500} .s0{stroke:#85837b}
+    .f1{fill:#3987e5} .f2{fill:#d95926} .f3{fill:#199e70} .f4{fill:#c98500} .f0{fill:#85837b}
+    .ring{stroke:#161615}
+  }
+</style>
+<text class="hd" x="60" y="30">Ten equal Fisher–Rao steps from θ = 0.01 to θ = 0.99</text>
+<line class="ax" x1="60.0" y1="75.0" x2="860.0" y2="75.0"/>
+<circle class="f1 ring" cx="68.0" cy="75.0" r="5"/>
+<text class="sm" x="68.0" y="97.0" text-anchor="middle">0.01</text>
+<circle class="f1 ring" cx="104.2" cy="75.0" r="5"/>
+<text class="sm" x="104.2" y="97.0" text-anchor="middle">0.06</text>
+<circle class="f1 ring" cx="166.9" cy="75.0" r="5"/>
+<text class="sm" x="166.9" y="97.0" text-anchor="middle">0.13</text>
+<circle class="f1 ring" cx="251.5" cy="75.0" r="5"/>
+<text class="sm" x="251.5" y="97.0" text-anchor="middle">0.24</text>
+<circle class="f1 ring" cx="351.7" cy="75.0" r="5"/>
+<text class="sm" x="351.7" y="97.0" text-anchor="middle">0.36</text>
+<circle class="f1 ring" cx="460.0" cy="75.0" r="5"/>
+<text class="sm" x="460.0" y="97.0" text-anchor="middle">0.50</text>
+<circle class="f1 ring" cx="568.3" cy="75.0" r="5"/>
+<text class="sm" x="568.3" y="97.0" text-anchor="middle">0.64</text>
+<circle class="f1 ring" cx="668.5" cy="75.0" r="5"/>
+<text class="sm" x="668.5" y="97.0" text-anchor="middle">0.76</text>
+<circle class="f1 ring" cx="753.1" cy="75.0" r="5"/>
+<text class="sm" x="753.1" y="97.0" text-anchor="middle">0.87</text>
+<circle class="f1 ring" cx="815.8" cy="75.0" r="5"/>
+<text class="sm" x="815.8" y="97.0" text-anchor="middle">0.94</text>
+<circle class="f1 ring" cx="852.0" cy="75.0" r="5"/>
+<text class="sm" x="852.0" y="97.0" text-anchor="middle">0.99</text>
+<text class="hd" x="60" y="140">The same eleven coins on the log-odds axis η = log(θ/(1 − θ))</text>
+<line class="ax" x1="60.0" y1="180.0" x2="860.0" y2="180.0"/>
+<circle class="f2 ring" cx="92.4" cy="180.0" r="5"/>
+<text class="sm" x="92.4" y="202.0" text-anchor="middle">−4.6</text>
+<circle class="f2 ring" cx="232.8" cy="180.0" r="5"/>
+<text class="sm" x="232.8" y="202.0" text-anchor="middle">−2.8</text>
+<circle class="f2 ring" cx="310.5" cy="180.0" r="5"/>
+<text class="sm" x="310.5" y="202.0" text-anchor="middle">−1.9</text>
+<circle class="f2 ring" cx="367.5" cy="180.0" r="5"/>
+<text class="sm" x="367.5" y="202.0" text-anchor="middle">−1.2</text>
+<circle class="f2 ring" cx="415.6" cy="180.0" r="5"/>
+<text class="sm" x="415.6" y="202.0" text-anchor="middle">−0.6</text>
+<circle class="f2 ring" cx="460.0" cy="180.0" r="5"/>
+<text class="sm" x="460.0" y="202.0" text-anchor="middle">0</text>
+<circle class="f2 ring" cx="504.4" cy="180.0" r="5"/>
+<text class="sm" x="504.4" y="202.0" text-anchor="middle">0.6</text>
+<circle class="f2 ring" cx="552.5" cy="180.0" r="5"/>
+<text class="sm" x="552.5" y="202.0" text-anchor="middle">1.2</text>
+<circle class="f2 ring" cx="609.5" cy="180.0" r="5"/>
+<text class="sm" x="609.5" y="202.0" text-anchor="middle">1.9</text>
+<circle class="f2 ring" cx="687.2" cy="180.0" r="5"/>
+<text class="sm" x="687.2" y="202.0" text-anchor="middle">2.8</text>
+<circle class="f2 ring" cx="827.6" cy="180.0" r="5"/>
+<text class="sm" x="827.6" y="202.0" text-anchor="middle">4.6</text>
+</svg>

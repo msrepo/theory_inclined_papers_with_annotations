@@ -24,6 +24,7 @@ status: read
   language-model sources.
 - **[Claßen 2026 — TE robustness](../2026-classen-te-robustness/index.html)** — on how
   fragile rankings from measures of this kind are under resampling.
+- **[Achille 2019 — task reachability](../2019-achille-task-reachability/index.html#transferability-scores-use-only-features-open-weight-models-come-without-data)** — a dynamics-based view of transfer. PAS is static in that paper's sense, and needs even less: no target labels, where the paper's static distance also needs the source data. The linked section places PAS and the other scores against the paper's two factors.
 - **[Runnable code](https://github.com/msrepo/theory_inclined_papers_with_annotations/blob/main/papers/2026-diniz-pas/code/pas.py)** —
   Eq. 1 as an argmax, the range and its non-zero null, the exact PAS/Oracle relationship, the
   blind spot that relationship implies, and the class-count dependence. `make verify` runs it.

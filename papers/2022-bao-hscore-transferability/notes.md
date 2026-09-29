@@ -38,6 +38,7 @@ status: read
   under nothing but a change of random seed.
 - **[Shao 2022 — SFDA](../2022-shao-sfda/index.html)** — the measure that imitates
   fine-tuning dynamics rather than scoring a static representation.
+- **[Achille 2019 — task reachability](../2019-achille-task-reachability/index.html#transferability-scores-use-only-features-open-weight-models-come-without-data)** — a dynamics-based view of the same question. The H-score is static in that paper's sense: a fit of frozen features, with nothing about whether fine-tuning can reach a good solution from the source weights. The linked section places the H-score and the other scores against the paper's two factors.
 - **[Runnable code](https://github.com/msrepo/theory_inclined_papers_with_annotations/blob/main/papers/2022-bao-hscore-transferability/code/hscore.py)** —
   Equations 2, 3 and 4 checked to machine precision on a discrete joint where $\tilde B$ can
   actually be built, plus the invariance, redundancy and locality questions, the six equivalent
