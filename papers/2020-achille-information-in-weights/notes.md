@@ -29,6 +29,10 @@ status: read
   for Proposition 2.3 and for the Gibbs form of the optimum below.
 - **[Expectation–Maximization](../expectation-maximization/index.html)**: the ELBO, which Definition 2.1
   generalises.
+- **[Langevin dynamics](../langevin-dynamics/index.html)**: background for Proposition 2.8 and the SGD-temperature
+  picture, built up with simulations: the Gibbs law $e^{-U/D}$, the free energy of a well
+  ($U+\frac D2\log\det H$), Eyring–Kramers escape times, and why noise shaped like the Hessian gives a round
+  stationary cloud instead of $DH^{-1}$.
 - The papers this one builds on: Achille & Soatto, *Emergence of invariance and disentanglement in deep
   representations*, JMLR 2018 ([arXiv:1706.01350](https://arxiv.org/abs/1706.01350)); Hinton & van Camp,
   *Keeping neural networks simple by minimizing the description length of the weights*, COLT 1993; McAllester,

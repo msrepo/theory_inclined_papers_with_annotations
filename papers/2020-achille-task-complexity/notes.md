@@ -32,6 +32,9 @@ status: read
   [below](#the-optimum-over-all-q-is-a-free-energy).
 - **[Inequalities and concentration](../inequalities-and-concentration/index.html)**: the KL chain rule and the
   Donsker–Varadhan formula, both used here.
+- **[Langevin dynamics](../langevin-dynamics/index.html)**: background for Section 6.2 (SGD as a local learning
+  algorithm, Eq 6): the Gibbs law $e^{-U/D}$ that makes the temperature the price of information, Kramers'
+  law for escaping a basin, and the path weight behind the SGD path integral.
 - **Companion papers in this collection**: [Dynamics and Reachability of Learning Tasks](../2019-achille-task-reachability/index.html)
   (the source of Eq 6, the SGD path integral) and [Where is the Information in a Deep Neural Network?](../2020-achille-information-in-weights/index.html)
   (the same Lagrangian applied to the weights and activations of one network).

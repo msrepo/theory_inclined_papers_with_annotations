@@ -144,6 +144,24 @@ canvas{display:block;width:100%;height:auto;border-radius:8px}
   <div class="stats" id="w4stats"></div>
 </div>
 
+<h2 id="sf">5. The structure function and its price, eqs. (2)–(3)</h2>
+<p>Linear regression with $N=100$ samples and 50 weight directions: 5 strong input directions carry the true weights, 45 weak ones carry only label noise. For each price $\beta$ the best "posterior" cloud $Q$ is known exactly, so every point below is exact. The blue curve is the <b>structure function</b> $S(t)$ of eq. (2): the best training loss with $t$ nats stored in the weights. Eq. (3) prices each nat at $\beta$: the optimum is where a line of slope $-\beta$ (dashed) touches $S$. Orange is the test loss of the same cloud.</p>
+<div class="widget" id="w5">
+  <div class="controls">
+    <label>price per nat $\beta$ <input type="range" id="w5b" min="-5" max="1" step="0.01" value="-2.315"><output id="w5bo"></output></label>
+    <span class="seg" id="w5lab"><button data-v="real" aria-pressed="true">Real labels</button><button data-v="rand" aria-pressed="false">Random labels</button></span>
+    <label><input type="checkbox" id="w5log"> log scale for $t$</label>
+  </div>
+  <div class="grid2">
+    <div><canvas id="w5c" width="460" height="300" aria-label="Structure function and test loss against nats"></canvas>
+      <div class="key"><span><span class="sw" style="border-color:var(--s1)"></span>train, $S(t)$</span><span><span class="sw" style="border-color:var(--s2)"></span>test</span><span><span class="sw dash" style="border-color:var(--faint)"></span>slope $-\beta$ (linear axis only)</span></div></div>
+    <div><canvas id="w5d" width="460" height="300" aria-label="Nats per weight direction"></canvas>
+      <div class="cap">Nats per weight direction at this $\beta$, strong directions on the left. Blue: the 5 that carry the signal.</div></div>
+  </div>
+  <div class="stats" id="w5stats"></div>
+  <div class="callout">Drag $\beta$ from right to left. At a high price the model stores almost nothing and both losses are large. Lowering it buys the signal directions first: the training and test losses fall together (structure). Near $\beta\approx0.005$ the test loss bottoms out at about 25 nats. Below that the extra nats go to the weak directions, fitting label noise: training loss keeps falling, test loss rises (nuisance). With random labels there is nothing to buy except the fact that the weights should be near zero.</div>
+</div>
+
 <p class="cap" style="margin-top:2rem">All computations run in your browser: Euler–Maruyama for the particles (with the exact Ornstein–Uhlenbeck step across the valley in widget 2), trapezoidal quadrature for the first-passage times. The same numbers are printed by <code>code/reachability.py</code>.</p>
 </main>
 
@@ -437,14 +455,61 @@ function w4draw(){
 }
 ["w4k","w4l","w4c"].forEach(id=>$(id).addEventListener("input",w4draw));
 
+/* ---------------- widget 5: structure function ---------------- */
+const SFJ={d:50,N:100,sig2:1,lam2:1,k:5};
+function geom(a,b,n){ const out=[]; for(let i=0;i<n;i++) out.push(a*Math.pow(b/a,i/(n-1))); return out; }
+function sfModel(rand){
+  const {d,N,sig2,k}=SFJ; const s=geom(10,1,k).concat(geom(1e-2,1e-4,d-k)); const w=s.map((_,j)=>j<k?1:0);
+  if(rand){ const sy2=s.reduce((a,v,j)=>a+v*w[j]*w[j],0)+sig2; const b=s.map((v,j)=>Math.SQRT2*Math.cos(1.3*j+0.4)*Math.sqrt(sy2*v/N));
+    return {s,b,w:s.map(()=>0),R0:sy2*(N-d)/N,noise:sy2}; }
+  const b=s.map((v,j)=>v*w[j]+Math.SQRT2*Math.cos(2.3999632*j+0.7)*Math.sqrt(sig2*v/N));
+  return {s,b,w,R0:sig2*(N-d)/N,noise:sig2};
+}
+function sfPost(beta,M){
+  const lam2=SFJ.lam2; let kl=0, train=0.5*M.R0, test=0.5*M.noise; const klj=[];
+  for(let j=0;j<M.s.length;j++){ const s=M.s[j], b=M.b[j], prec=1/lam2+s/beta, v=1/prec, m=(b/beta)/prec;
+    const kj=0.5*((v+m*m)/lam2-1-Math.log(v/lam2)); klj.push(kj); kl+=kj;
+    train+=0.5*b*b/s-b*m+0.5*s*(m*m+v); test+=0.5*s*((M.w[j]-m)**2+v); }
+  return {kl,train,test,klj};
+}
+const W5={lab:"real"};
+function w5curve(){ const M=sfModel(W5.lab==="rand"); const pts=[]; for(let i=0;i<=500;i++){ const lb=-5+6*i/500; pts.push(sfPost(Math.pow(10,lb),M)); } return {M,pts}; }
+function w5draw(){
+  const lb=+$("w5b").value, beta=Math.pow(10,lb); $("w5bo").textContent=beta<0.01?beta.toExponential(1):beta.toFixed(3);
+  const {M,pts}=W5.cache||(W5.cache=w5curve()); const cur=sfPost(beta,M); const logx=$("w5log").checked;
+  const c=$("w5c"), g=setupCanvas(c), W=c._w, H=c._h, pad={l:44,r:10,t:10,b:34};
+  const real=W5.lab==="real"; const tmax= logx? (real?1000:10000) : (real?80:200); const ymax= real? 1.6 : 25;
+  const tx = t => logx? Math.log10(Math.max(t,0.1)) : t;
+  const xr = logx? [-1, Math.log10(tmax)] : [0,tmax];
+  const xt = logx? (real?[-1,0,1,2,3]:[-1,0,1,2,3,4]) : niceTicks(0,tmax);
+  const T=frame(g,W,H,pad,xr,[0,ymax],xt,niceTicks(0,ymax),logx?"nats in the weights, t (log₁₀)":"nats in the weights, t","loss");
+  const xs=pts.map(p=>tx(p.kl));
+  const out = (p,y) => y>ymax || tx(p.kl)>xr[1];
+  curve(g,xs,pts.map(p=>out(p,p.train)?NaN:p.train),T,css("--s1"),false,2.2);
+  curve(g,xs,pts.map(p=>out(p,p.test)?NaN:p.test),T,css("--s2"),false,2.2);
+  if(!logx){ const y0=cur.train+beta*cur.kl; curve(g,[0,tmax],[y0,y0-beta*tmax],T,css("--faint"),true,1.4); }
+  for(const [y,col] of [[cur.train,"--s1"],[cur.test,"--s2"]]){ if(y<=ymax && tx(cur.kl)<=xr[1]){ g.fillStyle=css(col); g.strokeStyle=css("--surface"); g.lineWidth=1.5; g.beginPath(); g.arc(T.X(tx(cur.kl)),T.Y(y),5,0,7); g.fill(); g.stroke(); } }
+  const d=$("w5d"), g2=setupCanvas(d), W2=d._w, H2=d._h;
+  const kmax=Math.max(1,Math.ceil(Math.max(...cur.klj)));
+  const T2=frame(g2,W2,H2,pad,[0,50],[0,Math.min(kmax,60)],[0,10,20,30,40,50],niceTicks(0,Math.min(kmax,60)),"weight direction (strong → weak)","nats");
+  cur.klj.forEach((v,j)=>{ g2.fillStyle=css(j<SFJ.k?"--s1":"--faint"); const y=Math.min(v,Math.min(kmax,60)); g2.fillRect(T2.X(j)+0.5,T2.Y(y),T2.X(1)-T2.X(0)-1,T2.Y(0)-T2.Y(y)); });
+  const best=pts.reduce((a,p)=>p.test<a.test?p:a,pts[0]);
+  const sig=cur.klj.slice(0,SFJ.k).reduce((a,v)=>a+v,0);
+  $("w5stats").innerHTML=`<div>nats stored <b>${cur.kl.toFixed(1)}</b></div><div>train <b>${cur.train.toFixed(3)}</b></div><div>test <b>${cur.test.toFixed(3)}</b></div>`+
+    `<div>nats in the signal directions <b>${sig.toFixed(1)}</b>, elsewhere <b>${(cur.kl-sig).toFixed(1)}</b></div>`+
+    `<div>best test over β: <b>${best.test.toFixed(3)}</b> at <b>${best.kl.toFixed(1)}</b> nats</div>`;
+}
+$("w5b").addEventListener("input",w5draw); $("w5log").addEventListener("change",w5draw);
+$("w5lab").querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>{ W5.lab=b.dataset.v; W5.cache=null; $("w5lab").querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b)); w5draw(); }));
+
 /* ---------------- start ---------------- */
 function start(){
-  buildTables(); w1reset(); w2reset(); w3draw(); w4draw();
+  buildTables(); w1reset(); w2reset(); w3draw(); w4draw(); w5draw();
   requestAnimationFrame(w1loop); requestAnimationFrame(w2loop);
   if(window.renderMathInElement) renderMathInElement(document.body,{delimiters:[{left:"$$",right:"$$",display:true},{left:"$",right:"$",display:false}]});
 }
 window.addEventListener("load",start);
-matchMedia("(prefers-color-scheme: dark)").addEventListener("change",()=>{ w3draw(); w4draw(); });
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change",()=>{ w3draw(); w4draw(); w5draw(); });
 })();
 </script>
 </body>

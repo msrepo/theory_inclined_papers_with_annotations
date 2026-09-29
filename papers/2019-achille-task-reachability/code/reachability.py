@@ -38,7 +38,16 @@ Checked here, in the order the notes use them:
      (centre) without any complexity barrier;
  11. Figure 2 re-read from the numbers printed in it: pooled and within-target
      correlations of log epochs with the static distance, direction
-     agreement, negative distances, and which way the matrices are oriented.
+     agreement, negative distances, and which way the matrices are oriented;
+ 12. the structure function (eq. 2) and its Lagrangian (eq. 3) on a model that
+     can be solved exactly: linear regression with a few signal directions
+     and many noise directions, the Gibbs posterior at every beta, the
+     tangent-line property, and the same with random labels;
+ 13. why the Fisher stands in for the Hessian: they coincide exactly for a
+     model linear in its weights, and away from a minimum the Hessian of a
+     nonlinear model can have negative eigenvalues that the Fisher never has;
+ 14. eq. (7) as a sum over all paths: multiplying short-time Gaussian kernels
+     reproduces the exact Ornstein-Uhlenbeck transition density.
 
 With --figures it also regenerates the SVGs in ../figures/ from these same
 computations.
@@ -622,6 +631,178 @@ def check_fig2():
     return slope
 
 
+# ------------------------------------------------------------------ 12. structure function
+
+SF = dict(d=50, N=100, sigma2=1.0, lam2=1.0, n_signal=5, w_signal=1.0)
+
+
+def sf_model(random_labels=False, p=SF):
+    """Linear regression, in the eigenbasis of H = X^T X / N: curvatures s_j, the data term
+    b_j = (X^T y / N)_j, the true weights and the residual loss outside the column space.
+    The noise is a fixed deterministic sequence, so the JavaScript widget can rebuild it exactly."""
+    d, N, sig2 = p["d"], p["N"], p["sigma2"]
+    j = np.arange(d)
+    k = p["n_signal"]
+    s = np.concatenate([np.geomspace(10, 1, k), np.geomspace(1e-2, 1e-4, d - k)])   # strong inputs, then weak ones
+    w = np.where(j < k, p["w_signal"], 0.0)
+    if random_labels:
+        sy2 = float(np.sum(s * w ** 2)) + sig2
+        eps = math.sqrt(2) * np.cos(1.3 * j + 0.4)
+        return s, eps * np.sqrt(sy2 * s / N), np.zeros(d), sy2 * (N - d) / N, sy2
+    eps = math.sqrt(2) * np.cos(2.3999632 * j + 0.7)
+    return s, s * w + eps * np.sqrt(sig2 * s / N), w, sig2 * (N - d) / N, sig2
+
+
+def sf_posterior(beta, s, b, w, R0, noise, lam2=SF["lam2"]):
+    """The optimal Q for C_beta = E_Q[L] + beta KL(Q||P), P = N(0, lam2 I): the Gibbs posterior,
+    Gaussian because the loss is quadratic. Returns KL, E_Q train loss, E_Q test loss, KL per direction."""
+    prec = 1 / lam2 + s / beta
+    var = 1 / prec
+    m = (b / beta) / prec
+    klj = 0.5 * ((var + m ** 2) / lam2 - 1 - np.log(var / lam2))
+    train = 0.5 * R0 + np.sum(0.5 * b ** 2 / s - b * m + 0.5 * s * (m ** 2 + var))
+    test = 0.5 * (noise + np.sum(s * ((w - m) ** 2 + var)))
+    return float(klj.sum()), float(train), float(test), klj
+
+
+SF_BETAS = np.geomspace(1e-5, 10, 600)
+
+
+def sf_curve(random_labels=False):
+    s, b, w, R0, noise = sf_model(random_labels)
+    rows = [sf_posterior(be, s, b, w, R0, noise) for be in SF_BETAS]
+    return np.array([r[0] for r in rows]), np.array([r[1] for r in rows]), np.array([r[2] for r in rows]), (s, b, w, R0, noise)
+
+
+def check_structure_function():
+    print("\n12. The structure function (eq. 2) and the Lagrangian (eq. 3), solved exactly")
+    p = SF
+    print(f"   linear regression, N = {p['N']} samples, d = {p['d']} weight directions: {p['n_signal']} strong input directions"
+          f" (curvature 10 .. 1) carrying the true weights, {p['d'] - p['n_signal']} weak ones (0.01 .. 0.0001) carrying"
+          f" only label noise (variance {p['sigma2']}); prior N(0, {p['lam2']})")
+    kl, tr, te, (s, b, w, R0, noise) = sf_curve()
+    i = int(np.argmin(te))
+    beta_star = SF_BETAS[i]
+    print(f"   beta -> 0 (memorise): {kl[0]:.1f} nats in the weights, train loss {tr[0]:.3f}, test loss {te[0]:.3f}")
+    print(f"   best test loss at beta = {beta_star:.2e}: {kl[i]:.1f} nats, train {tr[i]:.3f}, test {te[i]:.3f}")
+    print(f"   beta -> large (store nothing): {kl[-1]:.3f} nats, train {tr[-1]:.3f}, test {te[-1]:.3f}")
+    _, _, _, klj = sf_posterior(beta_star, s, b, w, R0, noise)
+    print(f"   at the best beta: {klj[:p['n_signal']].sum():.1f} nats in the {p['n_signal']} signal directions,"
+          f" {klj[p['n_signal']:].sum():.1f} in the other {p['d'] - p['n_signal']}")
+    _, _, _, klj0 = sf_posterior(SF_BETAS[0], s, b, w, R0, noise)
+    print(f"   memorising: {klj0[:p['n_signal']].sum():.1f} nats in the signal directions, {klj0[p['n_signal']:].sum():.1f} in the rest")
+    # tangent property: the slope of S(t) at the beta-optimum is -beta
+    worst = 0.0
+    for k in range(50, 550, 50):
+        slope = (tr[k + 1] - tr[k - 1]) / (kl[k + 1] - kl[k - 1])
+        worst = max(worst, abs(slope / (-SF_BETAS[k]) - 1))
+    print(f"   tangent check: dS/dt = -beta along the curve, worst relative error {worst:.1e}")
+    kr, trr, ter, _ = sf_curve(random_labels=True)
+    j = int(np.argmin(ter))
+    print(f"   random labels: memorising stores {kr[0]:.1f} nats for train loss {trr[0]:.3f};"
+          f" the test loss is lowest at {kr[j]:.2f} nats ({ter[j]:.3f}) and {ter[0]:.3f} after memorising")
+    return (kl, tr, te, i), (kr, trr, ter, j), klj
+
+
+# ------------------------------------------------------------------ 13. Fisher against Hessian
+
+def fh_data(n=400, seed=13):
+    rng = np.random.default_rng(seed)
+    x = rng.normal(size=n)
+    y = (rng.random(n) < 1 / (1 + np.exp(-2 * np.tanh(1.5 * x)))).astype(float)
+    return x, y
+
+
+def fh_parts(th, x, y, model):
+    """Mean cross-entropy, its gradient, its Hessian (analytic) and the Fisher, for a logit z(x; th)."""
+    if model == "linear":
+        z = th[0] + th[1] * x
+        J = np.stack([np.ones_like(x), x], axis=1)
+        Hz = np.zeros((x.size, 2, 2))
+    else:
+        a, c = th
+        t = np.tanh(c * x)
+        z = a * t
+        J = np.stack([t, a * x * (1 - t ** 2)], axis=1)
+        Hz = np.zeros((x.size, 2, 2))
+        Hz[:, 0, 1] = Hz[:, 1, 0] = x * (1 - t ** 2)
+        Hz[:, 1, 1] = -2 * a * x ** 2 * t * (1 - t ** 2)
+    p = 1 / (1 + np.exp(-z))
+    F = (J * (p * (1 - p))[:, None]).T @ J / x.size
+    H = F + np.einsum("i,ijk->jk", p - y, Hz) / x.size
+    return F, H
+
+
+def check_fisher_hessian():
+    print("\n13. The Fisher as a positive semi-definite stand-in for the Hessian (Section 4)")
+    x, y = fh_data()
+    worst = 0.0
+    rng = np.random.default_rng(31)
+    for _ in range(200):
+        F, H = fh_parts(rng.normal(size=2) * 2, x, y, "linear")
+        worst = max(worst, np.abs(H - F).max())
+    print(f"   logistic regression z = a + b x, 200 random weights: max |H - F| = {worst:.1e} (identical: the logit is linear in the weights)")
+    neg = 0
+    grid = [(a, c) for a in np.linspace(-3, 3, 31) for c in np.linspace(-3, 3, 31)]
+    worst_eig, where = 0.0, None
+    for a, c in grid:
+        F, H = fh_parts(np.array([a, c]), x, y, "tanh")
+        e = np.linalg.eigvalsh(H)[0]
+        if e < 0:
+            neg += 1
+        if e < worst_eig:
+            worst_eig, where = e, (a, c)
+        assert np.linalg.eigvalsh(F)[0] > -1e-12
+    print(f"   z = a tanh(c x): the Hessian has a negative eigenvalue at {neg} of {len(grid)} grid points in [-3, 3]^2"
+          f" (most negative {worst_eig:.3f} at a = {where[0]:.1f}, c = {where[1]:.1f}); the Fisher at none")
+    # fit by Newton on the Fisher (Fisher scoring), then compare at the minimum
+    th = np.array([1.0, 1.0])
+    for _ in range(200):
+        a, c = th
+        t = np.tanh(c * x); z = a * t; p = 1 / (1 + np.exp(-z))
+        J = np.stack([t, a * x * (1 - t ** 2)], axis=1)
+        g = J.T @ (p - y) / x.size
+        F, _ = fh_parts(th, x, y, "tanh")
+        th = th - np.linalg.solve(F + 1e-9 * np.eye(2), g)
+    F, H = fh_parts(th, x, y, "tanh")
+    print(f"   at the fitted minimum a = {th[0]:.3f}, c = {th[1]:.3f}: Hessian eigenvalues {np.round(np.linalg.eigvalsh(H), 4).tolist()},"
+          f" Fisher {np.round(np.linalg.eigvalsh(F), 4).tolist()}")
+    beta, lam2 = 0.05, 1.0
+    F, H = fh_parts(np.array(where), x, y, "tanh")
+    print(f"   at a = {where[0]:.1f}, c = {where[1]:.1f}, the argument of eq. (4)'s log-det, (lambda^2/beta) H + I with beta = {beta},"
+          f" has eigenvalues {np.round(np.linalg.eigvalsh(lam2 / beta * H + np.eye(2)), 3).tolist()} (Fisher: "
+          f"{np.round(np.linalg.eigvalsh(lam2 / beta * F + np.eye(2)), 3).tolist()})")
+
+
+# ------------------------------------------------------------------ 14. eq. (7) as a sum over paths
+
+def check_path_sum():
+    print("\n14. Eq. (7): the transition probability is the total weight of all paths")
+    h, D, t = 1.0, 0.5, 1.0
+    x = np.linspace(-5, 5, 801)
+    dx = x[1] - x[0]
+    var = D * (1 - math.exp(-2 * h * t)) / h
+    x0 = 1.5
+    exact = np.exp(-(x - x0 * math.exp(-h * t)) ** 2 / (2 * var)) / math.sqrt(2 * math.pi * var)
+    for n in (2, 10, 100):
+        dt = t / n
+        # one step of the discretised SDE: w' ~ N(w - h w dt, 2 D dt); K[j, i] = weight of the jump i -> j
+        K = np.exp(-(x[:, None] - (x[None, :] - h * x[None, :] * dt)) ** 2 / (4 * D * dt)) / math.sqrt(4 * math.pi * D * dt) * dx
+        p = np.zeros_like(x); p[np.argmin(np.abs(x - x0))] = 1 / dx
+        for _ in range(n):
+            p = K @ p                                  # sums the weights of every path, one step at a time
+        print(f"   {n:3d} steps of dt = {dt:.3f}: max |sum over paths - exact density| = {np.abs(p - exact).max():.4f}"
+              f" (peak {exact.max():.3f})")
+    # the weight of one path is exp(-discretised action), up to the normalising constants
+    rng = np.random.default_rng(14)
+    n, dt = 20, t / 20
+    path = x0 + np.cumsum(rng.normal(scale=0.2, size=n + 1)); path[0] = x0
+    kern = np.prod(np.exp(-(path[1:] - path[:-1] + h * path[:-1] * dt) ** 2 / (4 * D * dt)) / math.sqrt(4 * math.pi * D * dt))
+    action = np.sum((path[1:] - path[:-1] + h * path[:-1] * dt) ** 2 / (4 * D * dt))
+    print(f"   one random 20-step path: product of step densities = {kern:.4e};"
+          f" exp(-action) x (4 pi D dt)^(-n/2) = {math.exp(-action) * (4 * math.pi * D * dt) ** (-n / 2):.4e}")
+
+
 # ------------------------------------------------------------------ figures
 
 STYLE = """<style>
@@ -854,7 +1035,46 @@ def fig_batch(out: Path, rows, gf):
     out.write_text(svg(W, H, "Batch size and a noise floor", desc, body))
 
 
-def figures(sim, Dsim, act, kr_rows, batch_rows, gf):
+def fig_structure(out: Path, real, rand, klj):
+    W, H = 920, 330
+    body = []
+    kl, tr, te, i = real
+    A = Panel(body, 60, 45, 250, 220, (0.3, 1000), (0, 2.0), logx=True)
+    A.frame([1, 10, 100, 1000], [0, 0.5, 1, 1.5, 2], "nats stored in the weights, t (log)", "loss",
+            "Real labels", fmt, fmt)
+    A.line(kl, tr, "ln s1")
+    A.line(kl, te, "ln s2")
+    A.dot(kl[i], tr[i], "f1", 4.5)
+    A.dot(kl[i], te[i], "f2", 4.5)
+    A.text(kl[i], te[i], "best test", "sm", "middle", 0, -10)
+    A.text(900, float(tr[0]), "train = S(t)", "sm", "end", 0, 16)
+    A.text(900, float(te[0]), "test", "sm", "end", 0, -8)
+    B = Panel(body, 370, 45, 230, 220, (0, 50), (0, 6))
+    B.frame([0, 10, 20, 30, 40, 50], [0, 2, 4, 6], "weight direction (strong → weak)", "nats at the best β",
+            "Where the nats go", fmt, fmt)
+    for j, v in enumerate(klj):
+        cls = "f1" if j < SF["n_signal"] else "f0"
+        body.append(f'<rect class="{cls}" x="{B.X(j) + 0.5:.1f}" y="{B.Y(min(v, 6)):.1f}" width="{B.X(1) - B.X(0) - 1:.1f}"'
+                    f' height="{B.Y(0) - B.Y(min(v, 6)):.1f}" rx="1"/>')
+    B.text(8, 5.3, "blue: the 5 signal directions", "sm", "start", 0, 0)
+    kr, trr, ter, jj = rand
+    C = Panel(body, 670, 45, 230, 220, (0.1, 10000), (0, 25), logx=True)
+    C.frame([1, 10, 100, 1000, 10000], [0, 5, 10, 15, 20, 25], "nats stored in the weights, t (log)", "loss",
+            "Random labels", fmt, fmt)
+    C.line(kr, trr, "ln s1")
+    C.line(kr, ter, "ln s2")
+    C.dot(kr[jj], ter[jj], "f2", 4.5)
+    C.text(9000, float(trr[0]), "train", "sm", "end", 0, 16)
+    C.text(9000, float(ter[0]), "test", "sm", "end", 0, -8)
+    desc = ("Linear regression with 5 strong input directions that carry the true weights and 45 weak ones that carry only "
+            "label noise, solved exactly for the optimal posterior at every beta. Left: the structure function S(t), the best "
+            "training loss for t nats in the weights (blue), and the test loss of the same posteriors (orange), against t on "
+            "a log axis; the test loss is lowest at about 25 nats and rises again as the weights memorise noise. Middle: the "
+            "nats per direction at that beta, mostly in the 5 signal directions. Right: random labels; the test loss is "
+            "lowest at about 18 nats, the cost of learning that the weights are near zero, and memorising only raises it.")
+    out.write_text(svg(W, H, "Structure function, solved exactly", desc, body))
+
+def figures(sim, Dsim, act, kr_rows, batch_rows, gf, sf):
     d = Path(__file__).resolve().parent.parent / "figures"
     d.mkdir(exist_ok=True)
     fig_kramers(d / "kramers-barrier.svg", kr_rows)
@@ -862,6 +1082,7 @@ def figures(sim, Dsim, act, kr_rows, batch_rows, gf):
     fig_action(d / "action-split.svg", act)
     fig_fig2(d / "figure2-reread.svg")
     fig_batch(d / "batch-size.svg", batch_rows, gf)
+    fig_structure(d / "structure-function.svg", *sf)
     print("\nfigures: wrote", ", ".join(sorted(p.name for p in d.glob("*.svg"))))
 
 
@@ -877,8 +1098,11 @@ def main():
     kr_rows = check_kramers()
     batch_rows, gf = check_batch()
     check_fig2()
+    sf = check_structure_function()
+    check_fisher_hessian()
+    check_path_sum()
     if "--figures" in sys.argv:
-        figures(sim, Dsim, act, kr_rows, batch_rows, gf)
+        figures(sim, Dsim, act, kr_rows, batch_rows, gf, sf)
 
 
 if __name__ == "__main__":

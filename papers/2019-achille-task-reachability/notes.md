@@ -19,9 +19,14 @@ status: read
   is in the main text.
 - **[Interactive companion](figures/interactive.html)**: particles escaping over a barrier while you
   move the end point; particles in a valley with a sharp and a flat minimum, against three effective
-  potentials; Figure 2's two matrices as a clickable scatter; and the batch-size curve of a noise floor.
+  potentials; Figure 2's two matrices as a clickable scatter; the batch-size curve of a noise floor; and
+  the structure function with a slider for $\beta$ (eqs. 2–3).
+- **Questions from a first reading**, the first section after the spine: what the transition
+  probability, the information-theoretic distance and reachability are; eqs. (2), (3), (5) and (9) and
+  the SDE line by line; the Fisher in place of the Hessian; and two comments, on feature-only
+  transferability scores and on dataset against architecture.
 - **[Runnable code](https://github.com/msrepo/theory_inclined_papers_with_annotations/blob/main/papers/2019-achille-task-reachability/code/reachability.py)**:
-  every number on this page, and the five figures (`python3 reachability.py --figures`). `make verify`
+  every number on this page, and the six figures (`python3 reachability.py --figures`). `make verify`
   runs it, in about four seconds.
 - Background: **[Langevin dynamics](../langevin-dynamics/index.html)**, for the Gibbs law, Fokker–Planck,
   Kramers' law, detailed balance and the path weight used throughout, built up from scratch with
@@ -77,6 +82,374 @@ $r=0.58$), which is better support than the paper's pooled scatter gives.
    convergence rate $e^{-\Delta C_\beta/D}$ (eq. 16).
 6. **Experiments** (§7). Convergence time grows with the number of random labels and with the
    estimated complexity, falls with batch size, and fine-tuning time grows with the static distance.
+
+## Questions from a first reading
+
+Twelve questions and comments from a first pass through the paper, answered in the order they were
+asked. Each answer starts with the idea in plain words, then gives the formula, then a number from the
+code where one helps. The sections after this one go through the same material in the paper's order.
+The **[Langevin dynamics](../langevin-dynamics/index.html)** foundations page builds the physics
+(noise, the Gibbs law, Kramers' law, path weights) from scratch.
+
+### What is the transition probability?
+
+Start SGD many times from the same weights $w_0$, for example the solution of a pre-training task. The
+runs see different mini-batches, so they follow different paths and, after a training time $t$, end up
+at different weights. The **transition probability** $p(w_f,t\mid w_0)$ is the density of where they end
+up: how likely it is, per unit volume of weight space, that SGD started at $w_0$ is at $w_f$ after time
+$t$. It is a conditional density in $w_f$, so it integrates to 1 over $w_f$. For fine-tuning, $w_0$ is the
+source solution and the question "does fine-tuning reach a good target solution within the budget?" is
+the integral of $p(w_f,t\mid w_0)$ over the region of good target solutions.
+
+Two limits make it concrete. At $t\to0$ it is a spike at $w_0$: nothing has moved. As $t\to\infty$ it
+forgets $w_0$ and becomes the stationary (Gibbs) law $\propto e^{-U/D}$. Everything interesting is in
+between. In the code's tilted double well (§5 below), the probability of being within 0.1 of the lower
+well, starting in the upper one, is $9\times10^{-5}$ at $t=0.5$, $0.052$ at $t=5$, $0.29$ at $t=50$ and
+$0.33$ at $t=500$. Eq. (7) computes it as the total weight of all paths from $w_0$ to $w_f$ (answer to
+eq. 5 below).
+
+### What is the information-theoretic distance?
+
+It is the extra cost of explaining a second dataset once you can explain the first:
+
+$$
+d_\beta(\mathcal D_1\to\mathcal D_2)=C_\beta(\mathcal D_1\cup\mathcal D_2)-C_\beta(\mathcal D_1),
+$$
+
+where $C_\beta(\mathcal D)$ is the smallest value of "training loss $+\;\beta\times$ nats stored in the
+weights" over all ways of fitting $\mathcal D$ (eq. 3, below). It is *information-theoretic* because
+the nats are a description length: $\mathrm{KL}(Q\Vert P)$, the number of nats needed to write down the
+trained weights (as a cloud $Q$) given the prior $P$. If $\mathcal D_2$ adds little that the model for
+$\mathcal D_1$ does not already encode, the distance is small. It is **asymmetric** by design:
+CIFAR-100 $\to$ CIFAR-10 is $0.01$ in Figure 2 and CIFAR-10 $\to$ CIFAR-100 is $0.52$, because knowing
+100 classes already covers 10, not the other way round. It is not a distance in the metric sense (it can
+be negative with the paper's averaged loss, §4). It comes from the companion paper; the
+**[task-complexity notes](../2020-achille-task-complexity/index.html)** go through its definition,
+Lemma 4.2 and the identity that makes its asymmetry a difference of complexities. In practice the paper
+evaluates it with eq. (4): loss, weight norm and the log-determinant of the Fisher, at trained weights.
+It is called *static* because it says nothing about how SGD gets from one solution to the other.
+
+### "The takeaway: landscape geometry, and the ease of traversing the path"
+
+Yes, that is the paper's own two-factor message (eq. 10), and it holds up, with one refinement about how
+the work divides between the factors.
+
+- **The static factor** depends only on the heights of the start and end points: the loss, corrected for
+  curvature. It turns out to be exactly half the equilibrium log-odds between them, which is detailed
+  balance (§5). So it decides which *direction* is favoured, not how fast anything happens.
+- **The ease of traversal**, the reachability factor, carries all the time dependence: barriers, narrow
+  passes, and whether a likely path exists within the training budget. The escape time follows the barrier
+  exponentially (§6: $d\ln\tau/d(1/D)$ equals the barrier height, 0.998 against 1, whatever the end
+  points), and on the most likely downhill path the static factor is cancelled exactly (§5).
+
+A sharper takeaway: **fine-tuning is easy when the target's loss has a low-barrier path from the source
+solution into a good target basin, and the information-theoretic distance is a proxy for that.** The proxy
+works better than one might expect: within a fixed target, it ranks sources with $r=0.58$ (§7).
+
+### What does reachability mean?
+
+A target solution is **reachable** from $w_0$ in time $t$ if some likely SGD paths of that duration
+connect them. Formally it is the second factor of eq. (10), the path integral
+
+$$
+K_t(w_0\to w_f)=\int e^{-\frac1{2D}\int_0^t\left[\frac12\lVert\dot w\rVert^2+V(w)\right]ds}\,\mathcal Dw ,
+$$
+
+the total weight of all paths from $w_0$ to $w_f$ after the end-point factor is taken out. It is large
+when there are many short, low paths, and tiny when every path must climb a barrier or squeeze through a
+narrow pass. It depends on the time budget: at short times only nearby points are reachable, and given
+long enough everything is. It is also symmetric, $K_t(a\to b)=K_t(b\to a)$ (§5).
+
+"Unreachable" in practice means that the expected time to get there, which grows like
+$e^{\text{barrier}/D}$, is far longer than the training run. The paper's motivating example is its
+reference [3], critical learning periods: a network first trained on blurred images never recovers full
+performance, although the good solution exists. In Figure 2 the one visible case is MNIST $\to$ Letters,
+which never converged although its static distance (0.68) is smaller than that of Fashion $\to$ Letters
+(0.72, converged in 79.7 epochs).
+
+### "Transferability scores use only features; open-weight models come without data"
+
+Both halves are right, and the second is worth separating by which quantity needs which data.
+
+- **What the usual scores do.** [LEEP](../2020-nguyen-leep/index.html), [NCE](../2019-tran-nce-hardness/index.html),
+  [LogME](../2021-you-logme/index.html), [H-score](../2022-bao-hscore-transferability/index.html),
+  [SFDA](../2022-shao-sfda/index.html) and [PAS](../2026-diniz-pas/index.html) pass the target data through
+  the frozen pre-trained model once and score how well its features (or its source-label predictions) fit
+  the target labels. They need only the weights and the target data, and they implicitly model a
+  *linear probe*: the features do not move. Fine-tuning is exactly the part where they move.
+- **What this paper needs.** The *static distance* needs the source dataset: $C_\beta(\mathcal
+  D_1\cup\mathcal D_2)-C_\beta(\mathcal D_1)$ trains on $\mathcal D_1$ and on the union. For an open-weight
+  model released without its data that is not computable.
+- **The dynamic side does not need the source data.** Fine-tuning runs SGD on the *target* loss, starting
+  from the released weights $w_0$. Everything in the reachability factor is a property of the target loss
+  around $w_0$: its value and gradient there, its curvature (the target Fisher at $w_0$, which is what the
+  paper's reference [1], Task2Vec, computes with a probe network), the barriers between $w_0$ and target
+  basins, and the neural tangent kernel of $w_0$ on target data (the
+  [NTK-selector](../2026-wang-ntk-selector/index.html) and [Fort et al.](../2020-fort-deep-vs-kernel/index.html)
+  notes). A dynamics-aware score from weights plus target data alone is therefore possible in principle.
+  What is lost without the source data is the static term, which by the detailed-balance argument is the
+  factor that says least about speed anyway.
+
+That is a suggestion, not a result of the paper; it has not been tested here.
+
+### The structure of a task, nuisance against task-relevant information, and eq. (2)
+
+**The idea.** A dataset contains two kinds of information. *Structure* is what many samples share: that
+cats have pointed ears, that digits are strokes. One nat of it lowers the loss on many samples at once.
+*Nuisance* is what is particular to individual samples: the exact background of image 4 017, a mislabelled
+example. One nat of it lowers the loss on one sample. A model trained long enough stores both, and only
+the first generalises.
+
+**Eq. (2)** measures this with a budget:
+
+$$
+S_{\mathcal D}(t)=\min_{Q:\ \mathrm{KL}(Q\Vert P)<t}\ \mathbb E_{w\sim Q}\big[L_{\mathcal D}(w)\big].
+$$
+
+Piece by piece:
+
+| Piece | Meaning |
+|---|---|
+| $P(w)$ | the prior: what the weights look like before any data, e.g. $\mathcal N(0,\lambda^2I)$ |
+| $Q(w)$ | a "posterior": a cloud of weights around the trained solution, not a single point, because exact real numbers take infinitely many bits |
+| $\mathrm{KL}(Q\Vert P)$ | the number of nats needed to describe the cloud $Q$ to someone who knows $P$: the **information stored in the weights** |
+| $\mathbb E_{w\sim Q}[L_{\mathcal D}(w)]$ | the average training loss of weights drawn from the cloud |
+| $S_{\mathcal D}(t)$ | the best training loss achievable with at most $t$ nats: the **structure function** |
+
+$S_{\mathcal D}$ falls as $t$ grows. It falls **fast** while the nats buy structure, then **slowly** once
+the only thing left to buy is nuisance, one sample at a time. The knee between the two regimes is the
+point to stop.
+
+**On a model that can be solved exactly.** The code builds linear regression with $N=100$ samples and 50
+weight directions: 5 strong input directions carry the true weights, 45 weak ones carry only label noise.
+For a quadratic loss the best $Q$ at every budget is Gaussian and known in closed form, so the whole curve
+is exact.
+
+- Storing everything (memorising): 570.7 nats, training loss 0.250, **test loss 0.745**.
+- The best test loss, **0.588**, needs only **24.7 nats**. 16.2 of them go to the 5 signal directions and
+  8.5 to the other 45.
+- Memorising spends 539.1 of its 570.7 nats on the 45 noise directions: that is the nuisance.
+- With **random labels** there is no structure to find. The test loss is lowest at 18 nats (12.02), the
+  cost of learning that the weights should be near zero. Memorising takes 9 954 nats and raises the test
+  loss to 16.71.
+
+<img src="figures/structure-function.svg" alt="Three panels for linear regression with 5 signal directions and 45 noise directions, solved exactly. Left: training loss S(t) and test loss against nats stored in the weights on a log axis; both fall steeply until about 25 nats, where the test loss is lowest at 0.588; after that the training loss keeps falling slowly and the test loss rises to 0.745 at full memorisation, 570 nats. Middle: nats per weight direction at the best beta: 3 to 4 nats in each of the 5 signal directions, a fraction of a nat in each of the others. Right: random labels: training loss keeps falling to 9954 nats while the test loss is lowest near 18 nats and then rises.">
+
+The paper's eq. (2) is a continuous version of Kolmogorov's structure function from algorithmic
+information theory; the **[task-complexity notes](../2020-achille-task-complexity/index.html)** cover
+Kolmogorov's discrete version, random labels (every nat is nuisance) and why only the convex hull of $S$
+matters.
+
+### "The dataset, not the architecture, dictates transferability"
+
+That is plausible for a fixed, reasonably good architecture, but this paper cannot decide it, and some
+evidence points the other way.
+
+- **For the dataset.** Re-read from Figure 2's printed matrices (§7), the identity of the *target* explains
+  a lot: row means of the distance and of log-epochs correlate at 0.75, since Letters takes 53–80 epochs from
+  any source and MNIST under 1. Within a target, the *source* dataset still matters ($r=0.58$).
+- **But Figure 2 uses one architecture** (ResNet-18) throughout, so it holds the architecture fixed and
+  cannot measure its effect.
+- **For the architecture.** Figure 1 (right) shows convergence time against complexity for three
+  architectures, and the slopes differ several-fold. The paper itself says the dynamic factor "depends on
+  the architecture of the network". Even the static distance is computed through a ResNet-18's Fisher, so in
+  practice it depends on the probe network. Outside this paper, Kornblith, Shlens & Le (*Do Better ImageNet
+  Models Transfer Better?*, CVPR 2019) find that transfer tracks ImageNet accuracy across architectures,
+  and that some training choices that raise ImageNet accuracy (label smoothing, dropout, auxiliary heads)
+  make the frozen features transfer worse. The [Chaves et al.](../2023-chaves-medical-transferability/index.html)
+  and [Claßen et al.](../2026-classen-te-robustness/index.html) notes show that which pre-trained model looks
+  best changes with the target dataset: the two interact.
+- **In the paper's own formalism** the loss $U(w)$ depends on the data through $L_{\mathcal D}$ but on the
+  architecture through the parameterisation. The same set of functions, parameterised differently, has
+  different curvatures, barriers and gradient noise, so a different $\log\lvert H\rvert$ and a different
+  temperature $D$. Information stored in *weights* is not invariant to reparameterisation. The claim of §5.2
+  that reachability "to first approximation depends only on information-theoretic quantities" of the data is
+  the step that removes the architecture, and it is the step this reading disputes.
+
+A fair summary: the dataset pair probably sets most of the variation in *which* transfers are easy; the
+architecture sets the *time scale* and some of the ranking.
+
+### The Lagrangian, eq. (3)
+
+Eq. (2) is a problem with a budget: "best loss using at most $t$ nats". Budgets are awkward to optimise.
+Eq. (3) replaces the budget by a **price**:
+
+$$
+C_\beta(\mathcal D;P,Q)=\underbrace{\mathbb E_{w\sim Q}\big[L_{\mathcal D}(w)\big]}_{\text{error}}+\beta\,\underbrace{\mathrm{KL}(Q\Vert P)}_{\text{nats stored}} .
+$$
+
+Each nat costs $\beta$ units of loss, and the optimiser buys nats only while one more nat lowers the loss
+by more than $\beta$. It is the same choice as a phone plan with a data cap against one that charges per
+gigabyte. The multiplier $\beta$ is the Lagrange multiplier of the budget constraint, and its meaning is
+exactly the exchange rate: at the optimum, one more nat of budget lowers the best loss by $\beta$,
+$\beta=-dS_{\mathcal D}/dt$.
+
+**Geometrically**, minimising $C_\beta$ slides a straight line of slope $-\beta$ up from below until it
+touches the curve $S_{\mathcal D}(t)$; the touching point is the solution. A small $\beta$ (cheap nats) gives a
+flat line that touches far to the right: memorise. A large $\beta$ gives a steep line that touches near
+$t=0$: store almost nothing. In the solvable model the code checks that the slope of $S$ at each
+$\beta$-optimum is $-\beta$, to a relative error of $1.6\times10^{-4}$, and the best test loss sits at
+$\beta=4.8\times10^{-3}$. The interactive page has a slider for it.
+
+Three connections the paper mentions, in plain terms:
+
+- the $Q$ that minimises $C_\beta$ over all distributions is the **Gibbs posterior**
+  $Q^*\propto P(w)\,e^{-L_{\mathcal D}(w)/\beta}$ (§6), and $\min_QC_\beta=-\beta\log\int P\,e^{-L_{\mathcal D}/\beta}$;
+- it is the **PAC-Bayes** objective, whose value bounds the test error;
+- at $\beta=1/N$ (not $\beta=1$, since $L_{\mathcal D}$ is an average) it is minus the **ELBO** of
+  variational inference, divided by $N$.
+
+The "critical $\beta$" of the companion paper is where the touching point jumps from the structure part of
+$S$ to the nuisance part.
+
+### The Fisher as a robust positive semi-definite approximation of $H$
+
+**Why an approximation is needed at all.** Eq. (4) contains $\log\big\lvert\frac{\lambda^2}\beta H+I\big\rvert$
+and the posterior covariance $\Sigma^*=\beta(H+\frac\beta{\lambda^2}I)^{-1}$. Both make sense only if every
+eigenvalue of the Hessian $H$ is above $-\beta/\lambda^2$. Away from a clean minimum, at a saddle or wherever the
+loss curves downward in some direction, $H$ has negative eigenvalues, the matrix inside the log can have a
+negative determinant, and "the variance of the posterior" would be negative.
+
+**Why the Fisher is always safe.** The Fisher information is an average of outer products,
+
+$$
+F=\mathbb E_{x}\,\mathbb E_{y\sim p_w(y\mid x)}\big[\nabla_w\log p_w(y\mid x)\,\nabla_w\log p_w(y\mid x)^\top\big],
+$$
+
+and for any direction $v$, $v^\top Fv=\mathbb E[(v^\top\nabla\log p)^2]\ge0$. So $F$ is positive semi-definite at
+every $w$, whatever the network.
+
+**Why it is close to the Hessian.** For cross-entropy with logits $z_w(x)$, differentiating twice gives
+
+$$
+H=\underbrace{\mathbb E_x\big[J^\top(\operatorname{diag}p-pp^\top)J\big]}_{=F\ \text{(Gauss–Newton)}}
++\underbrace{\mathbb E_{x,y}\Big[\textstyle\sum_c(p_c-\mathbb 1[y=c])\,\nabla_w^2z_c\Big]}_{\text{residual}},
+\qquad J=\partial z/\partial w .
+$$
+
+The first term is the Fisher exactly, because the curvature of softmax cross-entropy in logit space,
+$\operatorname{diag}p-pp^\top$, does not depend on the label. The residual is weighted by the prediction errors
+$p-e_y$ and by how curved the logits are in the weights. It vanishes for a model linear in its weights, and it
+is small near a good fit.
+
+The code checks each claim on one-input logistic models with 400 points:
+
+- logistic regression $z=a+bx$: $\max\lvert H-F\rvert=0$ over 200 random weight settings, since the logit is
+  linear in the weights;
+- the nonlinear model $z=a\tanh(cx)$: over a grid of 961 weight settings in $[-3,3]^2$, the Hessian has a
+  negative eigenvalue at 643 of them (as low as $-1.211$); the Fisher at none;
+- at the fitted minimum the two nearly agree: eigenvalues $0.0092,0.0858$ for $H$ against $0.0083,0.0852$ for $F$;
+- at the worst grid point, with $\beta=0.05$, the matrix inside eq. (4)'s log has an eigenvalue of $-23.2$ with
+  the Hessian and $1.035$ with the Fisher.
+
+Two cautions. The "empirical Fisher", with the true labels in place of $y\sim p_w$, is a different matrix and
+not guaranteed to be close to $H$. And on a trained network the relative gap between $H$ and $F$ stops
+shrinking at a few percent; the **[information-in-the-weights notes](../2020-achille-information-in-weights/index.html)**
+measure it (about 4%) in their section on Lemma 2.4. A bonus of the Fisher: because $y$ is drawn from the
+model, it depends on the data only through the inputs, which is why it can be computed on a target task
+without its labels.
+
+### The stochastic differential equation $\dot w=f(w)+\sqrt{2D}\,n(t)$
+
+Read it as a statement about velocity: **the weights move with a deterministic push $f(w)$ plus a random push.**
+
+| Piece | Meaning |
+|---|---|
+| $f(w)$ | the drift, $-\nabla U(w)$: downhill on the regularised loss (the paper writes $+\nabla U$, a sign slip) |
+| $n(t)$ | white noise: at every instant an independent standard Gaussian kick; formally the derivative of Brownian motion |
+| $D$ | the temperature: how strong the kicks are. For SGD, $D=\eta\sigma^2/(2B)$ (learning rate $\eta$, gradient-noise variance $\sigma^2$, batch size $B$) |
+| $\sqrt{2D}$ | the factor that makes pure noise spread with variance $2Dt$ and the equilibrium come out as $e^{-U/D}$ |
+
+To simulate it, take small steps $\eta$: $w\leftarrow w-\eta\nabla U(w)+\sqrt{2D\eta}\,\xi$ with $\xi\sim\mathcal N(0,I)$.
+That is gradient descent plus a Gaussian kick after every step. The kick scales with $\sqrt\eta$, not $\eta$,
+because independent kicks add in variance. With kicks proportional to $\eta$ the noise would vanish in the
+limit; the foundations page shows this numerically.
+
+**Where it comes from** (§2 below): an SGD step is a full-gradient step plus the mini-batch error, which has
+mean zero and variance $\eta^2\sigma^2/B$ per step. Matching that to the SDE's $2D\eta$ gives
+$D=\eta\sigma^2/(2B)$. The code confirms it on a toy loss: stationary variance $0.0187$, $0.00471$, $0.00115$ for
+$B=4,16,64$ against $D=0.0181,0.00453,0.00113$.
+
+**What it predicts:** the Gibbs law $e^{-U/D}$ at equilibrium, escape times $e^{\text{barrier}/D}$, and a
+preference for flat minima through $\frac D2\log\lvert H\rvert$ (§5–6).
+
+**What it assumes:** small steps, Gaussian noise, and noise that is the same in every direction and at every
+$w$. Real SGD noise is shaped roughly like the Hessian and changes with $w$, which changes the equilibrium
+(foundations page, §7 and §10).
+
+### Eq. (5), line by line
+
+Eq. (5) gives a probability to an entire training trajectory:
+
+$$
+p(w(\cdot)\mid w_0,t_0)=e^{-S[w]}=\exp\Big(-\int_{t_0}^{t_f}\mathcal L(w,\dot w)\,dt\Big),
+\qquad
+\mathcal L=\frac1{4D}\lVert\dot w-f(w)\rVert^2+\frac12\operatorname{div}f(w).
+$$
+
+**Where it comes from.** Chop the trajectory into steps of length $\Delta t$: positions $w_0,w_1,\dots,w_n$.
+Each step of the SDE is $w_{k+1}=w_k+f(w_k)\Delta t+\sqrt{2D\Delta t}\,\xi_k$. So a given path requires the
+kicks $\xi_k=(w_{k+1}-w_k-f(w_k)\Delta t)/\sqrt{2D\Delta t}$, and the probability of those kicks is a product of
+Gaussian densities:
+
+$$
+\prod_{k}\frac{1}{\sqrt{4\pi D\Delta t}}\exp\Big(-\frac{(w_{k+1}-w_k-f\,\Delta t)^2}{4D\,\Delta t}\Big)
+=\big(4\pi D\Delta t\big)^{-n/2}\exp\Big(-\frac1{4D}\sum_k\Big(\frac{w_{k+1}-w_k}{\Delta t}-f\Big)^2\Delta t\Big).
+$$
+
+The sum in the exponent is a Riemann sum for $\frac1{4D}\int(\dot w-f)^2dt$. The code checks the identity on a
+random 20-step path: the product of the step densities is $1.7210\times10^{-2}$, and so is
+$e^{-\text{action}}(4\pi D\Delta t)^{-n/2}$.
+
+**How to read it.** Every path has a cost $S$. A path that moves exactly with the drift, $\dot w=f(w)$, needs no
+kicks and costs nothing. Every deviation costs its square, divided by $4D$: at low temperature deviations are
+expensive and the likely paths hug gradient descent; at high temperature the particle wanders. The prefactor
+$(4\pi D\Delta t)^{-n/2}$ blows up as $\Delta t\to0$, which is why only *ratios* of path weights and *integrals*
+over paths are meaningful, never the weight of one path on its own.
+
+**The $\frac12\operatorname{div}f$ term** is a correction of order 1 (the main term is of order $1/D$). It comes
+from evaluating $f$ at the midpoint of each step instead of the start, which is the reading that lets the chain
+rule of eq. (9) work. With $f=-\nabla U$, $\operatorname{div}f=-\nabla^2U$: where the loss curves upward, the
+flow squeezes nearby paths together, and the term raises the weight of paths through such regions.
+
+**Eq. (7) adds up all paths.** The probability of being at $w_f$ at time $t$ is the total weight of every path
+that ends there. On a grid that sum is just the short-time transition matrix multiplied by itself $n$ times, one
+factor per step. For the Ornstein–Uhlenbeck process, where the exact answer is known, the code finds maximum
+errors of $0.129$, $0.025$ and $0.0025$ (against a peak density of $0.607$) with 2, 10 and 100 steps. The sum over
+paths converges to the exact transition probability as the steps shrink.
+
+### Eq. (9), line by line
+
+Eq. (9) splits the path weight of eq. (5) into a part that depends only on the end points and a part that
+depends on the whole path:
+
+$$
+p(w(\cdot)\mid w_0)=\underbrace{e^{-\frac{1}{2D}[U(w_f)-U(w_0)]}}_{\text{end points only}}\;
+\underbrace{\exp\Big(-\frac1{2D}\int\Big[\tfrac12\lVert\dot w\rVert^2+V(w)\Big]dt\Big)}_{\text{the whole path}},
+\qquad V=\tfrac12\lVert\nabla U\rVert^2-D\,\nabla^2U .
+$$
+
+**The algebra**, with $f=-\nabla U$:
+
+1. Expand the square: $\frac1{4D}\lVert\dot w+\nabla U\rVert^2=\frac1{4D}\lVert\dot w\rVert^2+\frac1{2D}\nabla U\cdot\dot w+\frac1{4D}\lVert\nabla U\rVert^2$.
+2. The middle term is a total derivative: $\nabla U\cdot\dot w=\frac{d}{dt}U(w(t))$ by the chain rule, so its integral
+   is $U(w_f)-U(w_0)$ **whatever the path**. That is the static factor.
+3. The divergence term $\frac12\operatorname{div}f=-\frac12\nabla^2U$ joins the rest. Collecting everything that is
+   left, $\frac1{4D}\lVert\dot w\rVert^2+\frac1{4D}\lVert\nabla U\rVert^2-\frac12\nabla^2U=\frac1{2D}\big[\frac12\lVert\dot w\rVert^2+V\big]$.
+
+**What it means.**
+
+- The second factor does not change if the path is run backwards in time ($\lVert\dot w\rVert^2$ and $V(w)$ do not
+  care about direction). So all the difference between going $a\to b$ and $b\to a$ is in the first factor:
+  $p_t(b\mid a)/p_t(a\mid b)=e^{-[U(b)-U(a)]/D}$ at every $t$. That is **detailed balance**. The code measures the ratio
+  at $7.403$ at $t=0.5$, 5, 50 and 500, against $e^{-\Delta U/D}=7.395$ (the gap is the grid).
+- $V$ is an "effective potential" felt by *paths*: it is high where the loss is steep, so a path that lingers on a
+  slope without moving with it is penalised, and it is lowered by curvature.
+- The two factors are **not independent**. Along the most likely downhill path the first factor is
+  $e^{+\lvert\Delta U\rvert/2D}$ and the second is exactly $e^{-\lvert\Delta U\rvert/2D}$: the code finds $-1.2616+1.2616=0$
+  (§5). Going uphill they multiply to $e^{-\Delta U/D}$. So "energy gap times existence of paths" is a correct
+  factorisation but not a separation of causes. The static factor tells you the odds of the two directions, and
+  the path factor tells you how long you will wait.
 
 ## Setup and notation
 
@@ -165,7 +538,8 @@ exactly takes infinitely many bits. A "noisy" weight, a cloud $Q$ around $w_0$, 
 finitely many bits relative to a prior $P$, and $\mathrm{KL}(Q\Vert P)$ is that description length.
 Think of a rate–distortion curve. The first few nats buy large drops in loss (the task's
 *structure*). Later nats buy less and less, because they are spent memorising individual samples
-(*nuisances*).
+(*nuisances*). The answer to the eq. (2) question above works this out on a regression model that can
+be solved exactly, with a figure.
 
 The Lagrangian of that constrained problem is
 
@@ -258,7 +632,8 @@ which then does not match the weight decay.
 $\lVert w_0\rVert^2$ term) *and* in a sharp minimum, where many directions have curvature large
 compared with $\beta/\lambda^2$. Each such direction must be specified precisely and costs about
 $\frac12\log(\lambda^2 h_i/\beta)$ nats. Flat directions cost nothing. The paper replaces $H$ by the
-Fisher, which is positive semi-definite and needs no labels.
+Fisher, which is positive semi-definite and needs no labels; the Fisher question above shows why that is
+needed and when the two agree.
 
 ## §5 A weight for every training trajectory
 
