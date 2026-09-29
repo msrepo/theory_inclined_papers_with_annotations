@@ -1,0 +1,67 @@
+<svg viewBox="0 0 920 300" xmlns="http://www.w3.org/2000/svg" role="img">
+<title>Static and dynamic parts cancel downhill</title>
+<desc>Bars of the two parts of 2D times the Onsager–Machlup action for the tilted double well, along the gradient-flow path from the saddle to the right well (ΔU = -1.262) and along the same path reversed. Downhill the static part is negative and the dynamic part cancels it exactly, so the total is zero; uphill both are positive and add to twice the climb, giving the Arrhenius weight exp(−ΔU/D).</desc>
+<style>
+  text{font-family:ui-sans-serif,-apple-system,"Segoe UI",sans-serif;font-weight:400}
+  .lab{font-size:11px;fill:#57564f} .hd{font-size:13px;font-weight:500;fill:#1a1a19}
+  .sm{font-size:10.5px;fill:#57564f} .v{font-size:11px;fill:#1a1a19}
+  .ax{stroke:#8a8880;stroke-width:0.9;fill:none} .gd{stroke:#e2e1da;stroke-width:0.6;fill:none}
+  .s1{stroke:#2a78d6} .s2{stroke:#eb6834} .s3{stroke:#1baf7a} .s4{stroke:#eda100} .s0{stroke:#8a8880}
+  .f1{fill:#2a78d6} .f2{fill:#eb6834} .f3{fill:#1baf7a} .f4{fill:#eda100} .f0{fill:#8a8880}
+  .ln{stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+  .dash{stroke-width:1.4;fill:none;stroke-dasharray:5 3}
+  .ring{stroke:#fdfdfc;stroke-width:1.5}
+  @media (prefers-color-scheme: dark){
+    .lab,.sm{fill:#b6b4ab} .hd,.v{fill:#eceae3} .ax{stroke:#85837b} .gd{stroke:#33312e}
+    .s1{stroke:#3987e5} .s2{stroke:#d95926} .s3{stroke:#199e70} .s4{stroke:#c98500} .s0{stroke:#85837b}
+    .f1{fill:#3987e5} .f2{fill:#d95926} .f3{fill:#199e70} .f4{fill:#c98500} .f0{fill:#85837b}
+    .ring{stroke:#161615}
+  }
+</style>
+<line class="gd" x1="90" y1="235.0" x2="870" y2="235.0"/>
+<text class="sm" x="84" y="238.5" text-anchor="end">−1.5</text>
+<line class="gd" x1="90" y1="213.9" x2="870" y2="213.9"/>
+<text class="sm" x="84" y="217.4" text-anchor="end">−1</text>
+<line class="gd" x1="90" y1="192.8" x2="870" y2="192.8"/>
+<text class="sm" x="84" y="196.3" text-anchor="end">−0.5</text>
+<line class="gd" x1="90" y1="171.7" x2="870" y2="171.7"/>
+<text class="sm" x="84" y="175.2" text-anchor="end">0</text>
+<line class="gd" x1="90" y1="150.6" x2="870" y2="150.6"/>
+<text class="sm" x="84" y="154.1" text-anchor="end">0.5</text>
+<line class="gd" x1="90" y1="129.4" x2="870" y2="129.4"/>
+<text class="sm" x="84" y="132.9" text-anchor="end">1</text>
+<line class="gd" x1="90" y1="108.3" x2="870" y2="108.3"/>
+<text class="sm" x="84" y="111.8" text-anchor="end">1.5</text>
+<line class="gd" x1="90" y1="87.2" x2="870" y2="87.2"/>
+<text class="sm" x="84" y="90.7" text-anchor="end">2</text>
+<line class="gd" x1="90" y1="66.1" x2="870" y2="66.1"/>
+<text class="sm" x="84" y="69.6" text-anchor="end">2.5</text>
+<line class="gd" x1="90" y1="45.0" x2="870" y2="45.0"/>
+<text class="sm" x="84" y="48.5" text-anchor="end">3</text>
+<line class="ax" x1="90" y1="235" x2="870" y2="235"/>
+<line class="ax" x1="90" y1="45" x2="90" y2="235"/>
+<text class="lab" x="480.0" y="267" text-anchor="middle"></text>
+<text class="lab" transform="translate(50,140.0) rotate(-90)" text-anchor="middle">2D × action (units of U)</text>
+<text class="hd" x="90" y="33">Static and dynamic parts of the path weight, saddle ↔ right well</text>
+<rect class="f1" x="155.0" y="171.7" width="78.0" height="53.3" rx="3"/>
+<text class="v" x="194.0" y="238.9" text-anchor="middle">−1.262</text>
+<text class="sm" x="194.0" y="251.0" text-anchor="middle">static ΔU</text>
+<rect class="f2" x="252.5" y="118.4" width="78.0" height="53.3" rx="3"/>
+<text class="v" x="291.5" y="112.4" text-anchor="middle">+1.262</text>
+<text class="sm" x="291.5" y="251.0" text-anchor="middle">dynamic ∫½ẇ²+½U′²</text>
+<rect class="f3" x="350.0" y="171.7" width="78.0" height="0.8" rx="3"/>
+<text class="v" x="389.0" y="185.7" text-anchor="middle">0</text>
+<text class="sm" x="389.0" y="251.0" text-anchor="middle">total</text>
+<text class="lab" x="291.5" y="57.0" text-anchor="middle">downhill (gradient flow)</text>
+<rect class="f1" x="545.0" y="118.4" width="78.0" height="53.3" rx="3"/>
+<text class="v" x="584.0" y="112.4" text-anchor="middle">+1.262</text>
+<text class="sm" x="584.0" y="251.0" text-anchor="middle">static ΔU</text>
+<rect class="f2" x="642.5" y="118.4" width="78.0" height="53.3" rx="3"/>
+<text class="v" x="681.5" y="112.4" text-anchor="middle">+1.262</text>
+<text class="sm" x="681.5" y="251.0" text-anchor="middle">dynamic ∫½ẇ²+½U′²</text>
+<rect class="f3" x="740.0" y="65.1" width="78.0" height="106.5" rx="3"/>
+<text class="v" x="779.0" y="59.1" text-anchor="middle">+2.523</text>
+<text class="sm" x="779.0" y="251.0" text-anchor="middle">total</text>
+<text class="lab" x="681.5" y="57.0" text-anchor="middle">uphill (reversed)</text>
+<polyline class="ax" points="90.0,171.7 870.0,171.7"/>
+</svg>
