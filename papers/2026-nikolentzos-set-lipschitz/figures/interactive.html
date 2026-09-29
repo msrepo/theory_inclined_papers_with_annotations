@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Set Aggregator Lipschitz Explorer</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/contrib/auto-render.min.js"></script>
+<style>
+:root{
+  --bg:#fbfaf7; --surface:#ffffff; --ink:#1c1d21; --muted:#5b5f68; --faint:#8a8880; --line:#e2dfd8; --soft:#f2f0ea;
+  --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a; --s4:#eda100; --neg:#e34948; --radius:12px;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#131417; --surface:#1b1d21; --ink:#ebebed; --muted:#a3a6ae; --faint:#85837b; --line:#2e3138; --soft:#23262b;
+    --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500; --neg:#e66767;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#131417; --surface:#1b1d21; --ink:#ebebed; --muted:#a3a6ae; --faint:#85837b; --line:#2e3138; --soft:#23262b;
+  --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500; --neg:#e66767;
+  color-scheme: dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,sans-serif}
+main{max-width:980px;margin:0 auto;padding:36px 16px 80px}
+a{color:var(--s1)}
+h1{font-size:1.9rem;line-height:1.2;margin:0 0 .4rem}
+h2{font-size:1.3rem;margin:2.6rem 0 .5rem;padding-top:.5rem;border-top:1px solid var(--line)}
+.lede{color:var(--muted);margin-bottom:1.2rem}
+.widget{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:14px;margin:1rem 0}
+.controls{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;margin:.2rem 0 .7rem;font-size:.9rem}
+.controls label{display:flex;align-items:center;gap:6px;color:var(--muted)}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg button{border:0;border-radius:0;border-right:1px solid var(--line)}
+.seg button:last-child{border-right:0}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--surface)}
+button,select{font:inherit;font-size:.88rem;color:var(--ink);background:var(--soft);border:1px solid var(--line);border-radius:8px;padding:5px 11px;cursor:pointer}
+button:focus-visible,input:focus-visible,select:focus-visible,canvas:focus-visible{outline:2px solid var(--s1);outline-offset:2px}
+input[type=range]{accent-color:var(--s1);width:170px}
+.readout{font-size:.9rem;color:var(--muted);margin-top:.5rem;font-variant-numeric:tabular-nums}
+.readout b{color:var(--ink)}
+.callout{border-left:3px solid var(--s1);background:var(--soft);padding:10px 14px;border-radius:0 8px 8px 0;margin:1rem 0}
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;align-items:start}
+@media (max-width:760px){.grid2{grid-template-columns:1fr}}
+canvas{display:block;width:100%;height:auto;touch-action:none;border-radius:8px}
+.cap{font-size:.82rem;color:var(--muted)}
+.mat{border-collapse:collapse;font-variant-numeric:tabular-nums;font-size:.86rem;margin:.3rem 0;width:100%}
+.mat td,.mat th{border:1px solid var(--line);padding:5px 6px;text-align:center;vertical-align:top}
+.mat th{color:var(--muted);font-weight:500;font-size:.78rem}
+.mat td small{display:block;color:var(--muted);font-size:.72rem;line-height:1.3}
+.mat td.ok{background:color-mix(in srgb,var(--s3) 14%,transparent)}
+.mat td.bad{background:color-mix(in srgb,var(--neg) 16%,transparent)}
+.mat td.big{background:color-mix(in srgb,var(--s4) 14%,transparent)}
+.key{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:.8rem;color:var(--muted);margin:.4rem 0}
+.sw{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;vertical-align:-1px}
+.dist{display:flex;gap:10px;flex-wrap:wrap;margin:.4rem 0}
+.dist div{background:var(--soft);border-radius:8px;padding:6px 10px;font-variant-numeric:tabular-nums;font-size:.9rem}
+.dist b{font-size:1.05rem}
+</style>
+</head>
+<body>
+<main>
+<h1>Set aggregators and their distances</h1>
+<p class="lede">Companion to the notes on Nikolentzos &amp; Skianis, <i>On the Lipschitz Continuity of Set Aggregation Functions and Neural Networks for Sets</i> (ICLR 2026). <a href="../index.html">Back to the notes</a>.</p>
+
+<p>A set network pools its element embeddings with a <b>sum</b>, <b>mean</b> or <b>max</b>. How far the pooled vector can move, per unit that the input set moves, is the aggregator's Lipschitz constant. The answer depends on how "the input set moves" is measured. The three widgets below let you watch that dependence directly.</p>
+
+<h2>1. Two sets, three distances, nine ratios</h2>
+<p>Blue is $X$, orange is $Y$. Click empty space to add a point to the selected set, drag a point to move it, and switch to <i>Delete</i> to remove one. Up to 6 points per set. The table shows $\lVert f(X)-f(Y)\rVert/d(X,Y)$ for every aggregator $f$ and distance $d$. It is green where the paper's theorem bounds it (bound underneath), red where the distance is 0 but the aggregates differ (a blind spot), and amber for max against EMD, which is bounded only because the size is capped.</p>
+<div class="widget">
+  <div class="controls">
+    <span class="seg" id="modeSeg"><button data-v="X" aria-pressed="true">Add to X</button><button data-v="Y" aria-pressed="false">Add to Y</button><button data-v="del" aria-pressed="false">Delete</button></span>
+    <span class="seg" id="viewSeg"><button data-v="emd" aria-pressed="true">EMD plan</button><button data-v="haus" aria-pressed="false">Hausdorff</button><button data-v="match" aria-pressed="false">Matching</button></span>
+    <label><input type="checkbox" id="showAgg" checked> show mean / sum / max</label>
+  </div>
+  <div class="controls">
+    <span style="color:var(--muted)">Presets:</span>
+    <button data-p="worked">Worked example</button>
+    <button data-p="emd0">EMD blind spot</button>
+    <button data-p="h0">Hausdorff blind spot</button>
+    <button data-p="m0">Matching blind spot</button>
+    <button data-p="sqrtd">√d for max</button>
+    <button data-p="rand">Random</button>
+  </div>
+  <div class="grid2">
+    <div>
+      <canvas id="pg" width="520" height="520" aria-label="Two point sets on a plane; drag to move points"></canvas>
+      <div class="key"><span><span class="sw" style="background:var(--s1)"></span>X</span><span><span class="sw" style="background:var(--s2)"></span>Y</span><span>○ mean &nbsp;□ sum &nbsp;△ max (outlined in each set's colour)</span><span>⊕ origin, where matching's phantom zeros sit</span></div>
+    </div>
+    <div>
+      <div class="dist" id="distBox"></div>
+      <table class="mat" id="ratioTab"></table>
+      <div class="readout" id="pgNote"></div>
+    </div>
+  </div>
+</div>
+
+<h2>2. Push each counterexample to its limit</h2>
+<p>The paper proves each "not Lipschitz" entry with a family of pairs whose ratio grows without bound. Pick one, then move the slider. Watch <i>how</i> it grows. Five families approach a pair at distance exactly zero (a blind spot), and blow up as $\varepsilon\to0$ at a fixed scale. Max against EMD grows only with the set size $M$. Attention against EMD grows only with the input scale $c$. All in $d=3$, computed with the real distances, not formulas.</p>
+<div class="widget">
+  <div class="controls">
+    <label>family <select id="fam">
+      <option value="mean_m">mean vs matching</option>
+      <option value="mean_h">mean vs Hausdorff</option>
+      <option value="sum_e">sum vs EMD</option>
+      <option value="sum_h">sum vs Hausdorff</option>
+      <option value="max_m">max vs matching</option>
+      <option value="max_e">max vs EMD (needs large M)</option>
+      <option value="att_e">attention vs EMD (needs large c)</option>
+    </select></label>
+    <label id="epsLab">ε <input type="range" id="eps" min="-4" max="0" step="0.05" value="-1"><span id="epsV"></span></label>
+    <label id="cLab">c <input type="range" id="cc" min="-1" max="3" step="0.05" value="0"><span id="cV"></span></label>
+    <label id="mLab" hidden>M <input type="range" id="MM" min="1" max="40" step="1" value="5"><span id="MV"></span></label>
+  </div>
+  <canvas id="cx" width="900" height="300" aria-label="Ratio as the family parameter changes"></canvas>
+  <div class="readout" id="cxNote"></div>
+</div>
+
+<h2>3. Add one point (Proposition 3.6)</h2>
+<p>A cloud $X$ of $n$ points and one extra point $\mathbf w$ (red, drag it). The Hausdorff distance to $X\cup\{\!\{\mathbf w\}\!\}$ is $\mathbf w$'s distance to its nearest neighbour. The EMD is <i>exactly</i> $\frac{1}{n(n+1)}\sum_i\lVert\mathbf v_i-\mathbf w\rVert$. The paper states this as an upper bound, but it is always an equality. For $n\le 10$ the page also solves the transport problem directly, so you can check. Drag $\mathbf w$ far away and compare how the mean (hollow circles) and the max (triangles) respond.</p>
+<div class="widget">
+  <div class="controls">
+    <label>n <input type="range" id="nn" min="3" max="100" step="1" value="8"><span id="nV"></span></label>
+    <button id="reseed">New cloud</button>
+  </div>
+  <div class="grid2">
+    <canvas id="ap" width="520" height="520" aria-label="Point cloud with one draggable extra point"></canvas>
+    <div>
+      <div class="dist" id="apBox"></div>
+      <div class="readout" id="apNote"></div>
+      <canvas id="apBars" width="460" height="200" aria-label="Bars comparing the distances and aggregate changes"></canvas>
+    </div>
+  </div>
+</div>
+
+<div class="callout">Everything here is exact. EMD between sizes $m$ and $n$ is solved by repeating each point of $X$ $L/m$ times and each point of $Y$ $L/n$ times ($L=\operatorname{lcm}(m,n)$) and running the Hungarian algorithm; the matching distance pads the smaller set with zero vectors. The same code in Python is in <code>code/set_lipschitz.py</code>.</div>
+</main>
+
+<script>
+"use strict";
+// ---------------------------------------------------------------- maths
+function hungarian(a){
+  const n=a.length, u=new Float64Array(n+1), v=new Float64Array(n+1), p=new Int32Array(n+1), way=new Int32Array(n+1);
+  for(let i=1;i<=n;i++){
+    p[0]=i; let j0=0; const minv=new Float64Array(n+1).fill(Infinity), used=new Uint8Array(n+1);
+    do{
+      used[j0]=1; const i0=p[j0]; let delta=Infinity, j1=0;
+      for(let j=1;j<=n;j++) if(!used[j]){
+        const cur=a[i0-1][j-1]-u[i0]-v[j];
+        if(cur<minv[j]){minv[j]=cur; way[j]=j0;}
+        if(minv[j]<delta){delta=minv[j]; j1=j;}
+      }
+      for(let j=0;j<=n;j++){ if(used[j]){u[p[j]]+=delta; v[j]-=delta;} else minv[j]-=delta; }
+      j0=j1;
+    }while(p[j0]!==0);
+    do{ const j1=way[j0]; p[j0]=p[j1]; j0=j1; }while(j0);
+  }
+  const col=new Int32Array(n); for(let j=1;j<=n;j++) col[p[j]-1]=j-1;
+  let cost=0; for(let i=0;i<n;i++) cost+=a[i][col[i]];
+  return {cost, col};
+}
+const sub=(a,b)=>a.map((x,i)=>x-b[i]);
+const nrm=a=>Math.sqrt(a.reduce((s,x)=>s+x*x,0));
+const dist=(a,b)=>nrm(sub(a,b));
+const gcd=(a,b)=>b?gcd(b,a%b):a;
+function emd(X,Y){
+  const m=X.length,n=Y.length,L=m*n/gcd(m,n),rx=L/m,ry=L/n;
+  const C=[]; for(let i=0;i<L;i++){ const row=[]; for(let j=0;j<L;j++) row.push(dist(X[Math.floor(i/rx)],Y[Math.floor(j/ry)])); C.push(row); }
+  const {cost,col}=hungarian(C);
+  const F=Array.from({length:m},()=>new Float64Array(n));
+  for(let i=0;i<L;i++) F[Math.floor(i/rx)][Math.floor(col[i]/ry)]+=1/L;
+  return {val:cost/L, F};
+}
+function haus(X,Y){
+  let best=-1, wit=null; const nnX=[], nnY=[];
+  X.forEach((x,i)=>{ let b=Infinity,bj=0; Y.forEach((y,j)=>{const d=dist(x,y); if(d<b){b=d;bj=j;}}); nnX.push(bj); if(b>best){best=b; wit=["X",i,bj];} });
+  Y.forEach((y,j)=>{ let b=Infinity,bi=0; X.forEach((x,i)=>{const d=dist(x,y); if(d<b){b=d;bi=i;}}); nnY.push(bi); if(b>best){best=b; wit=["Y",j,bi];} });
+  return {val:best, wit, nnX, nnY};
+}
+function match(X,Y){
+  const d=X[0].length, k=Math.max(X.length,Y.length), z=new Array(d).fill(0);
+  const Xp=X.concat(Array(k-X.length).fill(z)), Yp=Y.concat(Array(k-Y.length).fill(z));
+  const C=Xp.map(x=>Yp.map(y=>dist(x,y)));
+  const {cost,col}=hungarian(C);
+  const pairs=[]; for(let i=0;i<k;i++) pairs.push([i<X.length?i:null, col[i]<Y.length?col[i]:null]);
+  return {val:cost, pairs};
+}
+const fSum=X=>X.reduce((s,x)=>s.map((v,i)=>v+x[i]),new Array(X[0].length).fill(0));
+const fMean=X=>fSum(X).map(v=>v/X.length);
+const fMax=X=>X.reduce((s,x)=>s.map((v,i)=>Math.max(v,x[i])),new Array(X[0].length).fill(-Infinity));
+function fAtt(X){ // W = -I, q = 1, g = ReLU: score = total negativeness
+  const s=X.map(x=>x.reduce((t,v)=>t+Math.max(0,-v),0)), mx=Math.max(...s);
+  const w=s.map(v=>Math.exp(v-mx)), Z=w.reduce((a,b)=>a+b,0);
+  return X[0].map((_,k)=>X.reduce((t,x,i)=>t+w[i]/Z*x[k],0));
+}
+
+// ---------------------------------------------------------------- theme + canvas helpers
+function css(v){return getComputedStyle(document.documentElement).getPropertyValue(v).trim();}
+function setupCanvas(cv){
+  if(!cv._dprSet){ const dpr=window.devicePixelRatio||1; cv._w=cv.width; cv._h=cv.height; cv.style.aspectRatio=cv._w+"/"+cv._h; cv.width=cv._w*dpr; cv.height=cv._h*dpr; cv._dprSet=true; }
+  const ctx=cv.getContext("2d"); ctx.setTransform(cv.width/cv._w,0,0,cv.height/cv._h,0,0); return ctx;
+}
+function evtPos(cv,e){ const r=cv.getBoundingClientRect(); return [(e.clientX-r.left)/r.width*cv._w,(e.clientY-r.top)/r.height*cv._h]; }
+function marker(ctx,kind,x,y,col,size){
+  ctx.strokeStyle=col; ctx.lineWidth=2; ctx.beginPath();
+  if(kind==="mean") ctx.arc(x,y,size,0,7);
+  else if(kind==="sum") ctx.rect(x-size,y-size,2*size,2*size);
+  else { ctx.moveTo(x,y-size*1.2); ctx.lineTo(x+size*1.1,y+size*.8); ctx.lineTo(x-size*1.1,y+size*.8); ctx.closePath(); }
+  ctx.stroke();
+}
+const fmt=(v,k=3)=>!isFinite(v)?"∞":(Math.abs(v)>=1e4?v.toExponential(2):v.toFixed(k));
+
+// ---------------------------------------------------------------- widget 1: playground
+const pg=document.getElementById("pg");
+const PG={X:[[-1.5,-0.5],[0.5,1.2],[1.4,-1.0]],Y:[[-1.2,0.2],[0.9,1.5],[1.8,-0.6],[0.2,-1.8]],mode:"X",view:"emd",drag:null};
+const R=3.2;
+const w2c=p=>[(p[0]+R)/(2*R)*pg._w,(R-p[1])/(2*R)*pg._h];
+const c2w=q=>[q[0]/pg._w*2*R-R,R-q[1]/pg._h*2*R];
+function segInit(id,cb){ const s=document.getElementById(id); s.querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>{ s.querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b?"true":"false")); cb(b.dataset.v); })); }
+segInit("modeSeg",v=>{PG.mode=v;});
+segInit("viewSeg",v=>{PG.view=v; drawPG();});
+document.getElementById("showAgg").addEventListener("change",drawPG);
+const PRESETS={
+  worked:{X:[[0,0],[2,0]],Y:[[0,0],[2,0],[2,0]],view:"emd"},
+  emd0:{X:[[1.2,0.8]],Y:[[1.2,0.8],[1.2,0.8]],view:"emd"},
+  h0:{X:[[1,0],[0,2]],Y:[[1,0],[0,2],[0,2]],view:"haus"},
+  m0:{X:[[-1,-2]],Y:[[-1,-2],[0,0]],view:"match"},
+  sqrtd:{X:[[0.8,0],[0,0.8]],Y:[[0,0]],view:"haus"},
+};
+document.querySelectorAll("[data-p]").forEach(b=>b.addEventListener("click",()=>{
+  const k=b.dataset.p;
+  if(k==="rand"){ const r=()=>+(Math.random()*5-2.5).toFixed(2); PG.X=Array.from({length:2+Math.floor(Math.random()*4)},()=>[r(),r()]); PG.Y=Array.from({length:2+Math.floor(Math.random()*4)},()=>[r(),r()]); }
+  else { const p=PRESETS[k]; PG.X=p.X.map(a=>a.slice()); PG.Y=p.Y.map(a=>a.slice()); document.querySelector(`#viewSeg [data-v="${p.view}"]`).click(); }
+  drawPG();
+}));
+function hit(q){
+  let best=null,bd=14;
+  ["Y","X"].forEach(s=>PG[s].forEach((p,i)=>{ const c=w2c(p), d=Math.hypot(c[0]-q[0],c[1]-q[1]); if(d<bd){bd=d; best=[s,i];} }));
+  return best;
+}
+pg.addEventListener("pointerdown",e=>{
+  const q=evtPos(pg,e), h=hit(q);
+  if(PG.mode==="del"){ if(h && PG[h[0]].length>1){ PG[h[0]].splice(h[1],1); drawPG(); } return; }
+  if(h){ PG.drag=h; pg.setPointerCapture(e.pointerId); return; }
+  const s=PG.mode; if(PG[s].length>=6) return;
+  PG[s].push(c2w(q).map(v=>+v.toFixed(2))); drawPG();
+});
+pg.addEventListener("pointermove",e=>{ if(!PG.drag) return; const w=c2w(evtPos(pg,e)).map(v=>Math.max(-R+.1,Math.min(R-.1,v))); PG[PG.drag[0]][PG.drag[1]]=w; drawPG(); });
+pg.addEventListener("pointerup",()=>{PG.drag=null;});
+function drawPG(){
+  const ctx=setupCanvas(pg), W=pg._w, H=pg._h, X=PG.X, Y=PG.Y;
+  const c1=css("--s1"), c2=css("--s2"), c3=css("--s3"), c4=css("--s4"), ink=css("--ink"), line=css("--line"), faint=css("--faint");
+  ctx.fillStyle=css("--soft"); ctx.fillRect(0,0,W,H);
+  ctx.strokeStyle=line; ctx.lineWidth=1;
+  for(let t=-3;t<=3;t++){ const a=w2c([t,0]), b=w2c([0,t]); ctx.beginPath(); ctx.moveTo(a[0],0); ctx.lineTo(a[0],H); ctx.moveTo(0,b[1]); ctx.lineTo(W,b[1]); ctx.stroke(); }
+  const o=w2c([0,0]); ctx.strokeStyle=faint; ctx.lineWidth=1.3; ctx.beginPath(); ctx.arc(o[0],o[1],7,0,7); ctx.moveTo(o[0]-7,o[1]); ctx.lineTo(o[0]+7,o[1]); ctx.moveTo(o[0],o[1]-7); ctx.lineTo(o[0],o[1]+7); ctx.stroke();
+  const E=emd(X,Y), Hs=haus(X,Y), Mt=match(X,Y);
+  // overlay
+  if(PG.view==="emd"){
+    for(let i=0;i<X.length;i++) for(let j=0;j<Y.length;j++){ const f=E.F[i][j]; if(f<1e-9) continue;
+      const a=w2c(X[i]), b=w2c(Y[j]); ctx.strokeStyle=c3; ctx.globalAlpha=.85; ctx.lineWidth=1+10*f; ctx.beginPath(); ctx.moveTo(a[0],a[1]); ctx.lineTo(b[0],b[1]); ctx.stroke(); ctx.globalAlpha=1;
+      if(dist(X[i],Y[j])>0.25){ ctx.fillStyle=ink; ctx.font="11px system-ui"; ctx.fillText(fracStr(f),(a[0]+b[0])/2+4,(a[1]+b[1])/2-4); }
+    }
+  } else if(PG.view==="haus"){
+    ctx.setLineDash([4,3]); ctx.lineWidth=1; ctx.strokeStyle=faint;
+    X.forEach((x,i)=>{const a=w2c(x),b=w2c(Y[Hs.nnX[i]]); ctx.beginPath(); ctx.moveTo(a[0],a[1]); ctx.lineTo(b[0],b[1]); ctx.stroke();});
+    Y.forEach((y,j)=>{const a=w2c(y),b=w2c(X[Hs.nnY[j]]); ctx.beginPath(); ctx.moveTo(a[0],a[1]); ctx.lineTo(b[0],b[1]); ctx.stroke();});
+    ctx.setLineDash([]);
+    const [s,i,j]=Hs.wit, a=w2c(s==="X"?X[i]:Y[i]), b=w2c(s==="X"?Y[j]:X[j]);
+    ctx.strokeStyle=c4; ctx.lineWidth=3; ctx.beginPath(); ctx.moveTo(a[0],a[1]); ctx.lineTo(b[0],b[1]); ctx.stroke();
+  } else {
+    Mt.pairs.forEach(([i,j])=>{
+      const a=w2c(i===null?[0,0]:X[i]), b=w2c(j===null?[0,0]:Y[j]);
+      ctx.strokeStyle=(i===null||j===null)?c4:c3; ctx.lineWidth=2.2; ctx.beginPath(); ctx.moveTo(a[0],a[1]); ctx.lineTo(b[0],b[1]); ctx.stroke();
+      if(i===null||j===null){ ctx.setLineDash([2,2]); ctx.strokeStyle=faint; ctx.lineWidth=1.2; ctx.beginPath(); ctx.arc(o[0],o[1],11,0,7); ctx.stroke(); ctx.setLineDash([]); }
+    });
+  }
+  // points with multiplicity badges
+  const drawSet=(S,col,dx)=>{ const seen={}; S.forEach(p=>{ const key=p[0].toFixed(2)+","+p[1].toFixed(2); seen[key]=(seen[key]||0)+1; });
+    Object.entries(seen).forEach(([k,c])=>{ const p=k.split(",").map(Number), q=w2c(p); ctx.fillStyle=col; ctx.strokeStyle=css("--surface"); ctx.lineWidth=2; ctx.beginPath(); ctx.arc(q[0]+dx,q[1],7,0,7); ctx.fill(); ctx.stroke();
+      if(c>1){ ctx.fillStyle=ink; ctx.font="600 11px system-ui"; ctx.fillText("×"+c,q[0]+dx+9,q[1]-8); } }); };
+  drawSet(X,c1,-3); drawSet(Y,c2,3);
+  if(document.getElementById("showAgg").checked){
+    [["mean",fMean],["sum",fSum],["max",fMax]].forEach(([k,f])=>{
+      [[X,c1],[Y,c2]].forEach(([S,col])=>{ const v=f(S); if(Math.abs(v[0])>R||Math.abs(v[1])>R) return; const q=w2c(v); marker(ctx,k,q[0],q[1],col,6); });
+    });
+  }
+  // readouts
+  const m=X.length, n=Y.length, eq=m===n, d=2, D={EMD:E.val,Hausdorff:Hs.val,matching:Mt.val};
+  document.getElementById("distBox").innerHTML=
+    `<div>EMD <b>${fmt(E.val)}</b></div><div>Hausdorff <b>${fmt(Hs.val)}</b></div><div>matching <b>${fmt(Mt.val)}</b></div><div>|X| = ${m}, |Y| = ${n}</div>`;
+  const aggs=[["mean",fMean],["sum",fSum],["max",fMax]];
+  const bound=(a,dn)=>{
+    if(a==="mean"&&dn==="EMD") return [1,"≤ 1 (Thm 3.1)","ok"];
+    if(a==="sum"&&dn==="matching") return [1,"≤ 1 (Thm 3.1)","ok"];
+    if(a==="max"&&dn==="Hausdorff") return [Math.SQRT2,"≤ √d = 1.414 (Thm 3.1)","ok"];
+    if(eq&&a==="mean"&&dn==="matching") return [1/m,`≤ 1/M = ${fmt(1/m)} (Lem 3.2)`,"ok"];
+    if(eq&&a==="sum"&&dn==="EMD") return [m,`≤ M = ${m} (Lem 3.2)`,"ok"];
+    if(eq&&a==="max"&&dn==="matching") return [1,"≤ 1 (Lem 3.2)","ok"];
+    if(a==="max"&&dn==="EMD") return eq?[m,`≤ M = ${m} (Lem 3.2)`,"big"]:[Math.SQRT2*Math.max(m,n),`≤ √d·max(m,n) = ${fmt(Math.SQRT2*Math.max(m,n))} (size cap; see notes)`,"big"];
+    return [null,"no bound","none"];
+  };
+  let html="<tr><th></th>"+aggs.map(a=>`<th>${a[0]}</th>`).join("")+"</tr>";
+  let blind=[];
+  ["EMD","Hausdorff","matching"].forEach(dn=>{
+    html+=`<tr><th>${dn}</th>`;
+    aggs.forEach(([a,f])=>{
+      const diff=nrm(sub(f(X),f(Y))), dd=D[dn], [B,txt,cls]=bound(a,dn);
+      let val, c=cls;
+      if(dd<1e-9){ if(diff>1e-9){ val="∞"; c="bad"; blind.push(`${a}/${dn}`);} else val="0 / 0"; }
+      else val=fmt(diff/dd);
+      if(c==="none") c="";
+      html+=`<td class="${c}">${val}<small>${txt}</small></td>`;
+    });
+    html+="</tr>";
+  });
+  document.getElementById("ratioTab").innerHTML=html;
+  const views={emd:"Green lines: the optimal transport plan, thickness and label = mass moved.",haus:"Dashed: every point's nearest neighbour in the other set. Amber: the worst one, which is the Hausdorff distance.",match:"Green: matched pairs. Amber: an element left over, matched to a phantom zero at the origin and paying its own norm."};
+  document.getElementById("pgNote").innerHTML=views[PG.view]+(blind.length?` <br><b>Blind spot:</b> distance 0 but the aggregates differ for ${blind.join(", ")}, so no Lipschitz constant can exist there.`:"");
+}
+function fracStr(f){ for(let q=1;q<=36;q++){ const p=Math.round(f*q); if(Math.abs(p/q-f)<1e-9) return p+"/"+q; } return f.toFixed(3); }
+
+// ---------------------------------------------------------------- widget 2: counterexamples
+const D3=3, one=s=>new Array(D3).fill(s);
+const FAM={
+  mean_m:{f:fMean,d:match,dn:"matching",pair:(e,c)=>[[one(c),one(e)],[one(c)]],lim:"{c1} vs {c1, 0}: the phantom zero is free, but the mean is pulled halfway to it",par:"eps"},
+  mean_h:{f:fMean,d:haus,dn:"Hausdorff",pair:(e,c)=>[[one(-c),one(c),one(c+e)],[one(-c),one(c)]],lim:"{−c1, c1, c1} vs {−c1, c1}: same locations, different multiplicities",par:"eps"},
+  sum_e:{f:fSum,d:emd,dn:"EMD",pair:(e,c)=>[[one(c)],[one(c),one(c+e)]],lim:"{c1} vs {c1, c1}: the same distribution, but the sum doubles",par:"eps"},
+  sum_h:{f:fSum,d:haus,dn:"Hausdorff",pair:(e,c)=>[[one(c),one(c+e)],[one(c)]],lim:"{c1, c1} vs {c1}: Hausdorff ignores the duplicate, the sum does not",par:"eps"},
+  max_m:{f:fMax,d:match,dn:"matching",pair:(e,c)=>[[one(-c),one(e)],[one(-c)]],lim:"{−c1, 0} vs {−c1}: the phantom zero is free, but it lifts the max from −c1 to 0",par:"eps"},
+  max_e:{f:fMax,d:emd,dn:"EMD",pair:(M)=>maxEmdPair(M),par:"M"},
+  att_e:{f:fAtt,d:emd,dn:"EMD",pair:(e,c)=>[[one(c),one(e)],[one(c),one(-e)]],par:"eps+c"},
+};
+function maxEmdPair(M){ // Appendix B.3.7: M-1 shared points summing to zero, tops one apart
+  const base=[]; for(let i=0;i<M-1;i++){ const a=2*Math.PI*i/Math.max(1,M-1); base.push([Math.cos(a),Math.sin(a),0]); }
+  if(M===2) base[0]=[0,0,0];
+  const top=[10,10,10], top2=top.map(v=>v+1/Math.sqrt(3));
+  return [base.concat([top]), base.concat([top2])];
+}
+const cx=document.getElementById("cx");
+["fam","eps","cc","MM"].forEach(id=>document.getElementById(id).addEventListener("input",drawCX));
+function famRatio(F,a,b){ const [X,Y]=F.pair(a,b), dd=F.d(X,Y).val; return nrm(sub(F.f(X),F.f(Y)))/dd; }
+function drawCX(){
+  const key=document.getElementById("fam").value, F=FAM[key];
+  const eps=Math.pow(10,+document.getElementById("eps").value), c=Math.pow(10,+document.getElementById("cc").value), M=+document.getElementById("MM").value;
+  document.getElementById("epsV").textContent=" "+eps.toExponential(1);
+  document.getElementById("cV").textContent=" "+(c<10?c.toFixed(2):c.toFixed(0));
+  document.getElementById("MV").textContent=" "+M;
+  document.getElementById("epsLab").hidden=F.par==="M";
+  document.getElementById("mLab").hidden=F.par!=="M";
+  document.getElementById("cLab").hidden=F.par==="M";
+  const ctx=setupCanvas(cx), W=cx._w, H=cx._h, pad={l:62,r:20,t:18,b:40};
+  ctx.fillStyle=css("--surface"); ctx.fillRect(0,0,W,H);
+  const pw=W-pad.l-pad.r, ph=H-pad.t-pad.b, ink=css("--ink"), muted=css("--muted"), line=css("--line");
+  let pts=[], cur, xlab, xs, xticks, ylo=-1, yhi=5;
+  if(F.par==="M"){
+    for(let k=1;k<=40;k++) pts.push([k,famRatio(F,k)]);
+    cur=[M,famRatio(F,M)]; xs=v=>pad.l+(v-1)/39*pw; xlab="M = largest set size allowed"; xticks=[1,10,20,30,40].map(v=>[v,String(v)]); ylo=-0.2; yhi=Math.log10(60);
+  } else {
+    for(let k=0;k<=80;k++){ const e=Math.pow(10,-4+4*k/80); pts.push([1/e,famRatio(F,e,c)]); }
+    cur=[1/eps,famRatio(F,eps,c)]; xs=v=>pad.l+Math.log10(v)/4*pw; xlab="1/ε  (the two sets get closer →)"; xticks=[0,1,2,3,4].map(k=>[Math.pow(10,k),"10^"+k]);
+    ylo=-1; yhi=Math.max(2,Math.ceil(Math.log10(Math.max(...pts.map(p=>p[1]))*1.5)));
+  }
+  const ys=v=>pad.t+ph-(Math.log10(Math.max(v,1e-3))-ylo)/(yhi-ylo)*ph;
+  ctx.strokeStyle=line; ctx.fillStyle=muted; ctx.font="11px system-ui"; ctx.lineWidth=1;
+  for(let k=Math.ceil(ylo);k<=Math.floor(yhi);k++){ const y=ys(Math.pow(10,k)); ctx.beginPath(); ctx.moveTo(pad.l,y); ctx.lineTo(W-pad.r,y); ctx.stroke(); ctx.fillText("10^"+k,pad.l-40,y+4); }
+  xticks.forEach(([v,t])=>{ const x=xs(v); ctx.fillText(t,x-10,H-pad.b+16); });
+  ctx.fillText(xlab,pad.l+pw/2-80,H-8);
+  ctx.save(); ctx.translate(14,pad.t+ph/2+60); ctx.rotate(-Math.PI/2); ctx.fillText("‖f(X) − f(Y)‖ / "+F.dn,0,0); ctx.restore();
+  if(key==="att_e"){ const lim=c*D3/4+1, y=ys(lim); ctx.setLineDash([5,4]); ctx.strokeStyle=css("--s4"); ctx.beginPath(); ctx.moveTo(pad.l,y); ctx.lineTo(W-pad.r,y); ctx.stroke(); ctx.setLineDash([]); ctx.fillStyle=css("--s4"); ctx.fillText("limit c·d/4 + 1 = "+fmt(lim,2),W-pad.r-150,y-6); }
+  if(key==="max_e"){ ctx.setLineDash([5,4]); ctx.strokeStyle=css("--s4"); ctx.beginPath(); pts.forEach(([m],i)=>{const x=xs(m),y=ys(Math.sqrt(3)*m); i?ctx.lineTo(x,y):ctx.moveTo(x,y);}); ctx.stroke(); ctx.setLineDash([]); ctx.fillStyle=css("--s4"); ctx.fillText("upper bound √d·M",xs(28),ys(Math.sqrt(3)*28)-8); }
+  ctx.strokeStyle=css("--s1"); ctx.lineWidth=2.2; ctx.beginPath(); pts.forEach(([x,y],i)=>{ i?ctx.lineTo(xs(x),ys(y)):ctx.moveTo(xs(x),ys(y)); }); ctx.stroke();
+  ctx.fillStyle=css("--s2"); ctx.beginPath(); ctx.arc(xs(cur[0]),ys(cur[1]),6,0,7); ctx.fill();
+  const [X,Y]=F.par==="M"?F.pair(M):F.pair(eps,c), dd=F.d(X,Y).val, df=nrm(sub(F.f(X),F.f(Y)));
+  let note=`At the orange dot: ${F.dn} = <b>${fmt(dd,5)}</b>, ‖Δf‖ = <b>${fmt(df,4)}</b>, ratio <b>${fmt(cur[1],2)}</b>. `;
+  if(F.par==="eps") note+=`As ε → 0 the pair converges to ${F.lim.replace(/c1/g,"c𝟏")}. The ratio grows like 1/ε at <i>any</i> fixed c: an unconditional failure.`;
+  else if(F.par==="M") note+=`The ratio equals M exactly: for every fixed size cap the max is Lipschitz for EMD, but no single constant works for all M. The paper's proof picks M larger than the constant it wants to beat.`;
+  else note+=`Shrinking ε does not blow this up: the curve levels off at c·d/4 + 1. Only growing c (a longer lever arm for the shifted softmax weight) does. On a bounded input domain attention is Lipschitz for EMD.`;
+  document.getElementById("cxNote").innerHTML=note;
+}
+
+// ---------------------------------------------------------------- widget 3: add one point
+const ap=document.getElementById("ap"), bars=document.getElementById("apBars");
+const AP={cloud:[],w:[2.3,1.9],drag:false,seed:3};
+function rng(seed){ let s=seed>>>0; return ()=>{ s=(s*1664525+1013904223)>>>0; return s/4294967296; }; }
+function makeCloud(){ const r=rng(AP.seed), n=+document.getElementById("nn").value; AP.cloud=[];
+  for(let i=0;i<n;i++){ const u=Math.max(r(),1e-9), v=r(), rad=Math.sqrt(-2*Math.log(u))*0.75; AP.cloud.push([rad*Math.cos(2*Math.PI*v)-0.4,rad*Math.sin(2*Math.PI*v)-0.3]); } }
+document.getElementById("nn").addEventListener("input",()=>{makeCloud(); drawAP();});
+document.getElementById("reseed").addEventListener("click",()=>{AP.seed++; makeCloud(); drawAP();});
+const a2c=p=>[(p[0]+R)/(2*R)*ap._w,(R-p[1])/(2*R)*ap._h], c2a=q=>[q[0]/ap._w*2*R-R,R-q[1]/ap._h*2*R];
+ap.addEventListener("pointerdown",e=>{ const q=evtPos(ap,e), c=a2c(AP.w); AP.drag=true; ap.setPointerCapture(e.pointerId); if(Math.hypot(q[0]-c[0],q[1]-c[1])>16){ AP.w=c2a(q); drawAP(); } });
+ap.addEventListener("pointermove",e=>{ if(!AP.drag) return; AP.w=c2a(evtPos(ap,e)).map(v=>Math.max(-R+.1,Math.min(R-.1,v))); drawAP(); });
+ap.addEventListener("pointerup",()=>{AP.drag=false;});
+function drawAP(){
+  const ctx=setupCanvas(ap), W=ap._w, H=ap._h, X=AP.cloud, w=AP.w, Xp=X.concat([w]), n=X.length;
+  document.getElementById("nV").textContent=" "+n;
+  ctx.fillStyle=css("--soft"); ctx.fillRect(0,0,W,H);
+  ctx.strokeStyle=css("--line"); ctx.lineWidth=1;
+  for(let t=-3;t<=3;t++){ const a=a2c([t,t]); ctx.beginPath(); ctx.moveTo(a[0],0); ctx.lineTo(a[0],H); ctx.moveTo(0,a[1]); ctx.lineTo(W,a[1]); ctx.stroke(); }
+  const ds=X.map(v=>dist(v,w)), nnI=ds.indexOf(Math.min(...ds));
+  const emdF=ds.reduce((a,b)=>a+b,0)/(n*(n+1)), dH=ds[nnI];
+  const q=a2c(w), qn=a2c(X[nnI]);
+  ctx.strokeStyle=css("--s4"); ctx.lineWidth=3; ctx.beginPath(); ctx.moveTo(q[0],q[1]); ctx.lineTo(qn[0],qn[1]); ctx.stroke();
+  X.forEach(p=>{ const c=a2c(p); ctx.fillStyle=css("--s1"); ctx.beginPath(); ctx.arc(c[0],c[1],4,0,7); ctx.fill(); });
+  ctx.fillStyle=css("--neg"); ctx.strokeStyle=css("--surface"); ctx.lineWidth=2; ctx.beginPath(); ctx.arc(q[0],q[1],8,0,7); ctx.fill(); ctx.stroke();
+  const m0=fMean(X), m1=fMean(Xp), x0=fMax(X), x1=fMax(Xp);
+  [[m0,css("--s1")],[m1,css("--neg")]].forEach(([v,col])=>{const c=a2c(v); marker(ctx,"mean",c[0],c[1],col,7);});
+  [[x0,css("--s1")],[x1,css("--neg")]].forEach(([v,col])=>{const c=a2c(v); marker(ctx,"max",c[0],c[1],col,7);});
+  const dMean=dist(m0,m1), dMax=dist(x0,x1);
+  let lp="";
+  if(n<=10){ const E=emd(X,Xp).val; lp=`<div>LP check <b>${fmt(E,5)}</b></div>`; }
+  document.getElementById("apBox").innerHTML=`<div>EMD <b>${fmt(emdF,5)}</b></div>${lp}<div>Hausdorff <b>${fmt(dH,4)}</b></div><div>‖Δ mean‖ <b>${fmt(dMean,4)}</b></div><div>‖Δ max‖ <b>${fmt(dMax,4)}</b></div>`;
+  document.getElementById("apNote").innerHTML=`EMD = (1/(n(n+1)))·Σ‖vᵢ − w‖ with n = ${n}${n<=10?"; the direct transport solution agrees":""}. `+
+    `‖Δ mean‖ ≤ EMD (Theorem 3.1) and ‖Δ max‖ ≤ √2·Hausdorff. Hausdorff is ${fmt(dH/Math.max(emdF,1e-12),1)}× the EMD here. Blue markers: before; red: after adding w.`;
+  // bars
+  const bc=setupCanvas(bars), BW=bars._w, BH=bars._h;
+  bc.fillStyle=css("--surface"); bc.fillRect(0,0,BW,BH);
+  const items=[["EMD",emdF,css("--s3")],["‖Δ mean‖",dMean,css("--s1")],["Hausdorff",dH,css("--s4")],["‖Δ max‖",dMax,css("--s2")]];
+  const mx=Math.max(...items.map(i=>i[1]),1e-6);
+  items.forEach(([lab,v,col],i)=>{ const y=16+i*44, bw=(BW-190)*v/mx; bc.fillStyle=col; bc.fillRect(100,y,Math.max(bw,1),24); bc.fillStyle=css("--ink"); bc.font="12px system-ui"; bc.fillText(lab,6,y+16); bc.fillText(fmt(v,4),106+Math.max(bw,1),y+16); });
+}
+
+// ---------------------------------------------------------------- boot
+function all(){ drawPG(); drawCX(); drawAP(); }
+window.addEventListener("DOMContentLoaded",()=>{
+  makeCloud(); all();
+  if(window.renderMathInElement) renderMathInElement(document.body,{delimiters:[{left:"$$",right:"$$",display:true},{left:"$",right:"$",display:false}]});
+});
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change",all);
+</script>
+</body>
+</html>

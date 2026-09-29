@@ -1,0 +1,74 @@
+<svg viewBox="0 0 920 320" xmlns="http://www.w3.org/2000/svg" role="img">
+<title>Two kinds of blow-up</title>
+<desc>Two log-log charts of the ratio of output change to input distance for the paper's witnesses, d = 3. Left, at input scale c = 1 with epsilon shrinking: the mean against the matching distance grows like 1/(2 epsilon) without bound, while attention against EMD levels off at c d / 4 + 1 = 1.75. Right, with epsilon fixed at 1e-4 and c growing from 0.1 to 1000: the attention ratio grows linearly, about c d / 4. So the mean fails because of a blind spot of the distance, attention against EMD only because the inputs are unbounded.</desc>
+<style>
+  text{font-family:ui-sans-serif,-apple-system,"Segoe UI",sans-serif;font-weight:400}
+  .lab{font-size:11px;fill:#57564f} .hd{font-size:13px;font-weight:500;fill:#1a1a19}
+  .sm{font-size:10.5px;fill:#57564f} .v{font-size:11px;fill:#1a1a19}
+  .ax{stroke:#8a8880;stroke-width:0.9;fill:none} .gd{stroke:#e2e1da;stroke-width:0.6;fill:none}
+  .box{fill:none;stroke:#c9c7bf;stroke-width:1}
+  .s1{stroke:#2a78d6} .s2{stroke:#eb6834} .s3{stroke:#1baf7a} .s4{stroke:#eda100}
+  .f1{fill:#2a78d6} .f2{fill:#eb6834} .f3{fill:#1baf7a} .f4{fill:#eda100}
+  .ln{stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+  .dash{stroke-width:1.3;fill:none;stroke-dasharray:5 3}
+  .arr{stroke-width:1.6;fill:none}
+  .ring{stroke:#fdfdfc;stroke-width:1.5}
+  .ph{fill:none;stroke:#8a8880;stroke-width:1.2;stroke-dasharray:2 2}
+  @media (prefers-color-scheme: dark){
+    .lab,.sm{fill:#b6b4ab} .hd,.v{fill:#eceae3} .ax{stroke:#85837b} .gd{stroke:#33312e} .box{stroke:#4a4844}
+    .s1{stroke:#3987e5} .s2{stroke:#d95926} .s3{stroke:#199e70} .s4{stroke:#c98500}
+    .f1{fill:#3987e5} .f2{fill:#d95926} .f3{fill:#199e70} .f4{fill:#c98500}
+    .ring{stroke:#161615} .ph{stroke:#85837b}
+  }
+</style>
+<text class="hd" x="70" y="22">Shrink ε at fixed input scale c = 1</text>
+<line class="ax" x1="70" y1="250" x2="430" y2="250"/>
+<line class="ax" x1="70" y1="40" x2="70" y2="250"/>
+<line class="gd" x1="70" y1="250.0" x2="430" y2="250.0"/>
+<text class="sm" x="34" y="254.0">10^-1</text>
+<line class="gd" x1="70" y1="208.0" x2="430" y2="208.0"/>
+<text class="sm" x="34" y="212.0">10^0</text>
+<line class="gd" x1="70" y1="166.0" x2="430" y2="166.0"/>
+<text class="sm" x="34" y="170.0">10^1</text>
+<line class="gd" x1="70" y1="124.0" x2="430" y2="124.0"/>
+<text class="sm" x="34" y="128.0">10^2</text>
+<line class="gd" x1="70" y1="82.0" x2="430" y2="82.0"/>
+<text class="sm" x="34" y="86.0">10^3</text>
+<line class="gd" x1="70" y1="40.0" x2="430" y2="40.0"/>
+<text class="sm" x="34" y="44.0">10^4</text>
+<text class="sm" x="60.0" y="266">10^0</text>
+<text class="sm" x="150.0" y="266">10^1</text>
+<text class="sm" x="240.0" y="266">10^2</text>
+<text class="sm" x="330.0" y="266">10^3</text>
+<text class="sm" x="420.0" y="266">10^4</text>
+<text class="lab" x="230.0" y="284">1/ε</text>
+<text class="lab" transform="translate(20,205.0) rotate(-90)">‖Δf‖ / distance</text>
+<polyline class="ln s1" points="430.0,52.6 424.7,55.1 419.3,57.6 414.0,60.1 408.6,62.6 403.3,65.1 398.0,67.6 392.6,70.1 387.3,72.6 381.9,75.1 376.6,77.6 371.3,80.1 365.9,82.6 360.6,85.0 355.3,87.5 349.9,90.0 344.6,92.5 339.2,95.0 333.9,97.5 328.6,100.0 323.2,102.5 317.9,105.0 312.5,107.5 307.2,110.0 301.9,112.5 296.5,115.0 291.2,117.5 285.8,120.0 280.5,122.5 275.2,125.0 269.8,127.5 264.5,130.0 259.2,132.5 253.8,135.0 248.5,137.5 243.1,140.1 237.8,142.6 232.5,145.1 227.1,147.7 221.8,150.2 216.4,152.7 211.1,155.3 205.8,157.9 200.4,160.4 195.1,163.0 189.7,165.6 184.4,168.3 179.1,170.9 173.7,173.6 168.4,176.3 163.1,179.0 157.7,181.8 152.4,184.6 147.0,187.4 141.7,190.4 136.4,193.4 131.0,196.5 125.7,199.7 120.3,203.0 115.0,206.6"/>
+<polyline class="ln s2" points="430.0,197.8 424.7,197.8 419.3,197.8 414.0,197.8 408.6,197.8 403.3,197.8 398.0,197.8 392.6,197.8 387.3,197.8 381.9,197.8 376.6,197.8 371.3,197.8 365.9,197.8 360.6,197.8 355.3,197.8 349.9,197.8 344.6,197.8 339.2,197.8 333.9,197.8 328.6,197.8 323.2,197.8 317.9,197.8 312.5,197.8 307.2,197.8 301.9,197.8 296.5,197.8 291.2,197.8 285.8,197.8 280.5,197.8 275.2,197.8 269.8,197.7 264.5,197.7 259.2,197.7 253.8,197.7 248.5,197.7 243.1,197.7 237.8,197.7 232.5,197.7 227.1,197.7 221.8,197.6 216.4,197.6 211.1,197.6 205.8,197.6 200.4,197.5 195.1,197.5 189.7,197.4 184.4,197.4 179.1,197.3 173.7,197.3 168.4,197.2 163.1,197.1 157.7,197.1 152.4,197.0 147.0,196.9 141.7,196.7 136.4,196.6 131.0,196.5 125.7,196.4 120.3,196.2 115.0,196.1"/>
+<text class="v" x="244" y="69.35674018211279">mean vs matching → ∞</text>
+<text class="v" x="244" y="189.79162030049275">attention vs EMD → cd/4 + 1 = 1.75</text>
+<text class="hd" x="520" y="22">Grow the input scale c (ε = 10⁻⁴)</text>
+<line class="ax" x1="520" y1="250" x2="880" y2="250"/>
+<line class="ax" x1="520" y1="40" x2="520" y2="250"/>
+<line class="gd" x1="520" y1="250.0" x2="880" y2="250.0"/>
+<text class="sm" x="484" y="254.0">10^-1</text>
+<line class="gd" x1="520" y1="208.0" x2="880" y2="208.0"/>
+<text class="sm" x="484" y="212.0">10^0</text>
+<line class="gd" x1="520" y1="166.0" x2="880" y2="166.0"/>
+<text class="sm" x="484" y="170.0">10^1</text>
+<line class="gd" x1="520" y1="124.0" x2="880" y2="124.0"/>
+<text class="sm" x="484" y="128.0">10^2</text>
+<line class="gd" x1="520" y1="82.0" x2="880" y2="82.0"/>
+<text class="sm" x="484" y="86.0">10^3</text>
+<line class="gd" x1="520" y1="40.0" x2="880" y2="40.0"/>
+<text class="sm" x="484" y="44.0">10^4</text>
+<text class="sm" x="510.0" y="266">10^-1</text>
+<text class="sm" x="600.0" y="266">10^0</text>
+<text class="sm" x="690.0" y="266">10^1</text>
+<text class="sm" x="780.0" y="266">10^2</text>
+<text class="sm" x="870.0" y="266">10^3</text>
+<text class="lab" x="650.0" y="284">input scale c</text>
+<polyline class="ln s2" points="520.0,206.7 526.1,206.5 532.2,206.2 538.3,205.9 544.4,205.6 550.5,205.2 556.6,204.8 562.7,204.3 568.8,203.8 574.9,203.1 581.0,202.4 587.1,201.6 593.2,200.7 599.3,199.8 605.4,198.7 611.5,197.5 617.6,196.2 623.7,194.8 629.8,193.2 635.9,191.6 642.0,189.9 648.1,188.0 654.2,186.1 660.3,184.0 666.4,181.9 672.5,179.7 678.6,177.4 684.7,175.1 690.8,172.7 696.9,170.2 703.1,167.7 709.2,165.1 715.3,162.6 721.4,159.9 727.5,157.3 733.6,154.6 739.7,151.9 745.8,149.2 751.9,146.4 758.0,143.7 764.1,140.9 770.2,138.1 776.3,135.3 782.4,132.5 788.5,129.7 794.6,126.9 800.7,124.1 806.8,121.3 812.9,118.4 819.0,115.6 825.1,112.8 831.2,109.9 837.3,107.1 843.4,104.3 849.5,101.4 855.6,98.6 861.7,95.8 867.8,92.9 873.9,90.1 880.0,87.2"/>
+<text class="v" x="540" y="103.96090730177417">attention vs EMD ≈ c·d/4: unbounded</text>
+<text class="v" x="540" y="119.96090730177417">only because inputs are unbounded</text>
+</svg>
