@@ -1,0 +1,84 @@
+<svg viewBox="0 0 730 430" xmlns="http://www.w3.org/2000/svg" role="img">
+<title>The spine of the argument</title>
+<desc>Boxes and arrows. Left column: the pullback metric of the PF-ODE decoder, and Prop B.1 that its geodesics decode to straight lines. Middle column: the Fisher-Rao metric of p(x0 | x_T), its collapse by memorylessness, the move to spacetime z = (x_t, t), and Prop C.2 that the denoising posteriors form an exponential family. Right column: the metric formula of Prop C.1, the exact chord identity of Lemma D.2 giving the energy estimate Eq 14, the expectation parameter from the denoiser via Tweedie Eq 16, geodesic optimisation and DiffED. Bottom: transition path sampling.</desc>
+<style>
+  text{font-family:ui-sans-serif,-apple-system,"Segoe UI",sans-serif;font-weight:400}
+  .lab{font-size:11px;fill:#57564f} .hd{font-size:13px;font-weight:600;fill:#1a1a19}
+  .sub{font-size:11.5px;fill:#57564f} .tiny{font-size:10px;fill:#57564f} .ink{fill:#1a1a19}
+  .mono{font-family:ui-monospace,Menlo,monospace;font-size:10.5px;fill:#1a1a19}
+  .ax{stroke:#8a8880;stroke-width:0.8;fill:none} .gd{stroke:#e2e1da;stroke-width:0.6;fill:none;stroke-dasharray:3 3}
+  .hm{fill:#2f6fb5} .gfill{fill:#8a8880;opacity:.25}
+  .b{stroke:#2f6fb5;stroke-width:2.4;fill:none} .bf{fill:#2f6fb5}
+  .o{stroke:#c2571a;stroke-width:1.8;fill:none;stroke-dasharray:6 4} .of{fill:#c2571a}
+  .os{stroke:#c2571a;stroke-width:2;fill:none}
+  .g{stroke:#0f7a5a;stroke-width:1.6;fill:none} .gdash{stroke:#0f7a5a;stroke-width:1.6;fill:none;stroke-dasharray:5 3}
+  .p{stroke:#7c3aed;stroke-width:2;fill:none} .pf{fill:#7c3aed}
+  .k{stroke:#8a8880;stroke-width:1.6;fill:none;stroke-dasharray:5 4} .kt{stroke:#8a8880;stroke-width:0.7;fill:none;opacity:.6}
+  .el{stroke:#1a1a19;stroke-width:0.9;fill:none} .elc{stroke:#1a1a19;stroke-width:0.9;fill:none;stroke-dasharray:2 2;opacity:.5}
+  .pt{fill:#ffffff;stroke:#1a1a19;stroke-width:1.6}
+  .node{fill:#ffffff;stroke:#c3c2b7;stroke-width:1} .nodeb{fill:#eef4fb;stroke:#2f6fb5;stroke-width:1.2}
+  .nodeg{fill:#ecf6f1;stroke:#0f7a5a;stroke-width:1.2} .nodeo{fill:#fbf0e8;stroke:#c2571a;stroke-width:1.2}
+  .arr{stroke:#57564f;stroke-width:1.3;fill:none} .arrh{fill:#57564f}
+  .shade{fill:#8a8880;opacity:.12}
+  @media (prefers-color-scheme: dark){
+    .lab,.sub,.tiny{fill:#b6b4ab} .hd,.ink,.mono{fill:#eceae3} .ax{stroke:#8f9199} .gd{stroke:#33312e}
+    .hm{fill:#7fb2e8} .gfill{fill:#b6b4ab}
+    .b{stroke:#7fb2e8} .bf{fill:#7fb2e8} .o,.os{stroke:#f0a070} .of{fill:#f0a070}
+    .g,.gdash{stroke:#4cc79a} .p{stroke:#b48cff} .pf{fill:#b48cff} .k,.kt{stroke:#b6b4ab}
+    .el,.elc{stroke:#eceae3} .pt{fill:#1b1d21;stroke:#eceae3}
+    .node{fill:#1b1d21;stroke:#4a4844} .nodeb{fill:#1c2a3a;stroke:#7fb2e8} .nodeg{fill:#16291f;stroke:#4cc79a}
+    .nodeo{fill:#2e2016;stroke:#f0a070} .arr{stroke:#b6b4ab} .arrh{fill:#b6b4ab} .shade{fill:#b6b4ab}
+  }
+</style>
+<rect class="nodeo" x="20" y="50" width="210" height="64" rx="8"/>
+<text class="sub" x="125.0" y="70" text-anchor="middle">Pullback metric G = JᵀJ</text>
+<text class="sub" x="125.0" y="85" text-anchor="middle">of the PF-ODE decoder</text>
+<text class="sub" x="125.0" y="100" text-anchor="middle">(Eq 5)</text>
+<rect class="nodeo" x="20" y="150" width="210" height="64" rx="8"/>
+<text class="sub" x="125.0" y="170" text-anchor="middle">Bijective decoder ⇒</text>
+<text class="sub" x="125.0" y="185" text-anchor="middle">geodesics decode to</text>
+<text class="sub" x="125.0" y="200" text-anchor="middle">straight lines (Prop B.1)</text>
+<rect class="node" x="250" y="50" width="210" height="64" rx="8"/>
+<text class="sub" x="355.0" y="63" text-anchor="middle">Fisher–Rao metric of</text>
+<text class="sub" x="355.0" y="78" text-anchor="middle">p(x₀ | x_T) (Eq 7)</text>
+<rect class="node" x="250" y="150" width="210" height="64" rx="8"/>
+<text class="sub" x="355.0" y="170" text-anchor="middle">Memorylessness: p(x₀|x_T) ≈ q</text>
+<text class="sub" x="355.0" y="185" text-anchor="middle">⇒ G ≈ 0 (Eq 11). Use the</text>
+<text class="sub" x="355.0" y="200" text-anchor="middle">spacetime z = (x_t, t) (Eq 12)</text>
+<rect class="nodeg" x="250" y="250" width="210" height="64" rx="8"/>
+<text class="sub" x="355.0" y="270" text-anchor="middle">Bayes: p(x₀|z) = q(x₀) e^{ηᵀT − ψ},</text>
+<text class="sub" x="355.0" y="285" text-anchor="middle">T = (x₀, ‖x₀‖²), η = (αx/σ², −α²/2σ²)</text>
+<text class="sub" x="355.0" y="300" text-anchor="middle">an exponential family (Prop C.2)</text>
+<rect class="nodeg" x="500" y="50" width="210" height="64" rx="8"/>
+<text class="sub" x="605.0" y="63" text-anchor="middle">G = (∂η/∂z)ᵀ(∂μ/∂z)</text>
+<text class="sub" x="605.0" y="78" text-anchor="middle">(Prop C.1)</text>
+<rect class="nodeg" x="500" y="150" width="210" height="64" rx="8"/>
+<text class="sub" x="605.0" y="170" text-anchor="middle">(Δη)ᵀ(Δμ) = 2 KL^S, exactly</text>
+<text class="sub" x="605.0" y="185" text-anchor="middle">ψ cancels (Lemma D.2)</text>
+<text class="sub" x="605.0" y="200" text-anchor="middle">⇒ energy estimate (Eq 14)</text>
+<rect class="nodeg" x="500" y="250" width="210" height="64" rx="8"/>
+<text class="sub" x="605.0" y="270" text-anchor="middle">μ from the denoiser: Tweedie,</text>
+<text class="sub" x="605.0" y="285" text-anchor="middle">E‖x₀‖² = ‖x̂₀‖² + (σ²/α) div x̂₀</text>
+<text class="sub" x="605.0" y="300" text-anchor="middle">(Eq 16), one JVP per point</text>
+<rect class="nodeb" x="500" y="350" width="210" height="64" rx="8"/>
+<text class="sub" x="605.0" y="370" text-anchor="middle">Geodesic = minimise Eq 14</text>
+<text class="sub" x="605.0" y="385" text-anchor="middle">over a spline (Alg 3)</text>
+<text class="sub" x="605.0" y="400" text-anchor="middle">DiffED = its length (Eq 17)</text>
+<rect class="nodeb" x="250" y="350" width="210" height="64" rx="8"/>
+<text class="sub" x="355.0" y="370" text-anchor="middle">Transition paths: annealed</text>
+<text class="sub" x="355.0" y="385" text-anchor="middle">Langevin along the geodesic</text>
+<text class="sub" x="355.0" y="400" text-anchor="middle">(Alg 1), penalties (Eqs 21–23)</text>
+<path class="arr" d="M125,114 L125.0,143.0"/><path class="arrh" d="M125,150 L121.0,143.0 L129.0,143.0 Z"/>
+<path class="arr" d="M355,114 L355.0,143.0"/><path class="arrh" d="M355,150 L351.0,143.0 L359.0,143.0 Z"/>
+<path class="arr" d="M355,214 L355.0,243.0"/><path class="arrh" d="M355,250 L351.0,243.0 L359.0,243.0 Z"/>
+<path class="arr" d="M460,282 L498.6,88.9"/><path class="arrh" d="M500,82 L502.5,89.6 L494.7,88.1 Z"/>
+<path class="arr" d="M605,114 L605.0,143.0"/><path class="arrh" d="M605,150 L601.0,143.0 L609.0,143.0 Z"/>
+<path class="arr" d="M460,282 L493.0,282.0"/><path class="arrh" d="M500,282 L493.0,286.0 L493.0,278.0 Z"/>
+<path class="arr" d="M605,214 L605.0,243.0"/><path class="arrh" d="M605,250 L601.0,243.0 L609.0,243.0 Z"/>
+<path class="arr" d="M605,314 L605.0,343.0"/><path class="arrh" d="M605,350 L601.0,343.0 L609.0,343.0 Z"/>
+<path class="arr" d="M500,382 L467.0,382.0"/><path class="arrh" d="M460,382 L467.0,378.0 L467.0,386.0 Z"/>
+<text class="hd" x="20" y="28">The spine of the argument</text>
+<text class="tiny" x="20" y="238">orange: the rejected geometry</text>
+<text class="tiny" x="20" y="252">green: exact identities</text>
+<text class="tiny" x="20" y="266">blue: what they are used for</text>
+</svg>

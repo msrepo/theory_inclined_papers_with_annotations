@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Diffusion Spacetime, Interactive</title>
+<style>
+:root{
+  --bg:#fbfaf7; --surface:#ffffff; --ink:#1c1d21; --muted:#5b5f68; --line:#e2dfd8; --soft:#f2f0ea;
+  --c0:#2f6fb5; --c1:#c2571a; --c2:#0f7a5a; --c3:#7c3aed; --c4:#b8860b; --bad:#b42318; --grey:#8a8880;
+  --heat:#2f6fb5;
+  --radius:12px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#131417; --surface:#1b1d21; --ink:#ebebed; --muted:#a3a6ae; --line:#2e3138; --soft:#23262b;
+    --c0:#7fb2e8; --c1:#f0a070; --c2:#4cc79a; --c3:#b48cff; --c4:#e6c34d; --bad:#ff7a6b; --grey:#8f9199;
+    --heat:#5b93d6;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#131417; --surface:#1b1d21; --ink:#ebebed; --muted:#a3a6ae; --line:#2e3138; --soft:#23262b;
+  --c0:#7fb2e8; --c1:#f0a070; --c2:#4cc79a; --c3:#b48cff; --c4:#e6c34d; --bad:#ff7a6b; --grey:#8f9199;
+  --heat:#5b93d6;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,sans-serif;}
+main{max-width:920px;margin:0 auto;padding:40px 16px 80px}
+h1{font-size:2.05rem;line-height:1.2;margin:0 0 .4rem;letter-spacing:-.01em}
+h2{font-size:1.38rem;margin:3rem 0 .6rem;padding-top:.5rem;border-top:1px solid var(--line)}
+h3{font-size:1.08rem;margin:1.8rem 0 .4rem}
+p{margin:.6rem 0}
+a{color:var(--c0)}
+.lede{color:var(--muted);font-size:1.05rem;margin-bottom:1.4rem}
+nav.toc{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:12px 18px;font-size:.93rem}
+nav.toc ol{margin:.3rem 0;padding-left:1.2rem}
+nav.toc a{color:var(--ink);text-decoration:none;border-bottom:1px dotted var(--muted)}
+.widget{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:14px;margin:1rem 0 1.2rem}
+.controls{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;margin:.2rem 0 .6rem;font-size:.9rem}
+.controls label{display:flex;align-items:center;gap:6px;color:var(--muted)}
+button,select{font:inherit;font-size:.88rem;color:var(--ink);background:var(--soft);border:1px solid var(--line);border-radius:8px;padding:5px 11px;cursor:pointer}
+button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+input[type=range]{accent-color:var(--c0);width:140px}
+.readout{font-size:.9rem;color:var(--muted);margin-top:.5rem;font-variant-numeric:tabular-nums}
+.readout b{color:var(--ink);font-weight:600}
+.readout .bad{color:var(--bad);font-weight:600}
+.readout .good{color:var(--c2);font-weight:600}
+.callout{border-left:3px solid var(--c2);background:var(--soft);padding:10px 14px;border-radius:0 8px 8px 0;margin:1rem 0;font-size:.95rem}
+canvas{display:block;width:100%;touch-action:none}
+canvas.drag{cursor:grab}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grid21{display:grid;grid-template-columns:1.6fr 1fr;gap:12px}
+@media (max-width:680px){.grid2,.grid21{grid-template-columns:1fr}}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:.82rem;color:var(--muted);margin:.3rem 0 0}
+.legend span::before{content:"";display:inline-block;width:16px;height:3px;margin-right:6px;vertical-align:3px;background:var(--c)}
+.legend span.dash::before{background:repeating-linear-gradient(90deg,var(--c) 0 5px,transparent 5px 8px)}
+.legend span.fill::before{height:9px;vertical-align:0;opacity:.35}
+.legend span.dot::before{width:7px;height:7px;border-radius:50%;vertical-align:1px}
+table.mx{border-collapse:collapse;font-size:.85rem;font-variant-numeric:tabular-nums;margin:.4rem 0;max-width:100%}
+table.mx td,table.mx th{border:1px solid var(--line);padding:3px 8px;text-align:right;white-space:nowrap}
+table.mx th{background:var(--soft);color:var(--muted);font-weight:500}
+table.mx td.sym{color:var(--muted);text-align:left}
+table.mx tr.hl td{background:var(--soft)}
+.tablewrap{overflow-x:auto}
+.small{font-size:.86rem;color:var(--muted)}
+.kbd{font-family:ui-monospace,Menlo,monospace;font-size:.85em;background:var(--soft);padding:1px 5px;border-radius:4px}
+@media (max-width:600px){ h1{font-size:1.7rem} input[type=range]{width:110px} }
+</style>
+</head>
+<body>
+<main>
+
+<h1>Diffusion Spacetime, Interactive</h1>
+<p class="lede"><a href="../index.html">← text notes</a> · Karczewski, Heinonen, Pouplin, Hauberg &amp; Garg, ICLR 2026. Five widgets for the paper's constructs. Everything is computed in your browser, and nothing is learned. The data are Gaussian mixtures, so every denoising distribution p(x₀ | x<sub>t</sub>) is a Gaussian mixture in closed form. That makes η, μ, ψ, the KL divergences and the Fisher–Rao metric exact. The geodesic solver is the one in <span class="kbd">code/spacetime_checks.py</span>: it minimises the paper's Eq 14 with a natural-gradient step.</p>
+
+<nav class="toc"><b>Contents</b>
+<ol>
+  <li><a href="#explorer">The spacetime explorer: geodesics, posteriors, metric ellipses (Figs 1 and 3)</a></li>
+  <li><a href="#chord">Two points, four numbers: the chord is exactly twice the symmetrised KL</a></li>
+  <li><a href="#hyper">Gaussian data: the spacetime is a hyperbolic half-plane</a></li>
+  <li><a href="#ring">Pullback versus spacetime on a ring of data</a></li>
+  <li><a href="#tps">Transition paths along a spacetime geodesic</a></li>
+</ol></nav>
+
+<!-- ============================================================ -->
+<h2 id="explorer">1. The spacetime explorer</h2>
+<p>The data are the paper's toy (App G.1): three Gaussians at −2.5, 0.5 and 2.5 with standard deviation 0.75, under a variance-preserving schedule with log-SNR falling linearly from 10 at t = 0 to −10 at t = 1. The shading is the noisy marginal p<sub>t</sub>(x), normalised per column as in the paper's Fig. 1. Each point (x<sub>t</sub>, t) of the plane <i>is</i> a distribution: the denoising posterior p(x₀ | x<sub>t</sub>). <b>Drag the two white handles.</b> The blue curve is the spacetime geodesic between them, found by minimising the discrete energy, Eq 14. The slider moves a point along it, and the right panel shows the posterior at that point.</p>
+
+<div class="widget">
+  <div class="controls">
+    <label><input type="checkbox" id="exStraight" checked> straight line in (x<sub>t</sub>, t)</label>
+    <label><input type="checkbox" id="exNoise" checked> "noise everything" path</label>
+    <label><input type="checkbox" id="exOde"> PF-ODE trajectories</label>
+    <label><input type="checkbox" id="exTissot"> metric ellipses</label>
+  </div>
+  <div class="controls">
+    <button id="exFig1">Fig. 1 endpoints</button>
+    <button id="exSame">same mode</button>
+    <button id="exOdeBtn">Fig. 3: a PF-ODE trajectory's endpoints</button>
+    <label>position on the geodesic s <input type="range" id="exS" min="0" max="1" step="0.01" value="0.5"><span id="exSV">0.50</span></label>
+  </div>
+  <div class="grid21">
+    <div><canvas id="exMap" class="drag" data-h="340"></canvas></div>
+    <div><canvas id="exPost" data-h="340"></canvas></div>
+  </div>
+  <div class="legend"><span style="--c:var(--c0)">spacetime geodesic</span><span class="dash" style="--c:var(--grey)">straight line in (x<sub>t</sub>, t)</span><span class="dash" style="--c:var(--c1)">up to t = 1, across, down</span><span style="--c:var(--c2)">PF-ODE</span><span class="fill" style="--c:var(--grey)">data q(x₀)</span><span style="--c:var(--c3)">p(x₀ | γ<sub>s</sub>)</span></div>
+  <div class="readout" id="exRead"></div>
+</div>
+<div class="callout">Things to try. <b>(1)</b> With the Fig. 1 endpoints, move s from 0 to 1. The posterior starts narrow on the left mode, widens until it covers all three modes (the "forget" half), then narrows onto the right mode (the "denoise" half). <b>(2)</b> Compare the lengths. The geodesic climbs only to t ≈ 0.62, yet the path that goes all the way to t = 1 is barely longer: about 1% here. Everything above t ≈ 0.6 is almost free, because the posteriors there barely depend on x<sub>t</sub>. Press <b>same mode</b> and the ratio drops to about 0.2. <b>(3)</b> Turn on <b>metric ellipses</b>. Each one is the set of steps of equal cost, √(dz<sup>⊤</sup>G dz) = 0.3. Near t = 1 they are clipped to their cell: moving x<sub>t</sub> there costs nothing, which is the memorylessness of Eq 11. Near t = 0 they shrink to dots: the posteriors are nearly Dirac, and every step is expensive. <b>(4)</b> Press the Fig. 3 button. The geodesic and the PF-ODE path share their endpoints, and their lengths agree to within a few tenths of a percent.</div>
+
+<!-- ============================================================ -->
+<h2 id="chord">2. Two points, four numbers</h2>
+<p>For an exponential family, Lemma D.2 says (η₁ − η₂)<sup>⊤</sup>(μ₁ − μ₂) = KL(1‖2) + KL(2‖1). This is an identity for <i>any</i> two points, not an approximation for nearby ones. Eq 14 is therefore (N − 1) × a sum of symmetrised KLs between consecutive points of the curve. That is exactly the local-KL energy of Eq 13 with KL replaced by its symmetrised version. The only approximation left is the one every discretised energy makes. The usual local approximation, ½Δz<sup>⊤</sup>G Δz per KL, is shown for contrast. It is only right for nearby points.</p>
+<div class="widget">
+  <div class="controls">
+    <label>x₁ <input type="range" id="chX1" min="-4" max="4" step="0.05" value="-2.3"><span id="chX1V"></span></label>
+    <label>t₁ <input type="range" id="chT1" min="0.05" max="0.95" step="0.005" value="0.35"><span id="chT1V"></span></label>
+    <label>x₂ <input type="range" id="chX2" min="-4" max="4" step="0.05" value="-1.0"><span id="chX2V"></span></label>
+    <label>t₂ <input type="range" id="chT2" min="0.05" max="0.95" step="0.005" value="0.45"><span id="chT2V"></span></label>
+  </div>
+  <div class="grid2">
+    <div><canvas id="chPost" data-h="240"></canvas></div>
+    <div><canvas id="chConv" data-h="240"></canvas></div>
+  </div>
+  <div class="legend"><span class="fill" style="--c:var(--grey)">q(x₀)</span><span style="--c:var(--c0)">p(x₀ | z₁)</span><span style="--c:var(--c1)">p(x₀ | z₂)</span><span style="--c:var(--c2)">Eq 14 for the straight segment z₁ → z₂, against N</span></div>
+  <div class="tablewrap"><table class="mx" id="chTable"></table></div>
+</div>
+<div class="callout">Put the two points close together and all rows agree. Pull them apart and the quadratic approximation ½Δz<sup>⊤</sup>G(z₁)Δz drifts, by tens of percent within a mode, while the chord row still matches the sum of the two KLs to every printed digit. The right panel shows why Eq 14 needs only modest N: each chord is exact, so the energy of a fixed curve converges quickly as N grows. In the code, the straight Fig. 1 segment gives 129.3 at N = 4, 127.0 at N = 16 and 126.96 in the limit.</div>
+
+<!-- ============================================================ -->
+<h2 id="hyper">3. Gaussian data: the spacetime is a hyperbolic half-plane</h2>
+<p>Take q = N(0, 1) and the VP schedule. Then p(x₀ | x<sub>t</sub>) = N(m, s²), with m = α<sub>t</sub>x<sub>t</sub> and s = σ<sub>t</sub>. So spacetime <i>is</i> the family of 1-D Gaussians with s &lt; 1. Its Fisher–Rao metric is (dm² + 2ds²)/s², the hyperbolic half-plane stretched by √2 along m. Geodesics are semi-ellipses centred on the s = 0 axis, (m − m₀)²/2 + s² = R², and the distance has a closed form. <b>Drag the handles.</b> Both are data points anchored at a small noise level s, the way DiffED anchors at t<sub>min</sub>.</p>
+<div class="widget">
+  <div class="controls">
+    <label><input type="checkbox" id="hyOde"> PF-ODE paths m²/x² + s² = 1</label>
+    <label><input type="checkbox" id="hyBalls" checked> equal-cost circles</label>
+    <label>anchor noise s for the right panel <input type="range" id="hyS0" min="-2.5" max="-0.5" step="0.05" value="-1.5"><span id="hyS0V"></span></label>
+  </div>
+  <div class="grid2">
+    <div><canvas id="hyPlane" class="drag" data-h="300"></canvas></div>
+    <div><canvas id="hyCurve" data-h="300"></canvas></div>
+  </div>
+  <div class="legend"><span style="--c:var(--c0)">geodesic (closed form)</span><span class="dash" style="--c:var(--c2)">PF-ODE paths (the one with x = √2 is a geodesic)</span><span style="--c:var(--c3)">DiffED(d), both points at noise s</span><span class="dash" style="--c:var(--grey)">log law 2√2 log(d/√2s)</span><span class="dash" style="--c:var(--c1)">"noise everything" upper bound</span></div>
+  <div class="readout" id="hyRead"></div>
+</div>
+<div class="callout">What the formula says about DiffED. <b>(1)</b> Once d ≫ s it grows like the <i>logarithm</i> of the Euclidean distance d between the two points, 2√2 log(d/√2 s). So it is a compressed Euclidean distance, not a new notion of similarity. <b>(2)</b> It depends on the anchor noise s as −2√2 log s. Halving t<sub>min</sub> changes every DiffED by roughly the same additive amount. <b>(3)</b> The apex of the geodesic sits at s ≈ d/(2√2). That is the paper's "the less similar the endpoints, the noisier the midpoint" (Fig. 4), now with a number. <b>(4)</b> When the apex would pass s = 1, the geodesic has to leave the family. The true path then runs along the top edge, where every point is essentially the prior, and DiffED is squeezed between the purple curve and the orange bound, the length of the path that goes via q itself. Turn on the PF-ODE paths: they are quarter-ellipses with semi-axes (x, 1), and only the one with x = √2 has the geodesic shape.</div>
+
+<!-- ============================================================ -->
+<h2 id="ring">4. Pullback versus spacetime on a ring of data</h2>
+<p>The data lie near a circle of radius 2: a mixture of 24 small Gaussians, standard deviation 0.12. <b>Pullback geometry</b> (Section 4) uses the PF-ODE as a deterministic, bijective decoder. Whatever that decoder is, Prop B.1 says its shortest paths decode to the straight chord, the dashed grey line, straight through the empty middle. The <b>spacetime geodesic</b> between the same two points, anchored at log-SNR 4, is a path of <i>distributions</i>. The purple dots are 300 samples from the posterior at position s along it. Their mean (blue) does cut inside the ring, because the mean of a spread-out posterior is off the data. The samples themselves stay on the ring.</p>
+<div class="widget">
+  <div class="controls">
+    <label>angle of a <input type="range" id="rgA" min="0" max="359" step="1" value="200"><span id="rgAV"></span></label>
+    <label>angle of b <input type="range" id="rgB" min="0" max="359" step="1" value="340"><span id="rgBV"></span></label>
+    <label>position s <input type="range" id="rgS" min="0" max="1" step="0.01" value="0.5"><span id="rgSV"></span></label>
+  </div>
+  <div class="grid2">
+    <div><canvas id="rgData" data-h="320"></canvas></div>
+    <div><canvas id="rgNoise" data-h="320"></canvas></div>
+  </div>
+  <div class="legend"><span class="dash" style="--c:var(--grey)">pullback geodesic, decoded (the chord)</span><span style="--c:var(--c0)">E[x₀ | γ<sub>s</sub>] along the spacetime geodesic</span><span class="dot" style="--c:var(--c3)">samples of p(x₀ | γ<sub>s</sub>)</span><span style="--c:var(--c1)">noise level σ/α = SNR<sup>−1/2</sup> along the geodesic</span></div>
+  <div class="readout" id="rgRead"></div>
+</div>
+<div class="callout">Move the endpoints close together. The geodesic hardly rises in noise, and its posteriors are small blobs sliding along the ring. Move them to opposite sides. The geodesic climbs until one posterior covers most of the ring, then descends. It never tries to squeeze a sharp distribution through the middle, where there is no data. That is the sense in which spacetime geometry "sees" the data manifold and pullback geometry cannot: the chord is the same for <i>every</i> bijective decoder, and so for every data distribution.</div>
+
+<!-- ============================================================ -->
+<h2 id="tps">5. Transition paths along a spacetime geodesic</h2>
+<p>A Boltzmann density q ∝ e<sup>−U</sup> with two wells, A and B. The straight route between them crosses a high barrier. A curved channel over the top is much lower. The denoising posterior is again Boltzmann, with energy U(x₀) + ½SNR‖x₀ − x<sub>t</sub>/α‖² (Eq 19). Algorithm 1 runs 120 Langevin steps on the posterior at each of 40 points on the geodesic, carrying the state along. The result is a chain from A to B that is always near-typical for a slowly moving target. <b>Baseline</b>: the same annealed Langevin along a straight line at fixed noise, log-SNR 4 all the way. The optional penalty is the paper's low-variance constraint, h = max(−log SNR, ρ).</p>
+<div class="widget">
+  <div class="controls">
+    <label>paths <select id="tpN"><option>8</option><option selected>16</option><option>32</option></select></label>
+    <label>penalty λ <input type="range" id="tpLam" min="0" max="3" step="0.1" value="0"><span id="tpLamV"></span></label>
+    <label>threshold ρ (−log SNR) <input type="range" id="tpRho" min="-3" max="3" step="0.1" value="0"><span id="tpRhoV"></span></label>
+    <button id="tpRun">resample paths</button>
+    <label><input type="checkbox" id="tpAbl" checked> ablation: straight line, geodesic's noise schedule</label>
+  </div>
+  <div class="controls">
+    <label>posterior samples at position s <input type="range" id="tpS" min="0" max="1" step="0.01" value="0.5"><span id="tpSV">0.50</span></label>
+  </div>
+  <div class="grid21">
+    <div><canvas id="tpMap" data-h="330"></canvas></div>
+    <div><canvas id="tpNoise" data-h="330"></canvas></div>
+  </div>
+  <div class="legend"><span style="--c:var(--c1)">Langevin along the spacetime geodesic</span><span style="--c:var(--grey)">Langevin along a fixed-noise straight line</span><span style="--c:var(--c2)">straight line with the geodesic's noise schedule</span><span style="--c:var(--c0)">E[x₀ | γ<sub>s</sub>]</span><span class="dot" style="--c:var(--c3)">samples of p(x₀ | γ<sub>s</sub>)</span><span style="--c:var(--c3)">SNR<sup>−1/2</sup> along the geodesic</span></div>
+  <div class="readout" id="tpRead"></div>
+</div>
+<div class="callout"><b>Look at the blue curve first.</b> The geodesic's posterior mean runs straight along the barrier, not over the channel. Slide s to 0.5: the posterior there is the two wells, reweighted, with almost no mass in the channel. That is how Fisher–Rao geometry moves probability. It has no notion of transport, so mass moves from A to B by <i>reweighting</i> the two modes, and nothing ever has to pass through the middle. The geodesic even pushes x<sub>t</sub>/α far below the wells, to y ≈ −4.4, to keep the channel out of the posterior. Even so, the transition paths are much better than the baseline's, and the reason is the Langevin chain. Once the noise is high, a chain stranded in A is out of equilibrium and has to move to B. A slow random walk gets there by the lowest route it can find: the channel, or the flank of the barrier just below it. In <span class="kbd">spacetime_checks.py</span>, 44% of 32 chains cross x = 0 inside the channel, and none of the baseline's do. So the geodesic's job is to supply a schedule of broad, then narrow, targets. Routing the path is done by the dynamics. The fixed-noise baseline never gets broad enough, so every one of its chains is dragged through the barrier. <b>The ablation (green) tells you which part matters.</b> Keep x<sub>t</sub>/α on the straight line and borrow only the geodesic's noise schedule. Its chains do <i>better</i> than the geodesic's: in the code, MaxEnergy 8.6 against 11.9, and 94% against 44% crossing in the channel. The geodesic's dip away from the channel pulls chains toward the barrier. In this toy, what helps is noising up and back down; the geodesic's shape does not. Compare both MaxEnergy numbers with the flood-fill lower bound, the lowest barrier any continuous path can have. Note what MaxEnergy measures: the chain runs on a <i>moving</i> target, so a path's timing has no physical meaning, and only the set of states it visits is scored.</div>
+
+</main>
+
+<script>
+(() => {
+'use strict';
+// ============================================================ utilities
+const $ = id => document.getElementById(id);
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const col = c => c && c.startsWith('--') ? css(c) : c;
+function hexRGB(h){ h = h.replace('#', ''); if (h.length === 3) h = h.split('').map(c => c + c).join(''); const n = parseInt(h, 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255]; }
+function mix(a, b, f){ return [0, 1, 2].map(i => Math.round(a[i] + (b[i] - a[i]) * f)); }
+const fmt = (v, d = 3) => (v === null || !isFinite(v)) ? '—' : (Math.abs(v) >= 1e5 || (Math.abs(v) < 1e-3 && v !== 0)) ? v.toExponential(2) : v.toFixed(d);
+const sigmoid = u => 1 / (1 + Math.exp(-u));
+function mulberry(seed){ return () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+function gaussGen(r){ let spare = null; return () => { if (spare !== null){ const s = spare; spare = null; return s; } let u = 0; while (u === 0) u = r(); const v = r(), m = Math.sqrt(-2 * Math.log(u)); spare = m * Math.sin(2 * Math.PI * v); return m * Math.cos(2 * Math.PI * v); }; }
+function solveSmall(A, b){                      // Gaussian elimination with pivoting, n <= 4
+  const n = b.length, M = A.map((r, i) => [...r, b[i]]);
+  for (let c = 0; c < n; c++){
+    let p = c; for (let r = c + 1; r < n; r++) if (Math.abs(M[r][c]) > Math.abs(M[p][c])) p = r;
+    [M[c], M[p]] = [M[p], M[c]];
+    const piv = M[c][c]; if (Math.abs(piv) < 1e-300) return null;
+    for (let r = c + 1; r < n; r++){ const f = M[r][c] / piv; for (let k = c; k <= n; k++) M[r][k] -= f * M[c][k]; }
+  }
+  const x = new Array(n).fill(0);
+  for (let r = n - 1; r >= 0; r--){ let s = M[r][n]; for (let k = r + 1; k < n; k++) s -= M[r][k] * x[k]; x[r] = s / M[r][r]; }
+  return x;
+}
+
+// ------------------------------------------------------------ canvas views
+function view(cv, o){
+  const dpr = window.devicePixelRatio || 1, W = cv.clientWidth, H = +cv.dataset.h;
+  cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); cv.style.height = H + 'px';
+  const ctx = cv.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  const pad = Object.assign({l: 46, r: 12, t: o.title ? 24 : 10, b: o.xlabel ? 38 : 22}, o.pad || {});
+  const [x0, x1] = o.xlim, [y0, y1] = o.ylim;
+  const lx = !!o.logx, fx = v => lx ? Math.log10(v) : v;
+  const X = v => pad.l + (fx(v) - fx(x0)) / (fx(x1) - fx(x0)) * (W - pad.l - pad.r);
+  const Y = v => H - pad.b - (v - y0) / (y1 - y0) * (H - pad.t - pad.b);
+  const iX = px => { const u = fx(x0) + (px - pad.l) / (W - pad.l - pad.r) * (fx(x1) - fx(x0)); return lx ? 10 ** u : u; };
+  const iY = py => y0 + (H - pad.b - py) / (H - pad.t - pad.b) * (y1 - y0);
+  ctx.clearRect(0, 0, W, H);
+  return {cv, ctx, W, H, pad, X, Y, iX, iY, o, pw: W - pad.l - pad.r, ph: H - pad.t - pad.b};
+}
+function niceTicks(a, b, n = 5){
+  const span = b - a, step0 = span / n, mag = 10 ** Math.floor(Math.log10(step0));
+  const step = [1, 2, 2.5, 5, 10].map(m => m * mag).find(s => span / s <= n + 0.5) || mag * 10;
+  const out = []; for (let v = Math.ceil(a / step - 1e-9) * step; v <= b + 1e-9; v += step) out.push(+v.toFixed(10)); return out;
+}
+function frame(V, {xticks, yticks, xfmt, yfmt, grid = true} = {}){
+  const {ctx, W, H, pad, X, Y, o} = V;
+  ctx.font = '11px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif';
+  ctx.strokeStyle = col('--line'); ctx.fillStyle = col('--muted'); ctx.lineWidth = 1;
+  const xt = xticks || (o.logx ? (() => { const t = []; for (let e = Math.ceil(Math.log10(o.xlim[0])); e <= Math.log10(o.xlim[1]); e++) t.push(10 ** e); return t; })() : niceTicks(o.xlim[0], o.xlim[1], 6));
+  const yt = yticks || niceTicks(o.ylim[0], o.ylim[1], 5);
+  ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+  for (const v of xt){ const x = X(v); if (grid){ ctx.beginPath(); ctx.moveTo(x, pad.t); ctx.lineTo(x, H - pad.b); ctx.stroke(); } ctx.fillText(xfmt ? xfmt(v) : String(+v.toPrecision(4)), x, H - pad.b + 4); }
+  ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+  for (const v of yt){ const y = Y(v); if (grid){ ctx.beginPath(); ctx.moveTo(pad.l, y); ctx.lineTo(W - pad.r, y); ctx.stroke(); } ctx.fillText(yfmt ? yfmt(v) : String(+v.toPrecision(4)), pad.l - 5, y); }
+  ctx.strokeStyle = col('--grey'); ctx.strokeRect(pad.l + .5, pad.t + .5, V.pw - 1, V.ph - 1);
+  if (o.title){ ctx.fillStyle = col('--ink'); ctx.textAlign = 'left'; ctx.textBaseline = 'top'; ctx.font = '600 12px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif'; ctx.fillText(o.title, pad.l, 5); }
+  ctx.font = '11px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif'; ctx.fillStyle = col('--muted');
+  if (o.xlabel){ ctx.textAlign = 'center'; ctx.textBaseline = 'bottom'; ctx.fillText(o.xlabel, pad.l + V.pw / 2, H - 3); }
+  if (o.ylabel){ ctx.save(); ctx.translate(11, pad.t + V.ph / 2); ctx.rotate(-Math.PI / 2); ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(o.ylabel, 0, 0); ctx.restore(); }
+}
+function line(V, xs, ys, {color = '--c0', width = 2, dash = null, alpha = 1} = {}){
+  const {ctx, X, Y} = V; ctx.save(); ctx.globalAlpha = alpha; ctx.strokeStyle = col(color); ctx.lineWidth = width; ctx.setLineDash(dash || []);
+  ctx.beginPath(); let on = false;
+  for (let i = 0; i < xs.length; i++){ const x = X(xs[i]), y = Y(ys[i]); if (!isFinite(x) || !isFinite(y)){ on = false; continue; } on ? ctx.lineTo(x, y) : ctx.moveTo(x, y); on = true; }
+  ctx.stroke(); ctx.restore();
+}
+function clip(V){ const {ctx, pad} = V; ctx.save(); ctx.beginPath(); ctx.rect(pad.l, pad.t, V.pw, V.ph); ctx.clip(); }
+function dot(V, x, y, {r = 5, color = '--ink', fill = '--surface', width = 2} = {}){
+  const {ctx, X, Y} = V; ctx.beginPath(); ctx.arc(X(x), Y(y), r, 0, 2 * Math.PI); ctx.fillStyle = col(fill); ctx.fill(); ctx.lineWidth = width; ctx.strokeStyle = col(color); ctx.stroke();
+}
+function label(V, x, y, text, {color = '--ink', align = 'left', base = 'middle', dx = 0, dy = 0, size = 11} = {}){
+  const {ctx, X, Y} = V; ctx.fillStyle = col(color); ctx.textAlign = align; ctx.textBaseline = base; ctx.font = `${size}px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif`; ctx.fillText(text, X(x) + dx, Y(y) + dy);
+}
+const heatCache = new Map();
+function heat(V, f, nx, ny, {gamma = 0.6, colname = '--heat', normCols = false, alpha = 1, key = null} = {}){
+  // f(x, y) >= 0 on the plot range; draws an nx*ny raster blended from --surface to colname.
+  // With a key, the raster is cached until the size or the theme changes.
+  const {ctx, pad, iX, iY} = V;
+  const sig = key && [key, V.pw, V.ph, css('--surface'), css(colname)].join('|');
+  if (sig && heatCache.has(sig)){ ctx.save(); ctx.imageSmoothingEnabled = true; ctx.drawImage(heatCache.get(sig), pad.l, pad.t, V.pw, V.ph); ctx.restore(); return; }
+  const bg = hexRGB(css('--surface')), fg = hexRGB(css(colname));
+  const vals = new Float64Array(nx * ny);
+  for (let i = 0; i < nx; i++){ const x = iX(pad.l + (i + .5) / nx * V.pw); let mx = 0;
+    for (let j = 0; j < ny; j++){ const y = iY(pad.t + (j + .5) / ny * V.ph); const v = f(x, y); vals[j * nx + i] = v; if (v > mx) mx = v; }
+    if (normCols && mx > 0) for (let j = 0; j < ny; j++) vals[j * nx + i] /= mx;
+  }
+  let gmax = 0; if (!normCols) for (const v of vals) if (v > gmax) gmax = v;
+  const img = ctx.createImageData(nx, ny);
+  for (let k = 0; k < nx * ny; k++){ const u = Math.pow(normCols ? vals[k] : vals[k] / gmax, gamma) * alpha; const c = mix(bg, fg, Math.min(1, u)); img.data.set([c[0], c[1], c[2], 255], 4 * k); }
+  const off = document.createElement('canvas'); off.width = nx; off.height = ny; off.getContext('2d').putImageData(img, 0, 0);
+  if (sig) heatCache.set(sig, off);
+  ctx.save(); ctx.imageSmoothingEnabled = true; ctx.drawImage(off, pad.l, pad.t, V.pw, V.ph); ctx.restore();
+}
+
+// ============================================================ the family
+// q(x) = sum_k pi_k N(x; c_k, s_k^2 I_D). Every tilt q(x) exp(a.x + b|x|^2), b < 0, is again such a
+// mixture, so the denoising posteriors, their moments and psi are all closed form.
+function Family(centers, weights, vars){
+  const K = weights.length, D = centers[0].length;
+  const logpi = weights.map(Math.log), cc = centers.map(c => c.reduce((s, v) => s + v * v, 0));
+  function tilt(eta){
+    const b = eta[D], w = new Float64Array(K), v = new Float64Array(K), m = [];
+    let top = -Infinity;
+    for (let k = 0; k < K; k++){
+      const s2 = vars[k]; v[k] = 1 / (1 / s2 - 2 * b);
+      const mk = new Float64Array(D); let mm = 0;
+      for (let d = 0; d < D; d++){ mk[d] = v[k] * (centers[k][d] / s2 + eta[d]); mm += mk[d] * mk[d]; }
+      m.push(mk);
+      w[k] = logpi[k] + D / 2 * Math.log(v[k] / s2) + mm / (2 * v[k]) - cc[k] / (2 * s2);
+      if (w[k] > top) top = w[k];
+    }
+    let Z = 0; for (let k = 0; k < K; k++){ w[k] = Math.exp(w[k] - top); Z += w[k]; }
+    for (let k = 0; k < K; k++) w[k] /= Z;
+    return {w, m, v, psi: Math.log(Z) + top};
+  }
+  function stats(eta){           // mu = E[T], H = Cov[T], T = (x, |x|^2)
+    const {w, m, v, psi} = tilt(eta), P = D + 1;
+    const mu = new Float64Array(P), S = Array.from({length: P}, () => new Float64Array(P));
+    for (let k = 0; k < K; k++){
+      const wk = w[k]; if (wk < 1e-300) continue;
+      const mk = m[k], vk = v[k]; let mm = 0; for (let d = 0; d < D; d++) mm += mk[d] * mk[d];
+      const e2 = mm + D * vk, e3f = mm + (D + 2) * vk, e4 = e2 * e2 + 2 * D * vk * vk + 4 * vk * mm;
+      for (let i = 0; i < D; i++){
+        mu[i] += wk * mk[i];
+        for (let j = 0; j < D; j++) S[i][j] += wk * ((i === j ? vk : 0) + mk[i] * mk[j]);
+        S[i][D] += wk * mk[i] * e3f;
+      }
+      mu[D] += wk * e2; S[D][D] += wk * e4;
+    }
+    for (let i = 0; i < D; i++) S[D][i] = S[i][D];
+    const H = S.map((r, i) => Array.from(r, (val, j) => val - mu[i] * mu[j]));
+    return {mu, H, psi};
+  }
+  function logq(x){ let top = -Infinity; const l = []; for (let k = 0; k < K; k++){ let d2 = 0; for (let d = 0; d < D; d++) d2 += (x[d] - centers[k][d]) ** 2; l.push(logpi[k] - D / 2 * Math.log(2 * Math.PI * vars[k]) - d2 / (2 * vars[k])); if (l[k] > top) top = l[k]; } let s = 0; for (const u of l) s += Math.exp(u - top); return top + Math.log(s); }
+  function gradlogq(x){ const g = new Float64Array(D); let top = -Infinity; const l = []; for (let k = 0; k < K; k++){ let d2 = 0; for (let d = 0; d < D; d++) d2 += (x[d] - centers[k][d]) ** 2; l.push(logpi[k] - D / 2 * Math.log(vars[k]) - d2 / (2 * vars[k])); if (l[k] > top) top = l[k]; } let s = 0; for (let k = 0; k < K; k++){ const r = Math.exp(l[k] - top); s += r; for (let d = 0; d < D; d++) g[d] += r * (centers[k][d] - x[d]) / vars[k]; } for (let d = 0; d < D; d++) g[d] /= s; return g; }
+  function sample(eta, rnd, gauss){ const {w, m, v} = tilt(eta); let u = rnd(), k = 0; while (k < K - 1 && u > w[k]){ u -= w[k]; k++; } return Array.from(m[k], mi => mi + Math.sqrt(v[k]) * gauss()); }
+  function kl(e1, e2){ const s1 = stats(e1), s2 = stats(e2); let dot = 0; for (let i = 0; i <= D; i++) dot += (e1[i] - e2[i]) * s1.mu[i]; return dot - s1.psi + s2.psi; }
+  return {D, K, centers, weights, vars, tilt, stats, logq, gradlogq, sample, kl};
+}
+
+// coordinates y = (xhat, ell): xhat = x_t / alpha (the noisy point's guess of x0), ell = log SNR.
+// eta = (e^ell xhat, -e^ell / 2) for every schedule.
+function etaY(y){ const D = y.length - 1, el = Math.exp(y[D]), e = new Float64Array(D + 1); for (let d = 0; d < D; d++) e[d] = el * y[d]; e[D] = -el / 2; return e; }
+function jacY(y){ const D = y.length - 1, el = Math.exp(y[D]); const J = Array.from({length: D + 1}, () => new Float64Array(D + 1)); for (let d = 0; d < D; d++){ J[d][d] = el; J[d][D] = el * y[d]; } J[D][D] = -el / 2; return J; }
+
+// ------------------------------------------------------------ geodesic solver (Eq 14)
+function Geodesic(fam, N){
+  const P = fam.D + 1;
+  let Y = [];
+  const g = {N, iters: 0, penalty: null};
+  g.init = (ya, yb) => { Y = []; for (let n = 0; n < N; n++){ const s = n / (N - 1); Y.push(Float64Array.from(ya, (v, i) => (1 - s) * v + s * yb[i])); } g.iters = 0; };
+  g.shiftEnds = (ya, yb) => { // warm start: move the ends, drag the interior along linearly
+    const da = Array.from(ya, (v, i) => v - Y[0][i]), db = Array.from(yb, (v, i) => v - Y[N - 1][i]);
+    for (let n = 0; n < N; n++){ const s = n / (N - 1); for (let i = 0; i < P; i++) Y[n][i] += (1 - s) * da[i] + s * db[i]; }
+    g.iters = 0;
+  };
+  g.setCurve = C => { Y = C.map(r => Float64Array.from(r)); g.iters = 0; };
+  g.curve = () => Y;
+  g.step = (iters) => {
+    let maxStep = 0;
+    for (let it = 0; it < iters; it++){
+      const E = Y.map(etaY), S = E.map(fam.stats);
+      maxStep = 0;
+      const c = (N - 1) / 2;
+      for (let n = 1; n < N - 1; n++){
+        const gE = new Float64Array(P);
+        const dEm = E[n].map((v, i) => v - E[n - 1][i]), dEp = E[n + 1].map((v, i) => v - E[n][i]);
+        for (let i = 0; i < P; i++){
+          let hv = 0; for (let j = 0; j < P; j++) hv += S[n].H[i][j] * (dEm[j] - dEp[j]);
+          gE[i] = c * ((S[n].mu[i] - S[n - 1].mu[i]) - (S[n + 1].mu[i] - S[n].mu[i]) + hv);
+        }
+        const J = jacY(Y[n]);
+        const gy = new Array(P).fill(0), G = Array.from({length: P}, () => new Array(P).fill(0));
+        for (let a = 0; a < P; a++) for (let k = 0; k < P; k++) gy[a] += J[k][a] * gE[k];
+        const HJ = S[n].H.map(row => Array.from({length: P}, (_, b) => { let s = 0; for (let l = 0; l < P; l++) s += row[l] * J[l][b]; return s; }));
+        for (let a = 0; a < P; a++) for (let b = 0; b < P; b++){ let s = 0; for (let k = 0; k < P; k++) s += J[k][a] * HJ[k][b]; G[a][b] = s; }
+        if (g.penalty) { const pg = g.penalty(Y[n]); for (let a = 0; a < P; a++) gy[a] += pg[a] / (N - 1); }
+        const st = solveSmall(G, gy); if (!st) continue;
+        for (let a = 0; a < P; a++){ const d = Math.max(-0.3, Math.min(0.3, st[a] / (N - 1))); Y[n][a] -= 0.4 * d; if (Math.abs(d) > maxStep) maxStep = Math.abs(d); }
+      }
+      g.iters++;
+    }
+    return maxStep;
+  };
+  g.chords = () => { const E = Y.map(etaY), M = E.map(e => fam.stats(e).mu); const out = []; for (let n = 0; n < N - 1; n++){ let s = 0; for (let i = 0; i < P; i++) s += (E[n + 1][i] - E[n][i]) * (M[n + 1][i] - M[n][i]); out.push(s); } return out; };
+  g.energy = () => (N - 1) / 2 * g.chords().reduce((a, b) => a + b, 0);
+  g.length = () => g.chords().reduce((a, b) => a + Math.sqrt(Math.max(b, 0)), 0);
+  return g;
+}
+function curveLength(fam, Ycurve){ const E = Ycurve.map(etaY), M = E.map(e => fam.stats(e).mu); let L = 0; for (let n = 0; n < E.length - 1; n++){ let s = 0; for (let i = 0; i < E[n].length; i++) s += (E[n + 1][i] - E[n][i]) * (M[n + 1][i] - M[n][i]); L += Math.sqrt(Math.max(s, 0)); } return L; }
+function reparam(fam, Yc, N){ // resample a curve at N points equally spaced in arc length
+  const E = Yc.map(etaY), M = E.map(e => fam.stats(e).mu), cum = [0];
+  for (let n = 0; n < E.length - 1; n++){ let s = 0; for (let i = 0; i < E[n].length; i++) s += (E[n + 1][i] - E[n][i]) * (M[n + 1][i] - M[n][i]); cum.push(cum[n] + Math.sqrt(Math.max(s, 0))); }
+  const out = [], L = cum[cum.length - 1]; let j = 0;
+  for (let n = 0; n < N; n++){ const u = L * n / (N - 1); while (j < cum.length - 2 && cum[j + 1] < u) j++; const f = cum[j + 1] > cum[j] ? (u - cum[j]) / (cum[j + 1] - cum[j]) : 0; out.push(Float64Array.from(Yc[j], (v, i) => v + f * (Yc[j + 1][i] - v))); }
+  return out;
+}
+
+const redraw = [];
+// Run geo.step in ~12 ms slices, drawing between slices, until the largest move is tiny.
+function animate(geo, draw, {tol = 1e-7, maxIters = 4000, done = null} = {}){
+  let alive = true, timer = null;
+  const tick = () => {
+    if (!alive) return;
+    const t0 = performance.now(); let m = Infinity;
+    while (performance.now() - t0 < 12){ m = geo.step(5); if (m <= tol || geo.iters >= maxIters) break; }
+    draw();
+    if (m > tol && geo.iters < maxIters) timer = setTimeout(tick, 0); else if (done) done();
+  };
+  timer = setTimeout(tick, 0);
+  return () => { alive = false; clearTimeout(timer); };
+}
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => redraw.forEach(f => f()));
+let resizeT = null; window.addEventListener('resize', () => { clearTimeout(resizeT); resizeT = setTimeout(() => redraw.forEach(f => f()), 120); });
+
+function draggable(cv, getHandles, onMove){ // handles: [{px, py}] in CSS pixels
+  let active = -1;
+  const pos = e => { const r = cv.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; };
+  cv.addEventListener('pointerdown', e => { const [x, y] = pos(e), hs = getHandles(); let best = 22 * 22; hs.forEach((h, i) => { const d = (h.px - x) ** 2 + (h.py - y) ** 2; if (d < best){ best = d; active = i; } }); if (active >= 0){ cv.setPointerCapture(e.pointerId); cv.style.cursor = 'grabbing'; } });
+  cv.addEventListener('pointermove', e => { if (active < 0) return; const [x, y] = pos(e); onMove(active, x, y); });
+  const up = () => { active = -1; cv.style.cursor = ''; };
+  cv.addEventListener('pointerup', up); cv.addEventListener('pointercancel', up);
+}
+
+// ============================================================ 1D toy (App G.1)
+const TOY = Family([[-2.5], [0.5], [2.5]], [0.275, 0.45, 0.275], [0.5625, 0.5625, 0.5625]);
+const LMAX = 10, LMIN = -10;
+const lamT = t => LMAX + (LMIN - LMAX) * t;
+const tLam = l => (LMAX - l) / (LMAX - LMIN);
+const alphaT = t => Math.sqrt(sigmoid(lamT(t))), sigmaT = t => Math.sqrt(sigmoid(-lamT(t)));
+const yOfZ = (x, t) => Float64Array.of(x / alphaT(t), lamT(t));
+const zOfY = y => { const t = tLam(y[1]); return [alphaT(t) * y[0], t]; };
+const etaZ = (x, t) => { const a = alphaT(t), s = sigmaT(t); return Float64Array.of(a * x / (s * s), -a * a / (2 * s * s)); };
+function marg(x, t){ const a = alphaT(t), s = sigmaT(t); let p = 0; for (let k = 0; k < 3; k++){ const v = a * a * TOY.vars[k] + s * s; p += TOY.weights[k] * Math.exp(-((x - a * TOY.centers[k][0]) ** 2) / (2 * v)) / Math.sqrt(2 * Math.PI * v); } return p; }
+function score(x, t){ const a = alphaT(t), s = sigmaT(t); let num = 0, den = 0; for (let k = 0; k < 3; k++){ const v = a * a * TOY.vars[k] + s * s, c = TOY.weights[k] * Math.exp(-((x - a * TOY.centers[k][0]) ** 2) / (2 * v)) / Math.sqrt(v); num += c * (-(x - a * TOY.centers[k][0]) / v); den += c; } return num / den; }
+function pfode(xT, t1 = 1, t0 = 0.02, n = 600){ // VP with linear log-SNR: dx/dt = -10 s^2 (x + score)
+  const xs = [xT], ts = [t1]; let x = xT;
+  for (let i = 0; i < n; i++){ const t = t1 + (t0 - t1) * i / n, h = (t0 - t1) / n;
+    const f = (xx, tt) => -10 * sigmaT(tt) ** 2 * (xx + score(xx, tt));
+    const k1 = f(x, t), k2 = f(x + h * k1, t + h); x += h * (k1 + k2) / 2; xs.push(x); ts.push(t + h); }
+  return {xs, ts};
+}
+const qDensity1 = x => Math.exp(TOY.logq([x]));
+function postDensity1(eta, x){ const {w, m, v} = TOY.tilt(eta); let p = 0; for (let k = 0; k < w.length; k++) p += w[k] * Math.exp(-((x - m[k][0]) ** 2) / (2 * v[k])) / Math.sqrt(2 * Math.PI * v[k]); return p; }
+function metricZ(x, t){ // Fisher-Rao metric in (x_t, t) coordinates
+  const l = lamT(t), r = L => Math.sqrt(sigmoid(L)) / sigmoid(-L), h = 1e-5;
+  const dr = (r(l + h) - r(l - h)) / (2 * h);
+  const J = [[r(l), x * dr * (LMIN - LMAX)], [0, -Math.exp(l) / 2 * (LMIN - LMAX)]];
+  const H = TOY.stats(etaZ(x, t)).H;
+  const G = [[0, 0], [0, 0]];
+  for (let a = 0; a < 2; a++) for (let b = 0; b < 2; b++){ let s = 0; for (let k = 0; k < 2; k++) for (let m = 0; m < 2; m++) s += J[k][a] * H[k][m] * J[m][b]; G[a][b] = s; }
+  return G;
+}
+
+// ============================================================ widget 1: explorer
+const EX = (() => {
+  const N = 41, geo = Geodesic(TOY, N);
+  let A = [-2.3, 0.35], B = [2.0, 0.40], raf = null, V = null;
+  const odes = [-2.5, -1.2, -0.4, 0, 0.4, 1.2, 2.5].map(x => pfode(x));
+  let odeRef = null;
+  geo.init(yOfZ(...A), yOfZ(...B));
+  function upPath(y){ // straight up to t = 1 at fixed xhat
+    const xs = [], ts = []; for (let i = 0; i <= 80; i++){ const l = y[1] + (LMIN - y[1]) * i / 80; const t = tLam(l); xs.push(alphaT(t) * y[0]); ts.push(t); } return {xs, ts};
+  }
+  function upLen(y){ const C = []; for (let i = 0; i <= 200; i++) C.push(Float64Array.of(y[0], y[1] + (LMIN - y[1]) * i / 200)); return curveLength(TOY, C); }
+  function straightLen(){ const C = []; for (let i = 0; i <= 200; i++){ const s = i / 200; C.push(yOfZ(A[0] + (B[0] - A[0]) * s, A[1] + (B[1] - A[1]) * s)); } return curveLength(TOY, C); }
+  function draw(){
+    V = view($('exMap'), {xlim: [0, 1], ylim: [-4.5, 4.5], xlabel: 'diffusion time t', ylabel: 'x_t', pad: {l: 40}});
+    heat(V, (t, x) => marg(x, t), 160, 110, {normCols: true, gamma: 0.8, alpha: 0.85, key: 'ex'});
+    frame(V, {grid: false});
+    clip(V);
+    const {ctx, X, Y} = V;
+    if ($('exTissot').checked){
+      const cellx = V.pw / 12, celly = V.ph / 9, sx = V.pw / 1, sy = V.ph / 9;
+      ctx.strokeStyle = col('--ink'); ctx.lineWidth = 1;
+      for (let i = 0; i < 12; i++) for (let j = 0; j < 9; j++){
+        const t = 0.04 + (i + 0.5) * 0.92 / 12, x = -4.5 + (j + 0.5);
+        const G = metricZ(x, t);
+        // metric in pixel units: dz_px = S dz, so G_px = S^-1 G S^-1
+        const g = [[G[0][0] / (sy * sy), G[0][1] / (sx * sy)], [G[0][1] / (sx * sy), G[1][1] / (sx * sx)]]; // rows: x (vertical), t (horizontal)
+        const tr = g[0][0] + g[1][1], det = g[0][0] * g[1][1] - g[0][1] ** 2, disc = Math.sqrt(Math.max(tr * tr / 4 - det, 0));
+        const l1 = tr / 2 + disc, l2 = Math.max(tr / 2 - disc, 1e-30);
+        const ang = Math.atan2(l1 - g[0][0], g[0][1] || 1e-30); // eigenvector for l1 in (x, t) components
+        const r = 0.3, a1 = Math.min(r / Math.sqrt(l1), 0.48 * Math.min(cellx, celly)), a2 = Math.min(r / Math.sqrt(l2), 0.48 * Math.max(cellx, celly));
+        const clipped = r / Math.sqrt(l2) > 0.48 * Math.max(cellx, celly);
+        const cx = X(t), cy = Y(x);
+        ctx.save(); ctx.translate(cx, cy);
+        // eigenvector (vx along x-axis, vt along t-axis); screen: t -> +x, x -> -y
+        const vx = Math.cos(ang), vt = Math.sin(ang);
+        ctx.rotate(Math.atan2(-vx, vt));
+        ctx.globalAlpha = clipped ? 0.45 : 0.85; ctx.setLineDash(clipped ? [3, 2] : []);
+        ctx.beginPath(); ctx.ellipse(0, 0, Math.max(a1, 0.6), Math.max(a2, 0.6), 0, 0, 2 * Math.PI); ctx.stroke();
+        ctx.restore();
+      }
+    }
+    if ($('exOde').checked){ for (const o of odes) line(V, o.ts, o.xs, {color: '--c2', width: 1.2, alpha: 0.8}); }
+    if (odeRef) line(V, odeRef.ts, odeRef.xs, {color: '--c2', width: 2.2});
+    if ($('exStraight').checked) line(V, [A[1], B[1]], [A[0], B[0]], {color: '--grey', width: 1.6, dash: [5, 4]});
+    if ($('exNoise').checked){ const Y0 = geo.curve()[0], Y1 = geo.curve()[N - 1]; const u = upPath(Y0), d = upPath(Y1); line(V, u.ts, u.xs, {color: '--c1', width: 1.6, dash: [5, 4]}); line(V, d.ts, d.xs, {color: '--c1', width: 1.6, dash: [5, 4]}); }
+    const C = geo.curve().map(zOfY);
+    line(V, C.map(z => z[1]), C.map(z => z[0]), {color: '--c0', width: 2.6});
+    const s = +$('exS').value, k = s * (N - 1), k0 = Math.min(Math.floor(k), N - 2), f = k - k0;
+    const ys = Float64Array.from(geo.curve()[k0], (v, i) => v + f * (geo.curve()[k0 + 1][i] - v)), zs = zOfY(ys);
+    dot(V, zs[1], zs[0], {r: 4.5, color: '--c3', fill: '--c3'});
+    ctx.restore();
+    dot(V, A[1], A[0], {r: 6, color: '--ink'}); dot(V, B[1], B[0], {r: 6, color: '--ink'});
+    // posterior panel
+    const eta = etaY(ys);
+    const P = view($('exPost'), {xlim: [-5, 5], ylim: [0, 1], xlabel: 'x₀', title: `p(x₀ | γ_s), s = ${s.toFixed(2)}, t = ${zs[1].toFixed(2)}`, pad: {l: 14}});
+    const xs = Array.from({length: 301}, (_, i) => -5 + i / 30), q = xs.map(qDensity1), p = xs.map(x => postDensity1(eta, x));
+    const pm = Math.max(...p), qm = Math.max(...q), sc = 1 / Math.max(pm, qm) * 0.95;
+    frame(P, {yticks: []});
+    const c2 = P.ctx; c2.beginPath(); c2.moveTo(P.X(-5), P.Y(0)); xs.forEach((x, i) => c2.lineTo(P.X(x), P.Y(q[i] * sc))); c2.lineTo(P.X(5), P.Y(0)); c2.closePath(); c2.fillStyle = col('--grey'); c2.globalAlpha = 0.25; c2.fill(); c2.globalAlpha = 1;
+    line(P, xs, p.map(v => v * sc), {color: '--c3', width: 2.2});
+    const st = TOY.stats(eta);
+    label(P, -4.8, 0.9, `mean ${st.mu[0].toFixed(2)},  sd ${Math.sqrt(Math.max(st.mu[1] - st.mu[0] ** 2, 0)).toFixed(2)}`, {color: '--muted'});
+    label(P, -4.8, 0.82, `η = (${fmt(eta[0], 2)}, ${fmt(eta[1], 2)})`, {color: '--muted'});
+    // readout
+    const L = geo.length(), E = geo.energy(), up = upLen(geo.curve()[0]) + upLen(geo.curve()[N - 1]), sl = straightLen();
+    const tmax = Math.max(...C.map(z => z[1]));
+    let odeTxt = '';
+    if (odeRef){ const Cc = reparam(TOY, odeRef.ts.map((t, i) => yOfZ(odeRef.xs[i], t)), N); odeTxt = ` · PF-ODE path length <b>${fmt(curveLength(TOY, Cc), 3)}</b> (${((L / curveLength(TOY, Cc) - 1) * 100).toFixed(2)}% for the geodesic)`; }
+    $('exRead').innerHTML = `geodesic: energy <b>${fmt(E, 2)}</b>, length <b>${fmt(L, 3)}</b> (2E/L² = ${fmt(2 * E / (L * L), 3)}), highest noise t = <b>${tmax.toFixed(3)}</b> · straight line in (x<sub>t</sub>, t): length <b>${fmt(sl, 3)}</b> · up to t = 1 and down: length <b>${fmt(up, 3)}</b>, ratio geodesic / that = <b>${(L / up).toFixed(3)}</b>` + odeTxt + ` · iterations ${geo.iters}`;
+  }
+  let stop = null;
+  function run(){ if (stop) stop(); stop = animate(geo, draw); }
+  draggable($('exMap'), () => V ? [A, B].map(z => ({px: V.X(z[1]), py: V.Y(z[0])})) : [], (i, px, py) => {
+    const t = Math.min(1, Math.max(0.02, V.iX(px))), x = Math.min(4.4, Math.max(-4.4, V.iY(py)));
+    if (i === 0) A = [x, t]; else B = [x, t];
+    odeRef = null; geo.shiftEnds(yOfZ(...A), yOfZ(...B)); run();
+  });
+  const set = (a, b, reinit = true) => { A = a; B = b; if (reinit) geo.init(yOfZ(...A), yOfZ(...B)); run(); };
+  $('exFig1').onclick = () => { odeRef = null; set([-2.3, 0.35], [2.0, 0.40]); };
+  $('exSame').onclick = () => { odeRef = null; set([-2.3, 0.35], [-1.9, 0.35]); };
+  $('exOdeBtn').onclick = () => {
+    const o = pfode(1.0, 1.0, 0.1, 512); odeRef = o;
+    A = [o.xs[0], 1.0]; B = [o.xs[o.xs.length - 1], 0.1];
+    geo.setCurve(reparam(TOY, o.ts.map((t, i) => yOfZ(o.xs[i], t)), N)); run();
+  };
+  ['exStraight', 'exNoise', 'exOde', 'exTissot'].forEach(id => $(id).addEventListener('change', draw));
+  $('exS').addEventListener('input', () => { $('exSV').textContent = (+$('exS').value).toFixed(2); draw(); });
+  redraw.push(draw);
+  return {run};
+})();
+
+// ============================================================ widget 2: chord identity
+const CH = (() => {
+  function draw(){
+    const x1 = +$('chX1').value, t1 = +$('chT1').value, x2 = +$('chX2').value, t2 = +$('chT2').value;
+    $('chX1V').textContent = x1.toFixed(2); $('chT1V').textContent = t1.toFixed(3); $('chX2V').textContent = x2.toFixed(2); $('chT2V').textContent = t2.toFixed(3);
+    const e1 = etaZ(x1, t1), e2 = etaZ(x2, t2), s1 = TOY.stats(e1), s2 = TOY.stats(e2);
+    const chord = (e1[0] - e2[0]) * (s1.mu[0] - s2.mu[0]) + (e1[1] - e2[1]) * (s1.mu[1] - s2.mu[1]);
+    const kf = TOY.kl(e1, e2), kb = TOY.kl(e2, e1);
+    const G = metricZ(x1, t1), dz = [x2 - x1, t2 - t1];
+    const quad = G[0][0] * dz[0] ** 2 + 2 * G[0][1] * dz[0] * dz[1] + G[1][1] * dz[1] ** 2;
+    const G2 = metricZ(x2, t2), quad2 = G2[0][0] * dz[0] ** 2 + 2 * G2[0][1] * dz[0] * dz[1] + G2[1][1] * dz[1] ** 2;
+    const rel = v => `${v >= kf + kb ? '+' : '−'}${Math.abs(100 * (v / (kf + kb) - 1)).toFixed(v === chord ? 6 : 1)}%`;
+    $('chTable').innerHTML = `<tr><th style="text-align:left">quantity</th><th>value</th><th>vs KL(1‖2)+KL(2‖1)</th></tr>
+      <tr><td class="sym">KL(p(·|z₁) ‖ p(·|z₂)) = (η₁−η₂)ᵀμ₁ − ψ₁ + ψ₂ (Lemma D.1)</td><td>${fmt(kf, 5)}</td><td></td></tr>
+      <tr><td class="sym">KL(p(·|z₂) ‖ p(·|z₁))</td><td>${fmt(kb, 5)}</td><td></td></tr>
+      <tr class="hl"><td class="sym">sum = 2 KL<sup>S</sup></td><td>${fmt(kf + kb, 5)}</td><td>—</td></tr>
+      <tr class="hl"><td class="sym">chord (η₁−η₂)ᵀ(μ₁−μ₂): ψ cancels (Lemma D.2)</td><td>${fmt(chord, 5)}</td><td>${rel(chord)}</td></tr>
+      <tr><td class="sym">Δzᵀ G(z₁) Δz: local approximation at z₁</td><td>${fmt(quad, 5)}</td><td>${rel(quad)}</td></tr>
+      <tr><td class="sym">Δzᵀ G(z₂) Δz: local approximation at z₂</td><td>${fmt(quad2, 5)}</td><td>${rel(quad2)}</td></tr>`;
+    // posteriors
+    const P = view($('chPost'), {xlim: [-5, 5], ylim: [0, 1], xlabel: 'x₀', title: 'the two denoising posteriors', pad: {l: 14}});
+    const xs = Array.from({length: 301}, (_, i) => -5 + i / 30), q = xs.map(qDensity1), p1 = xs.map(x => postDensity1(e1, x)), p2 = xs.map(x => postDensity1(e2, x));
+    const sc = 0.95 / Math.max(...p1, ...p2, ...q);
+    frame(P, {yticks: []});
+    const c = P.ctx; c.beginPath(); c.moveTo(P.X(-5), P.Y(0)); xs.forEach((x, i) => c.lineTo(P.X(x), P.Y(q[i] * sc))); c.lineTo(P.X(5), P.Y(0)); c.closePath(); c.fillStyle = col('--grey'); c.globalAlpha = 0.25; c.fill(); c.globalAlpha = 1;
+    line(P, xs, p1.map(v => v * sc), {color: '--c0', width: 2.2}); line(P, xs, p2.map(v => v * sc), {color: '--c1', width: 2.2});
+    // convergence of Eq 14 for the straight segment
+    const Ns = [2, 3, 4, 6, 8, 12, 16, 24, 32, 64, 128, 256], Es = Ns.map(n => { const E = [], M = []; for (let i = 0; i < n; i++){ const s = i / (n - 1), e = etaZ(x1 + s * dz[0], t1 + s * dz[1]); E.push(e); M.push(TOY.stats(e).mu); } let tot = 0; for (let i = 0; i < n - 1; i++) tot += (E[i + 1][0] - E[i][0]) * (M[i + 1][0] - M[i][0]) + (E[i + 1][1] - E[i][1]) * (M[i + 1][1] - M[i][1]); return (n - 1) / 2 * tot; });
+    const lo = Math.min(...Es), hi = Math.max(...Es), padY = (hi - lo) * 0.12 + 1e-9;
+    const Cv = view($('chConv'), {xlim: [2, 256], ylim: [lo - padY, hi + padY], logx: true, xlabel: 'number of points N', title: 'Eq 14 energy of the straight segment', pad: {l: 54}});
+    frame(Cv, {xticks: [2, 4, 8, 16, 32, 64, 128, 256], yfmt: v => fmt(v, 2)});
+    line(Cv, Ns, Es, {color: '--c2', width: 2.2}); Ns.forEach((n, i) => dot(Cv, n, Es[i], {r: 3, color: '--c2', fill: '--c2', width: 1}));
+    label(Cv, 2.1, Es[0], ` N = 2: KL^S of the endpoints = ${fmt(Es[0], 2)}`, {color: '--muted', base: 'bottom', dy: -4});
+  }
+  ['chX1', 'chT1', 'chX2', 'chT2'].forEach(id => $(id).addEventListener('input', draw));
+  redraw.push(draw);
+  return {draw};
+})();
+
+// ============================================================ widget 3: hyperbolic
+const HY = (() => {
+  let A = [-0.6, 0.12], B = [0.7, 0.12], V = null;
+  const fr = (m1, s1, m2, s2) => Math.SQRT2 * Math.acosh(1 + ((m1 - m2) ** 2 / 2 + (s1 - s2) ** 2) / (2 * s1 * s2));
+  function ellipse(a, b){ // semi-ellipse (m - m0)^2/2 + s^2 = R^2 through a and b
+    if (Math.abs(a[0] - b[0]) < 1e-9) return {vertical: true};
+    const m0 = ((a[0] ** 2 - b[0] ** 2) / 2 + a[1] ** 2 - b[1] ** 2) / (a[0] - b[0]);
+    const R = Math.sqrt((a[0] - m0) ** 2 / 2 + a[1] ** 2);
+    return {m0, R};
+  }
+  function draw(){
+    V = view($('hyPlane'), {xlim: [-2.5, 2.5], ylim: [0, 1.35], xlabel: 'posterior mean m = α_t x_t', ylabel: 'posterior sd s = σ_t', title: 'spacetime of q = N(0,1) as the (m, s) half-plane'});
+    frame(V);
+    const {ctx, X, Y} = V;
+    clip(V);
+    ctx.fillStyle = col('--grey'); ctx.globalAlpha = 0.14; ctx.fillRect(X(-2.5), Y(1.35), X(2.5) - X(-2.5), Y(1) - Y(1.35)); ctx.globalAlpha = 1;
+    line(V, [-2.5, 2.5], [1, 1], {color: '--grey', width: 1.2});
+    label(V, -2.45, 1.17, 's > 1: no x_t gives this posterior', {color: '--muted'});
+    label(V, 0, 1, '● q itself (t = T)', {color: '--muted', align: 'center', base: 'bottom', dy: -2});
+    if ($('hyBalls').checked){
+      ctx.strokeStyle = col('--muted'); ctx.globalAlpha = 0.55; ctx.lineWidth = 1;
+      for (const s of [0.1, 0.2, 0.35, 0.55, 0.8]) for (let m = -2.25; m <= 2.26; m += 0.5){
+        const r = 0.18; // equal Fisher-Rao radius: dm = r s, ds = r s / sqrt 2
+        ctx.beginPath(); ctx.ellipse(X(m), Y(s), (X(r * s) - X(0)), (Y(0) - Y(r * s / Math.SQRT2)), 0, 0, 2 * Math.PI); ctx.stroke();
+      }
+      ctx.globalAlpha = 1;
+    }
+    if ($('hyOde').checked){ for (const x of [0.7, 1, Math.SQRT2, 2]) { const th = Array.from({length: 101}, (_, i) => i / 100 * Math.PI / 2); line(V, th.map(u => x * Math.cos(u)), th.map(u => Math.sin(u)), {color: '--c2', width: x === Math.SQRT2 ? 2.2 : 1.2, dash: [5, 3]}); } label(V, Math.SQRT2 * 0.72, 0.72, '  x = √2', {color: '--c2'}); }
+    const e = ellipse(A, B);
+    let apex = Math.max(A[1], B[1]);
+    if (!e.vertical){
+      const ta = Math.atan2(A[1], (A[0] - e.m0) / Math.SQRT2), tb = Math.atan2(B[1], (B[0] - e.m0) / Math.SQRT2);
+      const th = Array.from({length: 201}, (_, i) => ta + (tb - ta) * i / 200);
+      line(V, th.map(u => e.m0 + Math.SQRT2 * e.R * Math.cos(u)), th.map(u => e.R * Math.sin(u)), {color: '--c0', width: 2.6});
+      if ((Math.PI / 2 - ta) * (Math.PI / 2 - tb) < 0) apex = e.R;
+      line(V, [e.m0, e.m0], [0, 0.03], {color: '--c0', width: 2});
+    } else line(V, [A[0], B[0]], [A[1], B[1]], {color: '--c0', width: 2.6});
+    ctx.restore();
+    dot(V, A[0], A[1], {r: 6}); dot(V, B[0], B[1], {r: 6});
+    const d = fr(A[0], A[1], B[0], B[1]), dq = fr(A[0], A[1], 0, 1) + fr(B[0], B[1], 0, 1);
+    $('hyRead').innerHTML = `Fisher–Rao distance <b>${fmt(d, 3)}</b> · apex of the geodesic at s = <b>${apex.toFixed(3)}</b>` +
+      (apex > 1 ? ` <span class="bad">(above s = 1: this geodesic leaves the family; the true one is longer and at most ${fmt(dq, 3)})</span>` : '') +
+      ` · via q at the top: <b>${fmt(dq, 3)}</b> · Euclidean |Δm| = ${fmt(Math.abs(A[0] - B[0]), 3)}`;
+    // right panel: DiffED against d for symmetric endpoints at s0
+    const s0 = 10 ** +$('hyS0').value; $('hyS0V').textContent = s0.toFixed(3);
+    const ds = Array.from({length: 121}, (_, i) => 10 ** (-2 + i * 3 / 120));
+    const de = ds.map(dd => fr(-dd / 2, s0, dd / 2, s0)), law = ds.map(dd => 2 * Math.SQRT2 * Math.log(dd / (Math.SQRT2 * s0))), bound = ds.map(dd => 2 * fr(dd / 2, s0, 0, 1));
+    const ymax = Math.max(...bound) * 1.15;
+    const Rv = view($('hyCurve'), {xlim: [0.01, 10], ylim: [0, ymax], logx: true, xlabel: 'Euclidean distance d between the two data points', title: `DiffED at anchor noise s = ${s0.toFixed(3)}`});
+    frame(Rv, {xfmt: v => String(v)});
+    clip(Rv);
+    line(Rv, ds, bound, {color: '--c1', width: 1.6, dash: [5, 4]});
+    line(Rv, ds, law, {color: '--grey', width: 1.4, dash: [4, 3]});
+    const ok = ds.map((dd, i) => { const m0 = 0, R = Math.sqrt(dd * dd / 8 + s0 * s0); return R <= 1; });
+    line(Rv, ds.filter((_, i) => ok[i]), de.filter((_, i) => ok[i]), {color: '--c3', width: 2.4});
+    line(Rv, ds.filter((_, i) => !ok[i]), de.filter((_, i) => !ok[i]), {color: '--c3', width: 1.4, dash: [2, 3]});
+    const dStar = Math.sqrt(8 * (1 - s0 * s0));
+    line(Rv, [dStar, dStar], [0, ymax], {color: '--muted', width: 1, dash: [2, 3]});
+    label(Rv, dStar, ymax * 0.06, 'apex reaches s = 1 ', {color: '--muted', align: 'right'});
+    Rv.ctx.restore();
+  }
+  draggable($('hyPlane'), () => V ? [A, B].map(z => ({px: V.X(z[0]), py: V.Y(z[1])})) : [], (i, px, py) => {
+    const p = [Math.min(2.45, Math.max(-2.45, V.iX(px))), Math.min(0.99, Math.max(0.02, V.iY(py)))];
+    if (i === 0) A = p; else B = p; draw();
+  });
+  ['hyOde', 'hyBalls', 'hyS0'].forEach(id => $(id).addEventListener('input', draw));
+  redraw.push(draw);
+  return {draw};
+})();
+
+// ============================================================ widget 4: ring
+const RG = (() => {
+  const K = 24, centers = [], w = [], v = [];
+  for (let k = 0; k < K; k++){ const a = 2 * Math.PI * k / K; centers.push([2 * Math.cos(a), 2 * Math.sin(a)]); w.push(1 / K); v.push(0.12 ** 2); }
+  const fam = Family(centers, w, v), N = 29, geo = Geodesic(fam, N), ELL = 4;
+  let raf = null, samples = [];
+  const onRing = deg => { const a = deg * Math.PI / 180; return [2 * Math.cos(a), 2 * Math.sin(a)]; };
+  let key = '';
+  function reset(){
+    const a = onRing(+$('rgA').value), b = onRing(+$('rgB').value);
+    // start from an arc a little inside the ring, at the anchor noise, so the solver needs few iterations
+    const ya = Float64Array.of(a[0], a[1], ELL), yb = Float64Array.of(b[0], b[1], ELL);
+    geo.init(ya, yb);
+    run();
+  }
+  function posAt(s){ const k = s * (N - 1), k0 = Math.min(Math.floor(k), N - 2), f = k - k0, C = geo.curve(); return Float64Array.from(C[k0], (u, i) => u + f * (C[k0 + 1][i] - u)); }
+  function draw(){
+    $('rgAV').textContent = $('rgA').value + '°'; $('rgBV').textContent = $('rgB').value + '°'; $('rgSV').textContent = (+$('rgS').value).toFixed(2);
+    const cw = $('rgData').clientWidth, hx = 2.9 * Math.max(1, (cw - 42) / (320 - 46)), hy = 2.9 * Math.max(1, (320 - 46) / (cw - 42));
+    const Vd = view($('rgData'), {xlim: [-hx, hx], ylim: [-hy, hy], title: 'data plane (equal axes)', pad: {l: 30, b: 22}});
+    heat(Vd, (x, y) => Math.exp(fam.logq([x, y])), 140, 120, {gamma: 0.5, alpha: 0.75, key: 'ring' + hx.toFixed(3)});
+    frame(Vd, {grid: false});
+    const a = onRing(+$('rgA').value), b = onRing(+$('rgB').value);
+    clip(Vd);
+    line(Vd, [a[0], b[0]], [a[1], b[1]], {color: '--grey', width: 1.8, dash: [6, 4]});
+    const C = geo.curve(), M = C.map(y => fam.stats(etaY(y)).mu);
+    line(Vd, M.map(m => m[0]), M.map(m => m[1]), {color: '--c0', width: 2.4});
+    const y = posAt(+$('rgS').value), eta = etaY(y);
+    const rnd = mulberry(7), gg = gaussGen(mulberry(11));
+    const {ctx, X, Y} = Vd; ctx.fillStyle = col('--c3'); ctx.globalAlpha = 0.55;
+    for (let i = 0; i < 300; i++){ const p = fam.sample(eta, rnd, gg); ctx.beginPath(); ctx.arc(X(p[0]), Y(p[1]), 1.8, 0, 2 * Math.PI); ctx.fill(); }
+    ctx.globalAlpha = 1;
+    const mu = fam.stats(eta).mu; dot(Vd, mu[0], mu[1], {r: 4.5, color: '--c0', fill: '--c0'});
+    ctx.restore();
+    dot(Vd, a[0], a[1], {r: 5}); dot(Vd, b[0], b[1], {r: 5});
+    // noise panel
+    const ss = C.map((_, n) => n / (N - 1)), nl = C.map(yy => Math.exp(-yy[2] / 2));
+    const Vn = view($('rgNoise'), {xlim: [0, 1], ylim: [0, Math.max(1.2, Math.max(...nl) * 1.1)], xlabel: 'position s along the geodesic', title: 'noise level SNR^(−1/2) along it'});
+    frame(Vn);
+    line(Vn, ss, nl, {color: '--c1', width: 2.4});
+    const sNow = +$('rgS').value; dot(Vn, sNow, Math.exp(-y[2] / 2), {r: 4.5, color: '--c3', fill: '--c3'});
+    const chordLen = Math.hypot(a[0] - b[0], a[1] - b[1]);
+    $('rgRead').innerHTML = `chord (pullback geodesic, decoded) length <b>${chordLen.toFixed(3)}</b> · spacetime geodesic length (DiffED at log-SNR 4) <b>${fmt(geo.length(), 3)}</b> · peak noise σ/α = <b>${Math.max(...nl).toFixed(3)}</b> · iterations ${geo.iters}`;
+  }
+  let stop = null;
+  function run(){ if (stop) stop(); stop = animate(geo, draw, {tol: 1e-6, maxIters: 2500}); }
+  $('rgA').addEventListener('input', reset); $('rgB').addEventListener('input', reset); $('rgS').addEventListener('input', draw);
+  redraw.push(draw);
+  return {reset};
+})();
+
+// ============================================================ widget 5: transition paths
+const TP = (() => {
+  const A = [-1.8, -0.6], B = [1.8, -0.6], centers = [A, B], w = [0.2, 0.2], v = [0.05, 0.05];
+  for (let k = 0; k < 11; k++){ const ang = Math.PI * (150 - 12 * k) / 180; centers.push([1.9 * Math.cos(ang), -0.6 + 1.9 * Math.sin(ang)]); w.push(0.6 / 11); v.push(0.1); }
+  const fam = Family(centers, w, v), U = x => -fam.logq(x), N = 40, geo = Geodesic(fam, N), ELL = 4;
+  const XL = [-3.2, 3.2], YL = [-2.2, 2.2];
+  // lower bound on the barrier: smallest level at which A and B are connected in {U <= level}
+  const GN = 220, grid = new Float64Array(GN * GN);
+  for (let i = 0; i < GN; i++) for (let j = 0; j < GN; j++) grid[j * GN + i] = U([XL[0] + (XL[1] - XL[0]) * (i + .5) / GN, YL[0] + (YL[1] - YL[0]) * (j + .5) / GN]);
+  const cell = p => [Math.floor((p[0] - XL[0]) / (XL[1] - XL[0]) * GN), Math.floor((p[1] - YL[0]) / (YL[1] - YL[0]) * GN)];
+  function connected(level){ const [ai, aj] = cell(A), [bi, bj] = cell(B), seen = new Uint8Array(GN * GN), st = [aj * GN + ai]; seen[st[0]] = 1;
+    while (st.length){ const c = st.pop(); if (c === bj * GN + bi) return true; const i = c % GN, j = (c / GN) | 0;
+      for (const [di, dj] of [[1, 0], [-1, 0], [0, 1], [0, -1]]){ const ii = i + di, jj = j + dj; if (ii < 0 || jj < 0 || ii >= GN || jj >= GN) continue; const k = jj * GN + ii; if (!seen[k] && grid[k] <= level){ seen[k] = 1; st.push(k); } } } return false; }
+  let lo = Math.max(U(A), U(B)), hi = Math.max(...grid); for (let it = 0; it < 40; it++){ const mid = (lo + hi) / 2; connected(mid) ? hi = mid : lo = mid; }
+  const LB = hi;
+  let paths = [], base = [], abl = [], seed = 1;
+  function ald(Ycurve, rnd, gauss){ // Algorithm 1: K Langevin steps per point, state carried along
+    const Kst = 120, dt = 0.003; let x = A.slice(); const path = [x.slice()];
+    for (const y of Ycurve){ const e = etaY(y);
+      for (let k = 0; k < Kst; k++){ const g = fam.gradlogq(x); for (let d = 0; d < 2; d++) x[d] += (g[d] + e[d] + 2 * e[2] * x[d]) * dt + Math.sqrt(2 * dt) * gauss(); if (k % 6 === 5) path.push(x.slice()); }
+    }
+    return path;
+  }
+  function sample(){
+    const n = +$('tpN').value, rnd = mulberry(seed), gauss = gaussGen(mulberry(seed * 7 + 3));
+    const straight = []; for (let i = 0; i < N; i++){ const s = i / (N - 1); straight.push(Float64Array.of(A[0] + s * (B[0] - A[0]), A[1] + s * (B[1] - A[1]), ELL)); }
+    const sameNoise = straight.map((y, i) => Float64Array.of(y[0], y[1], geo.curve()[i][2]));
+    paths = []; base = []; abl = [];
+    for (let p = 0; p < n; p++){ paths.push(ald(geo.curve(), rnd, gauss)); base.push(ald(straight, rnd, gauss)); if ($('tpAbl').checked) abl.push(ald(sameNoise, rnd, gauss)); }
+  }
+  function maxE(P){ return P.map(path => Math.max(...path.map(U))); }
+  function draw(){
+    $('tpLamV').textContent = (+$('tpLam').value).toFixed(1); $('tpRhoV').textContent = (+$('tpRho').value).toFixed(1);
+    const Vm = view($('tpMap'), {xlim: XL, ylim: YL, title: 'energy U = −log q (dark = low)', pad: {l: 30, b: 22}});
+    heat(Vm, (x, y) => Math.exp(-0.35 * U([x, y])), 150, 110, {gamma: 1, alpha: 0.9, key: 'tp'});
+    frame(Vm, {grid: false});
+    clip(Vm);
+    for (const p of base) line(Vm, p.map(q => q[0]), p.map(q => q[1]), {color: '--grey', width: 1, alpha: 0.6});
+    for (const p of abl) line(Vm, p.map(q => q[0]), p.map(q => q[1]), {color: '--c2', width: 1, alpha: 0.7});
+    for (const p of paths) line(Vm, p.map(q => q[0]), p.map(q => q[1]), {color: '--c1', width: 1.1, alpha: 0.75});
+    const M = geo.curve().map(y => fam.stats(etaY(y)).mu);
+    line(Vm, M.map(m => m[0]), M.map(m => m[1]), {color: '--c0', width: 2.6});
+    const sNow = +$('tpS').value, kk = sNow * (N - 1), k0 = Math.min(Math.floor(kk), N - 2), fr = kk - k0, Cc = geo.curve();
+    const yNow = Float64Array.from(Cc[k0], (u, i) => u + fr * (Cc[k0 + 1][i] - u)), eNow = etaY(yNow);
+    { const rnd = mulberry(5), gg = gaussGen(mulberry(9)), {ctx, X, Y} = Vm; ctx.fillStyle = col('--c3'); ctx.globalAlpha = 0.6;
+      for (let i = 0; i < 250; i++){ const p = fam.sample(eNow, rnd, gg); ctx.beginPath(); ctx.arc(X(p[0]), Y(p[1]), 1.7, 0, 2 * Math.PI); ctx.fill(); } ctx.globalAlpha = 1; }
+    Vm.ctx.restore();
+    dot(Vm, A[0], A[1], {r: 5}); dot(Vm, B[0], B[1], {r: 5}); label(Vm, A[0], A[1], 'A', {dx: -10, dy: 12}); label(Vm, B[0], B[1], 'B', {dx: 8, dy: 12});
+    const C = geo.curve(), ss = C.map((_, n) => n / (N - 1)), nl = C.map(y => Math.exp(-y[2] / 2));
+    const Vn = view($('tpNoise'), {xlim: [0, 1], ylim: [0, Math.max(0.5, Math.max(...nl) * 1.15)], xlabel: 'position s along the geodesic', title: 'SNR^(−1/2) along the geodesic'});
+    frame(Vn);
+    line(Vn, ss, nl, {color: '--c3', width: 2.4});
+    dot(Vn, +$('tpS').value, Math.exp(-yNow[2] / 2), {r: 4.5, color: '--c3', fill: '--c3'});
+    if (+$('tpLam').value > 0) { const cap = Math.exp(+$('tpRho').value / 2); line(Vn, [0, 1], [cap, cap], {color: '--muted', width: 1, dash: [3, 3]}); label(Vn, 0.02, cap, 'penalty threshold', {color: '--muted', base: 'bottom', dy: -2}); }
+    const via = P => P.filter(path => { for (let i = 1; i < path.length; i++) if (path[i - 1][0] < 0 && path[i][0] >= 0) return (path[i - 1][1] + path[i][1]) / 2 > 0.3; return false; }).length;
+    const mg = maxE(paths), mb = maxE(base), mean = a => a.reduce((s, x) => s + x, 0) / Math.max(a.length, 1), sd = a => Math.sqrt(mean(a.map(x => (x - mean(a)) ** 2)));
+    $('tpRead').innerHTML = paths.length ? `MaxEnergy along the path, mean ± sd over ${paths.length}: spacetime geodesic <b>${mean(mg).toFixed(2)} ± ${sd(mg).toFixed(2)}</b> · fixed-noise straight line <b>${mean(mb).toFixed(2)} ± ${sd(mb).toFixed(2)}</b>` + (abl.length ? ` · straight line with the geodesic's noise schedule <b>${mean(maxE(abl)).toFixed(2)} ± ${sd(maxE(abl)).toFixed(2)}</b>` : '') + ` · lower bound (flood fill) <b>${LB.toFixed(2)}</b> · paths whose first crossing of x = 0 is in the channel: geodesic <b>${via(paths)}/${paths.length}</b>, straight line <b>${via(base)}/${base.length}</b>` + (abl.length ? `, same-schedule straight line <b>${via(abl)}/${abl.length}</b>` : '') + ` · U at the wells ${U(A).toFixed(2)} · geodesic length ${fmt(geo.length(), 3)}, iterations ${geo.iters}` : `optimising the geodesic… iterations ${geo.iters}`;
+  }
+  let stop = null;
+  function run(){
+    if (stop) stop(); paths = []; base = [];
+    const lam = +$('tpLam').value, rho = +$('tpRho').value;
+    geo.penalty = lam > 0 ? (y => { const g = [0, 0, 0]; if (-y[2] > rho) g[2] = -lam * 40; return g; }) : null;
+    stop = animate(geo, draw, {tol: 1e-6, maxIters: 2000, done: () => { sample(); draw(); }});
+  }
+  geo.init(Float64Array.of(A[0], A[1], ELL), Float64Array.of(B[0], B[1], ELL));
+  $('tpRun').onclick = () => { seed++; sample(); draw(); };
+  $('tpN').addEventListener('change', () => { sample(); draw(); });
+  $('tpAbl').addEventListener('change', () => { sample(); draw(); });
+  $('tpS').addEventListener('input', () => { $('tpSV').textContent = (+$('tpS').value).toFixed(2); draw(); });
+  ['tpLam', 'tpRho'].forEach(id => $(id).addEventListener('change', () => { geo.init(Float64Array.of(A[0], A[1], ELL), Float64Array.of(B[0], B[1], ELL)); run(); }));
+  ['tpLam', 'tpRho'].forEach(id => $(id).addEventListener('input', () => { $('tpLamV').textContent = (+$('tpLam').value).toFixed(1); $('tpRhoV').textContent = (+$('tpRho').value).toFixed(1); }));
+  redraw.push(draw);
+  return {run};
+})();
+
+$('exSV').textContent = '0.50';
+EX.run(); CH.draw(); HY.draw(); RG.reset(); TP.run();
+})();
+</script>
+</body>
+</html>
