@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Imbalanced Overfitting, Interactive</title>
+<style>
+:root{
+  --bg:#fbfaf7; --surface:#ffffff; --ink:#1c1d21; --muted:#5b5f68; --line:#e2dfd8; --soft:#f2f0ea;
+  --c0:#2f6fb5; --c1:#c2571a; --c2:#0f7a5a; --c3:#7c3aed; --bad:#b42318; --grey:#8a8880;
+  --radius:12px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#131417; --surface:#1b1d21; --ink:#ebebed; --muted:#a3a6ae; --line:#2e3138; --soft:#23262b;
+    --c0:#3d8ad8; --c1:#d8733a; --c2:#4cc79a; --c3:#b48cff; --bad:#ff7a6b; --grey:#8f9199;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#131417; --surface:#1b1d21; --ink:#ebebed; --muted:#a3a6ae; --line:#2e3138; --soft:#23262b;
+  --c0:#3d8ad8; --c1:#d8733a; --c2:#4cc79a; --c3:#b48cff; --bad:#ff7a6b; --grey:#8f9199;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,sans-serif;}
+main{max-width:900px;margin:0 auto;padding:40px 16px 80px}
+h1{font-size:2.05rem;line-height:1.2;margin:0 0 .4rem;letter-spacing:-.01em}
+h2{font-size:1.38rem;margin:3rem 0 .6rem;padding-top:.5rem;border-top:1px solid var(--line)}
+p{margin:.6rem 0}
+a{color:var(--c0)}
+.lede{color:var(--muted);font-size:1.05rem;margin-bottom:1.4rem}
+nav.toc{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:12px 18px;font-size:.93rem}
+nav.toc ol{margin:.3rem 0;padding-left:1.2rem}
+nav.toc a{color:var(--ink);text-decoration:none;border-bottom:1px dotted var(--muted)}
+.widget{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:14px;margin:1rem 0 1.2rem}
+.controls{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;margin:.2rem 0 .6rem;font-size:.9rem}
+.controls label{display:flex;align-items:center;gap:6px;color:var(--muted)}
+.controls output{color:var(--ink);font-variant-numeric:tabular-nums;min-width:3.2em}
+button,select{font:inherit;font-size:.88rem;color:var(--ink);background:var(--soft);border:1px solid var(--line);border-radius:8px;padding:5px 11px;cursor:pointer}
+button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+input[type=range]{accent-color:var(--c0);width:130px}
+.readout{font-size:.9rem;color:var(--muted);margin-top:.5rem;font-variant-numeric:tabular-nums}
+.readout b{color:var(--ink);font-weight:600}
+.readout .bad{color:var(--bad);font-weight:600}
+.readout .good{color:var(--c2);font-weight:600}
+.callout{border-left:3px solid var(--c2);background:var(--soft);padding:10px 14px;border-radius:0 8px 8px 0;margin:1rem 0;font-size:.95rem}
+.canvas-wrap{position:relative}
+canvas{display:block;width:100%;touch-action:none}
+.tip{position:absolute;pointer-events:none;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:4px 8px;font-size:.8rem;color:var(--ink);white-space:nowrap;display:none;font-variant-numeric:tabular-nums;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:680px){.grid2{grid-template-columns:1fr}}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:.82rem;color:var(--muted);margin:.3rem 0 0}
+.legend span::before{content:"";display:inline-block;width:16px;height:3px;margin-right:6px;vertical-align:3px;background:var(--c)}
+.legend span.dash::before{background:repeating-linear-gradient(90deg,var(--c) 0 5px,transparent 5px 8px)}
+.legend span.fill::before{height:9px;vertical-align:0;opacity:.45}
+.bar{display:flex;height:16px;border-radius:4px;overflow:hidden;gap:2px;margin:.35rem 0 .2rem;max-width:520px}
+.bar div{height:100%}
+table.mini{border-collapse:collapse;font-size:.86rem;margin:.4rem 0;font-variant-numeric:tabular-nums}
+table.mini td,table.mini th{padding:2px 10px 2px 0;text-align:left;border-bottom:1px solid var(--line)}
+table.mini th{color:var(--muted);font-weight:500}
+.small{font-size:.86rem;color:var(--muted)}
+@media (max-width:600px){ h1{font-size:1.7rem} input[type=range]{width:100px} }
+</style>
+</head>
+<body>
+<main>
+
+<h1>Imbalanced Overfitting, Interactive</h1>
+<p class="lede"><a href="../index.html">← text notes</a> · Lyu, Zhou &amp; Zhong, <i>A Statistical Theory of Overfitting for Imbalanced Classification</i>, ICLR 2026. Six widgets. Every curve comes from the paper's limiting equations (Lemma E.9, Eqs 28, 38, 168), solved in your browser. The first widget can also train a real hard-margin SVM to compare against.</p>
+
+<nav class="toc"><b>Contents</b>
+<ol>
+  <li><a href="#eld">Training logits vs test logits: the truncation</a></li>
+  <li><a href="#sep">When is the training set separable? δ*(0)</a></li>
+  <li><a href="#tau">Margin rebalancing: errors against τ and π</a></li>
+  <li><a href="#high">High imbalance: three phases</a></li>
+  <li><a href="#prox">Non-separable data: the proximal shrinkage</a></li>
+  <li><a href="#cal">Calibration: the limiting reliability curve</a></li>
+</ol></nav>
+
+<!-- ============================================================ -->
+<h2 id="eld">1. Training logits vs test logits: the truncation</h2>
+<p>The data are the paper's two-Gaussian mixture: y = +1 (minority) with probability π, and x | y ~ N(yµ, I<sub>d</sub>), with n/d → δ. Train the max-margin classifier f(x) = ⟨x, β⟩ + β₀ with ‖β‖ = 1. Theorem 2.1 says that on a <b>test</b> point the signed logit y·f(x) is N(ρ*‖µ‖ + yβ₀*, 1). On the <b>training</b> points it is the same Gaussian, except that everything below the margin κ* is moved to a point mass at κ*. The shaded area below 0 is the test error, and training erases it. The numbers come from solving Eqs 76a–c.</p>
+<div class="widget">
+  <div class="controls">
+    <label>π (minority) <input type="range" id="eP" min="0.01" max="0.5" step="0.01" value="0.15"><output id="ePV"></output></label>
+    <label>‖µ‖ <input type="range" id="eM" min="0.2" max="3" step="0.05" value="1.75"><output id="eMV"></output></label>
+    <label>δ = n/d <input type="range" id="eD" min="-1.5" max="3" step="0.001" value="0.9163"><output id="eDV"></output></label>
+    <label>τ <input type="range" id="eT" min="-1" max="1.6" step="0.01" value="0"><output id="eTV"></output></label>
+    <button id="eTopt">τ = τopt</button>
+  </div>
+  <div class="controls">
+    <label>simulate with n = <select id="eN"><option>400</option><option selected>800</option><option>1500</option></select></label>
+    <button id="eSim">train an SVM on fresh data</button>
+    <button id="eClr">clear simulation</button>
+    <span class="small" id="eSimMsg"></span>
+  </div>
+  <div class="grid2">
+    <div class="canvas-wrap"><canvas id="eC0" height="260"></canvas><div class="tip" id="eTip0"></div></div>
+    <div class="canvas-wrap"><canvas id="eC1" height="260"></canvas><div class="tip" id="eTip1"></div></div>
+  </div>
+  <div class="legend"><span class="dash" style="--c:var(--ink)">test logit density (TLD)</span><span style="--c:var(--ink)">training logit density (ELD) above κ*</span><span style="--c:var(--ink)">spike: point mass at κ*</span><span class="fill" style="--c:var(--grey)">test mass pushed to κ*</span><span class="fill" style="--c:var(--bad)">test errors</span><span class="fill" style="--c:var(--c0)">simulated training margins</span></div>
+  <div class="readout" id="eRead"></div>
+  <div class="small" style="margin-top:.5rem">The shared overfitting budget, E[(1−ρ²)ξ²] = (1−ρ*²)/δ, split into the minority's share π·g₂(t₊) and the majority's share (1−π)·g₂(t₋):</div>
+  <div class="bar" id="eBar"></div>
+  <div class="readout" id="eBarRead"></div>
+</div>
+<div class="callout">Things to try. At the default (Figure 1 of the paper), 61% of minority training points sit exactly on the margin, against 18% of majority points. The minority's per-point push g₁(t₊) is always exactly (1−π)/π times the majority's. The reason is Eq 79: each class's <i>total</i> push is equal, and the minority has fewer points to share it. Drag <b>δ</b> up towards δ*(0) and κ* shrinks to 0. Drag it down and the truncation gets more severe. <b>τ</b> leaves ρ* alone and slides β₀* (Corollary E.10). Press <b>τ = τopt</b> and the two test errors become equal. Now set π = 0.05 and δ = 0.5. τopt turns negative: no positive τ reaches β₀* = 0. Press <b>train an SVM</b> to overlay a real hard-margin SVM (dual SMO, d = n/δ) on the limit.</div>
+
+<!-- ============================================================ -->
+<h2 id="sep">2. When is the training set separable? δ*(0)</h2>
+<p>Theorem D.1(a): with probability tending to 1 the data are linearly separable if δ &lt; δ*(0), and not separable if δ &gt; δ*(0). Here δ*(0) = max over ρ, β₀ of (1−ρ²) / E[(−ρ‖µ‖ − G − β₀Y)₊²]. The page finds it as the δ at which κ* crosses 0. With ‖µ‖ = 0 and π = ½ this is Cover's classical n/d = 2. The intercept, the signal and the imbalance all raise it.</p>
+<div class="widget">
+  <div class="controls">
+    <label>‖µ‖ values <select id="sM"><option value="0,0.5,1,1.5">0, 0.5, 1, 1.5</option><option value="0,1,1.75,2.5" selected>0, 1, 1.75, 2.5</option></select></label>
+    <span class="small">The dot is widget 1's current (π, δ).</span>
+  </div>
+  <div class="canvas-wrap"><canvas id="sC" height="300"></canvas><div class="tip" id="sTip"></div></div>
+  <div class="legend" id="sLeg"></div>
+  <div class="readout" id="sRead"></div>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="tau">3. Margin rebalancing: errors against τ and π</h2>
+<p>The rebalanced SVM (Eq 7) asks for a margin τ times larger on the minority side. Proposition C.1 says this changes only the intercept: β₀(τ) = β₀(1) + (τ−1)/(τ+1)·κ(1). Left panel: limiting errors against τ at widget 1's (π, ‖µ‖, δ), as in the paper's Figure 8. Right panel: errors against π at τ = 1 and at τ = τopt, as in Figure 4. Where τopt &lt; 0 (grey), the τopt curve assumes a boundary no positive τ can reach.</p>
+<div class="widget">
+  <div class="grid2">
+    <div class="canvas-wrap"><canvas id="tC0" height="260"></canvas><div class="tip" id="tTip0"></div></div>
+    <div class="canvas-wrap"><canvas id="tC1" height="260"></canvas><div class="tip" id="tTip1"></div></div>
+  </div>
+  <div class="legend"><span style="--c:var(--c0)">minority error Err₊</span><span style="--c:var(--c1)">majority error Err₋</span><span class="dash" style="--c:var(--ink)">balanced error</span><span style="--c:var(--ink)">error at τopt (all equal)</span></div>
+  <div class="readout" id="tRead"></div>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="high">4. High imbalance: three phases</h2>
+<p>Theorem 3.2 lets things grow with d: π ∝ d<sup>−a</sup>, ‖µ‖² ∝ d<sup>b</sup>, n ∝ d<sup>c+1</sup>, and τ = d<sup>r</sup>. The whole story is a competition between two lengths. One is the signal ‖µ‖ ≍ d<sup>b/2</sup>. The other is the noise that the minority's few training points can be fitted to: the norm of their mean noise, √(d/n₊) ≍ d<sup>(a−c)/2</sup>. Lemma H.1 bounds the margin by half the distance between the two training class means, ≈ √(d<sup>b</sup> + d<sup>a−c</sup>/4).</p>
+<div class="widget">
+  <div class="controls">
+    <label>a <input type="range" id="hA" min="0" max="1.3" step="0.01" value="0.55"><output id="hAV"></output></label>
+    <label>b <input type="range" id="hB" min="0.02" max="0.8" step="0.01" value="0.3"><output id="hBV"></output></label>
+    <label>c <input type="range" id="hCc" min="0" max="0.8" step="0.01" value="0.1"><output id="hCV"></output></label>
+    <label>r (τ = d<sup>r</sup>) <input type="range" id="hR" min="0" max="1" step="0.01" value="0"><output id="hRV"></output></label>
+    <label>d = 10^<input type="range" id="hD" min="2" max="8" step="0.1" value="4"><output id="hDV"></output></label>
+  </div>
+  <div class="grid2">
+    <div class="canvas-wrap"><canvas id="hC0" height="270"></canvas></div>
+    <div class="canvas-wrap"><canvas id="hC1" height="270"></canvas></div>
+  </div>
+  <div class="readout" id="hRead"></div>
+</div>
+<div class="callout">Left: the (a − c, b) plane. Above the line a − c = b the signal wins outright and any 1 ≤ τ ≪ d<sup>b/2</sup> works. Below a − c = 2b the signal is lost and no τ helps. In between, the <b>moderate</b> wedge, the plain SVM (r = 0) gets the minority wrong almost always. Only τ in the window d<sup>a−b−c</sup> ≪ τ ≪ d<sup>(a−c)/2</sup> fixes it. Right: that window on the r axis. The numbers in the readout are order-of-magnitude estimates from Lemmas H.1–H.5 at the chosen d. They are not exact limits.</div>
+
+<!-- ============================================================ -->
+<h2 id="prox">5. Non-separable data: the proximal shrinkage</h2>
+<p>When δ &gt; δ*(0) the SVM does not exist, so the paper studies logistic regression instead (Theorem D.3). There a typical training logit is prox<sub>λ*ℓ</sub>(test logit), where prox<sub>λℓ</sub>(x) = argmin<sub>t</sub> ℓ(t) + (t − x)²/(2λ), and ℓ(t) = log(1 + e<sup>−t</sup>). A small λ* (large δ, little overfitting) gives nearly the identity. A large λ* (δ just above δ*(0)) gives a smooth version of the truncation max{κ, x}, up to scale. The paper does not give λ* in closed form (it solves a 4-equation system), so here λ is a free slider.</p>
+<div class="widget">
+  <div class="controls">
+    <label>λ = 10^<input type="range" id="pL" min="-1" max="4" step="0.05" value="1"><output id="pLV"></output></label>
+    <label>input N(c, 1), c = <input type="range" id="pCc" min="-2" max="4" step="0.05" value="1"><output id="pCV"></output></label>
+  </div>
+  <div class="grid2">
+    <div class="canvas-wrap"><canvas id="pC0" height="260"></canvas><div class="tip" id="pTip0"></div></div>
+    <div class="canvas-wrap"><canvas id="pC1" height="260"></canvas></div>
+  </div>
+  <div class="legend"><span style="--c:var(--c0)">x ↦ prox<sub>λℓ</sub>(x)</span><span class="dash" style="--c:var(--ink)">identity</span><span class="fill" style="--c:var(--c0)">prox applied to N(c, 1)</span></div>
+  <div class="readout" id="pRead"></div>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="cal">6. Calibration: the limiting reliability curve</h2>
+<p>With ‖β‖ = 1 the confidence is p̂ = σ(f). By Bayes' rule on the two Gaussian logit classes (Lemma I.1), the truth given that logit is p̂₀ = σ(2ρ*‖µ‖·(f − β₀*) + log π/(1−π)). So the limiting reliability diagram is one explicit curve, the paper's Figure 6 without the binning. There are two separate mismatches. The slope 2ρ*‖µ‖ need not equal 1, which is a scale that ‖β‖ = 1 fixes arbitrarily. And at τopt (β₀* = 0) the classifier ignores the prior log-odds. The toggle adds the prior back, to show how much of CalErr* each one accounts for.</p>
+<div class="widget">
+  <div class="controls">
+    <label>π <input type="range" id="cP" min="0.01" max="0.5" step="0.01" value="0.1"><output id="cPV"></output></label>
+    <label>‖µ‖ <input type="range" id="cM" min="0.2" max="3" step="0.05" value="1"><output id="cMV"></output></label>
+    <label>δ = n/d <input type="range" id="cD" min="-1.5" max="3" step="0.001" value="0.6931"><output id="cDV"></output></label>
+    <label>intercept <select id="cT"><option value="opt" selected>τ = τopt (β₀* = 0)</option><option value="one">τ = 1</option></select></label>
+    <label><input type="checkbox" id="cPrior"> add log π/(1−π) to the logit</label>
+  </div>
+  <div class="canvas-wrap"><canvas id="cC" height="300"></canvas><div class="tip" id="cTip"></div></div>
+  <div class="legend"><span style="--c:var(--c0)">P(y = +1 | confidence)</span><span class="dash" style="--c:var(--ink)">perfect calibration</span><span class="fill" style="--c:var(--grey)">how often each confidence occurs</span></div>
+  <div class="readout" id="cRead"></div>
+</div>
+
+<p class="small">Numerics: Φ via a Chebyshev erfc (relative error &lt; 1.2·10⁻⁷). g₁(t) = tΦ(t) + φ(t), g₂(t) = (t² + 1)Φ(t) + tφ(t), g₁⁻¹ and ρ* by bisection. The SVM is the C = ∞ dual solved by maximal-violating-pair SMO, as in the notes' <code>svm_simulation.py</code>, with µ = (‖µ‖, 0, …, 0) by rotation invariance.</p>
+
+</main>
+<script>
+"use strict";
+// ---------------------------------------------------------------- numerics
+function erfc(x){const z=Math.abs(x),t=1/(1+0.5*z);
+  const r=t*Math.exp(-z*z-1.26551223+t*(1.00002368+t*(0.37409196+t*(0.09678418+t*(-0.18628806+t*(0.27886807+t*(-1.13520398+t*(1.48851587+t*(-0.82215223+t*0.17087277)))))))));
+  return x>=0?r:2-r;}
+const Phi=x=>0.5*erfc(-x/Math.SQRT2);
+const phi=x=>Math.exp(-0.5*x*x)/Math.sqrt(2*Math.PI);
+function g1(t){ if(t<-8){const s=-t;return phi(t)*(1/(s*s)-3/s**4+15/s**6);} return t*Phi(t)+phi(t); }
+function g2(t){ if(t<-8){const s=-t;return phi(t)*(2/s**3-24/s**5);} return (t*t+1)*Phi(t)+t*phi(t); }
+function bisect(f,lo,hi,it=100){let flo=f(lo);for(let k=0;k<it;k++){const mid=0.5*(lo+hi),fm=f(mid);if((fm>0)===(flo>0)){lo=mid;flo=fm;}else hi=mid;}return 0.5*(lo+hi);}
+function g1inv(y){let lo=-40,hi=40;for(let k=0;k<60;k++){const mid=0.5*(lo+hi);if(g1(mid)<y)lo=mid;else hi=mid;}return 0.5*(lo+hi);}
+const sig=t=>1/(1+Math.exp(-t));
+
+// Lemma E.9: (rho*, beta0*, kappa*) for margin ratio tau
+function solve(m,pi,delta,tau=1){
+  const ap=r=>r/(2*pi*m*delta), am=r=>r/(2*(1-pi)*m*delta), g=y=>g2(g1inv(y));
+  const rho=bisect(r=>pi*delta*g(ap(r))+(1-pi)*delta*g(am(r))-(1-r*r),1e-9,1-1e-12,52);
+  const tp=g1inv(ap(rho)), tm=g1inv(am(rho));
+  const k1=(2*rho*m+tp+tm)/2, b1=rho*m+tm-k1;                // tau = 1
+  const kappa=2*k1/(tau+1), b0=b1+(tau-1)/(tau+1)*k1;         // Corollary E.10
+  return {rho,tp,tm,k1,b1,kappa,b0,errP:Phi(-rho*m-b0),errM:Phi(-rho*m+b0),
+          tauOpt:(tp+rho*m)/(tm+rho*m)};
+}
+function deltaStar0(m,pi){ // delta at which kappa*(tau=1) = 0
+  let lo=0.02,hi=2000;
+  for(let k=0;k<32;k++){const mid=Math.sqrt(lo*hi);if(solve(m,pi,mid).k1>0)lo=mid;else hi=mid;}
+  return Math.sqrt(lo*hi);
+}
+
+// ---------------------------------------------------------------- drawing
+function css(v){return getComputedStyle(document.documentElement).getPropertyValue(v).trim();}
+function setup(cv){if(!cv.dataset.h)cv.dataset.h=cv.getAttribute("height");const dpr=window.devicePixelRatio||1,w=cv.clientWidth,h=+cv.dataset.h;
+  cv.width=w*dpr;cv.height=h*dpr;cv.style.height=h+"px";const c=cv.getContext("2d");c.setTransform(dpr,0,0,dpr,0,0);return {c,w,h};}
+function Plot(cv,o){
+  const {c,w,h}=setup(cv);const L=o.left??46,R=12,T=o.top??26,B=36;
+  const X=x=>L+(x-o.xlim[0])/(o.xlim[1]-o.xlim[0])*(w-L-R);
+  const Y=y=>T+(1-(y-o.ylim[0])/(o.ylim[1]-o.ylim[0]))*(h-T-B);
+  const ink=css("--ink"),mut=css("--muted"),line=css("--line");
+  c.font="11px -apple-system,Segoe UI,sans-serif";
+  c.strokeStyle=line;c.lineWidth=1;c.fillStyle=mut;c.textAlign="right";
+  for(const t of o.yticks){c.beginPath();c.moveTo(L,Y(t));c.lineTo(w-R,Y(t));c.stroke();c.fillText(o.yfmt?o.yfmt(t):t,L-5,Y(t)+3);}
+  c.textAlign="center";
+  for(const t of o.xticks){c.fillText(o.xfmt?o.xfmt(t):t,X(t),h-B+14);}
+  c.fillText(o.xlabel,(L+w-R)/2,h-6);c.textAlign="left";if(o.title){c.fillStyle=ink;c.font="600 12px -apple-system,Segoe UI,sans-serif";c.fillText(o.title,L,14);c.font="11px -apple-system,Segoe UI,sans-serif";}
+  if(o.ylabel){c.fillStyle=mut;c.fillText(o.ylabel,L+4,T+10);}
+  const P={c,w,h,X,Y,L,R,T,B,
+    line(xs,ys,col,wd=2,dash=null){c.save();c.strokeStyle=col;c.lineWidth=wd;if(dash)c.setLineDash(dash);c.beginPath();let on=false;
+      for(let i=0;i<xs.length;i++){if(!isFinite(ys[i])){on=false;continue;}const px=X(xs[i]),py=Y(Math.max(o.ylim[0]-1,Math.min(o.ylim[1]+1,ys[i])));if(!on){c.moveTo(px,py);on=true;}else c.lineTo(px,py);}c.stroke();c.restore();},
+    area(xs,ys,col,alpha){c.save();c.globalAlpha=alpha;c.fillStyle=col;c.beginPath();c.moveTo(X(xs[0]),Y(0));for(let i=0;i<xs.length;i++)c.lineTo(X(xs[i]),Y(ys[i]));c.lineTo(X(xs[xs.length-1]),Y(0));c.closePath();c.fill();c.restore();},
+    vline(x,col,wd=1,dash=null,y1=null){c.save();c.strokeStyle=col;c.lineWidth=wd;if(dash)c.setLineDash(dash);c.beginPath();c.moveTo(X(x),Y(o.ylim[0]));c.lineTo(X(x),y1==null?T:Y(y1));c.stroke();c.restore();},
+    band(x0,x1,col,alpha){c.save();c.globalAlpha=alpha;c.fillStyle=col;c.fillRect(X(x0),T,X(x1)-X(x0),h-T-B);c.restore();},
+    text(s,x,y,col,align="left",bold=false){c.save();c.fillStyle=col||mut;c.textAlign=align;if(bold)c.font="600 11px -apple-system,Segoe UI,sans-serif";c.fillText(s,X(x),Y(y));c.restore();},
+    dot(x,y,col,r=5){c.save();c.fillStyle=col;c.strokeStyle=css("--surface");c.lineWidth=2;c.beginPath();c.arc(X(x),Y(y),r,0,7);c.fill();c.stroke();c.restore();},
+    invX(px){return o.xlim[0]+(px-L)/(w-L-R)*(o.xlim[1]-o.xlim[0]);}
+  };
+  c.strokeStyle=css("--grey");c.beginPath();c.moveTo(L,Y(o.ylim[0]));c.lineTo(w-R,Y(o.ylim[0]));c.stroke();
+  return P;
+}
+function hover(cv,tip,fn){
+  cv.addEventListener("mousemove",e=>{const r=cv.getBoundingClientRect(),px=e.clientX-r.left,py=e.clientY-r.top;
+    const s=fn(px,py);if(!s){tip.style.display="none";return;}tip.innerHTML=s;tip.style.display="block";
+    const tw=tip.offsetWidth;tip.style.left=Math.min(px+12,r.width-tw-4)+"px";tip.style.top=(py-30)+"px";});
+  cv.addEventListener("mouseleave",()=>tip.style.display="none");
+}
+const $=id=>document.getElementById(id);
+const f3=x=>(Math.abs(x)<1e-3&&x!==0)?x.toExponential(1):x.toFixed(3);
+const pct=x=>(100*x).toFixed(1)+"%";
+const linspace=(a,b,n)=>Array.from({length:n},(_,i)=>a+(b-a)*i/(n-1));
+
+// ---------------------------------------------------------------- widget 1
+let SIM=null, eHover=[null,null];
+function eState(){return {pi:+$("eP").value,m:+$("eM").value,delta:Math.exp(+$("eD").value),tau:Math.exp(+$("eT").value)};}
+function drawE(){
+  const {pi,m,delta,tau}=eState();
+  $("ePV").textContent=pi.toFixed(2);$("eMV").textContent=m.toFixed(2);$("eDV").textContent=delta.toFixed(2);$("eTV").textContent=tau.toFixed(2);
+  const ds=deltaStar0(m,pi);
+  const s=solve(m,pi,delta,tau);
+  const sep=s.k1>0;
+  const xs=linspace(-4,6,500);
+  for(const [idx,y] of [[0,1],[1,-1]]){
+    const cv=$("eC"+idx), col=css(idx===0?"--c0":"--c1");
+    const P=Plot(cv,{xlim:[-4,6],ylim:[0,0.8],xticks:[-4,-2,0,2,4,6],yticks:[0,0.2,0.4,0.6,0.8],
+      xlabel:"y · f(x)",title:idx===0?"minority (y = +1)":"majority (y = −1)",ylabel:"density"});
+    if(!sep){P.text("not separable: δ ≥ δ*(0) = "+ds.toFixed(2),-3.6,0.5,css("--bad"),"left",true);P.text("the SVM does not exist; see widget 5",-3.6,0.42);eHover[idx]=null;continue;}
+    const c=s.rho*m+y*s.b0, k=(y>0?tau:1)*s.kappa;   // class centre, class margin (y*f units)
+    const tld=xs.map(x=>phi(x-c));
+    const bx=xs.filter(x=>x<=k), by=bx.map(x=>phi(x-c));
+    P.area(bx,by,css("--grey"),0.22);
+    const ex=xs.filter(x=>x<=0), ey=ex.map(x=>phi(x-c));
+    P.area(ex,ey,css("--bad"),0.25);
+    if(SIM&&SIM.key===JSON.stringify([pi,m,delta])){ // histogram of simulated training margins (continuous part)
+      const v=SIM.marg.filter((_,i)=>SIM.y[i]===y), kk=(y>0?tau:1)*SIM.kappa, bw=0.25;
+      const cnt={};let atom=0;for(const t of v){if(t<=kk+1e-6){atom++;continue;}const b=Math.floor(t/bw);cnt[b]=(cnt[b]||0)+1;}
+      P.c.save();P.c.fillStyle=col;P.c.globalAlpha=0.35;
+      for(const b in cnt){const x0=b*bw,hh=cnt[b]/(v.length*bw);if(x0<-4||x0>6)continue;P.c.fillRect(P.X(x0)+1,P.Y(hh),P.X(x0+bw)-P.X(x0)-2,P.Y(0)-P.Y(hh));}
+      P.c.restore();
+      P.c.save();P.c.fillStyle=col;P.c.globalAlpha=0.35;P.c.fillRect(P.X(kk)-4,P.Y(Math.min(0.78,atom/v.length)),8,P.Y(0)-P.Y(Math.min(0.78,atom/v.length)));P.c.restore();
+    }
+    P.line(xs,tld,col,1.6,[5,3]);
+    const kx=xs.filter(x=>x>k);P.line(kx,kx.map(x=>phi(x-c)),col,2.2);
+    const atom=Phi(k-c);
+    P.vline(k,col,3,null,Math.min(0.78,atom));
+    P.text("atom "+pct(atom),k+0.15,Math.min(0.72,atom)+0.02,css("--ink"));
+    P.vline(0,css("--ink"),1);
+    P.text("test error "+pct(Phi(-c)),-3.8,0.64,css("--ink"));
+    eHover[idx]={P,c,k,atom};
+  }
+  // readout
+  if(!sep){$("eRead").innerHTML=`<span class="bad">Not separable</span>: δ = ${delta.toFixed(2)} ≥ δ*(0) = <b>${ds.toFixed(2)}</b>. κ*(τ=1) would be ${f3(s.k1)}.`;$("eBar").innerHTML="";$("eBarRead").innerHTML="";return;}
+  const gp=g1(s.tp), gm=g1(s.tm);
+  const to=s.tauOpt;
+  $("eRead").innerHTML=`ρ* = <b>${f3(s.rho)}</b> · β₀* = <b>${f3(s.b0)}</b> · κ* = <b>${f3(s.kappa)}</b> (minority margin τκ* = ${f3(tau*s.kappa)}) · separable up to δ*(0) = <b>${ds.toFixed(2)}</b><br>`+
+    `Err₊ = <b>${pct(s.errP)}</b> · Err₋ = <b>${pct(s.errM)}</b> · balanced = <b>${pct((s.errP+s.errM)/2)}</b> · best balanced Φ(−ρ*‖µ‖) = ${pct(Phi(-s.rho*m))}<br>`+
+    `mean push per minority point g₁(t₊) = <b>${f3(gp)}</b>, per majority point g₁(t₋) = <b>${f3(gm)}</b>, ratio ${ (gp/gm).toFixed(2)} = (1−π)/π = ${((1-pi)/pi).toFixed(2)}<br>`+
+    `τopt = <b>${to>0?to.toFixed(3):'<span class="bad">'+to.toFixed(2)+' &lt; 0</span>'}</b> ${to>0?"":"(β₀*(1) + κ*(1) = "+f3(s.b1+s.k1)+" &lt; 0: no positive τ puts the boundary at β₀* = 0)"}`+
+    (SIM&&SIM.key===JSON.stringify([pi,m,delta])?`<br>simulated SVM (n = ${SIM.n}, d = ${SIM.d}): ρ̂ = <b>${f3(SIM.rho)}</b>, β̂₀(τ) = <b>${f3(SIM.b1+(tau-1)/(tau+1)*SIM.kappa)}</b>, κ̂(τ) = <b>${f3(2*SIM.kappa/(tau+1))}</b>, exact test errors ${pct(Phi(-SIM.rho*m-(SIM.b1+(tau-1)/(tau+1)*SIM.kappa)))} / ${pct(Phi(-SIM.rho*m+(SIM.b1+(tau-1)/(tau+1)*SIM.kappa)))}`:"");
+  const share1=pi*g2(s.tp), share2=(1-pi)*g2(s.tm), tot=share1+share2;
+  $("eBar").innerHTML=`<div style="width:${100*share1/tot}%;background:var(--c0)"></div><div style="width:${100*share2/tot}%;background:var(--c1)"></div>`;
+  $("eBarRead").innerHTML=`minority share <b>${f3(share1)}</b> (${pct(share1/tot)}) from ${pct(pi)} of the points · majority share <b>${f3(share2)}</b> · total ${f3(tot)} = (1−ρ*²)/δ = ${f3((1-s.rho*s.rho)/delta)}`;
+  drawT();
+}
+for(const idx of [0,1])hover($("eC"+idx),$("eTip"+idx),(px)=>{const H=eHover[idx];if(!H)return null;const x=H.P.invX(px);if(x<-4||x>6)return null;
+  return `y·f = ${x.toFixed(2)} · TLD density ${phi(x-H.c).toFixed(3)} · ELD density ${x<H.k?"0 (this mass is at κ*)":phi(x-H.c).toFixed(3)}`;});
+
+// SVM by SMO (hard margin, C = inf)
+function mulberry(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+function simulate(){
+  const {pi,m,delta}=eState();const n=+$("eN").value,d=Math.max(2,Math.round(n/delta));
+  if(solve(m,pi,delta).k1<=0){$("eSimMsg").textContent="not separable: nothing to train";return;}
+  if(d>4000){$("eSimMsg").textContent="d = n/δ is too large for the browser; raise δ";return;}
+  $("eSimMsg").textContent="training…";
+  setTimeout(()=>{
+    const t0=performance.now();const rnd=mulberry(Math.floor(Math.random()*1e9));
+    const gauss=()=>{let u=0;while(u===0)u=rnd();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*rnd());};
+    const y=new Float64Array(n),X=new Float64Array(n*d);
+    for(let i=0;i<n;i++){y[i]=rnd()<pi?1:-1;for(let j=0;j<d;j++)X[i*d+j]=gauss();X[i*d]+=y[i]*m;}
+    let np=0;for(let i=0;i<n;i++)if(y[i]>0)np++;if(np<2||np>n-2){$("eSimMsg").textContent="degenerate draw, try again";return;}
+    const K=new Float64Array(n*n);
+    for(let i=0;i<n;i++)for(let j=i;j<n;j++){let s=0;const a=i*d,b=j*d;for(let k=0;k<d;k++)s+=X[a+k]*X[b+k];K[i*n+j]=s;K[j*n+i]=s;}
+    const al=new Float64Array(n),G=new Float64Array(n).fill(-1);
+    let it=0;
+    for(;it<3e6;it++){
+      let i=-1,j=-1,vi=-Infinity,vj=Infinity;
+      for(let t=0;t<n;t++){const v=-y[t]*G[t];
+        if((y[t]>0||al[t]>0)&&v>vi){vi=v;i=t;}
+        if((y[t]<0||al[t]>0)&&v<vj){vj=v;j=t;}}
+      const gap=vi-vj;if(gap<1e-7*Math.max(1,Math.abs(vi)))break;
+      let lam=gap/Math.max(K[i*n+i]+K[j*n+j]-2*K[i*n+j],1e-12);
+      if(y[i]<0)lam=Math.min(lam,al[i]);if(y[j]>0)lam=Math.min(lam,al[j]);
+      const di=y[i]*lam,dj=-y[j]*lam;al[i]+=di;al[j]+=dj;
+      const ci=y[i]*di,cj=y[j]*dj;
+      for(let t=0;t<n;t++)G[t]+=y[t]*(K[t*n+i]*ci+K[t*n+j]*cj);
+    }
+    const w=new Float64Array(d);for(let i=0;i<n;i++)if(al[i]>0){const c=al[i]*y[i];for(let k=0;k<d;k++)w[k]+=c*X[i*d+k];}
+    let nw=0;for(let k=0;k<d;k++)nw+=w[k]*w[k];nw=Math.sqrt(nw);
+    const proj=new Float64Array(n);let pmin=Infinity,mmax=-Infinity;
+    for(let i=0;i<n;i++){let s=0;for(let k=0;k<d;k++)s+=X[i*d+k]*w[k];proj[i]=s/nw;if(y[i]>0)pmin=Math.min(pmin,proj[i]);else mmax=Math.max(mmax,proj[i]);}
+    const b1=-(mmax+pmin)/2,kappa=(pmin-mmax)/2;
+    const marg=Array.from(proj,(p,i)=>y[i]*(p+b1));
+    SIM={key:JSON.stringify([pi,m,delta]),n,d,rho:w[0]/nw,b1,kappa,marg,y:Array.from(y)};
+    $("eSimMsg").textContent=`done: n = ${n}, d = ${d}, ${it} SMO steps, ${((performance.now()-t0)/1000).toFixed(1)} s`;
+    drawE();
+  },20);
+}
+$("eSim").onclick=simulate;
+$("eClr").onclick=()=>{SIM=null;$("eSimMsg").textContent="";drawE();};
+$("eTopt").onclick=()=>{const {pi,m,delta}=eState();const s=solve(m,pi,delta);if(s.tauOpt>0){$("eT").value=Math.log(s.tauOpt);}else{$("eSimMsg").textContent="τopt < 0 here: no positive τ equalises the errors";}drawE();};
+for(const id of ["eP","eM","eD","eT"])$(id).addEventListener("input",()=>{drawE();if(id!=="eT")drawS();});
+
+// ---------------------------------------------------------------- widget 2
+let sCache={};
+function drawS(){
+  const ms=$("sM").value.split(",").map(Number);
+  const cols=["--grey","--c0","--c2","--c1"];
+  const pis=linspace(0.02,0.5,40);
+  const {pi,delta,m}=eState();
+  const series=ms.map(mm=>{const key=mm;if(!sCache[key])sCache[key]=pis.map(p=>deltaStar0(Math.max(mm,1e-6),p));return sCache[key];});
+  const lg=v=>Math.log10(v), top=Math.max(20,...series.flat())*1.2;
+  const ticks=[1,2,5,10,20,50,100,200,500,1000].filter(t=>t<=top);
+  const P=Plot($("sC"),{xlim:[0,0.5],ylim:[0,lg(top)],xticks:[0,0.1,0.2,0.3,0.4,0.5],yticks:ticks.map(lg),yfmt:t=>Math.round(Math.pow(10,t)),xlabel:"π",ylabel:"δ*(0), log scale: separable below the curve"});
+  P.c.save();P.c.strokeStyle=css("--grey");P.c.setLineDash([3,3]);P.c.beginPath();P.c.moveTo(P.X(0),P.Y(lg(2)));P.c.lineTo(P.X(0.5),P.Y(lg(2)));P.c.stroke();P.c.restore();
+  P.text("Cover: n/d = 2",0.2,lg(2)-0.09);
+  series.forEach((ys,i)=>{P.line(pis,ys.map(lg),css(cols[i]),2);P.text("‖µ‖ = "+ms[i],0.43,lg(ys[35])+0.05,css("--ink"));});
+  P.dot(pi,Math.min(lg(delta),lg(top)),css(delta<deltaStar0(m,pi)?"--c2":"--bad"));
+  $("sLeg").innerHTML=ms.map((mm,i)=>`<span style="--c:var(${cols[i]})">‖µ‖ = ${mm}</span>`).join("")+`<span style="--c:var(--c2)">● widget 1’s (π, δ): separable</span>`;
+  const ds=deltaStar0(m,pi);
+  $("sRead").innerHTML=`At widget 1’s ‖µ‖ = ${m.toFixed(2)}, π = ${pi.toFixed(2)}: δ*(0) = <b>${ds.toFixed(2)}</b>, and δ = ${delta.toFixed(2)} is ${delta<ds?'<span class="good">separable</span>':'<span class="bad">not separable</span>'}. At ‖µ‖ = 0: δ*(0) = ${deltaStar0(1e-6,0.5).toFixed(3)} at π = ½, and ${deltaStar0(1e-6,pi).toFixed(3)} at π = ${pi.toFixed(2)}. With imbalance the intercept alone separates more points.`;
+  sHover={P,pis,series,ms};
+}
+let sHover=null;
+hover($("sC"),$("sTip"),px=>{if(!sHover)return null;const x=sHover.P.invX(px);if(x<0.02||x>0.5)return null;const i=Math.round((x-0.02)/(0.48)*39);
+  return "π = "+sHover.pis[i].toFixed(3)+" · "+sHover.ms.map((mm,k)=>"‖µ‖="+mm+": "+sHover.series[k][i].toFixed(2)).join(" · ");});
+$("sM").onchange=drawS;
+
+// ---------------------------------------------------------------- widget 3
+let tHover=[null,null];
+function drawT(){
+  const {pi,m,delta,tau}=eState();
+  const s1=solve(m,pi,delta);
+  if(s1.k1<=0){for(const i of [0,1]){const P=Plot($("tC"+i),{xlim:[0,1],ylim:[0,1],xticks:[],yticks:[0,1],xlabel:""});P.text("not separable at widget 1’s setting",0.05,0.5,css("--bad"),"left",true);}$("tRead").textContent="";return;}
+  const taus=linspace(Math.log(0.25),Math.log(40),160).map(Math.exp);
+  const eP=[],eM=[],eB=[];
+  for(const t of taus){const b0=s1.b1+(t-1)/(t+1)*s1.k1;const a=Phi(-s1.rho*m-b0),b=Phi(-s1.rho*m+b0);eP.push(a);eM.push(b);eB.push((a+b)/2);}
+  const lt=taus.map(Math.log);
+  const P0=Plot($("tC0"),{xlim:[lt[0],lt[lt.length-1]],ylim:[0,1],xticks:[0.25,1,4,16,40].map(Math.log),xfmt:t=>+Math.exp(t).toFixed(2),yticks:[0,0.25,0.5,0.75,1],xlabel:"τ (log scale)",title:`errors against τ, π = ${pi.toFixed(2)}`});
+  P0.line(lt,eP,css("--c0"));P0.line(lt,eM,css("--c1"));P0.line(lt,eB,css("--ink"),1.6,[5,3]);
+  if(s1.tauOpt>0&&s1.tauOpt<40){P0.vline(Math.log(s1.tauOpt),css("--grey"),1,[3,3]);P0.text("τopt = "+s1.tauOpt.toFixed(2),Math.log(s1.tauOpt)+0.08,0.92,css("--ink"));}
+  P0.dot(Math.log(Math.min(40,Math.max(0.25,tau))),(solve(m,pi,delta,tau).errP),css("--c0"),4);
+  tHover[0]={P:P0,xs:lt,eP,eM,eB,lab:x=>"τ = "+Math.exp(x).toFixed(2)};
+  const pis=linspace(0.01,0.5,60);const a1=[],a2=[],a3=[],a4=[];let pc=null;
+  for(const p of pis){const s=solve(m,p,delta);if(s.k1<=0){a1.push(NaN);a2.push(NaN);a3.push(NaN);a4.push(NaN);continue;}
+    a1.push(s.errP);a2.push(s.errM);a3.push((s.errP+s.errM)/2);a4.push(Phi(-s.rho*m));if(s.tauOpt<=0)pc=p;}
+  const P1=Plot($("tC1"),{xlim:[0,0.5],ylim:[0,1],xticks:[0,0.1,0.2,0.3,0.4,0.5],yticks:[0,0.25,0.5,0.75,1],xlabel:"π",title:`errors against π, ‖µ‖ = ${m.toFixed(2)}, δ = ${delta.toFixed(2)}`});
+  if(pc)P1.band(0,pc,css("--grey"),0.18);
+  P1.line(pis,a1,css("--c0"));P1.line(pis,a2,css("--c1"));P1.line(pis,a3,css("--ink"),1.6,[5,3]);P1.line(pis,a4,css("--ink"),2);
+  if(pc)P1.text("τopt < 0",0.005,0.95,css("--ink"));
+  tHover[1]={P:P1,xs:pis,eP:a1,eM:a2,eB:a3,e4:a4,lab:x=>"π = "+x.toFixed(3)};
+  $("tRead").innerHTML=`At τ = 1: Err₊ = ${pct(s1.errP)}, Err₋ = ${pct(s1.errM)}. `+(s1.tauOpt>0?`At τopt = <b>${s1.tauOpt.toFixed(3)}</b> (1/π = ${(1/pi).toFixed(2)}): every error equals Φ(−ρ*‖µ‖) = <b>${pct(Phi(-s1.rho*m))}</b>.`:`<span class="bad">τopt = ${s1.tauOpt.toFixed(2)} &lt; 0</span>: over τ &gt; 0 the balanced error only approaches its infimum as τ → ∞.`)+(pc?` In the right panel τopt &lt; 0 for π ≲ ${pc.toFixed(3)}.`:"");
+}
+for(const i of [0,1])hover($("tC"+i),$("tTip"+i),px=>{const H=tHover[i];if(!H)return null;const x=H.P.invX(px);let k=0,best=1e9;H.xs.forEach((v,j)=>{if(Math.abs(v-x)<best){best=Math.abs(v-x);k=j;}});
+  if(!isFinite(H.eP[k]))return null;return `${H.lab(H.xs[k])} · Err₊ ${pct(H.eP[k])} · Err₋ ${pct(H.eM[k])} · bal ${pct(H.eB[k])}`+(H.e4?` · τopt ${pct(H.e4[k])}`:"");});
+
+// ---------------------------------------------------------------- widget 4
+function drawH(){
+  const a=+$("hA").value,b=+$("hB").value,c=+$("hCc").value,r=+$("hR").value,L=+$("hD").value,d=Math.pow(10,L);
+  $("hAV").textContent=a.toFixed(2);$("hBV").textContent=b.toFixed(2);$("hCV").textContent=c.toFixed(2);$("hRV").textContent=r.toFixed(2);$("hDV").textContent=L.toFixed(1);
+  const x=a-c;
+  const P=Plot($("hC0"),{xlim:[-0.2,1.2],ylim:[0,0.8],xticks:[0,0.3,0.6,0.9,1.2],yticks:[0,0.2,0.4,0.6,0.8],xlabel:"a − c  (imbalance vs sample growth)",ylabel:"b (signal growth)",title:"phase plane"});
+  const cx=P.c;const poly=(pts,col,al)=>{cx.save();cx.globalAlpha=al;cx.fillStyle=col;cx.beginPath();pts.forEach(([u,v],i)=>i?cx.lineTo(P.X(u),P.Y(v)):cx.moveTo(P.X(u),P.Y(v)));cx.closePath();cx.fill();cx.restore();};
+  poly([[-0.2,0],[0,0],[0.8,0.8],[-0.2,0.8]],css("--c2"),0.14);
+  poly([[0,0],[0.8,0.8],[1.2,0.8],[1.2,0.6]],css("--c0"),0.14);
+  poly([[0,0],[1.2,0.6],[1.2,0]],css("--bad"),0.12);
+  P.band(1,1.2,css("--grey"),0.25);
+  P.line([0,0.8],[0,0.8],css("--ink"),1);P.line([0,1.2],[0,0.6],css("--ink"),1);
+  P.text("high signal",-0.15,0.7,css("--ink"),"left",true);P.text("moderate",0.86,0.74,css("--ink"),"left",true);P.text("low signal",0.8,0.12,css("--ink"),"left",true);
+  P.text("a − c = b",0.5,0.53,css("--muted"));P.text("a − c = 2b",0.62,0.26,css("--muted"));P.text("n₊ → 0",1.02,0.4,css("--muted"));
+  P.dot(Math.max(-0.2,Math.min(1.2,x)),b,css("--ink"),5);
+  let phase=x>=1?"invalid":(x<b?"high":(x<2*b?"moderate":"low"));
+  const Q=Plot($("hC1"),{xlim:[0,1],ylim:[0,1],xticks:[0,0.25,0.5,0.75,1],yticks:[],xlabel:"r, where τ = d^r",title:"window of τ that makes both errors vanish",left:14});
+  let lo=null,hi=null;
+  if(phase==="high"){lo=0;hi=b/2;}else if(phase==="moderate"){lo=a-b-c;hi=x/2;}
+  if(lo!==null){Q.c.save();Q.c.fillStyle=css("--c2");Q.c.globalAlpha=0.25;Q.c.fillRect(Q.X(Math.max(0,lo)),Q.Y(0.7),Q.X(Math.min(1,hi))-Q.X(Math.max(0,lo)),Q.Y(0.3)-Q.Y(0.7));Q.c.restore();
+    Q.text(`${phase==="high"?"0":"a−b−c = "+lo.toFixed(2)} < r < ${hi.toFixed(2)}`,Math.max(0,lo)+0.01,0.76,css("--ink"));}
+  else Q.text(phase==="low"?"no τ works: balanced error → ½":"a − c ≥ 1: the minority sample does not grow",0.02,0.5,css("--bad"),"left",true);
+  Q.vline(r,css("--ink"),2,null,0.9);Q.text("r = "+r.toFixed(2),r+0.01,0.9,css("--ink"));
+  const ok=lo!==null&&r>lo&&r<hi;
+  // orders of magnitude (Lemmas H.1-H.5), unit constants
+  const mu=Math.sqrt(Math.pow(d,b)), npos=Math.pow(d,1+c-a), noise=Math.sqrt(d/npos), tau=Math.pow(d,r);
+  const rt=mu/Math.sqrt(mu*mu+noise*noise/4);
+  const rhoMu=phase==="low"?0:rt*mu, mem=phase==="low"?noise:Math.sqrt(Math.max(0,1-rt*rt))*noise;
+  const cPlus=(2-2/(tau+1))*rhoMu-mem/(tau+1), cMinus=(2/(tau+1))*rhoMu+mem/(tau+1);
+  $("hRead").innerHTML=`phase <b>${phase}</b>; τ = d^${r.toFixed(2)} is ${lo===null?'<span class="bad">useless</span>':(ok?'<span class="good">inside the window</span>':'<span class="bad">outside the window</span>')}.<br>`+
+    `At d = 10^${L.toFixed(1)}: ‖µ‖ ≈ ${mu.toPrecision(3)}, n₊ ≈ ${npos.toPrecision(3)}, minority noise scale √(d/n₊) ≈ ${noise.toPrecision(3)}, margin bound √(‖µ‖² + d/(4n₊)) ≈ ${Math.sqrt(mu*mu+noise*noise/4).toPrecision(3)}, ρ ≈ ${rt.toPrecision(3)}.<br>`+
+    `Heuristic test-logit centres (unit noise): minority ≈ <b>${cPlus.toPrecision(3)}</b> → Err₊ ≈ ${pct(Phi(-cPlus))}; majority ≈ <b>${cMinus.toPrecision(3)}</b> → Err₋ ≈ ${pct(Phi(-cMinus))}.`+(phase==="low"?" (ρ̂‖µ‖ → 0 in this phase, so the classifier carries no signal.)":"");
+}
+for(const id of ["hA","hB","hCc","hR","hD"])$(id).addEventListener("input",drawH);
+
+// ---------------------------------------------------------------- widget 5
+const lp=t=>-sig(-t);                      // logistic loss derivative
+function prox(x,lam){let lo=Math.min(x,0)-1,hi=Math.max(x,0)+lam+1;return bisect(t=>t-x+lam*lp(t),lo,hi,60);}
+let pHover=null;
+function drawP(){
+  const lam=Math.pow(10,+$("pL").value),c0=+$("pCc").value;$("pLV").textContent=lam<10?lam.toFixed(2):Math.round(lam);$("pCV").textContent=c0.toFixed(2);
+  const xs=linspace(-6,8,300),ys=xs.map(x=>prox(x,lam));
+  const ymax=Math.max(8,...ys);
+  const P=Plot($("pC0"),{xlim:[-6,8],ylim:[-6,Math.ceil(ymax)],xticks:[-6,-3,0,3,6],yticks:linspace(-6,Math.ceil(ymax),5).map(v=>Math.round(v)),xlabel:"test logit x",title:"x ↦ prox_λℓ(x)"});
+  P.line([-6,8],[-6,8],css("--ink"),1.2,[5,3]);P.line(xs,ys,css("--c0"),2.2);
+  pHover={P,lam};
+  // transformed density: histogram of prox(c0 + G)
+  const N=6000,vals=[];for(let i=0;i<N;i++){const u=(i+0.5)/N;const g=Math.SQRT2*inverfc(2*(1-u));vals.push(prox(c0+g,lam));}
+  const lo=Math.min(...vals),hi=Math.max(...vals);const nb=40,bw=(hi-lo)/nb||1;const h=new Array(nb).fill(0);vals.forEach(v=>h[Math.min(nb-1,Math.floor((v-lo)/bw))]++);
+  const dens=h.map(v=>v/(N*bw));const ymx=Math.max(...dens)*1.1;
+  const Q=Plot($("pC1"),{xlim:[lo-0.5,hi+0.5],ylim:[0,ymx],xticks:linspace(lo,hi,5).map(v=>+v.toFixed(1)),yticks:[0,+(ymx/2).toFixed(2),+ymx.toFixed(2)],xlabel:"training logit prox_λℓ(c + G)",title:"what training does to N(c, 1)"});
+  Q.c.save();Q.c.fillStyle=css("--c0");Q.c.globalAlpha=0.4;dens.forEach((v,i)=>Q.c.fillRect(Q.X(lo+i*bw)+1,Q.Y(v),Q.X(lo+(i+1)*bw)-Q.X(lo+i*bw)-2,Q.Y(0)-Q.Y(v)));Q.c.restore();
+  const p0=prox(-6,lam),pz=prox(0,lam);
+  $("pRead").innerHTML=`prox(0) = <b>${pz.toFixed(3)}</b>, prox(−6) = ${p0.toFixed(3)}, prox(8) = ${prox(8,lam).toFixed(3)}. The slope at 0 is 1/(1 + λℓ″) = ${(1/(1+lam*sig(pz)*sig(-pz))).toFixed(3)}. Small λ gives the identity. Large λ lifts every low logit up to about the same floor, while high logits (where ℓ′ ≈ 0) barely move. That is the truncation, smoothed.`;
+}
+function inverfc(y){ // inverse of erfc on (0,2) by bisection
+  let lo=-6,hi=6;for(let k=0;k<60;k++){const mid=0.5*(lo+hi);if(erfc(mid)>y)lo=mid;else hi=mid;}return 0.5*(lo+hi);}
+hover($("pC0"),$("pTip0"),px=>{if(!pHover)return null;const x=pHover.P.invX(px);if(x<-6||x>8)return null;return `x = ${x.toFixed(2)} → prox = ${prox(x,pHover.lam).toFixed(3)}`;});
+for(const id of ["pL","pCc"])$(id).addEventListener("input",drawP);
+
+// ---------------------------------------------------------------- widget 6
+let cHover=null;
+function drawC(){
+  const pi=+$("cP").value,m=+$("cM").value,delta=Math.exp(+$("cD").value),mode=$("cT").value,addp=$("cPrior").checked;
+  $("cPV").textContent=pi.toFixed(2);$("cMV").textContent=m.toFixed(2);$("cDV").textContent=delta.toFixed(2);
+  const s=solve(m,pi,delta);
+  if(s.k1<=0){const P=Plot($("cC"),{xlim:[0,1],ylim:[0,1],xticks:[],yticks:[],xlabel:""});P.text("not separable here",0.05,0.5,css("--bad"),"left",true);$("cRead").textContent="";return;}
+  const b0=mode==="opt"?0:s.b1, lpr=Math.log(pi/(1-pi)), shift=addp?lpr:0;
+  // confidence q = sig(f + shift);  truth p0(f) = sig(2 rho m (f - b0) + lpr)
+  const truth=f=>sig(2*s.rho*m*(f-b0)+lpr);
+  const q=linspace(0.003,0.997,300), yv=q.map(v=>truth(Math.log(v/(1-v))-shift));
+  const P=Plot($("cC"),{xlim:[0,1],ylim:[0,1],xticks:[0,0.25,0.5,0.75,1],yticks:[0,0.25,0.5,0.75,1],xlabel:addp?"confidence σ(f + log π/(1−π))":"confidence p̂ = σ(f)",ylabel:"P(y = +1 | confidence)"});
+  // density of the confidence on test data
+  const G=linspace(-7,7,1401),dg=G[1]-G[0];const nb=40,h=new Array(nb).fill(0);
+  let cal=0,mse=0,calP=0;
+  for(const g of G){const w=phi(g)*dg;
+    for(const [Y,py] of [[1,pi],[-1,1-pi]]){const f=s.rho*m*Y+g+b0,conf=sig(f+shift),tr=truth(f);
+      h[Math.min(nb-1,Math.floor(conf*nb))]+=w*py;cal+=w*py*(sig(f)-tr)**2;calP+=w*py*(sig(f+lpr)-tr)**2;mse+=w*py*((Y>0?1:0)-sig(f))**2;}}
+  const hm=Math.max(...h);P.c.save();P.c.fillStyle=css("--grey");P.c.globalAlpha=0.28;
+  h.forEach((v,i)=>{const hh=0.25*v/hm;P.c.fillRect(P.X(i/nb)+1,P.Y(hh),P.X(1/nb)-P.X(0)-2,P.Y(0)-P.Y(hh));});P.c.restore();
+  P.line([0,1],[0,1],css("--ink"),1.2,[5,3]);P.line(q,yv,css("--c0"),2.4);
+  cHover={P,truth,shift};
+  $("cRead").innerHTML=`ρ* = ${f3(s.rho)}, β₀* = ${f3(b0)}${mode==="opt"&&s.tauOpt<=0?' <span class="bad">(τopt &lt; 0 here: β₀* = 0 is not reachable with τ &gt; 0)</span>':""} · slope of the truth in f: 2ρ*‖µ‖ = <b>${(2*s.rho*m).toFixed(3)}</b> · prior log-odds ${lpr.toFixed(2)}<br>`+
+    `CalErr* of σ(f) = <b>${cal.toFixed(4)}</b> · CalErr* of σ(f + log π/(1−π)) = <b>${calP.toFixed(4)}</b> · MSE* = ${mse.toFixed(4)} · share of CalErr* removed by the prior: ${cal>0?pct(Math.max(0,1-calP/cal)):"—"}`;
+}
+hover($("cC"),$("cTip"),px=>{if(!cHover)return null;const x=cHover.P.invX(px);if(x<=0.003||x>=0.997)return null;return `confidence ${x.toFixed(3)} → true P(y=+1) ${cHover.truth(Math.log(x/(1-x))-cHover.shift).toFixed(3)}`;});
+for(const id of ["cP","cM","cD","cT","cPrior"])$(id).addEventListener("input",drawC);
+
+// ---------------------------------------------------------------- boot
+function all(){drawE();drawS();drawH();drawP();drawC();}
+window.addEventListener("resize",all);
+window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change",all);
+all();
+</script>
+</body>
+</html>
