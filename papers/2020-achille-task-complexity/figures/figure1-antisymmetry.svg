@@ -1,0 +1,105 @@
+<svg viewBox="0 0 700 352" xmlns="http://www.w3.org/2000/svg" role="img">
+<title>Figure 1 antisymmetry</title>
+<desc>Measured asymmetry of each task pair in the paper's Figure 1 against the difference of fitted complexities, and the fitted complexities themselves.</desc>
+<style>
+  text{font-family:ui-sans-serif,-apple-system,"Segoe UI",sans-serif;font-weight:400}
+  .lab{font-size:11px;fill:#57564f} .hd{font-size:13px;font-weight:500;fill:#1a1a19}
+  .sub{font-size:11.5px;fill:#57564f} .tiny{font-size:10px;fill:#57564f} .ink{fill:#1a1a19}
+  .ax{stroke:#c3c2b7;stroke-width:0.8;fill:none} .gd{stroke:#e2e1da;stroke-width:0.6;fill:none}
+  .b{stroke:#2f6fb5;stroke-width:2;fill:none} .bf{fill:#2f6fb5} .bb{fill:#2f6fb5;opacity:.28}
+  .o{stroke:#c2571a;stroke-width:2;fill:none} .of{fill:#c2571a} .ob{fill:#c2571a;opacity:.28}
+  .g{stroke:#0f7a5a;stroke-width:2;fill:none} .gf{fill:#0f7a5a}
+  .p{stroke:#7c3aed;stroke-width:2;fill:none} .pf{fill:#7c3aed}
+  .r{stroke:#b42318;stroke-width:1.6;fill:none} .rf{fill:#b42318}
+  .k{stroke:#1a1a19;stroke-width:1.1;fill:none;stroke-dasharray:4 3} .k0{stroke:#1a1a19;stroke-width:1.3;fill:none}
+  .dash{stroke-dasharray:5 3} .dot{stroke-dasharray:1.5 3}
+  .shade{fill:#8a8880;opacity:.16} .shader{fill:#b42318;opacity:.12}
+  .cell{stroke:#ffffff;stroke-width:1}
+  @media (prefers-color-scheme: dark){
+    .lab,.sub,.tiny{fill:#b6b4ab} .hd,.ink{fill:#eceae3} .ax{stroke:#4a4844} .gd{stroke:#33312e}
+    .b{stroke:#3d8ad8} .bf{fill:#3d8ad8} .bb{fill:#3d8ad8;opacity:.36}
+    .o{stroke:#d8733a} .of{fill:#d8733a} .ob{fill:#d8733a;opacity:.36}
+    .g{stroke:#4cc79a} .gf{fill:#4cc79a} .p{stroke:#b48cff} .pf{fill:#b48cff}
+    .r{stroke:#ff7a6b} .rf{fill:#ff7a6b}
+    .k,.k0{stroke:#eceae3} .shade{fill:#b6b4ab;opacity:.16} .shader{fill:#ff7a6b;opacity:.16}
+    .cell{stroke:#131417}
+  }
+</style>
+<text class="hd" x="20" y="22">Figure 1 obeys d(1→2) − d(2→1) = I₂ − I₁ to rounding</text>
+<text class="sub" x="20" y="38">Left: each pair of tasks, measured asymmetry against the fitted c_j − c_i. Right: the fitted complexities c.</text>
+<line class="gd" x1="62" x2="312" y1="277.0" y2="277.0"/>
+<text class="tiny" x="57" y="280.0" text-anchor="end">-0.6</text>
+<line class="gd" x1="62" x2="312" y1="231.0" y2="231.0"/>
+<text class="tiny" x="57" y="234.0" text-anchor="end">-0.3</text>
+<line class="gd" x1="62" x2="312" y1="185.0" y2="185.0"/>
+<text class="tiny" x="57" y="188.0" text-anchor="end">+0.0</text>
+<line class="gd" x1="62" x2="312" y1="139.0" y2="139.0"/>
+<text class="tiny" x="57" y="142.0" text-anchor="end">+0.3</text>
+<line class="gd" x1="62" x2="312" y1="93.0" y2="93.0"/>
+<text class="tiny" x="57" y="96.0" text-anchor="end">+0.6</text>
+<text class="tiny" x="87.0" y="313" text-anchor="middle">-0.6</text>
+<text class="tiny" x="137.0" y="313" text-anchor="middle">-0.3</text>
+<text class="tiny" x="187.0" y="313" text-anchor="middle">+0.0</text>
+<text class="tiny" x="237.0" y="313" text-anchor="middle">+0.3</text>
+<text class="tiny" x="287.0" y="313" text-anchor="middle">+0.6</text>
+<line class="ax" x1="62" x2="312" y1="300" y2="300"/>
+<line class="ax" x1="62" x2="62" y1="70" y2="300"/>
+<text class="lab" x="187.0" y="328" text-anchor="middle">fitted c_j − c_i</text>
+<text class="lab" x="62" y="62">d(i→j) − d(j→i), from the figure</text>
+<polyline class="k" points="62.0,300.0 312.0,70.0"/>
+<circle class="bf" cx="163.5" cy="206.5" r="3"/>
+<circle class="bf" cx="171.4" cy="200.3" r="3"/>
+<circle class="bf" cx="180.3" cy="191.1" r="3"/>
+<circle class="bf" cx="271.0" cy="106.8" r="3"/>
+<circle class="bf" cx="272.2" cy="106.8" r="3"/>
+<circle class="bf" cx="268.0" cy="109.9" r="3"/>
+<circle class="bf" cx="261.0" cy="117.5" r="3"/>
+<circle class="bf" cx="194.9" cy="177.3" r="3"/>
+<circle class="bf" cx="203.9" cy="169.7" r="3"/>
+<circle class="bf" cx="294.5" cy="86.9" r="3"/>
+<circle class="bf" cx="295.8" cy="85.3" r="3"/>
+<circle class="bf" cx="291.6" cy="88.4" r="3"/>
+<circle class="bf" cx="284.5" cy="94.5" r="3"/>
+<circle class="bf" cx="196.0" cy="177.3" r="3"/>
+<circle class="bf" cx="286.6" cy="93.0" r="3"/>
+<circle class="bf" cx="287.8" cy="91.5" r="3"/>
+<circle class="bf" cx="283.7" cy="96.1" r="3"/>
+<circle class="bf" cx="276.6" cy="103.7" r="3"/>
+<circle class="bf" cx="277.6" cy="102.2" r="3"/>
+<circle class="bf" cx="278.9" cy="100.7" r="3"/>
+<circle class="bf" cx="274.7" cy="105.3" r="3"/>
+<circle class="bf" cx="267.6" cy="109.9" r="3"/>
+<circle class="bf" cx="188.2" cy="183.5" r="3"/>
+<circle class="bf" cx="184.1" cy="188.1" r="3"/>
+<circle class="bf" cx="177.0" cy="194.2" r="3"/>
+<circle class="bf" cx="182.8" cy="188.1" r="3"/>
+<circle class="bf" cx="175.8" cy="195.7" r="3"/>
+<circle class="bf" cx="179.9" cy="191.1" r="3"/>
+<line class="ax" x1="591.6" x2="591.6" y1="70" y2="300"/>
+<rect class="bf" x="522.9" y="277.0" width="68.6" height="17.2" rx="2"/>
+<text class="lab" x="466" y="289.6" text-anchor="end">mnist</text>
+<text class="tiny" x="518.9" y="288.6" text-anchor="end">-0.35</text>
+<rect class="bf" x="532.3" y="248.2" width="59.3" height="17.2" rx="2"/>
+<text class="lab" x="466" y="260.9" text-anchor="end">fashion</text>
+<text class="tiny" x="528.3" y="259.9" text-anchor="end">-0.30</text>
+<rect class="bf" x="542.8" y="219.5" width="48.8" height="17.2" rx="2"/>
+<text class="lab" x="466" y="232.1" text-anchor="end">ifashion</text>
+<text class="tiny" x="538.8" y="231.1" text-anchor="end">-0.25</text>
+<rect class="bf" x="550.6" y="190.8" width="40.9" height="17.2" rx="2"/>
+<text class="lab" x="466" y="203.4" text-anchor="end">cifar10</text>
+<text class="tiny" x="546.6" y="202.4" text-anchor="end">-0.21</text>
+<rect class="of" x="591.6" y="162.0" width="46.1" height="17.2" rx="2"/>
+<text class="lab" x="466" y="174.6" text-anchor="end">artificial</text>
+<text class="tiny" x="641.6" y="173.6" text-anchor="start">+0.24</text>
+<rect class="of" x="591.6" y="133.2" width="54.4" height="17.2" rx="2"/>
+<text class="lab" x="466" y="145.9" text-anchor="end">natural</text>
+<text class="tiny" x="650.0" y="144.9" text-anchor="start">+0.28</text>
+<rect class="of" x="591.6" y="104.5" width="57.8" height="17.2" rx="2"/>
+<text class="lab" x="466" y="117.1" text-anchor="end">letters</text>
+<text class="tiny" x="653.4" y="116.1" text-anchor="start">+0.30</text>
+<rect class="of" x="591.6" y="75.8" width="59.3" height="17.2" rx="2"/>
+<text class="lab" x="466" y="88.4" text-anchor="end">cifar100</text>
+<text class="tiny" x="654.9" y="87.4" text-anchor="start">+0.30</text>
+<text class="lab" x="591.6" y="328" text-anchor="middle">c (complexity, up to a constant)</text>
+<text class="lab" x="20" y="340">All 28 pairs lie on the diagonal: once c is fixed, the asymmetric half of the 8 × 8 matrix carries no other information.</text>
+</svg>

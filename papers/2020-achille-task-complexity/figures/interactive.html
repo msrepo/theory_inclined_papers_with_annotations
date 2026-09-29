@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Task Complexity, Interactive</title>
+<style>
+:root{
+  --bg:#fbfaf7; --surface:#ffffff; --ink:#1c1d21; --muted:#5b5f68; --line:#e2dfd8; --soft:#f2f0ea;
+  --c0:#2f6fb5; --c1:#c2571a; --c2:#0f7a5a; --c3:#7c3aed; --bad:#b42318; --grey:#8a8880;
+  --radius:12px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#131417; --surface:#1b1d21; --ink:#ebebed; --muted:#a3a6ae; --line:#2e3138; --soft:#23262b;
+    --c0:#3d8ad8; --c1:#d8733a; --c2:#4cc79a; --c3:#b48cff; --bad:#ff7a6b; --grey:#8f9199;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#131417; --surface:#1b1d21; --ink:#ebebed; --muted:#a3a6ae; --line:#2e3138; --soft:#23262b;
+  --c0:#3d8ad8; --c1:#d8733a; --c2:#4cc79a; --c3:#b48cff; --bad:#ff7a6b; --grey:#8f9199;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,sans-serif;}
+main{max-width:900px;margin:0 auto;padding:40px 16px 80px}
+h1{font-size:2.05rem;line-height:1.2;margin:0 0 .4rem;letter-spacing:-.01em}
+h2{font-size:1.38rem;margin:3rem 0 .6rem;padding-top:.5rem;border-top:1px solid var(--line)}
+p{margin:.6rem 0}
+a{color:var(--c0)}
+.lede{color:var(--muted);font-size:1.05rem;margin-bottom:1.4rem}
+nav.toc{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:12px 18px;font-size:.93rem}
+nav.toc ol{margin:.3rem 0;padding-left:1.2rem}
+nav.toc a{color:var(--ink);text-decoration:none;border-bottom:1px dotted var(--muted)}
+.widget{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:14px;margin:1rem 0 1.2rem}
+.controls{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;margin:.2rem 0 .6rem;font-size:.9rem}
+.controls label{display:flex;align-items:center;gap:6px;color:var(--muted)}
+.controls output{color:var(--ink);font-variant-numeric:tabular-nums;min-width:3.2em}
+button,select{font:inherit;font-size:.88rem;color:var(--ink);background:var(--soft);border:1px solid var(--line);border-radius:8px;padding:5px 11px;cursor:pointer}
+button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+input[type=range]{accent-color:var(--c0);width:130px}
+.readout{font-size:.9rem;color:var(--muted);margin-top:.5rem;font-variant-numeric:tabular-nums}
+.readout b{color:var(--ink);font-weight:600}
+.readout .bad{color:var(--bad);font-weight:600}
+.readout .good{color:var(--c2);font-weight:600}
+.callout{border-left:3px solid var(--c2);background:var(--soft);padding:10px 14px;border-radius:0 8px 8px 0;margin:1rem 0;font-size:.95rem}
+.canvas-wrap{position:relative}
+canvas{display:block;width:100%;touch-action:none}
+.tip{position:absolute;pointer-events:none;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:4px 8px;font-size:.8rem;color:var(--ink);white-space:nowrap;display:none;font-variant-numeric:tabular-nums;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:680px){.grid2{grid-template-columns:1fr}}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:.82rem;color:var(--muted);margin:.3rem 0 0}
+.legend span::before{content:"";display:inline-block;width:16px;height:3px;margin-right:6px;vertical-align:3px;background:var(--c)}
+.legend span.dash::before{background:repeating-linear-gradient(90deg,var(--c) 0 5px,transparent 5px 8px)}
+.legend span.fill::before{height:9px;vertical-align:0;opacity:.45}
+.small{font-size:.86rem;color:var(--muted)}
+table.mini{border-collapse:collapse;font-size:.86rem;margin:.4rem 0;font-variant-numeric:tabular-nums}
+table.mini td,table.mini th{padding:2px 10px 2px 0;text-align:left;border-bottom:1px solid var(--line)}
+table.mini th{color:var(--muted);font-weight:500}
+@media (max-width:600px){ h1{font-size:1.7rem} input[type=range]{width:100px} }
+</style>
+</head>
+<body>
+<main>
+
+<h1>Task Complexity, Interactive</h1>
+<p class="lede"><a href="../index.html">← text notes</a> · Achille, Paolini, Mbeng &amp; Soatto, <i>The Information Complexity of Learning Tasks, their Structure and their Distance</i>. Six widgets. Each one recomputes, in your browser, the same formulas as the scripts in <code>code/</code>.</p>
+
+<nav class="toc"><b>Contents</b>
+<ol>
+  <li><a href="#sf">The structure function of random labels (Example 3.5)</a></li>
+  <li><a href="#dw">A double well: the β-minimiser jumps (Sections 3.2, 6.1)</a></li>
+  <li><a href="#dir">Information per weight direction (Theorem 5.4)</a></li>
+  <li><a href="#fig1">Figure 1, taken apart</a></li>
+  <li><a href="#td">The task distance, solved exactly (Definition 6.1)</a></li>
+  <li><a href="#pb">The PAC-Bayes bound against β and λ (Theorem 5.5)</a></li>
+</ol></nav>
+
+<!-- ============================================================ -->
+<h2 id="sf">1. The structure function of random labels</h2>
+<p>N labels drawn uniformly from |Y| classes. S(t) is the lowest loss reachable with a model of complexity at most t nats. No model can go below the line N ln|Y| − t, since L + K ≥ C(D) ≈ N ln|Y|. The paper's Example 3.5 reaches the line by memorising ⌊t / ln|Y|⌋ points. That works when an oracle numbers the inputs. Without one, the model must also be told <i>which</i> inputs it memorised: ln C(N, m) more nats. Searching over 2<sup>t</sup> random labelings reaches the line in the large-deviation limit. The right panel adds βt, and its minimum is what the Lagrangian C<sub>β</sub> selects.</p>
+<div class="widget">
+  <div class="controls">
+    <label>N <input type="range" id="sN" min="2" max="4" step="0.001" value="3.30103"><output id="sNV"></output></label>
+    <label>|Y| <select id="sY"><option>2</option><option selected>10</option><option>100</option></select></label>
+    <label>β <input type="range" id="sB" min="0.2" max="2" step="0.01" value="0.8"><output id="sBV"></output></label>
+  </div>
+  <div class="grid2">
+    <div class="canvas-wrap"><canvas id="sC0" height="270"></canvas><div class="tip" id="sTip0"></div></div>
+    <div class="canvas-wrap"><canvas id="sC1" height="270"></canvas></div>
+  </div>
+  <div class="legend"><span class="dash" style="--c:var(--ink)">lower bound N ln|Y| − t (also: random search, large-deviation limit)</span><span class="dash" style="--c:var(--c0)">memorise m points, with oracle</span><span style="--c:var(--c1)">memorise m points, no oracle</span></div>
+  <div class="readout" id="sRead"></div>
+</div>
+<div class="callout">Things to try. At β &lt; 1 every scheme that tracks the line prefers to memorise everything; at β &gt; 1 the constant model (t = 0) wins; at β = 1 it is a tie, decided by the O(1) terms. That tie is Proposition 3.6's β* = 1 for random labels. It is also why Theorem 4.4 needs β ≥ 1 on noisy labels: below 1, the optimal model memorises the noise. The oracle-free memoriser (orange) never gets close to the line in the middle. How close it gets at the end depends on |Y|: with more classes, the label bits dominate the cost of naming the points.</div>
+
+<!-- ============================================================ -->
+<h2 id="dw">2. A double well: the β-minimiser jumps</h2>
+<p>One weight w with pre-distribution P = N(0, 3²) and post-distribution Q = N(µ, σ²); N = 50. The loss per sample has a wide shallow basin at w = 1 and a narrow deep one at w = 3.5. For each β the page minimises C<sub>β</sub> = N·E<sub>Q</sub>[loss] + β·KL(Q‖P) over a grid of (µ, σ). Right: the structure function S(t) = min {N·E<sub>Q</sub> loss : KL ≤ t}, its convex hull, and the line of slope −β that touches it at the optimum. <b>Anneal</b> starts from the global optimum at β = 20 and lowers β to the slider's value, taking ε-local steps (the best grid point within distance ε in (µ, σ)) until they stop moving.</p>
+<div class="widget">
+  <div class="controls">
+    <label>β <input type="range" id="dB" min="-1.2" max="3" step="0.005" value="1.5"><output id="dBV"></output></label>
+    <label>narrow depth <input type="range" id="dA" min="0.3" max="0.9" step="0.01" value="0.6"><output id="dAV"></output></label>
+    <label>narrow width <input type="range" id="dS" min="0.03" max="0.4" step="0.005" value="0.08"><output id="dSV"></output></label>
+  </div>
+  <div class="controls">
+    <label>ε <input type="range" id="dE" min="0.1" max="4" step="0.1" value="1"><output id="dEV"></output></label>
+    <button id="dRun">anneal from β = 20 to β</button>
+    <button id="dClr">clear</button>
+    <span class="small" id="dMsg"></span>
+  </div>
+  <div class="grid2">
+    <div class="canvas-wrap"><canvas id="dC0" height="280"></canvas></div>
+    <div class="canvas-wrap"><canvas id="dC1" height="280"></canvas><div class="tip" id="dTip"></div></div>
+  </div>
+  <div class="legend"><span style="--c:var(--ink)">loss per sample</span><span class="fill" style="--c:var(--c0)">global optimum Q</span><span class="fill" style="--c:var(--c1)">annealed Q</span><span style="--c:var(--c0)">S(t)</span><span class="dash" style="--c:var(--c1)">convex hull</span><span class="fill" style="--c:var(--bad)">never selected</span></div>
+  <div class="readout" id="dRead"></div>
+</div>
+<div class="callout">Things to try. Drag β slowly downwards from about 6. Near β ≈ 4.5 the optimum leaves the wide basin for the narrow one in one jump, and its information jumps from about 1.2 to 4.6 nats. The tangent line touches the hull at two points at that moment. Now set β = 0.5 and press <b>anneal</b> with ε = 1: the local steps stay in the wide basin. Raise ε until annealing finds the narrow well; it needs a step as large as the jump. Make the narrow well shallower or wider and the red band shrinks. Once it vanishes, S(t) is convex, and annealing works with any ε (Proposition 6.4).</div>
+
+<!-- ============================================================ -->
+<h2 id="dir">3. Information per weight direction</h2>
+<p>With P = N(0, λ²I) and the optimal Gaussian Q, each eigen-direction of the Hessian H = N·F carries ½ g(s) nats, where s = λ²h/β and g(s) = log(1+s) − s/(1+s). A flat direction (h = 0) carries nothing. Theorem 5.4 keeps only the large-s form ½(log s − 1). Summed, that is ½ log|F| + ½ k log λ² plus a "O(1)" of ½ k log(N/β) − k/2. The spectrum here has k = 40 directions, with per-sample Fisher eigenvalues j<sup>−α</sup>, and the last few set to exactly zero.</p>
+<div class="widget">
+  <div class="controls">
+    <label>λ <input type="range" id="iL" min="-1" max="4" step="0.01" value="1"><output id="iLV"></output></label>
+    <label>β <input type="range" id="iB" min="-3" max="1" step="0.01" value="0"><output id="iBV"></output></label>
+    <label>N <input type="range" id="iN" min="1" max="6" step="0.01" value="3"><output id="iNV"></output></label>
+  </div>
+  <div class="controls">
+    <label>decay α <input type="range" id="iA" min="0" max="4" step="0.05" value="2"><output id="iAV"></output></label>
+    <label>flat directions <input type="range" id="iF" min="0" max="30" step="1" value="5"><output id="iFV"></output></label>
+  </div>
+  <div class="canvas-wrap"><canvas id="iC" height="280"></canvas><div class="tip" id="iTip"></div></div>
+  <div class="legend"><span class="fill" style="--c:var(--c0)">exact ½ g(s<sub>j</sub>) per direction</span><span style="--c:var(--c1)">λ → ∞ form ½(log s<sub>j</sub> − 1)</span></div>
+  <div class="readout" id="iRead"></div>
+</div>
+<div class="callout">Things to try. With any flat direction, the theorem's ½ log|F| is −∞, while the exact information is finite. Set flat directions to 0 and raise λ: the exact total and the theorem's formula plus the hidden term converge. The hidden term alone is then often larger than ½ log|F|. Move β by a decade: the hidden term changes by ½ k ln 10 ≈ 46 nats here, with the Hessian untouched. Figure 2 sweeps β over three decades.</div>
+
+<!-- ============================================================ -->
+<h2 id="fig1">4. Figure 1, taken apart</h2>
+<p>The paper's estimated distance matrix, transcribed: entry (row j, column i) is d(task i → task j). If the optimal solutions are unique, Definition 6.1 gives d(i→j) − d(j→i) = I<sub>j</sub> − I<sub>i</sub>: the antisymmetric part must be a difference of one number per task. The page fits that number, c<sub>i</sub> = mean over j of [d(j→i) − d(i→j)], and shows what is left.</p>
+<div class="widget">
+  <div class="controls" id="fMode">
+    <button data-m="pub" class="on">as published</button>
+    <button data-m="anti">antisymmetric part</button>
+    <button data-m="fit">fitted c<sub>j</sub> − c<sub>i</sub></button>
+    <button data-m="res">residual</button>
+    <button data-m="sym">symmetric part</button>
+  </div>
+  <div class="canvas-wrap"><canvas id="fC" height="360"></canvas><div class="tip" id="fTip"></div></div>
+  <div class="readout" id="fRead"></div>
+</div>
+<div class="callout">Things to try. Switch to <b>residual</b>: every cell is below 0.01, the size of the rounding. The asymmetry of the whole matrix is fixed by eight numbers. <b>Symmetric part</b> is where similarity would live, d(i→j) + d(j→i) = 2I<sub>ij</sub> − I<sub>i</sub> − I<sub>j</sub>. It is negative for (natural, artificial): by these estimates, the union of the two halves of CIFAR-100 needs less information than either half. Hover a cell for its triangle-inequality slack.</div>
+
+<!-- ============================================================ -->
+<h2 id="td">5. The task distance, solved exactly</h2>
+<p>Linear-Gaussian regression with k inputs and three weight blocks: shared w<sub>s</sub>, and one block per task. Task i predicts x·(w<sub>s</sub> + w<sub>i</sub>), and the index in D<sub>1</sub> ⊔ D<sub>2</sub> picks the block. P = N(0, λ²I), noise variance 1, and population design X<sup>⊤</sup>X = N·I. The optimal Q is the posterior, so the information is exact: I = ‖µ‖²/(2λ²) + ½ Σ g(λ²h/β). The first term depends on the labels. The second, the log-det term, depends only on which directions the data curve and how many samples do it. Task 1's true weights are u<sub>1</sub> = e<sub>1</sub>, and task 2's are u<sub>2</sub> = r(cos θ e<sub>1</sub> + sin θ e<sub>2</sub>).</p>
+<div class="widget">
+  <div class="controls">
+    <label>angle θ <input type="range" id="tT" min="0" max="180" step="1" value="60"><output id="tTV"></output></label>
+    <label>r = |u₂| <input type="range" id="tR" min="0" max="4" step="0.05" value="1"><output id="tRV"></output></label>
+    <label>k <input type="range" id="tK" min="1" max="200" step="1" value="10"><output id="tKV"></output></label>
+  </div>
+  <div class="controls">
+    <label>N₁ <input type="range" id="tN1" min="1" max="4" step="0.01" value="2"><output id="tN1V"></output></label>
+    <label>N₂ <input type="range" id="tN2" min="1" max="4" step="0.01" value="2"><output id="tN2V"></output></label>
+    <label>λ <input type="range" id="tL" min="0.5" max="10" step="0.1" value="3"><output id="tLV"></output></label>
+    <button id="tCopy">task 2 = copy of task 1</button>
+  </div>
+  <div class="canvas-wrap"><canvas id="tC" height="250"></canvas></div>
+  <div class="legend"><span class="fill" style="--c:var(--grey)">log-det part (labels do not enter)</span><span class="fill" style="--c:var(--c0)">‖µ‖²/2λ² part (labels enter)</span></div>
+  <div class="readout" id="tRead"></div>
+</div>
+<div class="callout">Things to try. Press <b>copy</b>: a task is tens of nats from itself, not O(1) as Lemma 4.2 has it for the Kolmogorov version. The union turns on a new block of k curved directions, and each costs about ½ log N. Raise N₂ with the copy still in place: the "same" task moves further away. Sweep θ from 0 to 180°: the distance moves by a fraction of a nat, all of it in the blue part. Set r ≠ 1: d(1→2) − d(2→1) equals I₂ − I₁ exactly.</div>
+
+<!-- ============================================================ -->
+<h2 id="pb">6. The PAC-Bayes bound against β and λ</h2>
+<p>Theorem 5.5 (McAllester): for β &gt; ½ and a loss in [0, 1], L<sub>test</sub>(Q) ≤ [L̂(Q) + β(KL(Q‖P) + ln 1/δ)/N] / (1 − 1/(2β)). For a loss bounded by L<sub>max</sub>, the condition becomes β &gt; L<sub>max</sub>/2. Left: the multiplier 1/(1 − L<sub>max</sub>/(2β)), with the band where Figure 2's transitions happen. Right: the bound against the prior width λ. The KL at the optimal Gaussian Q uses the spectrum of widget 3 (k = 40 directions, α = 2, no flat ones), with ‖w*‖² = k and a fixed training Gibbs error of 0.15.</p>
+<div class="widget">
+  <div class="controls">
+    <label>L<sub>max</sub> <select id="pM"><option value="1">1 (0–1 loss)</option><option value="2.302585">ln 10</option><option value="4.60517">ln 100</option></select></label>
+    <label>β <input type="range" id="pB" min="0.55" max="5" step="0.01" value="1"><output id="pBV"></output></label>
+    <label>N <input type="range" id="pN" min="2" max="6" step="0.001" value="2.69897"><output id="pNV"></output></label>
+  </div>
+  <div class="grid2">
+    <div class="canvas-wrap"><canvas id="pC0" height="260"></canvas></div>
+    <div class="canvas-wrap"><canvas id="pC1" height="260"></canvas><div class="tip" id="pTip"></div></div>
+  </div>
+  <div class="legend"><span style="--c:var(--c0)">multiplier (left) · bound (right)</span><span class="fill" style="--c:var(--bad)">Figure 2's transitions (β ≈ 0.05–0.5)</span><span class="dash" style="--c:var(--ink)">bound = 1 (vacuous above)</span></div>
+  <div class="readout" id="pRead"></div>
+</div>
+<div class="callout">Things to try. With cross-entropy clipped at ln 10, the bound needs β &gt; 1.15, far to the right of every transition in Figure 2. On the right, the bound has a best λ. As λ → ∞, the limit Theorem 5.4 is stated in, the KL grows like ½ log λ² per curved direction, so the bound grows without limit. At N = 500 it is vacuous by λ = 10⁸. Raise N and it takes longer, but it always gets there.</div>
+
+<script>
+"use strict";
+// ---------------------------------------------------------------- numerics
+const g=s=>Math.log1p(s)-s/(1+s);
+function lgamma(z){ // Lanczos
+  const c=[676.5203681218851,-1259.1392167224028,771.32342877765313,-176.61502916214059,12.507343278686905,-0.13857109526572012,9.9843695780195716e-6,1.5056327351493116e-7];
+  if(z<0.5)return Math.log(Math.PI/Math.abs(Math.sin(Math.PI*z)))-lgamma(1-z);
+  z-=1;let x=0.99999999999980993;for(let i=0;i<8;i++)x+=c[i]/(z+i+1);const t=z+7.5;
+  return 0.5*Math.log(2*Math.PI)+(z+0.5)*Math.log(t)-t+Math.log(x);}
+const lnC=(n,m)=>lgamma(n+1)-lgamma(m+1)-lgamma(n-m+1);
+const linspace=(a,b,n)=>Array.from({length:n},(_,i)=>a+(b-a)*i/(n-1));
+const $=id=>document.getElementById(id);
+const fx=(x,d=2)=>Math.abs(x)>=1e5?x.toExponential(2):x.toFixed(d);
+
+// ---------------------------------------------------------------- drawing
+function css(v){return getComputedStyle(document.documentElement).getPropertyValue(v).trim();}
+function setup(cv){if(!cv.dataset.h)cv.dataset.h=cv.getAttribute("height");const dpr=window.devicePixelRatio||1,w=cv.clientWidth,h=+cv.dataset.h;
+  cv.width=w*dpr;cv.height=h*dpr;cv.style.height=h+"px";const c=cv.getContext("2d");c.setTransform(dpr,0,0,dpr,0,0);return {c,w,h};}
+function Plot(cv,o){
+  const {c,w,h}=setup(cv);const L=o.left??50,R=12,T=o.top??26,B=36;
+  const lx=o.logx, ly=o.logy;
+  const tx=x=>lx?Math.log10(x):x, ty=y=>ly?Math.log10(y):y;
+  const x0=tx(o.xlim[0]),x1=tx(o.xlim[1]),y0=ty(o.ylim[0]),y1=ty(o.ylim[1]);
+  const X=x=>L+(tx(x)-x0)/(x1-x0)*(w-L-R);
+  const Y=y=>T+(1-(ty(y)-y0)/(y1-y0))*(h-T-B);
+  const ink=css("--ink"),mut=css("--muted"),line=css("--line");
+  c.font="11px -apple-system,Segoe UI,sans-serif";
+  c.strokeStyle=line;c.lineWidth=1;c.fillStyle=mut;c.textAlign="right";
+  for(const t of o.yticks){c.beginPath();c.moveTo(L,Y(t));c.lineTo(w-R,Y(t));c.stroke();c.fillText(o.yfmt?o.yfmt(t):t,L-5,Y(t)+3);}
+  c.textAlign="center";
+  for(const t of o.xticks){c.fillText(o.xfmt?o.xfmt(t):t,X(t),h-B+14);}
+  c.fillText(o.xlabel,(L+w-R)/2,h-6);c.textAlign="left";
+  if(o.title){c.fillStyle=ink;c.font="600 12px -apple-system,Segoe UI,sans-serif";c.fillText(o.title,L,14);c.font="11px -apple-system,Segoe UI,sans-serif";}
+  if(o.ylabel){c.fillStyle=mut;c.fillText(o.ylabel,L+4,T+10);}
+  const clampY=y=>{const v=ty(y);if(!isFinite(v))return v;const lo=y0-(y1-y0),hi=y1+(y1-y0);return Math.max(lo,Math.min(hi,v));};
+  const Yc=y=>T+(1-(clampY(y)-y0)/(y1-y0))*(h-T-B);
+  const P={c,w,h,X,Y,L,R,T,B,
+    line(xs,ys,col,wd=2,dash=null){c.save();c.beginPath();c.rect(L,T-2,w-L-R,h-T-B+4);c.clip();c.strokeStyle=col;c.lineWidth=wd;if(dash)c.setLineDash(dash);c.beginPath();let on=false;
+      for(let i=0;i<xs.length;i++){const yy=ys[i];if(!isFinite(yy)||(ly&&yy<=0)){on=false;continue;}const px=X(xs[i]),py=Yc(yy);if(!on){c.moveTo(px,py);on=true;}else c.lineTo(px,py);}c.stroke();c.restore();},
+    area(xs,ys,col,alpha,base=0){c.save();c.globalAlpha=alpha;c.fillStyle=col;c.beginPath();c.moveTo(X(xs[0]),Y(base));for(let i=0;i<xs.length;i++)c.lineTo(X(xs[i]),Yc(ys[i]));c.lineTo(X(xs[xs.length-1]),Y(base));c.closePath();c.fill();c.restore();},
+    vline(x,col,wd=1,dash=null){c.save();c.strokeStyle=col;c.lineWidth=wd;if(dash)c.setLineDash(dash);c.beginPath();c.moveTo(X(x),h-B);c.lineTo(X(x),T);c.stroke();c.restore();},
+    hline(y,col,wd=1,dash=null){c.save();c.strokeStyle=col;c.lineWidth=wd;if(dash)c.setLineDash(dash);c.beginPath();c.moveTo(L,Y(y));c.lineTo(w-R,Y(y));c.stroke();c.restore();},
+    band(xa,xb,col,alpha){c.save();c.globalAlpha=alpha;c.fillStyle=col;c.fillRect(X(xa),T,X(xb)-X(xa),h-T-B);c.restore();},
+    text(s,x,y,col,align="left",bold=false){c.save();c.fillStyle=col||mut;c.textAlign=align;if(bold)c.font="600 11px -apple-system,Segoe UI,sans-serif";c.fillText(s,X(x),Y(y));c.restore();},
+    dot(x,y,col,r=5){c.save();c.fillStyle=col;c.strokeStyle=css("--surface");c.lineWidth=2;c.beginPath();c.arc(X(x),Y(y),r,0,7);c.fill();c.stroke();c.restore();},
+    invX(px){const v=x0+(px-L)/(w-L-R)*(x1-x0);return lx?Math.pow(10,v):v;}
+  };
+  c.strokeStyle=css("--grey");c.beginPath();c.moveTo(L,h-B);c.lineTo(w-R,h-B);c.stroke();
+  return P;
+}
+function hover(cv,tip,fn){
+  cv.addEventListener("mousemove",e=>{const r=cv.getBoundingClientRect(),px=e.clientX-r.left,py=e.clientY-r.top;
+    const s=fn(px,py);if(!s){tip.style.display="none";return;}tip.innerHTML=s;tip.style.display="block";
+    const tw=tip.offsetWidth;tip.style.left=Math.max(0,Math.min(px+12,r.width-tw-4))+"px";tip.style.top=(py-34)+"px";});
+  cv.addEventListener("mouseleave",()=>tip.style.display="none");
+}
+function niceTicks(a,b,n=5){const span=b-a,step0=span/n,mag=Math.pow(10,Math.floor(Math.log10(step0))),r=step0/mag;
+  const step=(r<1.5?1:r<3?2:r<7?5:10)*mag;const out=[];for(let t=Math.ceil(a/step)*step;t<=b+1e-9*span;t+=step)out.push(+t.toPrecision(12));return out;}
+
+// ---------------------------------------------------------------- widget 1
+let sHover=null;
+function drawS(){
+  const N=Math.round(Math.pow(10,+$("sN").value)), K=+$("sY").value, beta=+$("sB").value, lnY=Math.log(K);
+  $("sNV").textContent=N;$("sBV").textContent=beta.toFixed(2);
+  const S0=N*lnY, step=Math.max(1,Math.floor(N/500));
+  const ms=[];for(let m=0;m<=N;m+=step)ms.push(m);if(ms[ms.length-1]!==N)ms.push(N);
+  const lossM=ms.map(m=>(N-m)*lnY);
+  const cO=ms.map(m=>m*lnY+Math.log(m+1)), cN=ms.map(m=>m*lnY+lnC(N,m));
+  const tmax=S0*1.02;
+  const ticks=niceTicks(0,S0,4);
+  const P=Plot($("sC0"),{xlim:[0,tmax],ylim:[0,S0*1.02],xticks:ticks,yticks:ticks,xlabel:"description length t (nats)",ylabel:"S(t) (nats)",title:"loss after spending t nats",xfmt:v=>fx(v,0),yfmt:v=>fx(v,0)});
+  P.line([0,S0],[S0,0],css("--ink"),1.4,[5,3]);
+  P.line(cO,lossM,css("--c0"),2,[6,3]);
+  const keep=cN.map((c,i)=>c<=tmax?i:-1).filter(i=>i>=0);
+  P.line(keep.map(i=>cN[i]),keep.map(i=>lossM[i]),css("--c1"),2.2);
+  sHover={P,ms,cN,lossM,lnY,N};
+  // Lagrangian
+  const lag=(cs)=>{let best=Infinity,bi=0;cs.forEach((c,i)=>{const v=lossM[i]+beta*c;if(v<best){best=v;bi=i;}});return [best,bi];};
+  const lineC=[S0,beta*S0], lineBest=beta<1?[beta*S0,S0]:[S0,0];
+  const [bO,iO]=lag(cO),[bN,iN]=lag(cN);
+  const ymax=Math.max(S0,beta*S0)*1.05, ymin=Math.min(beta*S0,S0)*0.9;
+  const Q=Plot($("sC1"),{xlim:[0,tmax],ylim:[Math.max(0,ymin-0.1*S0),ymax],xticks:ticks,yticks:niceTicks(Math.max(0,ymin-0.1*S0),ymax,4),xlabel:"t (nats)",ylabel:"S(t) + βt",title:"what C_β minimises",xfmt:v=>fx(v,0),yfmt:v=>fx(v,0)});
+  Q.line([0,S0],lineC,css("--ink"),1.4,[5,3]);
+  Q.line(cO,cO.map((c,i)=>lossM[i]+beta*c),css("--c0"),2,[6,3]);
+  Q.line(keep.map(i=>cN[i]),keep.map(i=>lossM[i]+beta*cN[i]),css("--c1"),2.2);
+  Q.dot(lineBest[1],lineBest[0],css("--ink"),5);
+  Q.dot(cO[iO],bO,css("--c0"),5);Q.dot(cN[iN],bN,css("--c1"),5);
+  const pick=beta<1?"memorise all labels (t = N ln|Y|)":beta>1?"the constant model (t = 0)":"a tie";
+  $("sRead").innerHTML=`S(0) = N ln|Y| = <b>${fx(S0,1)}</b> nats · along the line, C<sub>β</sub> is linear in t with slope β − 1 = <b>${(beta-1).toFixed(2)}</b>, so the optimum is <b>${pick}</b><br>`+
+    `oracle memoriser: best t = <b>${fx(cO[iO],1)}</b> (m = ${ms[iO]}), C<sub>β</sub> = ${fx(bO,1)} · no-oracle memoriser: best t = <b>${fx(cN[iN],1)}</b> (m = ${ms[iN]}), C<sub>β</sub> = ${fx(bN,1)}<br>`+
+    `no-oracle memoriser at t = S(0)/2: saves only <b>${fx(S0-interp(S0/2,keep.map(i=>cN[i]),keep.map(i=>lossM[i])),1)}</b> of the ${fx(S0/2,1)} nats the line allows`;
+}
+function interp(x,xs,ys){for(let i=1;i<xs.length;i++){if(xs[i]>=x){const t=(x-xs[i-1])/(xs[i]-xs[i-1]||1);return ys[i-1]+t*(ys[i]-ys[i-1]);}}return ys[ys.length-1];}
+hover($("sC0"),$("sTip0"),px=>{if(!sHover)return null;const t=sHover.P.invX(px);if(t<0)return null;
+  const {ms,cN,lossM,lnY,N}=sHover;let i=0;while(i<cN.length-1&&cN[i+1]<=t)i++;
+  return `t = ${t.toFixed(0)} · bound ${Math.max(0,N*lnY-t).toFixed(0)} · no-oracle memoriser: m = ${ms[i]}, loss ${lossM[i].toFixed(0)}`;});
+for(const id of ["sN","sY","sB"])$(id).addEventListener("input",drawS);
+
+// ---------------------------------------------------------------- widget 2
+const DW={N:50,lam:3,mu:linspace(-1,5,241),sig:(()=>{const a=Math.log(0.01),b=Math.log(4);return linspace(a,b,140).map(Math.exp);})()};
+let DWS=null, ANN=null;
+function dwWells(){return [[0.30,1.0,0.8],[+$("dA").value,3.5,+$("dS").value]];}
+function dwLoss(w,W){let o=1;for(const [A,c,s] of W)o-=A*Math.exp(-(((w-c))**2)/(2*s*s));return o;}
+function dwTables(){
+  const W=dwWells(),nm=DW.mu.length,ns=DW.sig.length,EL=new Float64Array(nm*ns),KL=new Float64Array(nm*ns);
+  for(let i=0;i<nm;i++)for(let j=0;j<ns;j++){const mu=DW.mu[i],sg=DW.sig[j];let o=1;
+    for(const [A,c,s] of W){const v=s*s+sg*sg;o-=A*s/Math.sqrt(v)*Math.exp(-(((mu-c))**2)/(2*v));}
+    EL[i*ns+j]=DW.N*o;KL[i*ns+j]=Math.log(DW.lam/sg)+(sg*sg+mu*mu)/(2*DW.lam*DW.lam)-0.5;}
+  // structure function on a t grid and its lower hull
+  const idx=Array.from({length:nm*ns},(_,k)=>k).sort((a,b)=>KL[a]-KL[b]);
+  const tg=linspace(0,8,801),St=new Float64Array(tg.length);let p=0,cm=Infinity;
+  for(let q=0;q<tg.length;q++){while(p<idx.length&&KL[idx[p]]<=tg[q]){cm=Math.min(cm,EL[idx[p]]);p++;}St[q]=cm;}
+  const hull=[];for(let q=0;q<tg.length;q++){if(!isFinite(St[q]))continue;const pt=[tg[q],St[q]];
+    while(hull.length>=2){const a=hull[hull.length-2],b=hull[hull.length-1];if((b[0]-a[0])*(pt[1]-a[1])-(b[1]-a[1])*(pt[0]-a[0])<=0)hull.pop();else break;}hull.push(pt);}
+  return {W,EL,KL,nm,ns,tg,St,hull};
+}
+function dwArgmin(T,beta,mask){let best=Infinity,bk=0;for(let k=0;k<T.EL.length;k++){if(mask&&!mask(k))continue;const v=T.EL[k]+beta*T.KL[k];if(v<best){best=v;bk=k;}}return [bk,best];}
+function dwBeta(){return Math.pow(10,+$("dB").value)/10;}
+function drawD(recompute=true){
+  if(recompute||!DWS)DWS=dwTables();
+  const T=DWS,beta=dwBeta();
+  $("dBV").textContent=beta.toFixed(3);$("dAV").textContent=(+$("dA").value).toFixed(2);$("dSV").textContent=(+$("dS").value).toFixed(3);$("dEV").textContent=(+$("dE").value).toFixed(1);
+  const [k,C]=dwArgmin(T,beta);const mu=DW.mu[Math.floor(k/T.ns)],sg=DW.sig[k%T.ns];
+  const ws=linspace(-1,5,600);
+  const P=Plot($("dC0"),{xlim:[-1,5],ylim:[0,1.1],xticks:[-1,0,1,2,3,4,5],yticks:[0,0.25,0.5,0.75,1],xlabel:"weight w",ylabel:"loss per sample",title:"the loss and the optimal Q"});
+  const dens=(m,s)=>ws.map(w=>Math.exp(-(((w-m))**2)/(2*s*s))/(s*Math.sqrt(2*Math.PI)));
+  const dz=dens(mu,sg),mx=Math.max(...dz);P.area(ws,dz.map(v=>0.9*v/mx),css("--c0"),0.25);
+  if(ANN){const da=dens(ANN.mu,ANN.sig),ma=Math.max(...da);P.area(ws,da.map(v=>0.9*v/ma),css("--c1"),0.3);}
+  P.line(ws,ws.map(w=>dwLoss(w,T.W)),css("--ink"),1.8);
+  // right: S(t)
+  const tg=T.tg,St=Array.from(T.St);const fin=St.filter(isFinite);const ylo=Math.min(...fin)*0.95,yhi=Math.max(...fin)*1.02;
+  const Q=Plot($("dC1"),{xlim:[0,8],ylim:[ylo,yhi],xticks:[0,2,4,6,8],yticks:niceTicks(ylo,yhi,4),xlabel:"t = KL(Q‖P) (nats)",ylabel:"S(t) (nats)",title:"structure function and hull"});
+  const hx=T.hull.map(p=>p[0]),hy=T.hull.map(p=>p[1]);
+  // red bands where S is above the hull by > 0.2
+  let a=null;for(let q=0;q<tg.length;q++){const gap=St[q]-interp(tg[q],hx,hy);const on=isFinite(gap)&&gap>0.2;if(on&&a===null)a=tg[q];if((!on||q===tg.length-1)&&a!==null){Q.band(a,tg[q],css("--bad"),0.13);a=null;}}
+  Q.line(tg,St,css("--c0"),2.2);Q.line(hx,hy,css("--c1"),1.6,[5,3]);
+  const tstar=T.KL[k],sstar=T.EL[k];
+  Q.line([tstar-3,tstar+3],[sstar+3*beta,sstar-3*beta],css("--ink"),1,[3,3]);
+  Q.dot(tstar,sstar,css("--c0"),5);
+  if(ANN)Q.dot(ANN.kl,ANN.el,css("--c1"),5);
+  DWS.Q=Q;
+  let msg=`β = <b>${beta.toFixed(3)}</b>: global optimum µ = <b>${mu.toFixed(2)}</b>, σ = <b>${sg.toFixed(3)}</b>, information KL = <b>${tstar.toFixed(2)}</b> nats, C<sub>β</sub> = <b>${C.toFixed(2)}</b>`;
+  if(ANN)msg+=`<br>annealed (ε = ${ANN.eps.toFixed(1)}, to β = ${ANN.beta.toFixed(3)}): µ = <b>${ANN.mu.toFixed(2)}</b>, σ = <b>${ANN.sig.toFixed(3)}</b>, C = <b>${ANN.C.toFixed(2)}</b> `+
+    (Math.abs(ANN.C-ANN.Cglob)<0.05?'<span class="good">(global)</span>':`<span class="bad">(stuck: global is ${ANN.Cglob.toFixed(2)})</span>`);
+  $("dRead").innerHTML=msg;
+}
+function anneal(){
+  const T=DWS,target=dwBeta(),eps=+$("dE").value,ns=T.ns;
+  if(target>=20){$("dMsg").textContent="set β below 20 first";return;}
+  const sched=[];for(let i=0;i<60;i++)sched.push(20*Math.pow(target/20,i/59));
+  let [k]=dwArgmin(T,sched[0]);
+  for(const b of sched){for(let it=0;it<200;it++){const m0=DW.mu[Math.floor(k/ns)],s0=DW.sig[k%ns];
+      const [k2]=dwArgmin(T,b,q=>{const dm=DW.mu[Math.floor(q/ns)]-m0,ds=DW.sig[q%ns]-s0;return dm*dm+ds*ds<=eps*eps;});
+      if(k2===k)break;k=k2;}}
+  const [,Cg]=dwArgmin(T,target);
+  ANN={mu:DW.mu[Math.floor(k/ns)],sig:DW.sig[k%ns],kl:T.KL[k],el:T.EL[k],C:T.EL[k]+target*T.KL[k],Cglob:Cg,eps,beta:target};
+  $("dMsg").textContent="";drawD(false);
+}
+$("dRun").addEventListener("click",()=>{$("dMsg").textContent="annealing…";setTimeout(anneal,10);});
+$("dClr").addEventListener("click",()=>{ANN=null;drawD(false);});
+$("dB").addEventListener("input",()=>drawD(false));
+$("dE").addEventListener("input",()=>drawD(false));
+for(const id of ["dA","dS"])$(id).addEventListener("input",()=>{ANN=null;drawD(true);});
+hover($("dC1"),$("dTip"),px=>{if(!DWS||!DWS.Q)return null;const t=DWS.Q.invX(px);if(t<0||t>8)return null;const s=interp(t,DWS.tg,Array.from(DWS.St));
+  const h=interp(t,DWS.hull.map(p=>p[0]),DWS.hull.map(p=>p[1]));return `t = ${t.toFixed(2)} · S(t) = ${s.toFixed(2)} · hull ${h.toFixed(2)} · gap ${(s-h).toFixed(2)}`;});
+
+// ---------------------------------------------------------------- widget 3
+let iHover=null;
+function drawI(){
+  const lam=Math.pow(10,+$("iL").value),beta=Math.pow(10,+$("iB").value),N=Math.round(Math.pow(10,+$("iN").value)),al=+$("iA").value,nf=+$("iF").value,k=40;
+  $("iLV").textContent=fx(lam,lam<1?2:1);$("iBV").textContent=beta<0.01?beta.toExponential(1):beta.toFixed(3);$("iNV").textContent=N;$("iAV").textContent=al.toFixed(2);$("iFV").textContent=nf;
+  const f=Array.from({length:k},(_,j)=>j<k-nf?Math.pow(j+1,-al):0);
+  const s=f.map(v=>lam*lam*N*v/beta);
+  const ex=s.map(v=>0.5*g(v)), as=s.map(v=>v>0?0.5*(Math.log(v)-1):-Infinity);
+  const exact=ex.reduce((a,b)=>a+b,0);
+  const logF=f.reduce((a,v)=>a+(v>0?Math.log(v):-Infinity),0);
+  const paper=0.5*logF+0.5*k*Math.log(lam*lam), hidden=0.5*k*Math.log(N/beta)-k/2;
+  const ymax=Math.max(1,...ex,...as.filter(isFinite))*1.1, ymin=Math.min(-1,...as.filter(isFinite).map(v=>Math.max(v,-6)));
+  const P=Plot($("iC"),{xlim:[0.5,k+0.5],ylim:[ymin,ymax],xticks:[1,10,20,30,40],yticks:niceTicks(ymin,ymax,5),xlabel:"direction j (largest curvature first)",ylabel:"nats",title:"information carried by each direction"});
+  P.hline(0,css("--grey"),1);
+  const bw=(P.X(2)-P.X(1))*0.7;P.c.save();P.c.fillStyle=css("--c0");P.c.globalAlpha=0.55;
+  ex.forEach((v,j)=>{P.c.fillRect(P.X(j+1)-bw/2,P.Y(v),bw,P.Y(0)-P.Y(v));});P.c.restore();
+  const xs=[],ys=[];as.forEach((v,j)=>{xs.push(j+1);ys.push(v);});
+  P.line(xs,ys,css("--c1"),2);
+  for(let j=k-nf;j<k;j++)P.text("−∞",j+1,ymin+0.05*(ymax-ymin),css("--c1"),"center");
+  iHover={P,s,ex,as,f};
+  $("iRead").innerHTML=`exact information ½ Σ g(s<sub>j</sub>) = <b>${fx(exact,2)}</b> nats · Theorem 5.4's ½ log|F| + ½ k log λ² = <b>${isFinite(paper)?fx(paper,2):'−∞'}</b> `+
+    `· its "O(1)", ½ k log(N/β) − k/2 = <b>${fx(hidden,2)}</b> · sum of the two = <b>${isFinite(paper)?fx(paper+hidden,2):'−∞'}</b>`+
+    (nf>0?`<br><span class="bad">${nf} flat direction${nf>1?"s":""}: log|F| = −∞</span>, while each flat direction carries exactly 0 nats.`:"")+
+    `<br>directions with s &gt; 1 (effectively "stored"): <b>${s.filter(v=>v>1).length}</b> of ${k}`;
+}
+hover($("iC"),$("iTip"),px=>{if(!iHover)return null;const j=Math.round(iHover.P.invX(px))-1;if(j<0||j>=iHover.s.length)return null;
+  return `j = ${j+1} · Fisher ${iHover.f[j].toExponential(2)} · s = ${iHover.s[j].toExponential(2)} · exact ${iHover.ex[j].toFixed(3)} · λ→∞ form ${isFinite(iHover.as[j])?iHover.as[j].toFixed(3):"−∞"}`;});
+for(const id of ["iL","iB","iN","iA","iF"])$(id).addEventListener("input",drawI);
+
+// ---------------------------------------------------------------- widget 4
+const FN=["cifar10","mnist","fashion","ifashion","letters","cifar100","natural","artificial"];
+const FM=[[0.00,0.29,0.31,0.28,0.10,0.01,-0.08,-0.19],[0.15,0.00,0.20,0.15,0.04,-0.01,-0.06,-0.01],[0.21,0.25,0.00,0.07,0.12,0.06,-0.03,-0.04],
+  [0.24,0.25,0.12,0.00,0.10,0.07,0.02,0.01],[0.61,0.68,0.72,0.64,0.00,0.41,0.32,0.33],[0.52,0.64,0.67,0.62,0.42,0.00,0.12,0.07],
+  [0.41,0.57,0.55,0.54,0.30,0.10,0.00,-0.14],[0.25,0.58,0.49,0.50,0.27,0.00,-0.18,0.00]];
+const dd=(i,j)=>FM[j][i];            // d(task i -> task j)
+const FC=FN.map((_,j)=>FN.reduce((a,_2,i)=>a+(dd(i,j)-dd(j,i)),0)/FN.length);   // least squares potential
+let fMode="pub",fHover=null;
+function fVal(r,cI){ // row r = target, column cI = source
+  const i=cI,j=r;
+  if(fMode==="pub")return dd(i,j);
+  if(fMode==="anti")return dd(i,j)-dd(j,i);
+  if(fMode==="fit")return FC[j]-FC[i];
+  if(fMode==="res")return (dd(i,j)-dd(j,i))-(FC[j]-FC[i]);
+  return dd(i,j)+dd(j,i);
+}
+function drawF(){
+  const cv=$("fC"),{c,w,h}=setup(cv);const n=8,L=86,T=14,size=Math.min((w-L-70)/n,(h-T-70)/n);
+  const vals=[];for(let r=0;r<n;r++)for(let q=0;q<n;q++)vals.push(fVal(r,q));
+  const vmax=fMode==="res"?0.05:Math.max(...vals.map(Math.abs));
+  const pos=css("--c1"),neg=css("--c0"),ink=css("--ink"),mut=css("--muted");
+  c.font="11px -apple-system,Segoe UI,sans-serif";
+  for(let r=0;r<n;r++)for(let q=0;q<n;q++){const v=fVal(r,q),a=Math.min(1,Math.abs(v)/vmax);
+    c.fillStyle=v>=0?pos:neg;c.globalAlpha=0.08+0.8*a;c.fillRect(L+q*size+1,T+r*size+1,size-2,size-2);c.globalAlpha=1;
+    c.fillStyle=a>0.55?"#fff":ink;c.textAlign="center";c.fillText((fMode==="res"?v.toFixed(3):v.toFixed(2)),L+q*size+size/2,T+r*size+size/2+4);}
+  c.fillStyle=mut;c.textAlign="right";for(let r=0;r<n;r++)c.fillText(FN[r],L-6,T+r*size+size/2+4);
+  c.save();for(let q=0;q<n;q++){c.translate(L+q*size+size/2,T+n*size+8);c.rotate(-Math.PI/4);c.textAlign="right";c.fillText(FN[q],0,4);c.setTransform(1,0,0,1,0,0);const dpr=window.devicePixelRatio||1;c.setTransform(dpr,0,0,dpr,0,0);}c.restore();
+  c.fillStyle=mut;c.textAlign="left";c.fillText("rows: target D₂ · columns: source D₁",L,h-4);
+  fHover={L,T,size};
+  let ss=0,sr=0,neg0=0;for(let i=0;i<n;i++)for(let j=0;j<n;j++){if(i<j){const a=dd(i,j)-dd(j,i),res=a-(FC[j]-FC[i]);ss+=a*a;sr+=res*res;}if(i!==j&&dd(i,j)<0)neg0++;}
+  const order=FN.map((_,i)=>i).sort((a,b)=>FC[a]-FC[b]);
+  $("fRead").innerHTML=`R² of the antisymmetric part explained by c<sub>j</sub> − c<sub>i</sub>: <b>${(1-sr/ss).toFixed(5)}</b> · negative entries: <b>${neg0}</b> of 56<br>`+
+    `fitted complexity c, simplest first: `+order.map(i=>`${FN[i]} <b>${FC[i]>=0?"+":""}${FC[i].toFixed(3)}</b>`).join(", ");
+}
+document.querySelectorAll("#fMode button").forEach(b=>b.addEventListener("click",()=>{fMode=b.dataset.m;document.querySelectorAll("#fMode button").forEach(x=>x.classList.toggle("on",x===b));drawF();}));
+hover($("fC"),$("fTip"),(px,py)=>{if(!fHover)return null;const q=Math.floor((px-fHover.L)/fHover.size),r=Math.floor((py-fHover.T)/fHover.size);if(q<0||q>7||r<0||r>7)return null;
+  const i=q,j=r;let worst=Infinity,via=-1;for(let b=0;b<8;b++){if(b===i||b===j)continue;const slack=dd(i,b)+dd(b,j)-dd(i,j);if(slack<worst){worst=slack;via=b;}}
+  return `d(${FN[i]} → ${FN[j]}) = ${dd(i,j).toFixed(2)}, reverse ${dd(j,i).toFixed(2)} · c<sub>j</sub> − c<sub>i</sub> = ${(FC[j]-FC[i]).toFixed(3)}`+(i!==j?`<br>tightest triangle via ${FN[via]}: slack ${worst.toFixed(2)}${worst<0?" (violated)":""}`:"");});
+
+// ---------------------------------------------------------------- widget 5
+function eig3(A){ // Jacobi for symmetric 3x3
+  const a=A.map(r=>r.slice());for(let sweep=0;sweep<50;sweep++){let off=0;for(let p=0;p<3;p++)for(let q=p+1;q<3;q++)off+=a[p][q]*a[p][q];if(off<1e-22)break;
+    for(let p=0;p<3;p++)for(let q=p+1;q<3;q++){if(Math.abs(a[p][q])<1e-300)continue;const th=(a[q][q]-a[p][p])/(2*a[p][q]),t=Math.sign(th||1)/(Math.abs(th)+Math.sqrt(th*th+1)),cs=1/Math.sqrt(t*t+1),sn=t*cs;
+      for(let r=0;r<3;r++){const arp=a[r][p],arq=a[r][q];a[r][p]=cs*arp-sn*arq;a[r][q]=sn*arp+cs*arq;}
+      for(let r=0;r<3;r++){const apr=a[p][r],aqr=a[q][r];a[p][r]=cs*apr-sn*aqr;a[q][r]=sn*apr+cs*aqr;}}}
+  return [a[0][0],a[1][1],a[2][2]];}
+function solve3(A,b){const M=A.map((r,i)=>[...r,b[i]]);for(let c=0;c<3;c++){let p=c;for(let r=c+1;r<3;r++)if(Math.abs(M[r][c])>Math.abs(M[p][c]))p=r;[M[c],M[p]]=[M[p],M[c]];
+  for(let r=0;r<3;r++){if(r===c)continue;const f=M[r][c]/M[c][c];for(let q=c;q<4;q++)M[r][q]-=f*M[c][q];}}return [0,1,2].map(i=>M[i][3]/M[i][i]);}
+const TB1=[1,1,0],TB2=[1,0,1];
+function tInfo(tasks,k,lam,beta){ // tasks: [B, N, u (length-2 array: coords 1 and 2)]
+  const Mh=[[0,0,0],[0,0,0],[0,0,0]];for(const [B,N] of tasks)for(let p=0;p<3;p++)for(let q=0;q<3;q++)Mh[p][q]+=N*B[p]*B[q];
+  const A=Mh.map((r,p)=>r.map((v,q)=>v+(p===q?beta/(lam*lam):0)));
+  let mu2=0;for(let c=0;c<2;c++){const b=[0,0,0];for(const [B,N,u] of tasks)for(let p=0;p<3;p++)b[p]+=N*u[c]*B[p];const m=solve3(A,b);mu2+=m[0]*m[0]+m[1]*m[1]+m[2]*m[2];}
+  const h=eig3(Mh);const ld=0.5*k*h.reduce((a,v)=>a+g(Math.max(v,0)*lam*lam/beta),0);
+  return {mu:mu2/(2*lam*lam),ld,tot:mu2/(2*lam*lam)+ld};}
+function drawT(){
+  const th=+$("tT").value*Math.PI/180,r=+$("tR").value,k=+$("tK").value,N1=Math.round(Math.pow(10,+$("tN1").value)),N2=Math.round(Math.pow(10,+$("tN2").value)),lam=+$("tL").value,beta=1;
+  $("tTV").textContent=$("tT").value+"°";$("tRV").textContent=r.toFixed(2);$("tKV").textContent=k;$("tN1V").textContent=N1;$("tN2V").textContent=N2;$("tLV").textContent=lam.toFixed(2);
+  const u1=[1,0],u2=[r*Math.cos(th),r*Math.sin(th)];
+  const I1=tInfo([[TB1,N1,u1]],k,lam,beta),I2=tInfo([[TB1,N2,u2]],k,lam,beta),I12=tInfo([[TB1,N1,u1],[TB2,N2,u2]],k,lam,beta);
+  const d12=I12.tot-I1.tot,d21=I12.tot-I2.tot;
+  const rows=[["I(D₁)",I1],["I(D₂)",I2],["I(D₁ ⊔ D₂)",I12]];
+  const cv=$("tC"),{c,w,h}=setup(cv);const L=110,R=70,T=16,rh=(h-T-40)/5,maxv=Math.max(I12.tot,1)*1.05,X=v=>L+v/maxv*(w-L-R);
+  c.font="12px -apple-system,Segoe UI,sans-serif";
+  const draw=(y,lab,ld,mu,note)=>{c.fillStyle=css("--muted");c.textAlign="right";c.fillText(lab,L-8,y+rh*0.45);
+    c.fillStyle=css("--grey");c.globalAlpha=0.45;c.fillRect(L,y,X(ld)-L,rh*0.62);c.globalAlpha=0.85;c.fillStyle=css("--c0");c.fillRect(X(ld),y,Math.max(1,X(ld+mu)-X(ld)),rh*0.62);c.globalAlpha=1;
+    c.fillStyle=css("--ink");c.textAlign="left";c.fillText(note,X(ld+mu)+6,y+rh*0.45);};
+  rows.forEach(([lab,I],q)=>draw(T+q*rh,lab,I.ld,I.mu,I.tot.toFixed(3)));
+  c.fillStyle=css("--muted");c.textAlign="right";c.fillText("d(1→2)",L-8,T+3*rh+rh*0.45);c.fillText("d(2→1)",L-8,T+4*rh+rh*0.45);
+  c.fillStyle=css("--c1");c.globalAlpha=0.7;c.fillRect(L,T+3*rh,Math.max(1,X(Math.max(d12,0))-L),rh*0.62);c.fillRect(L,T+4*rh,Math.max(1,X(Math.max(d21,0))-L),rh*0.62);c.globalAlpha=1;
+  c.fillStyle=css("--ink");c.textAlign="left";c.fillText(d12.toFixed(3),X(Math.max(d12,0))+6,T+3*rh+rh*0.45);c.fillText(d21.toFixed(3),X(Math.max(d21,0))+6,T+4*rh+rh*0.45);
+  c.fillStyle=css("--muted");c.fillText("nats",L,h-8);
+  $("tRead").innerHTML=`d(1→2) = I₁₂ − I₁ = <b>${d12.toFixed(4)}</b> · d(2→1) = I₁₂ − I₂ = <b>${d21.toFixed(4)}</b> · d(1→2) − d(2→1) = <b>${(d12-d21).toFixed(4)}</b> = I₂ − I₁ = <b>${(I2.tot-I1.tot).toFixed(4)}</b><br>`+
+    `share of d(1→2) that depends on the labels: <b>${(100*(I12.mu-I1.mu)/Math.max(d12,1e-12)).toFixed(1)}%</b> · a pure-noise task 1 (u₁ = 0) would carry ${tInfo([[TB1,N1,[0,0]]],k,lam,beta).tot.toFixed(3)} nats against ${I1.tot.toFixed(3)}`;
+}
+$("tCopy").addEventListener("click",()=>{$("tT").value=0;$("tR").value=1;$("tN2").value=$("tN1").value;drawT();});
+for(const id of ["tT","tR","tK","tN1","tN2","tL"])$(id).addEventListener("input",drawT);
+
+// ---------------------------------------------------------------- widget 6
+let pHover=null;
+function drawP(){
+  const Lm=+$("pM").value,beta=+$("pB").value,N=Math.round(Math.pow(10,+$("pN").value)),delta=0.05,k=40,train=0.15;
+  $("pBV").textContent=beta.toFixed(2);$("pNV").textContent=N;
+  const bs=[];for(let i=0;i<=400;i++)bs.push(Math.pow(10,-2+i*(Math.log10(20)+2)/400));
+  const mult=bs.map(b=>b>Lm/2?1/(1-Lm/(2*b)):NaN);
+  const P=Plot($("pC0"),{xlim:[0.01,20],ylim:[0,10],logx:true,xticks:[0.01,0.1,1,10],yticks:[0,2,4,6,8,10],xlabel:"β (log scale)",ylabel:"multiplier",title:"1 / (1 − L_max / 2β)",xfmt:v=>v>=1?v:v.toString()});
+  P.band(0.05,0.5,css("--bad"),0.13);P.line(bs,mult,css("--c0"),2.2);P.vline(Lm/2,css("--ink"),1,[4,3]);
+  P.text("β = L_max/2 = "+(Lm/2).toFixed(2),Lm/2*1.1,9.3,css("--ink"));P.text("Fig 2",0.16,0.4,css("--bad"),"center");
+  if(beta>Lm/2)P.dot(beta,1/(1-Lm/(2*beta)),css("--c0"),5);
+  // right: bound vs lambda
+  const f=Array.from({length:k},(_,j)=>Math.pow(j+1,-2));
+  const lams=[];for(let i=0;i<=300;i++)lams.push(Math.pow(10,-1.5+i*9.5/300));
+  const bound=lams.map(l=>{const kl=k/(2*l*l)+0.5*f.reduce((a,v)=>a+g(l*l*N*v/beta),0);return beta>Lm/2?(train+(beta/Lm)*(kl+Math.log(1/delta))/N)/(1-Lm/(2*beta)):NaN;});
+  // loss rescaled to [0,1] by L_max: beta' = beta/L_max, bound = (train + beta'(KL + ln 1/δ)/N) / (1 − 1/(2 beta'))
+  const fin=bound.filter(isFinite);const yhi=Math.max(1.3,Math.min(3,fin.length?Math.max(...fin):1.3));
+  const Q=Plot($("pC1"),{xlim:[lams[0],lams[lams.length-1]],ylim:[0,yhi],logx:true,xticks:[0.1,10,1e3,1e5,1e7],yticks:niceTicks(0,yhi,4),xlabel:"prior width λ (log scale)",ylabel:"bound on test error",title:"bound against λ",xfmt:v=>v<1?v:v>=1e3?"1e"+Math.round(Math.log10(v)):v});
+  Q.hline(1,css("--ink"),1,[5,3]);Q.hline(train,css("--grey"),1,[2,3]);Q.text("training Gibbs error",lams[5],train+0.03,css("--muted"));
+  Q.line(lams,bound,css("--c0"),2.2);
+  let bi=-1;fin.length&&bound.forEach((v,i)=>{if(isFinite(v)&&(bi<0||v<bound[bi]))bi=i;});
+  if(bi>=0)Q.dot(lams[bi],bound[bi],css("--c0"),5);
+  pHover={Q,lams,bound};
+  $("pRead").innerHTML=beta<=Lm/2?`<span class="bad">β = ${beta.toFixed(2)} ≤ L_max/2 = ${(Lm/2).toFixed(2)}: Theorem 5.5 gives no bound.</span>`:
+    `multiplier at β = ${beta.toFixed(2)}: <b>${(1/(1-Lm/(2*beta))).toFixed(2)}</b> · best λ = <b>${fx(lams[bi],2)}</b> with bound <b>${bound[bi].toFixed(3)}</b> · at λ = 10⁸ the bound is <b>${bound[bound.length-1].toFixed(3)}</b>${bound[bound.length-1]>=1?' <span class="bad">(vacuous)</span>':""}`;
+}
+hover($("pC1"),$("pTip"),px=>{if(!pHover)return null;const l=pHover.Q.invX(px);let i=0;while(i<pHover.lams.length-1&&pHover.lams[i+1]<=l)i++;const v=pHover.bound[i];if(!isFinite(v))return null;return `λ = ${fx(l,2)} · bound ${v.toFixed(3)}`;});
+for(const id of ["pM","pB","pN"])$(id).addEventListener("input",drawP);
+
+// ---------------------------------------------------------------- boot
+function all(){drawS();drawD(!DWS);drawI();drawF();drawT();drawP();}
+window.addEventListener("resize",all);
+window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change",all);
+all();
+</script>
+</main>
+</body>
+</html>
