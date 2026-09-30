@@ -1,0 +1,57 @@
+<svg viewBox="0 0 820 320" xmlns="http://www.w3.org/2000/svg" role="img">
+<title>Dudley distance saturates</title>
+<desc>Lower bound on the Dudley distance between p_f and p_cf against c, with the ceiling at 2.</desc>
+<style>
+  text{font-family:ui-sans-serif,-apple-system,"Segoe UI",sans-serif;font-weight:400}
+  .lab{font-size:11px;fill:#57564f} .hd{font-size:13px;font-weight:500;fill:#1a1a19}
+  .sub{font-size:11.5px;fill:#57564f} .tiny{font-size:10px;fill:#57564f} .ink{fill:#1a1a19}
+  .ax{stroke:#c3c2b7;stroke-width:0.8;fill:none} .gd{stroke:#e2e1da;stroke-width:0.6;fill:none}
+  .b{stroke:#2f6fb5;stroke-width:2;fill:none} .bf{fill:#2f6fb5} .bb{fill:#2f6fb5;opacity:.28}
+  .o{stroke:#c2571a;stroke-width:2;fill:none} .of{fill:#c2571a} .ob{fill:#c2571a;opacity:.28}
+  .g{stroke:#0f7a5a;stroke-width:2;fill:none} .gf{fill:#0f7a5a}
+  .p{stroke:#7c3aed;stroke-width:2;fill:none} .pf{fill:#7c3aed}
+  .r{stroke:#b42318;stroke-width:1.6;fill:none} .rf{fill:#b42318}
+  .k{stroke:#1a1a19;stroke-width:1.1;fill:none;stroke-dasharray:4 3} .k0{stroke:#1a1a19;stroke-width:1.3;fill:none}
+  .dash{stroke-dasharray:5 3} .dot{stroke-dasharray:1.5 3}
+  .shade{fill:#8a8880;opacity:.16} .shader{fill:#b42318;opacity:.12}
+  .cell{stroke:#ffffff;stroke-width:1}
+  @media (prefers-color-scheme: dark){
+    .lab,.sub,.tiny{fill:#b6b4ab} .hd,.ink{fill:#eceae3} .ax{stroke:#4a4844} .gd{stroke:#33312e}
+    .b{stroke:#3d8ad8} .bf{fill:#3d8ad8} .bb{fill:#3d8ad8;opacity:.36}
+    .o{stroke:#d8733a} .of{fill:#d8733a} .ob{fill:#d8733a;opacity:.36}
+    .g{stroke:#4cc79a} .gf{fill:#4cc79a} .p{stroke:#b48cff} .pf{fill:#b48cff}
+    .r{stroke:#ff7a6b} .rf{fill:#ff7a6b}
+    .k,.k0{stroke:#eceae3} .shade{fill:#b6b4ab;opacity:.16} .shader{fill:#ff7a6b;opacity:.16}
+    .cell{stroke:#131417}
+  }
+</style>
+<text class="hd" x="60" y="20">“Arbitrarily far” in the Dudley metric: g = c f, σ = 0.2</text>
+<line class="gd" x1="60" x2="460" y1="280.0" y2="280.0"/>
+<text class="tiny" x="55" y="283.0" text-anchor="end">0</text>
+<line class="gd" x1="60" x2="460" y1="225.5" y2="225.5"/>
+<text class="tiny" x="55" y="228.5" text-anchor="end">0.5</text>
+<line class="gd" x1="60" x2="460" y1="170.9" y2="170.9"/>
+<text class="tiny" x="55" y="173.9" text-anchor="end">1</text>
+<line class="gd" x1="60" x2="460" y1="116.4" y2="116.4"/>
+<text class="tiny" x="55" y="119.4" text-anchor="end">1.5</text>
+<line class="gd" x1="60" x2="460" y1="61.8" y2="61.8"/>
+<text class="tiny" x="55" y="64.8" text-anchor="end">2</text>
+<text class="tiny" x="60.0" y="293" text-anchor="middle">1</text>
+<text class="tiny" x="140.0" y="293" text-anchor="middle">10</text>
+<text class="tiny" x="220.0" y="293" text-anchor="middle">100</text>
+<text class="tiny" x="300.0" y="293" text-anchor="middle">1000</text>
+<text class="tiny" x="380.0" y="293" text-anchor="middle">10000</text>
+<text class="tiny" x="460.0" y="293" text-anchor="middle">100000</text>
+<line class="ax" x1="60" x2="460" y1="280" y2="280"/>
+<line class="ax" x1="60" x2="60" y1="40" y2="280"/>
+<text class="lab" x="260.0" y="308" text-anchor="middle">c   (KL = (c−1)²/(2σ²): 12.5 at c = 2, 1012 at c = 10, 1.05·10⁴ at c = 30, 1.2·10⁵ at c = 100)</text>
+<text class="lab" x="60" y="32">Dudley lower bound</text>
+<line class="r dash" x1="60.0" x2="460.0" y1="61.8" y2="61.8"/>
+<text class="tiny" x="66.0" y="55.8" text-anchor="start">ceiling: 2</text>
+<polyline class="b" points="60.0,280.0 66.8,272.5 73.6,264.3 80.3,255.7 87.1,246.6 93.9,237.4 100.7,228.0 107.5,218.5 114.2,209.2 121.0,200.0 127.8,191.0 134.6,182.3 141.4,173.9 148.1,165.9 154.9,158.2 161.7,150.9 168.5,144.1 175.3,137.6 182.0,131.5 188.8,125.9 195.6,120.6 202.4,115.7 209.2,111.2 215.9,107.0 222.7,103.1 229.5,99.5 236.3,96.2 243.1,93.2 249.8,90.4 256.6,87.9 263.4,85.6 270.2,83.5 276.9,81.5 283.7,79.7 290.5,78.1 297.3,76.6 304.1,75.3 310.8,74.1 317.6,73.0 324.4,71.9 331.2,71.0 338.0,70.2 344.7,69.4 351.5,68.7 358.3,68.1 365.1,67.5 371.9,67.0 378.6,66.5 385.4,66.1 392.2,65.7 399.0,65.3 405.8,65.0 412.5,64.7 419.3,64.4 426.1,64.2 432.9,64.0 439.7,63.8 446.4,63.6 453.2,63.4 460.0,63.3"/>
+<text class="sub" x="490" y="80">The judge is</text>
+<text class="sub" x="490" y="98">h(y) = a (1 − 2 min(|y|/K, 1)),</text>
+<text class="sub" x="490" y="116">a = K/(K+2), so ‖h‖_BL = 1.</text>
+<text class="sub" x="490" y="146">The distance saturates at 2,</text>
+<text class="sub" x="490" y="164">while KL keeps growing like c².</text>
+</svg>

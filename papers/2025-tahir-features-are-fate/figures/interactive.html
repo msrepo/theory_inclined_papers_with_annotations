@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Features Are Fate, Interactive</title>
+<style>
+:root{
+  --bg:#fbfaf7; --surface:#ffffff; --ink:#1c1d21; --muted:#5b5f68; --line:#e2dfd8; --soft:#f2f0ea;
+  --c0:#2f6fb5; --c1:#c2571a; --c2:#0f7a5a; --c3:#7c3aed; --c4:#b8860b; --bad:#b42318; --grey:#8a8880;
+  --radius:12px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#131417; --surface:#1b1d21; --ink:#ebebed; --muted:#a3a6ae; --line:#2e3138; --soft:#23262b;
+    --c0:#7fb2e8; --c1:#f0a070; --c2:#4cc79a; --c3:#b48cff; --c4:#e6c34d; --bad:#ff7a6b; --grey:#8f9199;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#131417; --surface:#1b1d21; --ink:#ebebed; --muted:#a3a6ae; --line:#2e3138; --soft:#23262b;
+  --c0:#7fb2e8; --c1:#f0a070; --c2:#4cc79a; --c3:#b48cff; --c4:#e6c34d; --bad:#ff7a6b; --grey:#8f9199;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,sans-serif;}
+main{max-width:900px;margin:0 auto;padding:40px 16px 80px}
+h1{font-size:2.05rem;line-height:1.2;margin:0 0 .4rem;letter-spacing:-.01em}
+h2{font-size:1.38rem;margin:3rem 0 .6rem;padding-top:.5rem;border-top:1px solid var(--line)}
+h3{font-size:1.08rem;margin:1.8rem 0 .4rem}
+p{margin:.6rem 0}
+a{color:var(--c0)}
+.lede{color:var(--muted);font-size:1.05rem;margin-bottom:1.4rem}
+nav.toc{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:12px 18px;font-size:.93rem}
+nav.toc ol{margin:.3rem 0;padding-left:1.2rem}
+nav.toc a{color:var(--ink);text-decoration:none;border-bottom:1px dotted var(--muted)}
+.widget{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:14px;margin:1rem 0 1.2rem}
+.controls{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;margin:.2rem 0 .6rem;font-size:.9rem}
+.controls label{display:flex;align-items:center;gap:6px;color:var(--muted)}
+button,select{font:inherit;font-size:.88rem;color:var(--ink);background:var(--soft);border:1px solid var(--line);border-radius:8px;padding:5px 11px;cursor:pointer}
+button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+button:disabled{opacity:.4;cursor:not-allowed}
+input[type=range]{accent-color:var(--c0);width:130px}
+.readout{font-size:.9rem;color:var(--muted);margin-top:.5rem;font-variant-numeric:tabular-nums}
+.readout b{color:var(--ink);font-weight:600}
+.readout .bad{color:var(--bad);font-weight:600}
+.readout .good{color:var(--c2);font-weight:600}
+.callout{border-left:3px solid var(--c2);background:var(--soft);padding:10px 14px;border-radius:0 8px 8px 0;margin:1rem 0;font-size:.95rem}
+canvas{display:block;width:100%;touch-action:none}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:680px){.grid2{grid-template-columns:1fr}}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:.82rem;color:var(--muted);margin:.3rem 0 0}
+.legend span::before{content:"";display:inline-block;width:16px;height:3px;margin-right:6px;vertical-align:3px;background:var(--c)}
+.legend span.dash::before{background:repeating-linear-gradient(90deg,var(--c) 0 5px,transparent 5px 8px)}
+.legend span.fill::before{height:9px;vertical-align:0;opacity:.45}
+.legend span.dot::before{width:7px;height:7px;border-radius:50%;vertical-align:1px}
+.small{font-size:.86rem;color:var(--muted)}
+table.num{border-collapse:collapse;font-size:.88rem;font-variant-numeric:tabular-nums;margin:.4rem 0}
+table.num td,table.num th{border-bottom:1px solid var(--line);padding:3px 12px 3px 0;text-align:left;font-weight:400}
+table.num th{color:var(--muted)}
+@media (max-width:600px){ h1{font-size:1.7rem} input[type=range]{width:100px} }
+</style>
+</head>
+<body>
+<main>
+
+<h1>Features Are Fate, Interactive</h1>
+<p class="lede"><a href="../index.html">← text notes</a> · Tahir, Ganguli &amp; Rotskoff, ICML 2025. Seven widgets: the linear-transfer phase diagram (eq. 11), why transferability falls as the target set grows, fine-tuning and the null-space guess (eq. 15), the ridge result (eq. 13), and three from Appendix A: KL against transferability, the Dudley metric saturating, and a finite-sample Wasserstein distance that measures noise. Everything is computed in your browser from the closed forms in the notes; <code>code/</code> holds the Python that checks them.</p>
+
+<nav class="toc"><b>Contents</b>
+<ol>
+  <li><a href="#phase">Eq. (11): the linear-transfer phase diagram</a></li>
+  <li><a href="#floor">Why T falls with more target data: a moving curve against a floor</a></li>
+  <li><a href="#ft">Eq. (15): fine-tuning and the null-space guess</a></li>
+  <li><a href="#ridge">Eq. (13): ridge regularisation, and when it finally helps</a></li>
+  <li><a href="#kl">Appendix A (1): KL against transferability, θ from 0 to π</a></li>
+  <li><a href="#dudley">Appendix A (2): “arbitrarily far” in the Dudley metric, and the proof line that fails</a></li>
+  <li><a href="#w1">Appendix A (3): Figure 4(b), a Wasserstein estimate that measures noise</a></li>
+</ol></nav>
+
+<!-- ============================================================ -->
+<h2 id="phase">1. Eq. (11): the linear-transfer phase diagram</h2>
+<p>A source model has learned the single direction β<sub>s</sub>. The target uses β<sub>t</sub> at angle θ from it, and has <i>n</i> = γ<i>d</i> noisy examples. <b>Linear transfer</b> can only re-scale the source direction, so it has a floor sin²θ of error it can never remove. <b>Scratch training</b> pays the double-descent risk R<sub>sc</sub>(γ, σ) of eq. (8). The transferability is the difference, T = R<sub>sc</sub> − sin²θ. Blue is T &gt; 0 (transfer wins), red is T &lt; 0. <b>Click the left panel</b> to move the point; the right panel is the slice of the surface at your θ.</p>
+<div class="widget">
+  <div class="controls">
+    <label>θ <input type="range" id="phTh" min="0" max="90" step="0.5" value="45"><span id="phThV"></span></label>
+    <label>γ = n/d <input type="range" id="phG" min="0.01" max="2" step="0.01" value="0.5"><span id="phGV"></span></label>
+    <label>σ <input type="range" id="phS" min="0" max="1.2" step="0.01" value="0.2"><span id="phSV"></span></label>
+    <label><input type="checkbox" id="phB" checked> zero contours</label>
+  </div>
+  <div class="grid2">
+    <div><canvas id="phHeat" height="340"></canvas>
+      <div class="legend"><span class="fill" style="--c:var(--c0)">T &gt; 0</span><span class="fill" style="--c:var(--bad)">T &lt; 0</span><span style="--c:var(--ink)">T = 0</span></div></div>
+    <div><canvas id="phSlice" height="340"></canvas>
+      <div class="legend"><span style="--c:var(--c1)">T(γ) at this θ, σ</span><span class="dot" style="--c:var(--ink)">your γ</span></div></div>
+  </div>
+  <div class="readout" id="phRead"></div>
+</div>
+<div class="callout">Things to try. Set <b>σ = 0</b>: the band of anomalous positive transfer around γ = 1 disappears, and for γ &gt; 1 the picture is one solid red, because scratch training is exact once n &gt; d and T = −sin²θ. Raise <b>σ</b> to 1: negative transfer for γ &lt; 1 vanishes altogether (needs 1 − cos θ &gt; σ). Set <b>θ = 90°</b> (orthogonal tasks) and watch the blue sliver at γ = 1: transfer wins there only because scratch training is at its worst. Finally fix θ = 45° and σ = 0.2 and drag γ from 0 to 2: <i>the same pair of tasks</i> flips from positive to negative to positive to negative.</div>
+
+<!-- ============================================================ -->
+<h2 id="floor">2. Why T falls with more target data: a moving curve against a floor</h2>
+<p>This is the same formula seen as two risks. The <b>linear-transfer risk</b> is sin²θ + (σ² + sin²θ)/(<i>n</i>−2) (Theorem 3.7): it is nearly flat in <i>n</i>, because one direction can be estimated from a handful of points, and it cannot go below sin²θ. The <b>scratch risk</b> is the double-descent curve, which keeps improving. T is the gap. Tick <b>exact</b> to draw the finite-<i>d</i> versions the proofs really give (thin lines): the scratch peak is finite at finite <i>d</i>, and the linear-transfer risk sits slightly above its floor at small <i>n</i>.</p>
+<div class="widget">
+  <div class="controls">
+    <label>θ <input type="range" id="flTh" min="0" max="90" step="0.5" value="45"><span id="flThV"></span></label>
+    <label>σ <input type="range" id="flS" min="0" max="1.2" step="0.01" value="0.2"><span id="flSV"></span></label>
+    <label>d <input type="range" id="flD" min="1" max="3.3" step="0.01" value="2.3"><span id="flDV"></span></label>
+    <label><input type="checkbox" id="flEx" checked> exact (finite d)</label>
+  </div>
+  <canvas id="flCv" height="330"></canvas>
+  <div class="legend"><span style="--c:var(--c0)">R<sub>sc</sub> scratch, eq. (8)</span><span class="dash" style="--c:var(--c1)">sin²θ, the floor (n → ∞)</span><span style="--c:var(--c0);opacity:.6">R<sub>sc</sub>, exact at this d</span><span style="--c:var(--c1);opacity:.6">R<sub>lt</sub>, exact at this d</span><span class="fill" style="--c:var(--c2)">T &gt; 0</span><span class="fill" style="--c:var(--bad)">T &lt; 0</span></div>
+  <div class="readout" id="flRead"></div>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="ft">3. Eq. (15): fine-tuning and the null-space guess</h2>
+<p>Fine-tuning changes all the weights, but gradient flow can only move the model inside the space the <i>data</i> span (the row space of X, a random n-dimensional slice of R<sup>d</sup>). In the remaining (1 − γ) of directions the data are silent, and the network keeps whatever it was initialised with. <b>Scratch guesses 0 there; fine-tuning guesses β<sub>s</sub>.</b> Fine-tuning wins if β<sub>s</sub> is closer to β<sub>t</sub> than the origin is: inside the dashed circle, which is exactly θ &lt; 60°. Drag β<sub>s</sub> around the unit circle.</p>
+<div class="widget">
+  <div class="controls">
+    <label>θ <input type="range" id="ftTh" min="0" max="180" step="0.5" value="40"><span id="ftThV"></span></label>
+    <label>γ = n/d <input type="range" id="ftG" min="0" max="0.99" step="0.01" value="0.5"><span id="ftGV"></span></label>
+    <label>σ <input type="range" id="ftS" min="0" max="1" step="0.01" value="0.2"><span id="ftSV"></span></label>
+    <label><input type="checkbox" id="ftC"> balancedness correction (notes, §Doubts)</label>
+  </div>
+  <div class="grid2">
+    <div><canvas id="ftGeo" height="300"></canvas>
+      <div class="legend"><span class="dot" style="--c:var(--c0)">β<sub>t</sub></span><span class="dot" style="--c:var(--bad)">0 (scratch's guess)</span><span class="dot" style="--c:var(--c2)">β<sub>s</sub> (fine-tune's guess)</span><span class="dash" style="--c:var(--ink)">distance 1 from β<sub>t</sub></span></div></div>
+    <div><canvas id="ftCurve" height="300"></canvas>
+      <div class="legend"><span style="--c:var(--c0)">T<sub>ft</sub>(θ), eq. (15)</span><span class="dash" style="--c:var(--c1)">with the balancedness factor c</span></div></div>
+  </div>
+  <div class="readout" id="ftRead"></div>
+</div>
+<div class="callout">The threshold does not depend on γ: sample size only sets how <i>much</i> is at stake, (1 − γ). Drag θ across 60° and the sign flips at every γ. Tick the correction (derived in the notes and checked against real gradient descent): the threshold becomes cos θ = c/2 with c = 1 + O(σ²). At σ = 0.2 it barely moves (59.8° at γ = 0.25). Set σ = 1 and γ = 0.5: c = 1.22 and the break-even angle drops to 52°.</div>
+
+<!-- ============================================================ -->
+<h2 id="ridge">4. Eq. (13): ridge regularisation, and when it finally helps</h2>
+<p>Theorem 3.8 says ridge on the last layer only raises the risk of linear transfer. The proof is a law of large numbers: for large <i>n</i> the scalar being fitted is b = z·y/(‖z‖² + nλ) → cos θ/(1 + λ), which is biased and has no variance left to trade against. At <b>finite n</b> there is a variance term (σ² + sin²θ)/(<i>n</i> − 2) and a dip is possible. The dots are a Monte Carlo of the finite-<i>n</i> risk; the curve is the <i>n</i> → ∞ limit. The defaults (σ = 1.5, n = 10, a very noisy small set) show the dip; at σ = 0.2 there is essentially none.</p>
+<div class="widget">
+  <div class="controls">
+    <label>θ <input type="range" id="rgTh" min="0" max="90" step="0.5" value="45"><span id="rgThV"></span></label>
+    <label>σ <input type="range" id="rgS" min="0" max="2" step="0.01" value="1.5"><span id="rgSV"></span></label>
+    <label>n <input type="range" id="rgN" min="0.7" max="3.7" step="0.01" value="1.0"><span id="rgNV"></span></label>
+    <button id="rgRun">simulate (400 draws)</button>
+  </div>
+  <canvas id="rgCv" height="300"></canvas>
+  <div class="legend"><span style="--c:var(--c0)">eq. (13), n → ∞</span><span class="dot" style="--c:var(--c1)">Monte Carlo at this n</span><span class="dash" style="--c:var(--grey)">sin²θ</span></div>
+  <div class="readout" id="rgRead"></div>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="kl">5. Appendix A (1): KL against transferability, θ from 0 to π</h2>
+<p>Within the paper's own family (‖β<sub>s</sub>‖ = ‖β<sub>t</sub>‖ = 1) the two data distributions differ by a shift in the mean of <i>y</i>, and KL(p<sub>s</sub>‖p<sub>t</sub>) = ‖β<sub>s</sub> − β<sub>t</sub>‖²/(2σ²) = (1 − cos θ)/σ². It rises with θ all the way to π. But T<sub>lt</sub> depends on θ only through sin²θ, which comes back down after π/2. Sweeping θ over [0, π] gives Figure 4(a)'s U. Restrict to [0, π/2], where the phase diagrams live, and KL orders T perfectly.</p>
+<div class="widget">
+  <div class="controls">
+    <label>θ <input type="range" id="klTh" min="0" max="180" step="0.5" value="60"><span id="klThV"></span></label>
+    <label>γ <input type="range" id="klG" min="0.01" max="2" step="0.01" value="0.5"><span id="klGV"></span></label>
+    <label>σ <input type="range" id="klS" min="0.05" max="1" step="0.01" value="0.2"><span id="klSV"></span></label>
+  </div>
+  <canvas id="klCv" height="320"></canvas>
+  <div class="legend"><span style="--c:var(--c0)">θ ≤ π/2</span><span style="--c:var(--c1)">θ &gt; π/2</span><span class="dot" style="--c:var(--ink)">your θ</span></div>
+  <div class="readout" id="klRead"></div>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="dudley">6. Appendix A (2): “arbitrarily far” in the Dudley metric, and the proof line that fails</h2>
+<p>Theorem A.2 takes g = c·f and lets c grow. KL then grows without bound. The Dudley metric cannot: every judge in its unit ball has |h| ≤ 1, so the distance is at most 2. The left panel gives a lower bound from an explicit judge h(y) = a(1 − 2 min(|y|/K, 1)); the right panel shows KL and the transferability of linear transfer (with the target g = c f, ‖g‖ = c) both growing like c². The table below tests line (29) of the proof.</p>
+<div class="widget">
+  <div class="controls">
+    <label>c (g = c·f) <input type="range" id="duC" min="0" max="5" step="0.01" value="1.5"><span id="duCV"></span></label>
+    <label>σ <input type="range" id="duS" min="0.05" max="1" step="0.01" value="0.2"><span id="duSV"></span></label>
+    <label>γ <input type="range" id="duG" min="0.05" max="0.95" step="0.01" value="0.5"><span id="duGV"></span></label>
+  </div>
+  <div class="grid2">
+    <div><canvas id="duL" height="290"></canvas>
+      <div class="legend"><span style="--c:var(--c0)">Dudley lower bound (ramp judge)</span><span class="dash" style="--c:var(--bad)">ceiling 2</span></div></div>
+    <div><canvas id="duR" height="290"></canvas>
+      <div class="legend"><span style="--c:var(--c1)">KL(p<sub>f</sub>‖p<sub>g</sub>)</span><span style="--c:var(--c2)">T<sub>lt</sub></span></div></div>
+  </div>
+  <div class="readout" id="duRead"></div>
+  <table class="num" id="duTab"></table>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="w1">7. Appendix A (3): Figure 4(b), a Wasserstein estimate that measures noise</h2>
+<p>Figure 4(b) plots T against a Wasserstein-1 distance <i>estimated from finite samples</i>, and the values (526 to 529) barely vary. Here both laws are samples of (x, y) with x ∈ ℝ<sup>d</sup> Gaussian and y = β·x + noise. The x-marginals are <b>identical</b>; only the mean of y differs, by at most a Gaussian of size ‖β<sub>s</sub> − β<sub>t</sub>‖ ≤ 2. The population W<sub>1</sub> is therefore at most √(2/π)·‖β<sub>s</sub> − β<sub>t</sub>‖ ≤ 1.6. But two independent samples of a Gaussian in ℝ<sup>d</sup> are far apart in ℓ<sub>1</sub> or ℓ<sub>2</sub>, and the estimator sees that separation. The page solves the assignment problem exactly (Hungarian algorithm) between two samples of <i>n</i> points.</p>
+<div class="widget">
+  <div class="controls">
+    <label>d <input type="range" id="wD" min="0" max="8" step="1" value="8"><span id="wDV"></span></label>
+    <label>n <input type="range" id="wN" min="20" max="200" step="10" value="120"><span id="wNV"></span></label>
+    <label>ground metric <select id="wM"><option value="1">ℓ₁ (sum of |differences|)</option><option value="2">ℓ₂ (Euclidean)</option></select></label>
+    <button id="wRun">resample</button>
+    <button id="wSweep">sweep d</button>
+  </div>
+  <div class="grid2">
+    <div><canvas id="wBar" height="260"></canvas>
+      <div class="legend"><span style="--c:var(--bad)">population W₁: 0, ≤ 1.13, ≤ 1.60</span><span class="fill" style="--c:var(--c0)">estimate from two samples</span></div></div>
+    <div><canvas id="wSw" height="260"></canvas>
+      <div class="legend"><span style="--c:var(--c0)">θ = 0 (same law; hidden under the other line)</span><span style="--c:var(--c1)">θ = π (far apart)</span><span class="dash" style="--c:var(--grey)">population: 0 and ≤ 1.6</span></div></div>
+  </div>
+  <div class="readout" id="wRead"></div>
+</div>
+<div class="callout">At d = 500 with the ℓ<sub>1</sub> metric and n around 250 the estimate is ≈ 527 for <b>every</b> θ, including θ = 0 where the two laws are the same. Turn d down to 2: now the estimate is informative and rises with θ, like KL. So the estimator in Figure 4(b) is dominated by dimension, not by the difference between tasks. (This page's n is capped at 200 for speed; the Python check uses n = 250 and gets the same 526 to 528.)</div>
+
+</main>
+
+<script id="core">
+// ---------------------------------------------------------------- math core (port of code/theory.py, appendix_a.py)
+const PI = Math.PI;
+const sq = x => x * x;
+function rSc(g, s2) { return g < 1 ? (sq(1 - g) + g * s2) / (1 - g) : s2 / (g - 1); }              // eq. (8)
+function rScExact(n, d, s2) { return n < d - 1 ? 1 - n / d + s2 * n / (d - n - 1) : n > d + 1 ? s2 * d / (n - d - 1) : Infinity; }
+function rLtExact(n, th, s2) { const sn = sq(Math.sin(th)); return sn + (s2 + sn) / (n - 2); }     // Thm 3.7
+function tLt(g, th, s2) { return rSc(g, s2) - sq(Math.sin(th)); }                                   // eq. (11)
+function negInterval(th, s) { const c2 = sq(Math.cos(th)), b = 1 + c2 - s * s, disc = b * b - 4 * c2;
+  if (disc <= 0 || b <= 0) return null; const r = Math.sqrt(disc); return [(b - r) / 2, (b + r) / 2]; }
+function negOver(th, s) { const sn = sq(Math.sin(th)); return sn < 1e-12 ? Infinity : 1 + s * s / sn; }
+function tFt(g, th) { return g <= 1 ? (1 - g) * (2 * Math.cos(th) - 1) : 0; }                       // eq. (15)
+function cBal(g, s2) { const a = 1 - g, b = g + s2 * g / (1 - g); return Math.sqrt((a + Math.sqrt(a * a + 4 * b)) / 2); }
+function tFtBal(g, th, s2) { if (g >= 1) return 0; const c = cBal(g, s2); return (1 - g) * (2 * c * Math.cos(th) - c * c); }
+function rRidge(th, lam) { return 1 - (1 + 2 * lam) / sq(1 + lam) * sq(Math.cos(th)); }             // eq. (13)
+function klFam(th, s2) { return (1 - Math.cos(th)) / s2; }                                          // (1 - cos th)/sigma^2
+function erfc(x) { const z = Math.abs(x), t = 1 / (1 + 0.5 * z);                                    // Numerical Recipes erfcc, |err| < 1.2e-7
+  const r = t * Math.exp(-z * z - 1.26551223 + t * (1.00002368 + t * (0.37409196 + t * (0.09678418 + t * (-0.18628806 +
+    t * (0.27886807 + t * (-1.13520398 + t * (1.48851587 + t * (-0.82215223 + t * 0.17087277))))))))); return x >= 0 ? r : 2 - r; }
+function eRamp(v, K) { const s = Math.sqrt(v), phi = Math.exp(-sq(K / s) / 2) / Math.sqrt(2 * PI), Q = 0.5 * erfc(K / s / Math.SQRT2);
+  const emin = s * Math.sqrt(2 / PI) - 2 * (s * phi - K * Q); return 1 - 2 * emin / K; }
+function dudleyLB(c, sig) { let best = 0;
+  for (let i = 0; i < 300; i++) { const K = Math.exp(Math.log(0.3) + (Math.log(5000) - Math.log(0.3)) * i / 299), a = K / (K + 2);
+    const v = a * (eRamp(1 + sig * sig, K) - eRamp(c * c + sig * sig, K)); if (v > best) best = v; } return best; }
+function hungarian(C, n) {                                                                          // mean cost of the optimal perfect matching, O(n^3)
+  const INF = 1e18, u = new Float64Array(n + 1), v = new Float64Array(n + 1), p = new Int32Array(n + 1), way = new Int32Array(n + 1);
+  for (let i = 1; i <= n; i++) { p[0] = i; let j0 = 0; const minv = new Float64Array(n + 1).fill(INF), used = new Uint8Array(n + 1);
+    do { used[j0] = 1; const i0 = p[j0]; let delta = INF, j1 = 0;
+      for (let j = 1; j <= n; j++) if (!used[j]) { const cur = C[(i0 - 1) * n + (j - 1)] - u[i0] - v[j];
+        if (cur < minv[j]) { minv[j] = cur; way[j] = j0; } if (minv[j] < delta) { delta = minv[j]; j1 = j; } }
+      for (let j = 0; j <= n; j++) if (used[j]) { u[p[j]] += delta; v[j] -= delta; } else minv[j] -= delta;
+      j0 = j1; } while (p[j0] !== 0);
+    do { const j1 = way[j0]; p[j0] = p[j1]; j0 = j1; } while (j0);
+  }
+  let s = 0; for (let j = 1; j <= n; j++) s += C[(p[j] - 1) * n + (j - 1)]; return s / n; }
+</script>
+
+<script id="ui">
+// ---------------------------------------------------------------- UI helpers
+const $ = id => document.getElementById(id);
+function colors() { const s = getComputedStyle(document.documentElement), v = n => s.getPropertyValue(n).trim();
+  return { bg: v('--bg'), surface: v('--surface'), ink: v('--ink'), muted: v('--muted'), line: v('--line'), c0: v('--c0'), c1: v('--c1'), c2: v('--c2'), c3: v('--c3'), bad: v('--bad'), grey: v('--grey') }; }
+function rgba(hex, a) { hex = hex.replace('#', ''); if (hex.length === 3) hex = hex.split('').map(c => c + c).join('');
+  const n = parseInt(hex, 16); return `rgba(${n >> 16},${(n >> 8) & 255},${n & 255},${a})`; }
+function prep(cv, h) { const dpr = window.devicePixelRatio || 1, w = cv.clientWidth || 600; cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr);
+  cv.style.height = h + 'px'; const g = cv.getContext('2d'); g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, w, h); return { g, w, h }; }
+class Ax { constructor(g, x0, y0, w, h, xl, yl, logx) { Object.assign(this, { g, x0, y0, w, h, xl, yl, logx: !!logx }); }
+  X(x) { const a = this.logx ? Math.log10(x) : x, l0 = this.logx ? Math.log10(this.xl[0]) : this.xl[0], l1 = this.logx ? Math.log10(this.xl[1]) : this.xl[1]; return this.x0 + (a - l0) / (l1 - l0) * this.w; }
+  Y(y) { return this.y0 + this.h - (y - this.yl[0]) / (this.yl[1] - this.yl[0]) * this.h; }
+  invX(px) { const l0 = this.logx ? Math.log10(this.xl[0]) : this.xl[0], l1 = this.logx ? Math.log10(this.xl[1]) : this.xl[1], a = l0 + (px - this.x0) / this.w * (l1 - l0); return this.logx ? Math.pow(10, a) : a; }
+  invY(py) { return this.yl[0] + (this.y0 + this.h - py) / this.h * (this.yl[1] - this.yl[0]); } }
+function frame(A, C, xt, yt, xlab, ylab, xf, yf) { const g = A.g; g.font = '11px -apple-system,Segoe UI,sans-serif'; g.lineWidth = 1;
+  g.fillStyle = C.muted; g.strokeStyle = C.line; g.textAlign = 'right';
+  for (const t of yt) { const y = A.Y(t); g.beginPath(); g.moveTo(A.x0, y); g.lineTo(A.x0 + A.w, y); g.stroke(); g.fillText(yf ? yf(t) : t, A.x0 - 5, y + 3); }
+  g.textAlign = 'center'; for (const t of xt) g.fillText(xf ? xf(t) : t, A.X(t), A.y0 + A.h + 14);
+  g.strokeStyle = C.grey; g.beginPath(); g.moveTo(A.x0, A.y0); g.lineTo(A.x0, A.y0 + A.h); g.lineTo(A.x0 + A.w, A.y0 + A.h); g.stroke();
+  g.fillStyle = C.muted; g.textAlign = 'center'; g.fillText(xlab, A.x0 + A.w / 2, A.y0 + A.h + 30); g.textAlign = 'left'; if (ylab) g.fillText(ylab, A.x0, A.y0 - 7); }
+function line(A, xs, ys, col, lw, dash, clip) { const g = A.g; g.strokeStyle = col; g.lineWidth = lw || 2; g.setLineDash(dash || []); g.beginPath(); let pen = false;
+  for (let i = 0; i < xs.length; i++) { const y = ys[i]; if (!isFinite(y) || (clip && (y < A.yl[0] - clip || y > A.yl[1] + clip))) { pen = false; continue; }
+    const px = A.X(xs[i]), py = A.Y(y); if (pen) g.lineTo(px, py); else { g.moveTo(px, py); pen = true; } } g.stroke(); g.setLineDash([]); }
+function dotAt(A, x, y, col, r) { const g = A.g; g.fillStyle = col; g.beginPath(); g.arc(A.X(x), A.Y(y), r || 5, 0, 2 * PI); g.fill(); g.strokeStyle = 'rgba(255,255,255,.8)'; g.lineWidth = 1.2; g.stroke(); }
+function txt(g, s, x, y, col, size, al) { g.fillStyle = col; g.font = (size || 12) + 'px -apple-system,Segoe UI,sans-serif'; g.textAlign = al || 'left'; g.fillText(s, x, y); }
+function lin(a, b, n) { const r = []; for (let i = 0; i < n; i++) r.push(a + (b - a) * i / (n - 1)); return r; }
+function fmt(x, k) { return isFinite(x) ? x.toFixed(k === undefined ? 3 : k) : '∞'; }
+function sgn(x, k) { return (x >= 0 ? '+' : '−') + Math.abs(x).toFixed(k === undefined ? 3 : k); }
+const deg = d => d * PI / 180;
+function bind(ids, fn) { for (const id of ids) $(id).addEventListener('input', fn); }
+function drag(cv, fn) { let on = false; const go = e => { const r = cv.getBoundingClientRect(); const t = e.touches ? e.touches[0] : e; fn(t.clientX - r.left, t.clientY - r.top); };
+  cv.addEventListener('pointerdown', e => { on = true; cv.setPointerCapture(e.pointerId); go(e); }); cv.addEventListener('pointermove', e => { if (on) go(e); });
+  cv.addEventListener('pointerup', () => on = false); cv.addEventListener('pointercancel', () => on = false); }
+const redraws = []; function reg(f) { redraws.push(f); f(); }
+addEventListener('resize', () => redraws.forEach(f => f()));
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => redraws.forEach(f => f()));
+
+// ---------------------------------------------------------------- 1. phase diagram
+(function () {
+  const TH = 'phTh', G = 'phG', S = 'phS';
+  function draw() {
+    const C = colors(), th = deg(+$(TH).value), g0 = +$(G).value, s = +$(S).value, s2 = s * s;
+    $('phThV').textContent = (+$(TH).value).toFixed(1) + '°'; $('phGV').textContent = g0.toFixed(2); $('phSV').textContent = s.toFixed(2);
+    // left: heat map
+    let { g, w, h } = prep($('phHeat'), 340); const A = new Ax(g, 44, 14, w - 56, h - 52, [0, PI / 2], [0, 2]);
+    { const pw = Math.max(2, Math.floor(A.w / 2)), ph = Math.max(2, Math.floor(A.h / 2)), tmp = document.createElement('canvas'); tmp.width = pw; tmp.height = ph;
+      const tg = tmp.getContext('2d'), im = tg.createImageData(pw, ph), hexrgb = hx => { const n = parseInt(hx.replace('#', ''), 16); return [n >> 16, (n >> 8) & 255, n & 255]; }, cb = hexrgb(C.c0), cr = hexrgb(C.bad);
+      for (let i = 0; i < pw; i++) for (let j = 0; j < ph; j++) { const t = (i + 0.5) / pw * PI / 2, gm = 2 * (1 - (j + 0.5) / ph), v = tLt(gm, t, s2), a = Math.min(Math.abs(isFinite(v) ? v : 1), 1), col = v > 0 ? cb : cr, k = 4 * (j * pw + i);
+        im.data[k] = col[0]; im.data[k + 1] = col[1]; im.data[k + 2] = col[2]; im.data[k + 3] = Math.round(255 * Math.pow(a, 0.8) * 0.85); }
+      tg.putImageData(im, 0, 0); g.imageSmoothingEnabled = true; g.drawImage(tmp, A.x0, A.y0, A.w, A.h); }
+    frame(A, C, [0, PI / 6, PI / 3, PI / 2], [0, 0.5, 1, 1.5, 2], 'θ', 'γ = n/d', t => ['0', 'π/6', 'π/3', 'π/2'][Math.round(t / (PI / 6))], t => t);
+    if ($('phB').checked) { const ths = lin(0.001, PI / 2, 300);
+      const lo = ths.map(t => { const i = negInterval(t, s); return i ? i[0] : NaN; }), hi = ths.map(t => { const i = negInterval(t, s); return i ? i[1] : NaN; }), ov = ths.map(t => negOver(t, s));
+      line(A, ths, lo, C.ink, 1.6); line(A, ths, hi, C.ink, 1.6); line(A, ths, ov.map(v => Math.min(v, 2.2)), C.ink, 1.6); }
+    g.strokeStyle = C.ink; g.lineWidth = 1; g.setLineDash([3, 3]); g.beginPath(); g.moveTo(A.X(th), A.y0); g.lineTo(A.X(th), A.y0 + A.h); g.moveTo(A.x0, A.Y(g0)); g.lineTo(A.x0 + A.w, A.Y(g0)); g.stroke(); g.setLineDash([]);
+    dotAt(A, th, g0, C.ink, 6);
+    A.click = (px, py) => { const t = Math.max(0, Math.min(PI / 2, A.invX(px))), gm = Math.max(0.01, Math.min(2, A.invY(py))); $(TH).value = (t * 180 / PI).toFixed(1); $(G).value = gm.toFixed(2); draw(); };
+    draw.A = A;
+    // right: slice
+    ({ g, w, h } = prep($('phSlice'), 340)); const B = new Ax(g, 44, 14, w - 56, h - 52, [0, 2], [-1, 1]);
+    frame(B, C, [0, 0.5, 1, 1.5, 2], [-1, -0.5, 0, 0.5, 1], 'γ = n/d', 'T_lt', t => t, t => (t > 0 ? '+' : '') + t);
+    g.strokeStyle = C.ink; g.setLineDash([4, 3]); g.beginPath(); g.moveTo(B.x0, B.Y(0)); g.lineTo(B.x0 + B.w, B.Y(0)); g.stroke(); g.setLineDash([]);
+    const xs = lin(0.003, 2, 800); line(B, xs, xs.map(x => Math.abs(x - 1) < 1e-3 ? NaN : Math.max(-3, Math.min(3, tLt(x, th, s2)))), C.c1, 2.2, null, 0.0);
+    txt(g, '→ ∞ at γ = 1', B.X(1) - 6, B.y0 + 12, C.muted, 11, 'right');
+    const tv = tLt(g0, th, s2); dotAt(B, g0, Math.max(-1, Math.min(1, tv)), C.ink, 5);
+    // readout
+    const iv = negInterval(th, s), ov = negOver(th, s);
+    const parts = []; if (iv) parts.push(`γ ∈ (${fmt(iv[0], 3)}, ${fmt(iv[1], 3)})`); if (isFinite(ov)) parts.push(`γ > ${fmt(ov, 3)}`);
+    $('phRead').innerHTML = `At γ = <b>${g0.toFixed(2)}</b>: R<sub>sc</sub> = <b>${fmt(rSc(g0, s2), 3)}</b>, floor sin²θ = <b>${fmt(sq(Math.sin(th)), 3)}</b>, so T<sub>lt</sub> = <b class="${tv > 0 ? 'good' : 'bad'}">${isFinite(tv) ? sgn(tv, 3) : '+∞'}</b> (${tv > 0 ? 'transfer beats scratch' : 'scratch beats transfer'}).<br>For this θ and σ, T &lt; 0 on ${parts.length ? parts.join(' and ') : 'no γ at all'}; θ<sub>min</sub> = arccos(1−σ) = ${s < 1 ? (Math.acos(1 - s) * 180 / PI).toFixed(1) + '°' : 'none (σ ≥ 1)'}.`;
+  }
+  reg(draw); bind([TH, G, S, 'phB'], draw); drag($('phHeat'), (x, y) => draw.A.click(x, y));
+})();
+
+// ---------------------------------------------------------------- 2. floor
+(function () {
+  function draw() {
+    const C = colors(), th = deg(+$('flTh').value), s = +$('flS').value, s2 = s * s, d = Math.round(Math.pow(10, +$('flD').value));
+    $('flThV').textContent = (+$('flTh').value).toFixed(1) + '°'; $('flSV').textContent = s.toFixed(2); $('flDV').textContent = d;
+    const { g, w, h } = prep($('flCv'), 330), A = new Ax(g, 44, 14, w - 60, h - 52, [0, 3], [0, 1.6]);
+    const sn = sq(Math.sin(th)), ex = $('flEx').checked;
+    // gap shading
+    for (let px = 0; px < A.w; px += 2) { const gm = A.invX(A.x0 + px + 1); if (Math.abs(gm - 1) < 0.004) continue;
+      let a = rSc(gm, s2), b = sn; if (ex) { const n = gm * d; a = rScExact(n, d, s2); b = n > 2 ? rLtExact(n, th, s2) : 3; }
+      if (!isFinite(a)) a = 5; const lo = Math.max(0, Math.min(a, b)), hi = Math.min(1.6, Math.max(a, b)); if (hi <= lo) continue;
+      g.fillStyle = rgba(a > b ? C.c2 : C.bad, 0.22); g.fillRect(A.x0 + px, A.Y(hi), 2.5, A.Y(lo) - A.Y(hi)); }
+    frame(A, C, [0, 0.5, 1, 1.5, 2, 2.5, 3], [0, 0.5, 1, 1.5], 'γ = n/d', 'test risk', t => t, t => t);
+    const xs = lin(0.002, 3, 1500);
+    line(A, xs, xs.map(x => Math.abs(x - 1) < 0.002 ? NaN : rSc(x, s2)), C.c0, 2.4, null, 0);
+    line(A, [0, 3], [sn, sn], C.c1, 2.2, [6, 4]);
+    if (ex) { line(A, xs, xs.map(x => rScExact(x * d, d, s2)), C.c0, 1, null, 0); line(A, xs, xs.map(x => x * d > 2.5 ? rLtExact(x * d, th, s2) : NaN), C.c1, 1.2, null, 0); }
+    txt(g, 'scratch: double descent at γ = 1', A.X(1) + 8, A.y0 + 12, C.muted, 11);
+    const cross = []; const grid = lin(0.002, 3, 6000); let prev = null; for (const x of grid) { if (Math.abs(x - 1) < 0.003) { prev = null; continue; } const v = rSc(x, s2) - sn; if (prev && Math.sign(v) !== Math.sign(prev.v)) cross.push(x); prev = { x, v }; }
+    $('flRead').innerHTML = `The floor is <b>sin²θ = ${fmt(sn, 3)}</b> and never moves. Scratch crosses it at γ = ${cross.length ? cross.map(x => x.toFixed(3)).join(', ') : '— (never)'}. ` +
+      (ex ? `At d = ${d}, R<sub>lt</sub> = sin²θ + (σ²+sin²θ)/(n−2) exceeds its floor by ${fmt((s2 + sn) / (0.5 * d - 2), 3)} at γ = 0.5 and by ${fmt((s2 + sn) / (2 * d - 2), 4)} at γ = 2.` : '');
+  }
+  reg(draw); bind(['flTh', 'flS', 'flD', 'flEx'], draw);
+})();
+
+// ---------------------------------------------------------------- 3. fine-tuning
+(function () {
+  function draw() {
+    const C = colors(), thd = +$('ftTh').value, th = deg(thd), gm = +$('ftG').value, s = +$('ftS').value, s2 = s * s, useC = $('ftC').checked;
+    $('ftThV').textContent = thd.toFixed(1) + '°'; $('ftGV').textContent = gm.toFixed(2); $('ftSV').textContent = s.toFixed(2);
+    let { g, w, h } = prep($('ftGeo'), 300);
+    const sc = Math.min(w / 3.9, h / 2.7), ox = w * 0.5 - 0.5 * sc * 1.0 - 0.0, oy = h / 2, P = (x, y) => [w / 2 - 0.4 * sc + x * sc, oy - y * sc];
+    g.strokeStyle = C.line; g.lineWidth = 1; g.beginPath(); g.arc(...P(0, 0), sc, 0, 2 * PI); g.stroke();
+    g.strokeStyle = C.ink; g.setLineDash([5, 4]); g.beginPath(); g.arc(...P(1, 0), sc, 0, 2 * PI); g.stroke(); g.setLineDash([]);
+    g.strokeStyle = C.grey; g.beginPath(); g.moveTo(...P(-1.4, 0)); g.lineTo(...P(2.3, 0)); g.stroke();
+    const sx = Math.cos(th), sy = Math.sin(th), inside = Math.hypot(sx - 1, sy) < 1;
+    g.strokeStyle = inside ? C.c2 : C.c1; g.lineWidth = 2; g.setLineDash([2, 3]); g.beginPath(); g.moveTo(...P(1, 0)); g.lineTo(...P(sx, sy)); g.stroke(); g.setLineDash([]);
+    for (const [x, y, col, lab, dx, dy] of [[1, 0, C.c0, 'β_t', 8, 16], [0, 0, C.bad, '0', -14, 18], [sx, sy, inside ? C.c2 : C.c1, 'β_s', 8, -6]]) { g.fillStyle = col; g.beginPath(); g.arc(...P(x, y), 6, 0, 2 * PI); g.fill(); const [px, py] = P(x, y); txt(g, lab, px + dx, py + dy, C.ink, 12); }
+    txt(g, `‖β_t − β_s‖ = ${fmt(2 * Math.sin(th / 2), 3)}   vs   ‖β_t − 0‖ = 1`, 10, 20, C.muted, 12);
+    drag.ft = (px, py) => { const x = (px - (w / 2 - 0.4 * sc)) / sc, y = (oy - py) / sc; let a = Math.atan2(Math.abs(y), x) * 180 / PI; $('ftTh').value = Math.max(0, Math.min(180, a)).toFixed(1); draw(); };
+    // curve
+    ({ g, w, h } = prep($('ftCurve'), 300)); const B = new Ax(g, 44, 14, w - 56, h - 52, [0, 180], [-1.2, 1.2]);
+    frame(B, C, [0, 30, 60, 90, 120, 150, 180], [-1, -0.5, 0, 0.5, 1], 'θ (degrees)', 'T_ft', t => t, t => (t > 0 ? '+' : '') + t);
+    g.strokeStyle = C.ink; g.setLineDash([4, 3]); g.beginPath(); g.moveTo(B.x0, B.Y(0)); g.lineTo(B.x0 + B.w, B.Y(0)); g.stroke(); g.setLineDash([]);
+    const ts = lin(0, 180, 200); line(B, ts, ts.map(t => tFt(gm, deg(t))), C.c0, 2.4);
+    if (useC) line(B, ts, ts.map(t => tFtBal(gm, deg(t), s2)), C.c1, 2, [6, 4]);
+    g.strokeStyle = C.grey; g.setLineDash([2, 3]); g.beginPath(); g.moveTo(B.X(60), B.y0); g.lineTo(B.X(60), B.y0 + B.h); g.stroke(); g.setLineDash([]); txt(g, '60°', B.X(60) + 4, B.y0 + 12, C.muted, 11);
+    const tv = useC ? tFtBal(gm, th, s2) : tFt(gm, th); dotAt(B, thd, Math.max(-1.2, Math.min(1.2, tv)), C.ink, 5);
+    const c = cBal(gm, s2);
+    $('ftRead').innerHTML = `Where the data are silent (fraction 1−γ = <b>${(1 - gm).toFixed(2)}</b> of directions): scratch error <b>1</b>, fine-tune error <b>${fmt(sq(2 * Math.sin(th / 2)), 3)}</b> (= 2−2cos θ). ` +
+      `T<sub>ft</sub> = (1−γ)(2cos θ − 1) = <b class="${tFt(gm, th) > 0 ? 'good' : 'bad'}">${sgn(tFt(gm, th), 3)}</b>.` +
+      (useC ? ` With c = ${c.toFixed(4)}: T = (1−γ)(2c cos θ − c²) = <b class="${tv > 0 ? 'good' : 'bad'}">${sgn(tv, 3)}</b>; break-even cos θ = c/2 = ${(c / 2).toFixed(4)} (θ = ${(Math.acos(c / 2) * 180 / PI).toFixed(1)}°).` : '');
+  }
+  reg(draw); bind(['ftTh', 'ftG', 'ftS', 'ftC'], draw); drag($('ftGeo'), (x, y) => drag.ft(x, y));
+})();
+
+// ---------------------------------------------------------------- 4. ridge
+(function () {
+  let sim = null;
+  function randn() { let u = 0, v = 0; while (!u) u = Math.random(); v = Math.random(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * PI * v); }
+  function run() {
+    const th = deg(+$('rgTh').value), s = +$('rgS').value, n = Math.round(Math.pow(10, +$('rgN').value)), lams = lin(0, 1, 21), R = lams.map(() => 0), R2 = lams.map(() => 0), reps = 400;
+    for (let r = 0; r < reps; r++) { let s1 = 0, s2z = 0;
+      for (let i = 0; i < n; i++) { const z = randn(), y = Math.cos(th) * z + Math.sin(th) * randn() + s * randn(); s1 += z * y; s2z += z * z; }
+      lams.forEach((l, k) => { const b = s1 / (s2z + n * l), e = sq(b - Math.cos(th)) + sq(Math.sin(th)); R[k] += e; R2[k] += e * e; }); }
+    sim = { n, th, s, lams, m: R.map(x => x / reps), se: R.map((x, k) => Math.sqrt(Math.max(0, R2[k] / reps - sq(x / reps)) / reps)) }; draw();
+  }
+  function draw() {
+    const C = colors(), th = deg(+$('rgTh').value), s = +$('rgS').value, n = Math.round(Math.pow(10, +$('rgN').value));
+    $('rgThV').textContent = (+$('rgTh').value).toFixed(1) + '°'; $('rgSV').textContent = s.toFixed(2); $('rgNV').textContent = n;
+    if (sim && (sim.n !== n || sim.th !== th || sim.s !== s)) sim = null;
+    const { g, w, h } = prep($('rgCv'), 300), lam = lin(0, 1, 100), y0 = rRidge(th, 0);
+    let ylo = Math.max(0, Math.min(y0, sq(Math.sin(th))) - 0.05), yhi = Math.max(sq(Math.sin(th)) + 0.2, rRidge(th, 1) + 0.03);
+    if (sim) { ylo = Math.max(0, Math.min(ylo, ...sim.m.map((v, k) => v - 2 * sim.se[k]) ) - 0.02); yhi = Math.max(yhi, ...sim.m.map((v, k) => v + 2 * sim.se[k])) + 0.02; }
+    const A = new Ax(g, 44, 14, w - 60, h - 52, [0, 1], [ylo, yhi]);
+    frame(A, C, [0, 0.25, 0.5, 0.75, 1], lin(A.yl[0], A.yl[1], 5).map(v => +v.toFixed(2)), 'λ', 'risk of linear transfer', t => t, t => t);
+    line(A, [0, 1], [sq(Math.sin(th)), sq(Math.sin(th))], C.grey, 1.5, [5, 4]); line(A, lam, lam.map(l => rRidge(th, l)), C.c0, 2.4);
+    if (sim) { sim.lams.forEach((l, k) => { const px = A.X(l); g.strokeStyle = rgba(C.c1, .6); g.lineWidth = 1.2; g.beginPath(); g.moveTo(px, A.Y(sim.m[k] - 2 * sim.se[k])); g.lineTo(px, A.Y(sim.m[k] + 2 * sim.se[k])); g.stroke(); dotAt(A, l, sim.m[k], C.c1, 3.5); }); }
+    let msg = `eq. (13) at λ = 0: <b>${fmt(y0, 3)}</b> = sin²θ; at λ = 1: <b>${fmt(rRidge(th, 1), 3)}</b>. It is strictly increasing in λ.`;
+    if (sim) { let kb = 0; sim.m.forEach((v, k) => { if (v < sim.m[kb]) kb = k; }); msg += ` Monte Carlo at n = ${n}: best λ ≈ <b>${sim.lams[kb].toFixed(2)}</b>, risk ${fmt(sim.m[kb], 4)} vs ${fmt(sim.m[0], 4)} at λ = 0 (± ${fmt(sim.se[0], 4)}).`; }
+    else msg += ` Press <b>simulate</b> to see the finite-n risk (variance term ≈ (σ²+sin²θ)/(n−2) = ${fmt((s * s + sq(Math.sin(th))) / (n - 2), 4)}).`;
+    $('rgRead').innerHTML = msg;
+  }
+  reg(draw); bind(['rgTh', 'rgS', 'rgN'], draw); $('rgRun').addEventListener('click', run);
+})();
+
+// ---------------------------------------------------------------- 5. KL vs T
+(function () {
+  function draw() {
+    const C = colors(), thd = +$('klTh').value, th = deg(thd), gm = +$('klG').value, s = +$('klS').value, s2 = s * s;
+    $('klThV').textContent = thd.toFixed(1) + '°'; $('klGV').textContent = gm.toFixed(2); $('klSV').textContent = s.toFixed(2);
+    const { g, w, h } = prep($('klCv'), 320), klmax = klFam(PI, s2); const tv = tLt(gm, PI / 2, s2), t0 = tLt(gm, 0, s2);
+    const lo = Math.min(tv, t0, -0.1), hi = Math.max(tv, t0, 0.1), pad = 0.1 * (hi - lo);
+    const A = new Ax(g, 50, 14, w - 66, h - 52, [0, klmax], [lo - pad, hi + pad]);
+    const nice = (a, b, k) => { const st = (b - a) / k, p = Math.pow(10, Math.floor(Math.log10(st))), m = [1, 2, 5, 10].find(m => m * p >= st) * p, r = []; for (let v = Math.ceil(a / m) * m; v <= b + 1e-9; v += m) r.push(+v.toFixed(6)); return r; };
+    frame(A, C, nice(0, klmax, 6), nice(A.yl[0], A.yl[1], 5), 'KL(p_s ‖ p_t) = (1 − cos θ)/σ²', 'T_lt', t => t, t => t);
+    if (A.yl[0] < 0 && A.yl[1] > 0) { g.strokeStyle = C.ink; g.setLineDash([4, 3]); g.beginPath(); g.moveTo(A.x0, A.Y(0)); g.lineTo(A.x0 + A.w, A.Y(0)); g.stroke(); g.setLineDash([]); }
+    const a = lin(0, PI / 2, 80), b = lin(PI / 2, PI, 80);
+    line(A, a.map(t => klFam(t, s2)), a.map(t => tLt(gm, t, s2)), C.c0, 2.4); line(A, b.map(t => klFam(t, s2)), b.map(t => tLt(gm, t, s2)), C.c1, 2.4);
+    dotAt(A, klFam(th, s2), Math.max(A.yl[0], Math.min(A.yl[1], tLt(gm, th, s2))), C.ink, 6);
+    const N = 181, ths = lin(0, PI, N), kl = ths.map(t => klFam(t, s2)), T = ths.map(t => tLt(gm, t, s2));
+    const corr = (x, y) => { const n = x.length, mx = x.reduce((p, c) => p + c) / n, my = y.reduce((p, c) => p + c) / n; let sxy = 0, sxx = 0, syy = 0; for (let i = 0; i < n; i++) { sxy += (x[i] - mx) * (y[i] - my); sxx += sq(x[i] - mx); syy += sq(y[i] - my); } return sxy / Math.sqrt(sxx * syy); };
+    const half = (N + 1) / 2, c1 = corr(kl, T), c2 = corr(kl.slice(0, half), T.slice(0, half));
+    $('klRead').innerHTML = `θ = <b>${thd.toFixed(1)}°</b>: KL = <b>${fmt(klFam(th, s2), 2)}</b>, T<sub>lt</sub> = <b class="${tLt(gm, th, s2) > 0 ? 'good' : 'bad'}">${sgn(tLt(gm, th, s2), 3)}</b>. Correlation of KL with T over θ ∈ [0, π]: <b>${c1.toFixed(3)}</b>; over θ ∈ [0, π/2]: <b>${c2.toFixed(3)}</b>.<br>Symmetry: KL(π−θ) = 2/σ² − KL(θ) and T(π−θ) = T(θ). At θ = π (β<sub>t</sub> = −β<sub>s</sub>), KL is at its maximum ${fmt(klmax, 1)} and T is exactly as good as at θ = 0.`;
+  }
+  reg(draw); bind(['klTh', 'klG', 'klS'], draw);
+})();
+
+// ---------------------------------------------------------------- 6. Dudley
+(function () {
+  function draw() {
+    const C = colors(), c = Math.pow(10, +$('duC').value), s = +$('duS').value, s2 = s * s, gm = +$('duG').value;
+    $('duCV').textContent = c < 100 ? c.toFixed(2) : c.toExponential(1); $('duSV').textContent = s.toFixed(2); $('duGV').textContent = gm.toFixed(2);
+    const kl = sq(c - 1) / (2 * s2), dl = dudleyLB(c, s);
+    const tt = sq(c) * (1 - gm) + gm * s2 / (1 - gm);                      // R_sc for a norm-c target, minus the tiny linear-transfer variance (sigma^2/(n-2), dropped)
+    let { g, w, h } = prep($('duL'), 290); const A = new Ax(g, 44, 14, w - 56, h - 52, [1, 1e5], [0, 2.2], true);
+    frame(A, C, [1, 10, 100, 1000, 1e4, 1e5], [0, 0.5, 1, 1.5, 2], 'c', 'Dudley ≥', t => t >= 1000 ? '1e' + Math.log10(t) : t, t => t);
+    line(A, [1, 1e5], [2, 2], C.bad, 1.6, [5, 4]); const cs = lin(0, 5, 80).map(v => Math.pow(10, v)); line(A, cs, cs.map(x => dudleyLB(x, s)), C.c0, 2.4); dotAt(A, Math.max(1, c), dl, C.ink, 5);
+    ({ g, w, h } = prep($('duR'), 290)); const B = new Ax(g, 50, 14, w - 62, h - 52, [1, 1e5], [-2, 12], true);
+    frame(B, C, [1, 10, 100, 1000, 1e4, 1e5], [0, 4, 8, 12], 'c', 'log10', t => t >= 1000 ? '1e' + Math.log10(t) : t, t => t);
+    const cs2 = lin(0.03, 5, 80).map(v => Math.pow(10, v)); line(B, cs2, cs2.map(x => Math.log10(sq(x - 1) / (2 * s2))), C.c1, 2.2, null, 0); line(B, cs2, cs2.map(x => Math.log10(sq(x) * (1 - gm) + gm * s2 / (1 - gm))), C.c2, 2.2, null, 0);
+    const ec = Math.exp(-sq(s) / 2);
+    $('duRead').innerHTML = `c = <b>${c < 100 ? c.toFixed(2) : c.toExponential(1)}</b>: KL = <b>${kl < 1e5 ? kl.toFixed(1) : kl.toExponential(2)}</b>; Dudley ≥ <b>${dl.toFixed(4)}</b> (gap to the ceiling 2: ${(2 - dl).toFixed(4)}); T<sub>lt</sub> ≈ c²(1−γ) + γσ²/(1−γ) = <b class="good">${tt < 1e5 ? tt.toFixed(2) : tt.toExponential(2)}</b> &gt; 0.`;
+    // proof line check, f = x, g = c x
+    const l28 = ec / 2 * Math.abs(Math.exp(-0.5) - Math.exp(-sq(c) / 2)), r29 = ec / 2 * (1 + sq(c)), bad = l28 < r29;
+    $('duTab').innerHTML = `<tr><th>Proof of Theorem A.2, f = x, g = c·x</th><th>value</th></tr>
+      <tr><td>line (28): (e<sup>−σ²/2</sup>/2)·|E cos f − E cos g|, what the judge cos(y)/2 achieves</td><td>${l28.toFixed(4)}</td></tr>
+      <tr><td>ceiling of any cos-judge: e<sup>−σ²/2</sup></td><td>${ec.toFixed(4)}</td></tr>
+      <tr><td>line (29) claims ≥ (e<sup>−σ²/2</sup>/2)·E[f² + g²]</td><td>${r29 < 1e6 ? r29.toFixed(4) : r29.toExponential(2)}</td></tr>
+      <tr><td>is (28) ≥ (29)?</td><td><b class="${bad ? 'bad' : 'good'}">${bad ? 'no: the inequality fails' : 'yes'}</b></td></tr>`;
+  }
+  reg(draw); bind(['duC', 'duS', 'duG'], draw);
+})();
+
+// ---------------------------------------------------------------- 7. W1
+(function () {
+  const DS = [2, 4, 8, 16, 32, 64, 128, 256, 500]; let res = null, sw = null;
+  function randn() { let u = 0; while (!u) u = Math.random(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * PI * Math.random()); }
+  function sample(n, d, beta, sig) { const X = new Float64Array(n * (d + 1)); for (let i = 0; i < n; i++) { let y = sig * randn(); for (let j = 0; j < d; j++) { const x = randn(); X[i * (d + 1) + j] = x; y += beta[j] * x; } X[i * (d + 1) + d] = y; } return X; }
+  function w1(A, B, n, d, p) { const D = d + 1, C = new Float64Array(n * n);
+    for (let i = 0; i < n; i++) for (let k = 0; k < n; k++) { let s = 0; for (let j = 0; j < D; j++) { const t = A[i * D + j] - B[k * D + j]; s += p === 1 ? Math.abs(t) : t * t; } C[i * n + k] = p === 1 ? s : Math.sqrt(s); }
+    return hungarian(C, n); }
+  function betas(d, th) { const bs = new Float64Array(d), nu = new Float64Array(d); bs[0] = 1; if (d > 1) nu[1] = 1; return [bs, Float64Array.from(bs, (v, j) => Math.cos(th) * v + Math.sin(th) * nu[j])]; }
+  function estimate(d, n, p, ths) { const [bs] = betas(d, 0); return ths.map(th => { const bt = betas(d, th)[1]; return w1(sample(n, d, bs, 0.2), sample(n, d, bt, 0.2), n, d, p); }); }
+  function run() { const d = DS[+$('wD').value], n = +$('wN').value, p = +$('wM').value; $('wRun').disabled = true; setTimeout(() => { res = { d, n, p, v: estimate(d, n, p, [0, PI / 2, PI]) }; $('wRun').disabled = false; draw(); }, 20); }
+  function sweep() { const n = Math.min(100, +$('wN').value), p = +$('wM').value; sw = { n, p, d: [], a: [], b: [] }; $('wSweep').disabled = true; let i = 0;
+    const step = () => { if (i >= DS.length) { $('wSweep').disabled = false; draw(); return; } const d = DS[i++], v = estimate(d, n, p, [0, PI]); sw.d.push(d); sw.a.push(v[0]); sw.b.push(v[1]); draw(); setTimeout(step, 10); }; step(); }
+  function draw() {
+    const C = colors(), d = DS[+$('wD').value], n = +$('wN').value; $('wDV').textContent = d; $('wNV').textContent = n;
+    let { g, w, h } = prep($('wBar'), 260); const names = ['θ = 0', 'θ = π/2', 'θ = π'], bound = [0, Math.sqrt(2 / PI) * Math.SQRT2, Math.sqrt(2 / PI) * 2];
+    const vmax = res ? Math.max(...res.v, 2) * 1.15 : 1; const A = new Ax(g, 50, 14, w - 62, h - 52, [0, 3], [0, vmax]);
+    const nice = m => { const p = Math.pow(10, Math.floor(Math.log10(m / 4))); const s = [1, 2, 5, 10].find(x => x * p >= m / 4) * p; const r = []; for (let v = 0; v <= m; v += s) r.push(+v.toFixed(6)); return r; };
+    frame(A, C, [], nice(vmax), '', 'empirical W₁' + (res ? ` (d = ${res.d}, n = ${res.n}, ℓ${res.p === 1 ? '₁' : '₂'})` : ''), null, t => t);
+    names.forEach((nm, k) => { const cx = A.X(k + 0.5); txt(g, nm, cx, A.y0 + A.h + 16, C.muted, 12, 'center'); if (res) { const top = A.Y(res.v[k]); g.fillStyle = rgba(k === 0 ? C.c0 : k === 1 ? C.c3 : C.c1, 0.8); g.fillRect(cx - 28, top, 56, A.Y(0) - top); txt(g, res.v[k].toFixed(res.v[k] < 10 ? 3 : 1), cx, top - 5, C.ink, 12, 'center'); }
+      g.strokeStyle = C.bad; g.lineWidth = 2.5; g.beginPath(); g.moveTo(cx - 34, A.Y(bound[k])); g.lineTo(cx + 34, A.Y(bound[k])); g.stroke(); });
+    if (!res) txt(g, 'press “resample”', A.x0 + A.w / 2, A.y0 + A.h / 2, C.muted, 13, 'center');
+    ({ g, w, h } = prep($('wSw'), 260)); const B = new Ax(g, 50, 14, w - 62, h - 52, [2, 500], [0, sw ? Math.max(...sw.b, 2) * 1.15 : 1], true);
+    frame(B, C, [2, 8, 32, 128, 500], nice(B.yl[1]), 'd', 'empirical W₁', t => t, t => t);
+    line(B, [2, 500], [0, 0], C.grey, 1.4, [5, 4]); line(B, [2, 500], [1.6, 1.6], C.grey, 1.4, [5, 4]);
+    if (sw) { line(B, sw.d, sw.a, C.c0, 2.2); line(B, sw.d, sw.b, C.c1, 2.2); sw.d.forEach((x, k) => { dotAt(B, x, sw.a[k], C.c0, 3); dotAt(B, x, sw.b[k], C.c1, 3); }); }
+    else txt(g, 'press “sweep d”', B.x0 + B.w / 2, B.y0 + B.h / 2, C.muted, 13, 'center');
+    $('wRead').innerHTML = res ? `d = ${res.d}, n = ${res.n}: W₁(θ=0) = <b>${res.v[0].toFixed(res.v[0] < 10 ? 3 : 1)}</b> although the two laws are <b>identical</b>; W₁(θ=π) = <b>${res.v[2].toFixed(res.v[2] < 10 ? 3 : 1)}</b>; difference ${(res.v[2] - res.v[0]).toFixed(2)}. Population values: 0 and ≤ 1.60.` :
+      `Population W₁ between the two laws is 0 at θ = 0 and at most √(2/π)·2 = 1.60 at θ = π.`;
+  }
+  reg(draw); bind(['wD', 'wN'], draw); $('wRun').addEventListener('click', run); $('wSweep').addEventListener('click', sweep); $('wM').addEventListener('change', () => { res = null; sw = null; draw(); });
+})();
+</script>
+</body>
+</html>

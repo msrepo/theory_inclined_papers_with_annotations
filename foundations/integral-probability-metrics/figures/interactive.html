@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Integral Probability Metrics, Interactive</title>
+<style>
+:root{
+  --bg:#fbfaf7; --surface:#ffffff; --ink:#1c1d21; --muted:#5b5f68; --line:#e2dfd8; --soft:#f2f0ea;
+  --c0:#2f6fb5; --c1:#c2571a; --c2:#0f7a5a; --c3:#7c3aed; --c4:#b8860b; --bad:#b42318; --grey:#8a8880;
+  --radius:12px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#131417; --surface:#1b1d21; --ink:#ebebed; --muted:#a3a6ae; --line:#2e3138; --soft:#23262b;
+    --c0:#7fb2e8; --c1:#f0a070; --c2:#4cc79a; --c3:#b48cff; --c4:#e6c34d; --bad:#ff7a6b; --grey:#8f9199;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#131417; --surface:#1b1d21; --ink:#ebebed; --muted:#a3a6ae; --line:#2e3138; --soft:#23262b;
+  --c0:#7fb2e8; --c1:#f0a070; --c2:#4cc79a; --c3:#b48cff; --c4:#e6c34d; --bad:#ff7a6b; --grey:#8f9199;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,sans-serif;}
+main{max-width:900px;margin:0 auto;padding:40px 16px 80px}
+h1{font-size:2.05rem;line-height:1.2;margin:0 0 .4rem;letter-spacing:-.01em}
+h2{font-size:1.38rem;margin:3rem 0 .6rem;padding-top:.5rem;border-top:1px solid var(--line)}
+h3{font-size:1.08rem;margin:1.8rem 0 .4rem}
+p{margin:.6rem 0}
+a{color:var(--c0)}
+.lede{color:var(--muted);font-size:1.05rem;margin-bottom:1.4rem}
+nav.toc{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:12px 18px;font-size:.93rem}
+nav.toc ol{margin:.3rem 0;padding-left:1.2rem}
+nav.toc a{color:var(--ink);text-decoration:none;border-bottom:1px dotted var(--muted)}
+.widget{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:14px;margin:1rem 0 1.2rem}
+.controls{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;margin:.2rem 0 .6rem;font-size:.9rem}
+.controls label{display:flex;align-items:center;gap:6px;color:var(--muted)}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg button{border:0;border-radius:0;border-right:1px solid var(--line)}
+.seg button:last-child{border-right:0}
+button,select{font:inherit;font-size:.88rem;color:var(--ink);background:var(--soft);border:1px solid var(--line);border-radius:8px;padding:5px 11px;cursor:pointer}
+button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+button:disabled{opacity:.4;cursor:not-allowed}
+input[type=range]{accent-color:var(--c0);width:130px}
+.readout{font-size:.9rem;color:var(--muted);margin-top:.5rem;font-variant-numeric:tabular-nums}
+.readout b{color:var(--ink);font-weight:600}
+.readout .bad{color:var(--bad);font-weight:600}
+.readout .good{color:var(--c2);font-weight:600}
+.callout{border-left:3px solid var(--c2);background:var(--soft);padding:10px 14px;border-radius:0 8px 8px 0;margin:1rem 0;font-size:.95rem}
+canvas{display:block;width:100%;touch-action:none}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:680px){.grid2{grid-template-columns:1fr}}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:.82rem;color:var(--muted);margin:.3rem 0 0}
+.legend span::before{content:"";display:inline-block;width:16px;height:3px;margin-right:6px;vertical-align:3px;background:var(--c)}
+.legend span.dash::before{background:repeating-linear-gradient(90deg,var(--c) 0 5px,transparent 5px 8px)}
+.legend span.fill::before{height:9px;vertical-align:0;opacity:.35}
+.legend span.dot::before{width:7px;height:7px;border-radius:50%;vertical-align:1px}
+.small{font-size:.86rem;color:var(--muted)}
+@media (max-width:600px){ h1{font-size:1.7rem} input[type=range]{width:100px} }
+</style>
+</head>
+<body>
+<main>
+
+<h1>Integral Probability Metrics, Interactive</h1>
+<p class="lede"><a href="../index.html">← text notes</a> · Three widgets for the panel-of-judges picture: one judge and the gap it earns, how four distances behave as two distributions move apart, and the MMD witness function as the kernel bandwidth changes. Everything is computed in your browser. <span id="selfcheck" class="small"></span></p>
+
+<nav class="toc"><b>Contents</b>
+<ol>
+  <li><a href="#judge">The judge: one function, one gap</a></li>
+  <li><a href="#sep">Distance versus separation</a></li>
+  <li><a href="#mmd">The MMD witness and the bandwidth</a></li>
+</ol></nav>
+
+<!-- ============================================================ -->
+<h2 id="judge">1. The judge: one function, one gap</h2>
+<p>Two distributions P (blue) and Q (orange) live on a line, say one coordinate of an embedding. A <b>judge</b> is a function <i>h</i> that scores every point. The <b>gap</b> is E<sub>P</sub><i>h</i> − E<sub>Q</sub><i>h</i>: the average score under P minus the average score under Q. Here the judge is a <b>ramp</b>, <i>h</i>(<i>x</i>) = clip(<i>L</i>(<i>x</i> − <i>c</i>), −<i>a</i>, <i>a</i>), which climbs with slope <i>L</i> around the centre <i>c</i> and then flattens at height ±<i>a</i>. The Dudley budget splits 1 between the two limits: <i>a</i> (how tall) plus <i>L</i> (how steep) = 1. The lower panel shows the two CDFs' difference F − G; a ramp's gap is <i>L</i> times the signed area under that curve over the ramp's sloping window.</p>
+<div class="widget">
+  <div class="controls">
+    <label>preset <select id="j1Preset">
+      <option value="shift">Gaussian shift, m = 1</option>
+      <option value="wide">Q wider and shifted</option>
+      <option value="bump">Q two-humped, same mean</option>
+      <option value="far">far apart, both narrow</option>
+    </select></label>
+    <label>Q shape <select id="j1Shape"><option value="g">one bump</option><option value="b">two bumps</option></select></label>
+  </div>
+  <div class="controls">
+    <label>P mean <input type="range" id="j1Mp" min="-3" max="3" step="0.05" value="0"><span id="j1MpV"></span></label>
+    <label>P sd <input type="range" id="j1Sp" min="0.3" max="1.6" step="0.05" value="1"><span id="j1SpV"></span></label>
+    <label>Q mean <input type="range" id="j1Mq" min="-3" max="3" step="0.05" value="1"><span id="j1MqV"></span></label>
+    <label>Q sd <input type="range" id="j1Sq" min="0.3" max="1.6" step="0.05" value="1"><span id="j1SqV"></span></label>
+    <label id="j1OffL">bump offset <input type="range" id="j1Off" min="0.5" max="2.5" step="0.05" value="1.5"><span id="j1OffV"></span></label>
+  </div>
+  <div class="controls">
+    <label>judge centre c <input type="range" id="j1C" min="-7" max="7" step="0.05" value="0.5"><span id="j1CV"></span></label>
+    <label id="j1AL">sup-norm a <input type="range" id="j1A" min="0.02" max="0.9" step="0.01" value="0.57"><span id="j1AV"></span></label>
+    <label id="j1CapL" style="display:none">clip level a′ <input type="range" id="j1Cap" min="0.1" max="6" step="0.1" value="3"><span id="j1CapV"></span></label>
+    <label><input type="checkbox" id="j1Flip" checked> flip the ramp (h → −h)</label>
+    <label><input type="checkbox" id="j1Pure"> ignore the budget: pure Lipschitz-1</label>
+    <label><input type="checkbox" id="j1Any"> also show the best judge of any shape</label>
+    <button id="j1Best">find best ramp</button>
+  </div>
+  <canvas id="j1CvA" height="300"></canvas>
+  <div class="legend"><span class="fill" style="--c:var(--c0)">P</span><span class="fill" style="--c:var(--c1)">Q</span><span style="--c:var(--c2)">your ramp judge h (right axis)</span><span class="dash" style="--c:var(--c3)">best judge of any shape at this budget</span></div>
+  <canvas id="j1CvB" height="170"></canvas>
+  <div class="legend"><span style="--c:var(--ink)">F − G (P's CDF minus Q's)</span><span class="fill" style="--c:var(--c2)">the ramp's sloping window</span></div>
+  <div class="readout" id="j1Read"></div>
+</div>
+<div class="callout">Things to try. On the default preset drag the <b>centre c</b> and watch the gap peak at c = 0.5, halfway between the means; then press <b>find best ramp</b>: the best gap (about 0.343) sits at a ≈ 0.57, well below W<sub>1</sub> = 1, because a ramp with a sup-norm budget can only read a window of width 2a/L from the CDF gap. Tick <b>ignore the budget</b>: the ramp becomes a plain 1-Lipschitz judge, and with the clip level at its largest the gap approaches the difference of the means, which for this pair equals W<sub>1</sub>. Now choose <b>Q two-humped, same mean</b> and tick <b>also show the best judge of any shape</b>. The best ramp earns about half of what a zig-zag judge earns, because the CDF gap has two humps of opposite sign, and a ramp can read only one of them. In the no-budget mode the zig-zag judge (the derivative of h is the sign of G − F) earns exactly W<sub>1</sub>.</div>
+
+<!-- ============================================================ -->
+<h2 id="sep">2. Distance versus separation</h2>
+<p>Move Q away from P and watch five numbers. <b>TV</b> can never exceed 1. <b>Dudley</b> (sup-norm plus Lipschitz constant at most 1) can never exceed 2. <b>MMD</b> with a Gaussian kernel has a ceiling too, and it is set by the bandwidth and the widths of the distributions. <b>W<sub>1</sub></b> and <b>KL</b> keep growing. The first tab shifts N(0, σ²) to N(<i>m</i>, σ²). The second tab uses two point masses, where every number has a closed form and KL is infinite from the first millimetre of separation.</p>
+<div class="widget">
+  <div class="controls">
+    <span class="seg" id="w2Tab"><button data-v="g" class="on">two Gaussians</button><button data-v="p">two point masses</button></span>
+    <label id="w2SL">width σ <input type="range" id="w2S" min="0.05" max="3" step="0.05" value="1"><span id="w2SV"></span></label>
+    <label id="w2ML">shift m <input type="range" id="w2M" min="0" max="6" step="0.02" value="1"><span id="w2MV"></span></label>
+    <label id="w2DL" style="display:none">distance D <input type="range" id="w2D" min="-1.3" max="1.7" step="0.02" value="0"><span id="w2DV"></span></label>
+    <label>MMD kernel bandwidth <input type="range" id="w2K" min="-1" max="1" step="0.02" value="0"><span id="w2KV"></span></label>
+    <label>y up to <span class="seg" id="w2Y"><button data-v="3" class="on">3</button><button data-v="10">10</button></span></label>
+  </div>
+  <canvas id="w2Cv" height="330"></canvas>
+  <div class="legend"><span style="--c:var(--c0)">TV</span><span style="--c:var(--c2)">Dudley (sum norm)</span><span style="--c:var(--c1)">W<sub>1</sub></span><span style="--c:var(--c3)">KL(P‖Q), Gaussians only</span><span style="--c:var(--bad)">MMD, Gaussian kernel</span><span class="dash" style="--c:var(--ink)">ceiling 2 for Dudley</span></div>
+  <div class="readout" id="w2Read"></div>
+</div>
+<div class="callout">Things to try. <b>Gaussians</b>, σ = 1: at m = 1 the four numbers are TV = 0.383, Dudley = 0.343, W<sub>1</sub> = 1, KL = 0.5. Pull m to 6: TV is stuck at 1, Dudley creeps towards 2, W<sub>1</sub> = 6, KL = 18 (off the chart at y ≤ 3). Now lower σ to 0.05 with the shift at 1: the two bumps no longer overlap and the Gaussian curves collapse onto the point-mass curves of the second tab. The Dudley curve becomes 2D/(D + 2), and KL = m²/(2σ²) is enormous. That is the sense in which KL "blows up" and TV "saturates" while W<sub>1</sub> and Dudley keep a geometry. <b>Point masses</b>: Dudley = 2D/(D + 2) is below W<sub>1</sub> = D everywhere, and equals W<sub>1</sub> only in the limit D → 0; it crosses TV at D = 2 and tends to 2 as D grows. The Gaussian-kernel MMD saturates at √2 for any bandwidth. Shrinking the kernel bandwidth pulls the saturation in: the kernel sees separation only at its own length scale.</div>
+
+<!-- ============================================================ -->
+<h2 id="mmd">3. The MMD witness and the bandwidth</h2>
+<p>The judges of MMD are the functions in the unit ball of the kernel's function space. The best one has a closed form: the <b>witness</b> <i>w</i>(<i>t</i>) = (1/<i>n</i>)Σ<sub>i</sub> <i>k</i>(<i>x</i><sub>i</sub>, <i>t</i>) − (1/<i>m</i>)Σ<sub>j</sub> <i>k</i>(<i>y</i><sub>j</sub>, <i>t</i>), the P-sample "kernel density" minus the Q-sample "kernel density" (each sample point drops a Gaussian bump of width σ). Scaled to unit norm it is the judge <i>f</i>* = <i>w</i>/‖<i>w</i>‖, and the gap it earns is MMD = ‖<i>w</i>‖. Blue regions are where the P sample has more mass than Q, orange where Q has more. The lower panel plots the unbiased MMD² estimate for this sample against the bandwidth.</p>
+<div class="widget">
+  <div class="controls">
+    <label>data <select id="m3Preset">
+      <option value="means">means differ: N(0,1) vs N(1.5,1)</option>
+      <option value="width">same mean, Q wider: N(0,1) vs N(0,2²)</option>
+      <option value="humps">same mean and variance, Q two-humped</option>
+      <option value="same">same law: N(0,1) vs N(0,1)</option>
+    </select></label>
+    <label>n per sample <input type="range" id="m3N" min="10" max="100" step="5" value="40"><span id="m3NV"></span></label>
+    <label>bandwidth σ <input type="range" id="m3S" min="-1.3" max="1.3" step="0.02" value="0"><span id="m3SV"></span></label>
+    <button id="m3New">resample</button>
+    <button id="m3Perm">permutation test (500 shuffles)</button>
+  </div>
+  <canvas id="m3CvA" height="270"></canvas>
+  <div class="legend"><span class="fill" style="--c:var(--c0)">w &gt; 0: P heavier</span><span class="fill" style="--c:var(--c1)">w &lt; 0: Q heavier</span><span class="dot" style="--c:var(--c0)">P sample</span><span class="dot" style="--c:var(--c1)">Q sample</span></div>
+  <canvas id="m3CvB" height="190"></canvas>
+  <div class="legend"><span style="--c:var(--ink)">unbiased MMD² of this sample</span><span class="dash" style="--c:var(--c2)">population MMD²</span><span class="dot" style="--c:var(--bad)">current σ</span></div>
+  <div class="readout" id="m3Read"></div>
+</div>
+<div class="callout">Things to try. <b>Means differ</b>: at σ around 1 to 2 the witness is a clean blue-to-orange step and MMD is largest. Drag σ down to 0.05: the witness turns into a spike at every sample point, the population MMD² falls towards zero (the kernel sees nothing beyond its own footprint), and the sample MMD² is just noise. Drag σ up to 20: MMD² ≈ (difference of means)²/σ², so the kernel has become a linear one and sees only the first moment. Switch to <b>same mean, Q wider</b>: the large-σ tail of the bottom curve falls much faster than for the shifted pair, because a Gaussian kernel with a huge bandwidth cannot see a difference in width. <b>Same mean and variance, Q two-humped</b> is harder still: only a mid-range bandwidth finds it. On <b>same law</b> the estimate hovers around zero and the permutation test returns a large p-value. On <b>means differ</b> it sits at its floor, 1/501, at every bandwidth here. On the other two, the p-value depends on σ and on the draw: with 40 points per sample the two-humped pair is often missed, so press <b>resample</b> a few times at σ ≈ 0.5, where the population curve peaks, and again at σ = 3, where it has died away.</div>
+
+</main>
+<script>
+"use strict";
+// ---------------------------------------------------------------- DOM / canvas helpers
+const $ = id => document.getElementById(id);
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+function mulberry(a){ return function(){ a|=0; a=a+0x6D2B79F5|0; let t=Math.imul(a^a>>>15,1|a);
+  t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+function gaussGen(rnd){ let spare=null; return function(){ if(spare!==null){const s=spare; spare=null; return s;}
+  let u=0,v=0; while(u===0) u=rnd(); v=rnd(); const r=Math.sqrt(-2*Math.log(u)); spare=r*Math.sin(2*Math.PI*v); return r*Math.cos(2*Math.PI*v); }; }
+function setup(cv){ const dpr=window.devicePixelRatio||1; if(!cv.dataset.h) cv.dataset.h=cv.getAttribute('height'); const w=cv.clientWidth, h=+cv.dataset.h;
+  cv.width=Math.round(w*dpr); cv.height=Math.round(h*dpr); cv.style.height=h+'px';
+  const ctx=cv.getContext('2d'); ctx.setTransform(dpr,0,0,dpr,0,0); ctx.clearRect(0,0,w,h); return {ctx,w,h}; }
+function fmt(v,d=3){ if(v===Infinity) return '∞'; if(!isFinite(v)) return '—'; const a=Math.abs(v);
+  if(a!==0 && (a<1e-3||a>=1e5)) return v.toExponential(2); return v.toFixed(d); }
+function fmtTick(v){ const a=Math.abs(v); if(a===0) return '0'; return (+v.toPrecision(3)).toString(); }
+function axes(ctx, b, xr, yr, o={}){
+  const X = v => b.x + (v-xr[0])/(xr[1]-xr[0])*b.w;
+  const Y = v => b.y + b.h - (v-yr[0])/(yr[1]-yr[0])*b.h;
+  ctx.save(); ctx.strokeStyle=css('--line'); ctx.lineWidth=1; ctx.strokeRect(b.x,b.y,b.w,b.h);
+  ctx.fillStyle=css('--muted'); ctx.font='11px -apple-system,Segoe UI,sans-serif';
+  ctx.textAlign='right'; ctx.textBaseline='middle';
+  (o.yt||[]).forEach(t=>{ const y=Y(t); ctx.strokeStyle=css('--line'); ctx.setLineDash([3,3]); ctx.beginPath(); ctx.moveTo(b.x,y); ctx.lineTo(b.x+b.w,y); ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillText(fmtTick(t), b.x-4, y); });
+  ctx.textAlign='center'; ctx.textBaseline='top';
+  (o.xt||[]).forEach(t=>{ const x=X(o.xlog?Math.log10(t):t); ctx.strokeStyle=css('--line'); ctx.beginPath(); ctx.moveTo(x,b.y+b.h); ctx.lineTo(x,b.y+b.h+4); ctx.stroke(); ctx.fillText(fmtTick(t), x, b.y+b.h+6); });
+  if(o.xl) ctx.fillText(o.xl, b.x+b.w/2, b.y+b.h+21);
+  if(o.yl){ ctx.save(); ctx.translate(b.x-(o.ylOff||36), b.y+b.h/2); ctx.rotate(-Math.PI/2); ctx.textBaseline='middle'; ctx.fillText(o.yl,0,0); ctx.restore(); }
+  ctx.restore(); return {X,Y};
+}
+function line(ctx, pts, color, w=2, dash=null){ ctx.save(); ctx.strokeStyle=color; ctx.lineWidth=w; if(dash) ctx.setLineDash(dash);
+  ctx.beginPath(); let started=false; for(const [x,y] of pts){ if(!isFinite(x)||!isFinite(y)){started=false; continue;} if(!started){ctx.moveTo(x,y); started=true;} else ctx.lineTo(x,y);} ctx.stroke(); ctx.restore(); }
+function rgba(hex,a){ hex=hex.replace('#',''); if(hex.length===3) hex=hex.split('').map(c=>c+c).join('');
+  return `rgba(${parseInt(hex.slice(0,2),16)},${parseInt(hex.slice(2,4),16)},${parseInt(hex.slice(4,6),16)},${a})`; }
+function fillUnder(ctx, pts, y0, color, alpha){ if(pts.length<2) return; ctx.save(); ctx.fillStyle=rgba(color,alpha); ctx.beginPath();
+  ctx.moveTo(pts[0][0],y0); for(const [x,y] of pts) ctx.lineTo(x,y); ctx.lineTo(pts[pts.length-1][0],y0); ctx.closePath(); ctx.fill(); ctx.restore(); }
+function segVal(id){ const b=$(id).querySelector('button.on'); return b? b.dataset.v : null; }
+function segUI(id, cb){ $(id).querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{
+  $(id).querySelectorAll('button').forEach(x=>x.classList.remove('on')); b.classList.add('on'); cb(); })); }
+
+// ================================================================= CORE (no DOM below until END)
+// Pure functions. selfTest() at the bottom of this block recomputes numbers printed by code/ipm.py
+// (the "Test vectors" section of its output) and reports the largest deviation; the result is shown
+// under the title of this page. Keep this block free of DOM access: it is also run under Node.
+const SQ2=Math.SQRT2, SQ2PI=Math.sqrt(2*Math.PI);
+
+function erf(x){                       // Taylor series for |x| < 2.5, Laplace continued fraction beyond
+  const ax=Math.abs(x); if(ax>6) return x<0?-1:1;
+  if(ax<2.5){ let sum=x, term=x;
+    for(let n=1;n<200;n++){ term*=-x*x/n; const t=term/(2*n+1); sum+=t; if(Math.abs(t)<1e-17*Math.abs(sum)) break; }
+    return 2/Math.sqrt(Math.PI)*sum; }
+  let t=ax; for(let k=60;k>=1;k--) t=ax+(k/2)/t;
+  const erfc=Math.exp(-ax*ax)/(Math.sqrt(Math.PI)*t);
+  return x<0? erfc-1 : 1-erfc;
+}
+const Phi = z => 0.5*(1+erf(z/SQ2));
+const pdfN = z => Math.exp(-0.5*z*z)/SQ2PI;
+const Iphi = z => z*Phi(z)+pdfN(z);                     // antiderivative of Phi
+
+// E clip(X, lo, hi) for X ~ N(mu, s^2)
+function clipMean(mu,s,lo,hi){ const al=(lo-mu)/s, be=(hi-mu)/s;
+  return lo*Phi(al)+hi*(1-Phi(be))+mu*(Phi(be)-Phi(al))-s*(pdfN(be)-pdfN(al)); }
+// E_P h - E_Q h for h(x) = clip(L (x - c), -a, a), P = N(mp, sp^2), Q = N(mq, sq^2)
+function rampGapGauss(mp,sp,mq,sq,c,a,L){ const lo=c-a/L, hi=c+a/L; return L*(clipMean(mp,sp,lo,hi)-clipMean(mq,sq,lo,hi)); }
+const klGauss = (m1,s1,m2,s2) => Math.log(s2/s1)+(s1*s1+(m1-m2)*(m1-m2))/(2*s2*s2)-0.5;
+const tvShift = (m,s) => 2*Phi(Math.abs(m)/(2*s))-1;
+// integral of F - G over the window [m/2 - w/2, m/2 + w/2], P = N(0,s^2), Q = N(m,s^2), m > 0
+function windowArea(m,s,w){ const lo=m/2-w/2, hi=m/2+w/2;
+  return s*(Iphi(hi/s)-Iphi(lo/s)) - s*(Iphi((hi-m)/s)-Iphi((lo-m)/s)); }
+// Dudley distance (||h||_L + ||h||_inf <= 1) of N(0,s^2) and N(m,s^2): max over a of L * windowArea(2a/L).
+// stride > 1 scans a coarser grid first and refines around the best point (same maximiser, faster).
+const NA=1999;
+const aAt = k => 0.0005+(0.9995-0.0005)*k/(NA-1);
+function dudleyShift(m,s,stride=1){
+  m=Math.abs(m); if(m===0) return {v:0,a:0};
+  const val = k => { const a=aAt(k), L=1-a; return L*windowArea(m,s,2*a/L); };
+  let best=-1, bk=0;
+  for(let k=0;k<NA;k+=stride){ const v=val(k); if(v>best){best=v; bk=k;} }
+  if(stride>1) for(let k=Math.max(0,bk-stride);k<=Math.min(NA-1,bk+stride);k++){ const v=val(k); if(v>best){best=v; bk=k;} }
+  return {v:best,a:aAt(bk)};
+}
+const dudleyPoints = D => 2*D/(D+2);
+// MMD^2 for k(x,y) = exp(-(x-y)^2/(2 sig^2)) between N(0,s^2) and N(m,s^2)
+function mmd2Gauss(m,s,sig){ const v=2*s*s, ks=sig/Math.sqrt(sig*sig+v), kc=ks*Math.exp(-m*m/(2*(sig*sig+v))); return 2*ks-2*kc; }
+const mmdShift = (m,s,sig) => Math.sqrt(Math.max(mmd2Gauss(m,s,sig),0));
+// population MMD^2 between Gaussian mixtures [[weight, mean, sd], ...]
+function mmd2PopMix(P,Q,sig){
+  const E=(A,B)=>{ let t=0; for(const [w1,m1,s1] of A) for(const [w2,m2,s2] of B){ const v=s1*s1+s2*s2;
+    t+=w1*w2*sig/Math.sqrt(sig*sig+v)*Math.exp(-(m1-m2)*(m1-m2)/(2*(sig*sig+v))); } return t; };
+  return E(P,P)+E(Q,Q)-2*E(P,Q); }
+
+// ---- grid tools: one fixed grid on [-12, 12], the same as GX in ipm.py
+const GRID={n:961,x0:-12,x1:12}; GRID.dx=(GRID.x1-GRID.x0)/(GRID.n-1);
+GRID.x=new Float64Array(GRID.n); for(let i=0;i<GRID.n;i++) GRID.x[i]=GRID.x0+i*GRID.dx;
+function distArrays(comps){                // pdf, cdf and log-pdf of a Gaussian mixture on the grid
+  const n=GRID.n, p=new Float64Array(n), F=new Float64Array(n), lp=new Float64Array(n), lc=new Array(comps.length);
+  for(let i=0;i<n;i++){ const x=GRID.x[i]; let pp=0, FF=0, mx=-Infinity;
+    comps.forEach(([w,mu,s],k)=>{ const z=(x-mu)/s; pp+=w*Math.exp(-0.5*z*z)/(s*SQ2PI); FF+=w*Phi(z);
+      lc[k]=Math.log(w)-0.5*z*z-Math.log(s*SQ2PI); if(lc[k]>mx) mx=lc[k]; });
+    let se=0; for(let k=0;k<lc.length;k++) se+=Math.exp(lc[k]-mx);
+    p[i]=pp; F[i]=FF; lp[i]=mx+Math.log(se); }
+  return {p,F,lp};
+}
+function metricsGrid(A,B){                 // TV, W1 (= int |F - G|), KL both ways, Kolmogorov
+  let tv=0,w1=0,k1=0,k2=0,kol=0;
+  for(let i=0;i<GRID.n;i++){ tv+=Math.abs(A.p[i]-B.p[i]); const df=Math.abs(A.F[i]-B.F[i]); w1+=df; if(df>kol) kol=df;
+    if(A.p[i]>1e-300) k1+=A.p[i]*(A.lp[i]-B.lp[i]); if(B.p[i]>1e-300) k2+=B.p[i]*(B.lp[i]-A.lp[i]); }
+  const dx=GRID.dx; return {tv:0.5*tv*dx, w1:w1*dx, klPQ:k1*dx, klQP:k2*dx, kol};
+}
+function dGrid(A,B){ const d=new Float64Array(GRID.n); for(let i=0;i<GRID.n;i++) d[i]=(A.p[i]-B.p[i])*GRID.dx; return d; }
+function rampGapGrid(d,c,a,L){ let s=0; const x=GRID.x;
+  for(let i=0;i<x.length;i++){ let h=L*(x[i]-c); if(h>a) h=a; else if(h<-a) h=-a; s+=h*d[i]; } return s; }
+function rampBestGrid(d,a,nc=1601,cmin=-5,cmax=5){ const L=1-a; let best=0, bc=cmin;
+  for(let k=0;k<nc;k++){ const c=cmin+(cmax-cmin)*k/(nc-1), g=Math.abs(rampGapGrid(d,c,a,L)); if(g>best){best=g; bc=c;} }
+  return [best,bc]; }
+// Best judge of ANY shape with |h| <= a and |h_(i+1) - h_i| <= L dx, maximising sum_i h_i d_i (chain dynamic programme
+// over h-levels that are multiples of delta = L dx / j). Same algorithm as best_judge_dp in ipm.py.
+function bestJudgeDP(d,a,L,wantPath){
+  const n=d.length, dx=GRID.dx;
+  const j=Math.max(1,Math.min(6,Math.floor(1250*L*dx/a)));
+  const delta=L*dx/j, K=Math.floor(a/delta), nl=2*K+1;
+  const lev=new Float64Array(nl); for(let k=0;k<nl;k++) lev[k]=(k-K)*delta;
+  let f=new Float64Array(nl), g=new Float64Array(nl);
+  for(let k=0;k<nl;k++) f[k]=d[0]*lev[k];
+  const back = wantPath? new Int16Array(n*nl) : null;
+  for(let i=1;i<n;i++){
+    const di=d[i];
+    for(let k=0;k<nl;k++){
+      let best=f[k], arg=0; const lo=k-j<0?0:k-j, hi=k+j>nl-1?nl-1:k+j;
+      for(let kk=lo;kk<=hi;kk++) if(f[kk]>best){best=f[kk]; arg=kk-k;}
+      g[k]=best+di*lev[k]; if(back) back[i*nl+k]=arg;
+    }
+    const t=f; f=g; g=t;
+  }
+  let kb=0; for(let k=1;k<nl;k++) if(f[k]>f[kb]) kb=k;
+  const val=f[kb]; if(!wantPath) return {val};
+  const h=new Float64Array(n); let k=kb; h[n-1]=lev[k];
+  for(let i=n-1;i>=1;i--){ k+=back[i*nl+k]; h[i-1]=lev[k]; }
+  return {val,h};
+}
+// ---- MMD on samples
+function kmean(A,B,sig){ let s=0; const c=-1/(2*sig*sig);
+  for(let i=0;i<A.length;i++) for(let j=0;j<B.length;j++){ const t=A[i]-B[j]; s+=Math.exp(c*t*t); } return s/(A.length*B.length); }
+function mmd2Biased(X,Y,sig){ return kmean(X,X,sig)+kmean(Y,Y,sig)-2*kmean(X,Y,sig); }
+function mmd2Unbiased(X,Y,sig){ const n=X.length, m=Y.length;
+  const xx=(kmean(X,X,sig)*n*n-n)/(n*(n-1)), yy=(kmean(Y,Y,sig)*m*m-m)/(m*(m-1));
+  return xx+yy-2*kmean(X,Y,sig); }
+function witnessAt(X,Y,sig,t){ const c=-1/(2*sig*sig); let a=0,b=0;
+  for(let i=0;i<X.length;i++){ const u=X[i]-t; a+=Math.exp(c*u*u); }
+  for(let j=0;j<Y.length;j++){ const u=Y[j]-t; b+=Math.exp(c*u*u); }
+  return a/X.length-b/Y.length; }
+
+// ---- self-test against ipm.py ("Test vectors" section of its output)
+const TX=[-1,0,0.5,2], TY=[0.5,1.5,2,3.5];
+const M3_PRE={ means:{P:[[1,0,1]],Q:[[1,1.5,1]]}, width:{P:[[1,0,1]],Q:[[1,0,2]]},
+  humps:{P:[[1,0,1.34164]],Q:[[0.5,-1.2,0.6],[0.5,1.2,0.6]]}, same:{P:[[1,0,1]],Q:[[1,0,1]]} };
+const EXPECT = {                       // key: [value from ipm.py, tolerance]
+  gs_m1_s1_tv:[0.382925,1e-6], gs_m1_s1_kl:[0.5,1e-9], gs_m1_s1_dudley:[0.342711,1e-6], gs_m1_s1_mmd_sig1:[0.421032,1e-6], gs_m1_s1_mmd_sig0p4:[0.335383,1e-6],
+  gs_m3_s0p5_tv:[0.997300,1e-6], gs_m3_s0p5_kl:[18,1e-9], gs_m3_s0p5_dudley:[1.040630,1e-6], gs_m3_s0p5_mmd_sig1:[1.245669,1e-6], gs_m3_s0p5_mmd_sig0p4:[0.991794,1e-6],
+  gs_m0p3_s2_tv:[0.059785,1e-6], gs_m0p3_s2_kl:[0.011250,1e-6], gs_m0p3_s2_dudley:[0.068308,1e-6], gs_m0p3_s2_mmd_sig1:[0.057663,1e-6], gs_m0p3_s2_mmd_sig0p4:[0.039245,1e-6],
+  pts_D1_dudley:[0.666667,1e-6], pts_D5_dudley:[1.428571,1e-6],
+  four_pt_mmd2_biased_sig1:[0.296381,1e-6], four_pt_mmd2_unbiased_sig1:[-0.013221,1e-6], four_pt_mmd2_biased_sig0p5:[0.265570,1e-6],
+  four_pt_witness_sig1_t_m1:[0.390638,1e-6], four_pt_witness_sig1_t0:[0.319923,1e-6], four_pt_witness_sig1_t1:[-0.046142,1e-6],
+  four_pt_witness_sig1_t2:[-0.265176,1e-6], four_pt_witness_sig1_t3:[-0.298926,1e-6], four_pt_witness_sig0p5_t1:[-0.117716,1e-6],
+  ramp_gap_P0_1_Q1p5_0p6_c0p7_a0p5:[-0.549607,1e-6], ramp_gap_grid_same:[-0.549607,5e-4],
+  gs_m1_grid_tv:[0.382925,1e-3], gs_m1_grid_w1:[1.0,1e-3], gs_m1_grid_klPQ:[0.5,1e-3],
+  bimodal_tv:[0.525384,2e-3], bimodal_w1:[0.704094,2e-3], bimodal_kl_pq:[1.158435,2e-3],
+  bimodal_grid_ramp_a0p45:[0.175619,1e-5], bimodal_grid_dp_a0p45:[0.351394,1e-5],
+  shift_m1_grid_dp_a0p57:[0.342634,1e-5], shift_m1_grid_ramp_a0p57:[0.342718,1e-5],
+  mix_pop_mmd2_matches_closed_form:[0.177268,1e-6],
+  preset_means_pop_mmd2_sig1:[0.361087,1e-6], preset_means_pop_mmd2_sig0p3:[0.172754,1e-6],
+  preset_width_pop_mmd2_sig1:[0.094187,1e-6], preset_width_pop_mmd2_sig0p3:[0.047043,1e-6],
+  preset_humps_pop_mmd2_sig1:[0.023105,1e-6], preset_humps_pop_mmd2_sig0p3:[0.037142,1e-6],
+};
+function selfTest(){
+  const got={};
+  for(const [nm,m,s] of [['gs_m1_s1',1,1],['gs_m3_s0p5',3,0.5],['gs_m0p3_s2',0.3,2]]){
+    got[nm+'_tv']=tvShift(m,s); got[nm+'_kl']=klGauss(0,s,m,s); got[nm+'_dudley']=dudleyShift(m,s).v;
+    got[nm+'_mmd_sig1']=mmdShift(m,s,1); got[nm+'_mmd_sig0p4']=mmdShift(m,s,0.4); }
+  got.pts_D1_dudley=dudleyPoints(1); got.pts_D5_dudley=dudleyPoints(5);
+  got.four_pt_mmd2_biased_sig1=mmd2Biased(TX,TY,1); got.four_pt_mmd2_unbiased_sig1=mmd2Unbiased(TX,TY,1); got.four_pt_mmd2_biased_sig0p5=mmd2Biased(TX,TY,0.5);
+  [[-1,'m1'],[0,'0'],[1,'1'],[2,'2'],[3,'3']].forEach(([t,k])=>{ got['four_pt_witness_sig1_t'+(k==='m1'?'_m1':k)]=witnessAt(TX,TY,1,t); });
+  got.four_pt_witness_sig0p5_t1=witnessAt(TX,TY,0.5,1);
+  got.ramp_gap_P0_1_Q1p5_0p6_c0p7_a0p5=rampGapGauss(0,1,1.5,0.6,0.7,0.5,0.5);
+  const A0=distArrays([[1,0,1]]), B1=distArrays([[1,1,1]]), B15=distArrays([[1,1.5,0.6]]);
+  const M=metricsGrid(A0,B1); got.gs_m1_grid_tv=M.tv; got.gs_m1_grid_w1=M.w1; got.gs_m1_grid_klPQ=M.klPQ;
+  got.ramp_gap_grid_same=rampGapGrid(dGrid(A0,B15),0.7,0.5,0.5);
+  const Bb=distArrays([[0.5,-1.5,0.5],[0.5,1.5,0.5]]), Mb=metricsGrid(A0,Bb); got.bimodal_tv=Mb.tv; got.bimodal_w1=Mb.w1; got.bimodal_kl_pq=Mb.klPQ;
+  const db=dGrid(A0,Bb); got.bimodal_grid_ramp_a0p45=rampBestGrid(db,0.45)[0]; got.bimodal_grid_dp_a0p45=bestJudgeDP(db,0.45,0.55,false).val;
+  const ds=dGrid(A0,B1); got.shift_m1_grid_dp_a0p57=bestJudgeDP(ds,0.57,0.43,false).val; got.shift_m1_grid_ramp_a0p57=rampBestGrid(ds,0.57)[0];
+  got.mix_pop_mmd2_matches_closed_form=mmd2PopMix([[1,0,1]],[[1,1,1]],1);
+  for(const nm of ['means','width','humps']){ got['preset_'+nm+'_pop_mmd2_sig1']=mmd2PopMix(M3_PRE[nm].P,M3_PRE[nm].Q,1);
+    got['preset_'+nm+'_pop_mmd2_sig0p3']=mmd2PopMix(M3_PRE[nm].P,M3_PRE[nm].Q,0.3); }
+  let maxRel=0, worst='', bad=0; const n=Object.keys(EXPECT).length;
+  for(const k of Object.keys(EXPECT)){ const [e,tol]=EXPECT[k]; const dev=Math.abs(got[k]-e);
+    if(!(dev<=tol)){ bad++; worst=worst||k+' ('+got[k]+' vs '+e+')'; } if(dev/tol>maxRel) maxRel=dev/tol; }
+  return {n,bad,maxRel,worst,got};
+}
+// ================================================================= END CORE
+
+// ================================================================= 1. the judge
+const J1={cache:{key:''}, best:null, any:{key:'',res:null}};
+function j1Read(){ return { mp:+$('j1Mp').value, sp:+$('j1Sp').value, mq:+$('j1Mq').value, sq:+$('j1Sq').value,
+  shape:$('j1Shape').value, off:+$('j1Off').value, c:+$('j1C').value, a:+$('j1A').value, cap:+$('j1Cap').value,
+  pure:$('j1Pure').checked, any:$('j1Any').checked, flip:$('j1Flip').checked }; }
+function j1Dists(P){
+  const key=[P.mp,P.sp,P.mq,P.sq,P.shape,P.off].join('|');
+  if(J1.cache.key!==key){
+    const cq = P.shape==='g'? [[1,P.mq,P.sq]] : [[0.5,P.mq-P.off,P.sq],[0.5,P.mq+P.off,P.sq]];
+    const A=distArrays([[1,P.mp,P.sp]]), B=distArrays(cq), M=metricsGrid(A,B), d=dGrid(A,B), n=GRID.n;
+    const S=new Float64Array(n);                 // S(x) = integral of (G - F) from -inf to x
+    for(let i=1;i<n;i++) S[i]=S[i-1]+0.5*((B.F[i]-A.F[i])+(B.F[i-1]-A.F[i-1]))*GRID.dx;
+    J1.cache={key,A,B,M,d,S}; J1.best=null; J1.any={key:'',res:null};
+  }
+  return J1.cache;
+}
+function interp(S,x){ const t=(x-GRID.x0)/GRID.dx; if(t<=0) return S[0]; if(t>=GRID.n-1) return S[GRID.n-1];
+  const i=Math.floor(t), f=t-i; return S[i]*(1-f)+S[i+1]*f; }
+function j1Draw(){
+  const P=j1Read();
+  $('j1MpV').textContent=P.mp.toFixed(2); $('j1SpV').textContent=P.sp.toFixed(2); $('j1MqV').textContent=P.mq.toFixed(2);
+  $('j1SqV').textContent=P.sq.toFixed(2); $('j1OffV').textContent=P.off.toFixed(2); $('j1CV').textContent=P.c.toFixed(2);
+  $('j1AV').textContent=P.a.toFixed(2)+' (L = '+(1-P.a).toFixed(2)+')'; $('j1CapV').textContent=P.cap.toFixed(1);
+  $('j1OffL').style.display=P.shape==='b'?'flex':'none';
+  $('j1AL').style.display=P.pure?'none':'flex'; $('j1CapL').style.display=P.pure?'flex':'none';
+  const D=j1Dists(P), {A,B,M,d,S}=D, x=GRID.x, n=GRID.n, dx=GRID.dx;
+  const L=P.pure?1:1-P.a, cap=P.pure?P.cap:P.a;
+  const h=new Float64Array(n); let hmax=0;
+  const sg=P.flip?-1:1;
+  for(let i=0;i<n;i++){ let v=L*(x[i]-P.c); if(v>cap) v=cap; else if(v<-cap) v=-cap; v*=sg; h[i]=v; if(Math.abs(v)>hmax) hmax=Math.abs(v); }
+  let EP=0, EQ=0; for(let i=0;i<n;i++){ EP+=h[i]*A.p[i]; EQ+=h[i]*B.p[i]; } EP*=dx; EQ*=dx;
+  const gap=EP-EQ, lo=P.c-cap/L, hi=P.c+cap/L, rule=sg*L*(interp(S,hi)-interp(S,lo));
+  // best judge of any shape
+  let anyH=null, anyGap=null;
+  if(P.any){
+    if(P.pure){ anyH=new Float64Array(n); let acc=0, mn=0, mx=0; anyH[0]=0;
+      for(let i=1;i<n;i++){ acc+=Math.sign(B.F[i]-A.F[i])*dx; anyH[i]=acc; if(acc<mn) mn=acc; if(acc>mx) mx=acc; }
+      const mid=(mn+mx)/2; let g=0; for(let i=0;i<n;i++){ anyH[i]-=mid; g+=anyH[i]*d[i]; } anyGap=Math.abs(g); }
+    else { const key=D.key+'|'+P.a; if(J1.any.key!==key){ J1.any={key,res:bestJudgeDP(d,P.a,1-P.a,true)}; }
+      anyH=J1.any.res.h; anyGap=J1.any.res.val; }
+  }
+  // ---------- canvas A
+  const {ctx,w,hh}=(()=>{ const s=setup($('j1CvA')); return {ctx:s.ctx,w:s.w,hh:s.h}; })();
+  const xr=[-7.5,7.5]; let ymax=0; for(let i=0;i<n;i++){ ymax=Math.max(ymax,A.p[i],B.p[i]); } ymax=Math.max(0.5,ymax*1.15);
+  let hr=Math.max(1,hmax*1.1); if(anyH){ let m2=0; for(let i=0;i<n;i++) m2=Math.max(m2,Math.abs(anyH[i])); hr=Math.max(hr,m2*1.1); }
+  const b={x:44,y:10,w:w-92,h:hh-40};
+  const ax=axes(ctx,b,xr,[0,ymax],{xt:[-6,-4,-2,0,2,4,6],yt:[0,+(ymax/2).toFixed(2),+ymax.toFixed(2)],xl:'x (one coordinate of an embedding)',yl:'density'});
+  const HY=v=>b.y+b.h/2-v/hr*(b.h/2);
+  ctx.save(); ctx.beginPath(); ctx.rect(b.x,b.y,b.w,b.h); ctx.clip();
+  const sel=arr=>{ const pts=[]; for(let i=0;i<n;i+=2){ if(x[i]<xr[0]-0.2||x[i]>xr[1]+0.2) continue; pts.push([ax.X(x[i]),ax.Y(arr[i])]); } return pts; };
+  fillUnder(ctx,sel(A.p),ax.Y(0),css('--c0'),0.28); fillUnder(ctx,sel(B.p),ax.Y(0),css('--c1'),0.28);
+  line(ctx,sel(A.p),css('--c0'),2); line(ctx,sel(B.p),css('--c1'),2);
+  ctx.setLineDash([2,3]); ctx.strokeStyle=css('--muted'); ctx.beginPath(); ctx.moveTo(b.x,HY(0)); ctx.lineTo(b.x+b.w,HY(0)); ctx.stroke(); ctx.setLineDash([]);
+  const selH=arr=>{ const pts=[]; for(let i=0;i<n;i+=2){ if(x[i]<xr[0]-0.2||x[i]>xr[1]+0.2) continue; pts.push([ax.X(x[i]),HY(arr[i])]); } return pts; };
+  if(anyH) line(ctx,selH(anyH),css('--c3'),2,[6,4]);
+  line(ctx,selH(h),css('--c2'),2.6);
+  ctx.restore();
+  ctx.save(); ctx.fillStyle=css('--c2'); ctx.font='11px -apple-system,Segoe UI,sans-serif'; ctx.textAlign='left'; ctx.textBaseline='middle';
+  [-hr,-hr/2,0,hr/2,hr].forEach(t=>ctx.fillText(fmtTick(+t.toFixed(2)),b.x+b.w+5,HY(t)));
+  ctx.save(); ctx.translate(b.x+b.w+40,b.y+b.h/2); ctx.rotate(Math.PI/2); ctx.textAlign='center'; ctx.fillText('judge h(x)',0,0); ctx.restore(); ctx.restore();
+  // ---------- canvas B
+  const sb=setup($('j1CvB')), c2=sb.ctx; let dm=0; for(let i=0;i<n;i++) dm=Math.max(dm,Math.abs(A.F[i]-B.F[i])); dm=Math.max(0.05,dm*1.15);
+  const bb={x:44,y:8,w:sb.w-92,h:sb.h-38};
+  const ax2=axes(c2,bb,xr,[-dm,dm],{xt:[-6,-4,-2,0,2,4,6],yt:[-dm,0,dm].map(v=>+v.toFixed(2)),xl:'x',yl:'F − G'});
+  c2.save(); c2.beginPath(); c2.rect(bb.x,bb.y,bb.w,bb.h); c2.clip();
+  const dpts=[], wpts=[]; for(let i=0;i<n;i+=2){ if(x[i]<xr[0]-0.2||x[i]>xr[1]+0.2) continue; const v=A.F[i]-B.F[i]; dpts.push([ax2.X(x[i]),ax2.Y(v)]); if(x[i]>=lo&&x[i]<=hi) wpts.push([ax2.X(x[i]),ax2.Y(v)]); }
+  fillUnder(c2,dpts,ax2.Y(0),css('--grey'),0.16); fillUnder(c2,wpts,ax2.Y(0),css('--c2'),0.45);
+  line(c2,dpts,css('--ink'),1.8);
+  [lo,hi].forEach(v=>{ c2.setLineDash([4,3]); c2.strokeStyle=css('--c2'); c2.beginPath(); c2.moveTo(ax2.X(v),bb.y); c2.lineTo(ax2.X(v),bb.y+bb.h); c2.stroke(); c2.setLineDash([]); });
+  c2.restore();
+  // ---------- readout
+  const sgn = gap>=-1e-9? '' : ' (negative: tick "flip the ramp")';
+  const ceil = Math.min(M.w1, 2*M.tv);
+  let html = `E<sub>P</sub>h = <b>${fmt(EP)}</b> · E<sub>Q</sub>h = <b>${fmt(EQ)}</b> · gap E<sub>P</sub>h − E<sub>Q</sub>h = <b>${fmt(gap)}</b>${sgn}`+
+    `<br>this judge: slope L = <b>${fmt(L,2)}</b>, height a = <b>${fmt(Math.min(cap,hmax),2)}</b> `+(P.pure? `<span class="small">(budget ignored: only the Lipschitz constant is held at 1)</span>` : `(L + a = ${fmt(L+P.a,2)} ≤ 1: inside the Dudley ball)`)+
+    `<br>window rule: L × (area of G − F over the sloping window [${fmt(lo,2)}, ${fmt(hi,2)}]) = <b>${fmt(rule)}</b> (same number, read off the lower panel)`;
+  if(J1.best && J1.best.key===D.key+'|'+P.pure) html+=`<br>best ramp (sweep): gap <b class="good">${fmt(J1.best.gap)}</b> at ${P.pure?'clip level a′':'a'} = ${fmt(J1.best.a,2)}, c = ${fmt(J1.best.c,2)}`;
+  if(anyGap!==null) html+=`<br>best judge of any shape ${P.pure?'with Lipschitz constant 1 (h′ = sign(G − F))':'at this budget'}: gap <b class="good">${fmt(anyGap)}</b>`+(P.pure?` = W<sub>1</sub>`:` (grid dynamic programme)`);
+  html+=`<br>exact distances for this pair (numerical integration on a 961-point grid): W<sub>1</sub> = <b>${fmt(M.w1)}</b> · TV = <b>${fmt(M.tv)}</b> (2TV = ${fmt(2*M.tv)}) · Kolmogorov = ${fmt(M.kol)} · KL(P‖Q) = <b>${fmt(M.klPQ)}</b> · KL(Q‖P) = ${fmt(M.klQP)}`+
+    `<br>ceiling for the Dudley distance of this pair: min(W<sub>1</sub>, 2TV) = <b>${fmt(ceil)}</b>`;
+  $('j1Read').innerHTML=html;
+}
+function j1Best(){
+  const P=j1Read(), D=j1Dists(P), d=D.d; let best={gap:0,a:0,c:0};
+  const as=[]; if(P.pure){ for(let a=0.1;a<=6.0001;a+=0.1) as.push(a); } else { for(let a=0.02;a<=0.9001;a+=0.01) as.push(a); }
+  for(const a of as){ const L=P.pure?1:1-a, cap=a;
+    for(let c=-7;c<=7.0001;c+=0.05){ const g0=rampGapGrid(d,c,cap,L), g=Math.abs(g0); if(g>best.gap) best={gap:g,a,c,flip:g0<0}; } }
+  // orient the ramp so that the shown gap is positive (h decreasing where P is on the left)
+  const c=Math.round(best.c*20)/20, a=Math.round(best.a*100)/100;
+  J1.best={key:D.key+'|'+P.pure, gap:best.gap, a:P.pure?Math.round(best.a*10)/10:a, c};
+  $('j1C').value=c; $('j1Flip').checked=best.flip; if(P.pure) $('j1Cap').value=Math.round(best.a*10)/10; else $('j1A').value=a;
+  j1Draw();
+}
+const J1_PRESETS={ shift:{mp:0,sp:1,mq:1,sq:1,shape:'g',off:1.5,c:0.5,a:0.57,flip:true}, wide:{mp:0,sp:1,mq:0.5,sq:1.5,shape:'g',off:1.5,c:0.3,a:0.5,flip:true},
+  bump:{mp:0,sp:1,mq:0,sq:0.5,shape:'b',off:1.5,c:-1.0,a:0.45,flip:false}, far:{mp:-1.5,sp:0.4,mq:1.5,sq:0.4,shape:'g',off:1.5,c:0,a:0.6,flip:true} };
+function j1UI(){
+  ['j1Mp','j1Sp','j1Mq','j1Sq','j1Off','j1C','j1A','j1Cap','j1Shape','j1Pure','j1Any','j1Flip'].forEach(id=>$(id).addEventListener('input',()=>j1Draw()));
+  $('j1Preset').addEventListener('input',()=>{ const p=J1_PRESETS[$('j1Preset').value]; $('j1Mp').value=p.mp; $('j1Sp').value=p.sp; $('j1Mq').value=p.mq; $('j1Sq').value=p.sq;
+    $('j1Shape').value=p.shape; $('j1Off').value=p.off; $('j1C').value=p.c; $('j1A').value=p.a; $('j1Flip').checked=p.flip; j1Draw(); });
+  $('j1Best').onclick=j1Best; j1Draw();
+}
+
+// ================================================================= 2. distance vs separation
+const W2={tab:'g',ymax:3};
+function w2Draw(){
+  const g=W2.tab==='g', s=+$('w2S').value, kb=Math.pow(10,+$('w2K').value), ym=+segVal('w2Y'); W2.ymax=ym;
+  $('w2SL').style.display=g?'flex':'none'; $('w2ML').style.display=g?'flex':'none'; $('w2DL').style.display=g?'none':'flex';
+  const m=+$('w2M').value, D=Math.pow(10,+$('w2D').value);
+  $('w2SV').textContent=s.toFixed(2); $('w2MV').textContent=m.toFixed(2); $('w2DV').textContent=D.toFixed(3); $('w2KV').textContent=kb.toFixed(2);
+  const {ctx,w,h}=setup($('w2Cv')); const b={x:46,y:12,w:w-62,h:h-44};
+  let xr, xt, ax, xs;
+  if(g){ xr=[0,6]; xt=[0,1,2,3,4,5,6]; ax=axes(ctx,b,xr,[0,ym],{xt,yt:ym===3?[0,1,2,3]:[0,2,4,6,8,10],xl:'shift m between the two means',yl:'distance'}); }
+  else { xr=[Math.log10(0.05),Math.log10(50)]; xt=[0.05,0.1,0.5,1,5,10,50]; ax=axes(ctx,b,xr,[0,ym],{xt,xlog:true,yt:ym===3?[0,1,2,3]:[0,2,4,6,8,10],xl:'distance D between the two point masses (log scale)',yl:'distance'}); }
+  ctx.save(); ctx.beginPath(); ctx.rect(b.x,b.y,b.w,b.h); ctx.clip();
+  // ceiling at 2
+  ctx.setLineDash([5,4]); ctx.strokeStyle=css('--ink'); ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(b.x,ax.Y(2)); ctx.lineTo(b.x+b.w,ax.Y(2)); ctx.stroke(); ctx.setLineDash([]);
+  const N=140, pts={tv:[],du:[],w1:[],kl:[],mm:[]};
+  for(let k=0;k<=N;k++){
+    if(g){ const mm=xr[1]*k/N; const X=ax.X(mm);
+      pts.tv.push([X,ax.Y(tvShift(mm,s))]); pts.du.push([X,ax.Y(dudleyShift(mm,s,8).v)]); pts.w1.push([X,ax.Y(mm)]);
+      pts.kl.push([X,ax.Y(mm*mm/(2*s*s))]); pts.mm.push([X,ax.Y(mmdShift(mm,s,kb))]); }
+    else { const lg=xr[0]+(xr[1]-xr[0])*k/N, Dd=Math.pow(10,lg), X=ax.X(lg);
+      pts.tv.push([X,ax.Y(1)]); pts.du.push([X,ax.Y(dudleyPoints(Dd))]); pts.w1.push([X,ax.Y(Dd)]);
+      pts.mm.push([X,ax.Y(Math.sqrt(2-2*Math.exp(-Dd*Dd/(2*kb*kb))))]); }
+  }
+  line(ctx,pts.w1,css('--c1'),2.2); if(g) line(ctx,pts.kl,css('--c3'),2.2); line(ctx,pts.mm,css('--bad'),2.2); line(ctx,pts.du,css('--c2'),2.6); line(ctx,pts.tv,css('--c0'),2.6);
+  // marker
+  let read;
+  if(g){ const X=ax.X(m); ctx.setLineDash([3,3]); ctx.strokeStyle=css('--muted'); ctx.beginPath(); ctx.moveTo(X,b.y); ctx.lineTo(X,b.y+b.h); ctx.stroke(); ctx.setLineDash([]);
+    const du=dudleyShift(m,s), tv=tvShift(m,s), kl=m*m/(2*s*s), mm=mmdShift(m,s,kb);
+    [[tv,'--c0'],[du.v,'--c2'],[m,'--c1'],[kl,'--c3'],[mm,'--bad']].forEach(([v,c])=>{ ctx.fillStyle=css(c); ctx.beginPath(); ctx.arc(X,ax.Y(v),4,0,2*Math.PI); ctx.fill(); });
+    read=`N(0, ${s.toFixed(2)}²) vs N(${m.toFixed(2)}, ${s.toFixed(2)}²): TV = <b>${fmt(tv)}</b> · Dudley = <b>${fmt(du.v)}</b> (best a = ${fmt(du.a,2)}, L = ${fmt(1-du.a,2)}) · W<sub>1</sub> = <b>${fmt(m)}</b> · KL = m²/(2σ²) = <b>${fmt(kl)}</b> · MMD = <b>${fmt(mm)}</b> (bandwidth ${kb.toFixed(2)})`+
+      `<br>ratios: Dudley / W<sub>1</sub> = ${m>0?fmt(du.v/m):'—'} · Dudley / (2TV) = ${tv>0?fmt(du.v/(2*tv)):'—'} · MMD is limited by its own ceiling √(2·bw / √(bw² + 2σ²)) = ${fmt(Math.sqrt(2*kb/Math.sqrt(kb*kb+2*s*s)))}`;
+  } else { const lg=+$('w2D').value, X=ax.X(lg); ctx.setLineDash([3,3]); ctx.strokeStyle=css('--muted'); ctx.beginPath(); ctx.moveTo(X,b.y); ctx.lineTo(X,b.y+b.h); ctx.stroke(); ctx.setLineDash([]);
+    const du=dudleyPoints(D), mm=Math.sqrt(2-2*Math.exp(-D*D/(2*kb*kb)));
+    [[1,'--c0'],[du,'--c2'],[D,'--c1'],[mm,'--bad']].forEach(([v,c])=>{ ctx.fillStyle=css(c); ctx.beginPath(); ctx.arc(X,ax.Y(v),4,0,2*Math.PI); ctx.fill(); });
+    const a=D/(D+2), L=2/(D+2);
+    read=`δ<sub>0</sub> vs δ<sub>${D.toFixed(3)}</sub>: TV = <b>1</b> · Dudley = 2D/(D + 2) = <b>${fmt(du)}</b> · W<sub>1</sub> = D = <b>${fmt(D)}</b> · KL = <b>∞</b> · MMD = <b>${fmt(mm)}</b> (bandwidth ${kb.toFixed(2)}; ceiling √2 = 1.414)`+
+      `<br>the best judge has height a = D/(D + 2) = ${fmt(a)} and slope L = 2/(D + 2) = ${fmt(L)}; its slope window is 2a/L = ${fmt(2*a/L)} = D wide, so it separates the two points by min(2a, L·D) = ${fmt(Math.min(2*a,L*D))}`;
+  }
+  ctx.restore();
+  if(!g){ ctx.save(); ctx.fillStyle=css('--c3'); ctx.font='12px -apple-system,Segoe UI,sans-serif'; ctx.textAlign='left'; ctx.fillText('KL(P‖Q) = ∞ for every D > 0 (not drawn)',b.x+8,b.y+16); ctx.restore(); }
+  $('w2Read').innerHTML=read;
+}
+function w2UI(){
+  segUI('w2Tab',()=>{ W2.tab=segVal('w2Tab'); w2Draw(); }); segUI('w2Y',w2Draw);
+  ['w2S','w2M','w2D','w2K'].forEach(id=>$(id).addEventListener('input',w2Draw)); w2Draw();
+}
+
+// ================================================================= 3. MMD witness
+const M3={X:[],Y:[],seed:1,perm:null,cache:null};
+function m3Draw1(comps,rnd,gs){ const u=rnd(); let acc=0; for(const [w,mu,s] of comps){ acc+=w; if(u<=acc) return mu+s*gs(); } const l=comps[comps.length-1]; return l[1]+l[2]*gs(); }
+function m3Sample(){ const pre=M3_PRE[$('m3Preset').value], n=+$('m3N').value, rnd=mulberry(M3.seed*104729+n), gs=gaussGen(rnd);
+  M3.X=[]; M3.Y=[]; for(let i=0;i<n;i++) M3.X.push(m3Draw1(pre.P,rnd,gs)); for(let i=0;i<n;i++) M3.Y.push(m3Draw1(pre.Q,rnd,gs)); M3.perm=null; M3.cache=null; }
+function m3Curve(sigGrid){ return sigGrid.map(s=>mmd2Unbiased(M3.X,M3.Y,s)); }
+function m3Draw(){
+  const sig=Math.pow(10,+$('m3S').value), n=+$('m3N').value, pre=M3_PRE[$('m3Preset').value];
+  $('m3SV').textContent=sig.toFixed(2); $('m3NV').textContent=n;
+  if(M3.X.length!==n) m3Sample();
+  const X=M3.X, Y=M3.Y;
+  const mb=mmd2Biased(X,Y,sig), mu=mmd2Unbiased(X,Y,sig), pop=mmd2PopMix(pre.P,pre.Q,sig), mmd=Math.sqrt(Math.max(mb,0));
+  // witness on a grid
+  const xr=[-6,6], T=[]; for(let k=0;k<=360;k++) T.push(xr[0]+(xr[1]-xr[0])*k/360);
+  const wv=T.map(t=>witnessAt(X,Y,sig,t)); let wm=0; wv.forEach(v=>{ if(Math.abs(v)>wm) wm=Math.abs(v); }); wm=Math.max(wm*1.2,0.05);
+  const {ctx,w,h}=setup($('m3CvA')); const b={x:46,y:10,w:w-62,h:h-42};
+  const ax=axes(ctx,b,xr,[-wm,wm],{xt:[-6,-4,-2,0,2,4,6],yt:[-wm,0,wm].map(v=>+v.toFixed(2)),xl:'t',yl:'witness w(t)'});
+  ctx.save(); ctx.beginPath(); ctx.rect(b.x,b.y,b.w,b.h); ctx.clip();
+  const pos=T.map((t,i)=>[ax.X(t),ax.Y(Math.max(wv[i],0))]), neg=T.map((t,i)=>[ax.X(t),ax.Y(Math.min(wv[i],0))]);
+  fillUnder(ctx,pos,ax.Y(0),css('--c0'),0.4); fillUnder(ctx,neg,ax.Y(0),css('--c1'),0.4);
+  line(ctx,T.map((t,i)=>[ax.X(t),ax.Y(wv[i])]),css('--ink'),1.8);
+  const rugY=(y)=>b.y+b.h-y;
+  X.forEach(v=>{ ctx.fillStyle=css('--c0'); ctx.beginPath(); ctx.arc(ax.X(v),rugY(8),3,0,2*Math.PI); ctx.fill(); });
+  Y.forEach(v=>{ ctx.fillStyle=css('--c1'); ctx.beginPath(); ctx.arc(ax.X(v),rugY(18),3,0,2*Math.PI); ctx.fill(); });
+  ctx.restore();
+  // bottom: unbiased MMD^2 against bandwidth
+  const sg=[]; for(let k=0;k<=40;k++) sg.push(Math.pow(10,-1.3+2.6*k/40));
+  if(!M3.cache) M3.cache={sg,u:m3Curve(sg),p:sg.map(s=>mmd2PopMix(pre.P,pre.Q,s))};
+  const C=M3.cache; let ymax=0.02, ymin=-0.02; C.u.forEach(v=>{ ymax=Math.max(ymax,v); ymin=Math.min(ymin,v); }); C.p.forEach(v=>{ ymax=Math.max(ymax,v); }); ymax*=1.15; ymin*=1.15;
+  const s2=setup($('m3CvB')), c2=s2.ctx, bb={x:46,y:8,w:s2.w-62,h:s2.h-40};
+  const ax2=axes(c2,bb,[-1.3,1.3],[ymin,ymax],{xt:[0.1,0.3,1,3,10,20],xlog:true,yt:[0,ymax].map(v=>+v.toFixed(3)),xl:'bandwidth σ (log scale)',yl:'MMD²',ylOff:40});
+  c2.save(); c2.beginPath(); c2.rect(bb.x,bb.y,bb.w,bb.h); c2.clip();
+  c2.setLineDash([2,3]); c2.strokeStyle=css('--muted'); c2.beginPath(); c2.moveTo(bb.x,ax2.Y(0)); c2.lineTo(bb.x+bb.w,ax2.Y(0)); c2.stroke(); c2.setLineDash([]);
+  line(c2,C.sg.map((s,i)=>[ax2.X(Math.log10(s)),ax2.Y(C.p[i])]),css('--c2'),2,[6,4]);
+  line(c2,C.sg.map((s,i)=>[ax2.X(Math.log10(s)),ax2.Y(C.u[i])]),css('--ink'),2);
+  c2.fillStyle=css('--bad'); c2.beginPath(); c2.arc(ax2.X(Math.log10(sig)),ax2.Y(mu),5,0,2*Math.PI); c2.fill();
+  c2.restore();
+  // readout: gap of the normalised witness = MMD (biased) exactly
+  let ma=0; for(const t of X) ma+=witnessAt(X,Y,sig,t); let mb2=0; for(const t of Y) mb2+=witnessAt(X,Y,sig,t);
+  const idg=(ma/X.length-mb2/Y.length);       // = ||w||^2 = biased MMD^2
+  let sup=0; wv.forEach(v=>{ if(Math.abs(v)>sup) sup=Math.abs(v); });
+  let html=`bandwidth σ = <b>${sig.toFixed(3)}</b> · biased MMD² = <b>${fmt(mb,4)}</b> (MMD = ${fmt(mmd,4)}) · unbiased MMD² = <b>${fmt(mu,4)}</b> · population MMD² for these laws = <b>${fmt(pop,4)}</b>`+
+    `<br>identity check: (mean of w over the P sample) − (mean of w over the Q sample) = ${fmt(idg,4)} = ‖w‖² = biased MMD². So the normalised witness f* = w/‖w‖ earns E<sub>P</sub>f* − E<sub>Q</sub>f* = ${fmt(idg/Math.sqrt(Math.max(idg,1e-300)),4)} = MMD, and no other function of RKHS norm 1 does better.`+
+    `<br>largest |w| = ${fmt(sup,3)} on the plotted range; the unbiased estimate can be negative (it is centred on the truth, not forced positive).`;
+  if(M3.perm) html+=`<br>permutation test (500 random re-labellings of the pooled sample, biased MMD² as the statistic, σ = ${M3.perm.sig.toFixed(3)}): p = <b>${fmt(M3.perm.p,3)}</b>${M3.perm.sig!==sig?' <span class="small">(computed at a different σ; press again)</span>':''}`;
+  $('m3Read').innerHTML=html;
+}
+function m3Perm(){
+  const sig=Math.pow(10,+$('m3S').value), X=M3.X, Y=M3.Y, Z=X.concat(Y), N=Z.length, n=X.length, m=Y.length, c=-1/(2*sig*sig);
+  const K=new Float64Array(N*N); for(let i=0;i<N;i++) for(let j=0;j<N;j++){ const t=Z[i]-Z[j]; K[i*N+j]=Math.exp(c*t*t); }
+  const stat=idx=>{ let sxx=0,syy=0,sxy=0; for(let i=0;i<n;i++){ const a=idx[i]; for(let j=0;j<n;j++) sxx+=K[a*N+idx[j]]; for(let j=n;j<N;j++) sxy+=K[a*N+idx[j]]; }
+    for(let i=n;i<N;i++){ const a=idx[i]; for(let j=n;j<N;j++) syy+=K[a*N+idx[j]]; } return sxx/(n*n)+syy/(m*m)-2*sxy/(n*m); };
+  const idx=Array.from({length:N},(_,i)=>i), obs=stat(idx), rnd=mulberry(12345+M3.seed); let ge=0; const R=500;
+  for(let r=0;r<R;r++){ for(let i=N-1;i>0;i--){ const j=Math.floor(rnd()*(i+1)); const t=idx[i]; idx[i]=idx[j]; idx[j]=t; } if(stat(idx)>=obs-1e-12) ge++; }
+  M3.perm={p:(1+ge)/(1+R),sig}; m3Draw();
+}
+function m3UI(){
+  $('m3Preset').addEventListener('input',()=>{ m3Sample(); m3Draw(); });
+  $('m3N').addEventListener('input',()=>{ m3Sample(); m3Draw(); });
+  $('m3S').addEventListener('input',m3Draw);
+  $('m3New').onclick=()=>{ M3.seed++; m3Sample(); m3Draw(); }; $('m3Perm').onclick=m3Perm;
+  m3Sample(); m3Draw();
+}
+
+// ---------------------------------------------------------------- boot
+function redrawAll(){ j1Draw(); w2Draw(); m3Draw(); }
+j1UI(); w2UI(); m3UI();
+(function(){ const r=selfTest(), el=$('selfcheck');
+  el.innerHTML = r.bad===0 ? `Self-check against code/ipm.py: ${r.n} numbers recomputed here, all within tolerance (worst deviation is ${(r.maxRel*100).toFixed(1)}% of its tolerance).`
+    : `<span class="bad" style="color:var(--bad)">Self-check FAILED for ${r.bad} of ${r.n} numbers, first: ${r.worst}</span>`; })();
+let rsT=null; window.addEventListener('resize',()=>{ clearTimeout(rsT); rsT=setTimeout(redrawAll,150); });
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change',redrawAll);
+</script>
+</body>
+</html>
