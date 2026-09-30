@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Coupled Transfer Distance, Interactive</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/contrib/auto-render.min.js"></script>
+<style>
+:root{
+  --bg:#fbfaf7; --surface:#ffffff; --ink:#1c1d21; --muted:#5b5f68; --line:#e2dfd8; --soft:#f2f0ea;
+  --c0:#2f6fb5; --c1:#c2571a; --c2:#0f7a5a; --c3:#7c3aed; --bad:#b42318; --grey:#8a8880;
+  --radius:12px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#131417; --surface:#1b1d21; --ink:#ebebed; --muted:#a3a6ae; --line:#2e3138; --soft:#23262b;
+    --c0:#3d8ad8; --c1:#d8733a; --c2:#4cc79a; --c3:#b48cff; --bad:#ff7a6b; --grey:#8f9199;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#131417; --surface:#1b1d21; --ink:#ebebed; --muted:#a3a6ae; --line:#2e3138; --soft:#23262b;
+  --c0:#3d8ad8; --c1:#d8733a; --c2:#4cc79a; --c3:#b48cff; --bad:#ff7a6b; --grey:#8f9199;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,sans-serif;}
+main{max-width:900px;margin:0 auto;padding:40px 16px 80px}
+h1{font-size:2.05rem;line-height:1.2;margin:0 0 .4rem;letter-spacing:-.01em}
+h2{font-size:1.38rem;margin:3rem 0 .6rem;padding-top:.5rem;border-top:1px solid var(--line)}
+p{margin:.6rem 0}
+a{color:var(--c0)}
+code{font-size:.9em}
+.lede{color:var(--muted);font-size:1.05rem;margin-bottom:1.4rem}
+nav.toc{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:12px 18px;font-size:.93rem}
+nav.toc ol{margin:.3rem 0;padding-left:1.2rem}
+nav.toc a{color:var(--ink);text-decoration:none;border-bottom:1px dotted var(--muted)}
+.widget{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:14px;margin:1rem 0 1.2rem}
+.controls{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;margin:.2rem 0 .6rem;font-size:.9rem}
+.controls label{display:flex;align-items:center;gap:6px;color:var(--muted)}
+.controls output{color:var(--ink);font-variant-numeric:tabular-nums;min-width:3.2em}
+button,select{font:inherit;font-size:.88rem;color:var(--ink);background:var(--soft);border:1px solid var(--line);border-radius:8px;padding:5px 11px;cursor:pointer}
+button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+input[type=range]{accent-color:var(--c0);width:140px}
+.readout{font-size:.9rem;color:var(--muted);margin-top:.5rem;font-variant-numeric:tabular-nums}
+.readout b{color:var(--ink);font-weight:600}
+.readout .bad{color:var(--bad);font-weight:600}
+.readout .good{color:var(--c2);font-weight:600}
+.callout{border-left:3px solid var(--c2);background:var(--soft);padding:10px 14px;border-radius:0 8px 8px 0;margin:1rem 0;font-size:.95rem}
+.canvas-wrap{position:relative}
+canvas{display:block;width:100%;touch-action:none}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:680px){.grid2{grid-template-columns:1fr}}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:.82rem;color:var(--muted);margin:.3rem 0 0}
+.legend > span::before{content:"";display:inline-block;width:16px;height:3px;margin-right:6px;vertical-align:3px;background:var(--c)}
+.legend > span.dash::before{background:repeating-linear-gradient(90deg,var(--c) 0 5px,transparent 5px 8px)}
+.legend > span.fill::before{height:9px;vertical-align:0;opacity:.45}
+.small{font-size:.86rem;color:var(--muted)}
+table.mini{border-collapse:collapse;font-size:.86rem;margin:.4rem 0;font-variant-numeric:tabular-nums}
+table.mini td,table.mini th{padding:2px 12px 2px 0;text-align:left;border-bottom:1px solid var(--line)}
+table.mini th{color:var(--muted);font-weight:500}
+@media (max-width:600px){ h1{font-size:1.7rem} input[type=range]{width:110px} }
+</style>
+</head>
+<body>
+<main>
+
+<h1>Coupled Transfer Distance, Interactive</h1>
+<p class="lede"><a href="../index.html">← text notes</a> · Gao &amp; Chaudhari, <i>An Information-Geometric Distance on the Space of Tasks</i> (ICML 2021). Eight widgets. The numerical ones recompute, in your browser, the same quantities as the scripts in <code>code/</code>; the toy transfer problem is the one in <code>transfer_toy.py</code>.</p>
+
+<nav class="toc"><b>Contents</b>
+<ol>
+  <li><a href="#ruler">The ruler: what one step costs (eq. 2)</a></li>
+  <li><a href="#simplex">Distances between predictions live on a sphere</a></li>
+  <li><a href="#jensen">Where the average over x sits: eq. (5) against eq. (11)</a></li>
+  <li><a href="#toy">Moving a task, and the weights that follow it (Remark 1)</a></li>
+  <li><a href="#kappa">How fast the weights learn, and asymmetry (Remarks 1, 3)</a></li>
+  <li><a href="#emp">The empirical Fisher in eq. (21)</a></li>
+  <li><a href="#bound">Theorem 6 as printed, and with N</a></li>
+  <li><a href="#mantel">Re-running the Mantel tests of Figures 2 and 3</a></li>
+</ol></nav>
+
+<!-- ============================================================ -->
+<h2 id="ruler">1. The ruler: what one step costs</h2>
+<p>Two classifiers are close if they <i>predict</i> alike, not if their weights are close. For a binary classifier with logit $z$ and $p=\sigma(z)$, moving the logit by $\delta$ costs $2\,\mathrm{KL}(p_z\Vert p_{z+\delta})$, and for a small step this is $\delta^2\,p(1-p)$: the Fisher information of a coin. A confident classifier ($p$ near 0 or 1) barely changes its predictions when its logit moves; one at $p=\tfrac12$ changes the most.</p>
+<div class="widget">
+  <div class="controls">
+    <label>current logit $z_0$ <input type="range" id="rZ" min="-6" max="6" step="0.05" value="0"><output id="rZV"></output></label>
+    <label>step $\delta$ <input type="range" id="rD" min="-4" max="4" step="0.05" value="1"><output id="rDV"></output></label>
+  </div>
+  <div class="grid2">
+    <div class="canvas-wrap"><canvas id="rC0" height="250"></canvas></div>
+    <div class="canvas-wrap"><canvas id="rC1" height="250"></canvas></div>
+  </div>
+  <div class="legend"><span style="--c:var(--c0)">exact $2\,\mathrm{KL}$</span><span class="dash" style="--c:var(--c1)">quadratic $\delta^2p(1-p)$</span></div>
+  <div class="readout" id="rRead"></div>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="simplex">2. Distances between predictions live on a sphere</h2>
+<p>For a three-class softmax the Fisher–Rao distance is $d(p,q)=2\arccos\sum_i\sqrt{p_iq_i}$ (the sphere of radius 2, seen through $u=\sqrt p$). Drag the two points. The blue curve is the geodesic; the dashed circle is every prediction at the same Fisher–Rao distance from the blue point, so it passes through the orange one. Near an edge the circle is squashed, and it stops at the edge: a small change in a rare class is expensive.</p>
+<div class="widget">
+  <div class="canvas-wrap"><canvas id="tC" height="380"></canvas></div>
+  <div class="legend"><span style="--c:var(--c0)">geodesic</span><span class="dash" style="--c:var(--c1)">ball through the orange point</span></div>
+  <div class="readout" id="tRead"></div>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="jensen">3. Where the average over x sits</h2>
+<p>The Fisher matrix (3) averages the KL over the inputs <i>inside</i> the square root, $A=\int\sqrt{\mathbb E_x[2\mathrm{KL}_x]}$. Definition 2 averages the square root, $B=\mathbb E_x\int\sqrt{2\mathrm{KL}_x}$. Take a logistic model whose weights move in a straight line from $(1,0)$ to $(a_1,b_1)$, with inputs $x\sim N(0,\sigma_x^2)$. In the extreme where a fraction $f$ of the inputs feel the change and the rest are saturated and feel nothing, $B/A=\sqrt f$; in between it lies between $\sqrt f$ and 1 (Jensen).</p>
+<div class="widget">
+  <div class="controls">
+    <label>input spread $\sigma_x$ <input type="range" id="jS" min="0.3" max="8" step="0.1" value="3"><output id="jSV"></output></label>
+    <label>final slope $a_1$ <input type="range" id="jA" min="1.2" max="8" step="0.1" value="3"><output id="jAV"></output></label>
+    <label>final bias $b_1$ <input type="range" id="jB" min="-4" max="4" step="0.1" value="0"><output id="jBV"></output></label>
+  </div>
+  <div class="canvas-wrap"><canvas id="jC" height="230"></canvas></div>
+  <div class="legend"><span class="fill" style="--c:var(--grey)">density of $x$</span><span style="--c:var(--c0)">how much a logit step at $x$ changes the prediction, $\sqrt{p(1-p)}$ (final weights)</span></div>
+  <div class="readout" id="jRead"></div>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="toy">4. Moving a task, and the weights that follow it</h2>
+<p>A toy transfer problem in one dimension. The source has a class at $-2$ and a class at $+2$ (sd 1); the target is the same task translated by $s$. The classifier is logistic regression $\sigma(w_1x+w_0)$, and the weights follow the <i>minimiser</i> at each instant $\tau$ (the limit of eq. 10 for infinitely fast learning). <b>Displacement</b> moves each class by optimal transport; <b>mixture</b> draws from the source with probability $1-\tau$ and from the target otherwise (eq. 9). The pictures show the task at time $\tau$; the tables show the three lengths $A$, $B$ and $TV$ (see the notes) of the whole path.</p>
+<div class="widget">
+  <div class="controls">
+    <label>translation $s$ <input type="range" id="mS" min="0" max="8" step="0.25" value="4"><output id="mSV"></output></label>
+    <label>time $\tau$ <input type="range" id="mT" min="0" max="1" step="0.01" value="0.5"><output id="mTV"></output></label>
+    <span><button id="mKd" class="on">displacement</button> <button id="mKm">mixture</button></span>
+  </div>
+  <div class="grid2">
+    <div class="canvas-wrap"><canvas id="mC0" height="260"></canvas></div>
+    <div class="canvas-wrap"><canvas id="mC1" height="260"></canvas></div>
+    <div class="canvas-wrap"><canvas id="mC2" height="220"></canvas></div>
+    <div class="canvas-wrap"><canvas id="mC3" height="220"></canvas></div>
+  </div>
+  <div class="legend"><span style="--c:var(--c0)">displacement</span><span style="--c:var(--c1)">mixture</span></div>
+  <div class="readout" id="mRead"></div>
+</div>
+<div class="callout">For $s\gtrsim1$ the mixture path is longer by $B$ and by $TV$, as Remark 1 says. By the Riemannian length $A$ it is longer only up to about $s=4$; for large $s$ it is <i>shorter</i>, because the mixture's minimiser goes through a much flatter classifier (its slope falls from 4 to 0.8 at $s=4$ and to 0.2 at $s=8$) whose predictions are cheap to move. Remark 1 is an expectation, not a theorem.</div>
+
+<!-- ============================================================ -->
+<h2 id="kappa">5. How fast the weights learn, and asymmetry</h2>
+<p>Eq. (10) follows the task with SGD; in the population limit that is $\dot w=-\kappa\nabla L_\tau(w)$, where $\kappa$ is the number of steps times the learning rate. Here the tasks move along a <b>displacement</b> path. For small $\kappa$ the weights barely move: the path is short and the fit is bad. The <i>minimiser</i> path is exactly reversible, so forward and backward lengths agree; the SGD path is not, and the two directions differ until $\kappa$ is very large.</p>
+<div class="widget">
+  <div class="controls">
+    <label>pair <select id="kP"><option value="shift">source → source translated by 4</option><option value="sharp">source ↔ sharper task</option></select></label>
+    <label>$\log_{10}\kappa$ <input type="range" id="kK" min="0" max="3" step="0.05" value="1.5"><output id="kKV"></output></label>
+    <span><button id="kFw" class="on">forward</button> <button id="kBw">backward</button></span>
+  </div>
+  <div class="grid2">
+    <div class="canvas-wrap"><canvas id="kC0" height="250"></canvas></div>
+    <div class="canvas-wrap"><canvas id="kC1" height="250"></canvas></div>
+  </div>
+  <div class="legend"><span style="--c:var(--c0)">SGD path (this $\kappa$)</span><span class="dash" style="--c:var(--ink)">minimiser path</span><span style="--c:var(--grey)">midpoint of the class means</span></div>
+  <div class="readout" id="kRead"></div>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="emp">6. The empirical Fisher in eq. (21)</h2>
+<p>To turn the length into a change of loss, the proof replaces the model's own label distribution by the observed label (a Dirac delta). For one binary input, the true speed is $\sqrt{p(1-p)}\,|\dot z|$ and the empirical one is $(1-p_y)\,|\dot z|$, where $p_y$ is the probability the model gives to the observed label. Their ratio is $\sqrt{(1-p_y)/p_y}$.</p>
+<div class="widget">
+  <div class="controls"><label>$p_y$ <input type="range" id="eP" min="0.005" max="0.995" step="0.005" value="0.9"><output id="ePV"></output></label></div>
+  <div class="canvas-wrap"><canvas id="eC" height="240"></canvas></div>
+  <div class="readout" id="eRead"></div>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="bound">7. Theorem 6 as printed, and with N</h2>
+<p>The proof ends with $\Pr\{\tfrac1K\sum_k\text{gap}_k>\epsilon\}\le\exp\{-\tfrac{2K}{M^2}(\epsilon-2\bar R)^2\}$ (15), where $\bar R$ is the average Rademacher complexity. Here $N$ never appears in the exponent; it enters only through $\bar R$. Applying McDiarmid's inequality instead of Hoeffding's lemma to $\varphi_k$ puts a factor $N$ there. The last row shows what the printed $\lambda=4K(\epsilon-2\bar R)/M^2$ does to the exponent.</p>
+<div class="widget">
+  <div class="controls">
+    <label>$K$ time points <input type="range" id="bK" min="1" max="100" step="1" value="10"><output id="bKV"></output></label>
+    <label>$\log_{10}N$ <input type="range" id="bN" min="1" max="6" step="0.05" value="3"><output id="bNV"></output></label>
+    <label>$\epsilon$ <input type="range" id="bE" min="0.01" max="1" step="0.01" value="0.3"><output id="bEV"></output></label>
+    <label>$\bar R$ <input type="range" id="bR" min="0" max="0.3" step="0.005" value="0.05"><output id="bRV"></output></label>
+    <label>$M$ <input type="range" id="bM" min="0.5" max="5" step="0.1" value="1"><output id="bMV"></output></label>
+  </div>
+  <div class="canvas-wrap"><canvas id="bC" height="250"></canvas></div>
+  <div class="legend"><span style="--c:var(--bad)">printed (15)</span><span style="--c:var(--c0)">with McDiarmid, $\exp\{-2NK(\epsilon-2\bar R)^2/M^2\}$</span></div>
+  <div class="readout" id="bRead"></div>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="mantel">8. Re-running the Mantel tests of Figures 2 and 3</h2>
+<p>The distance matrices printed in the paper's Figures 2 and 3, compared with the fine-tuning matrix. With four tasks there are only $4!=24$ ways to relabel them, so no Mantel test can return a $p$-value below $1/24\approx0.042$; with five tasks the floor is $1/120$. The bars are the correlation $r$ for every relabelling; the line is the correlation for the true labelling.</p>
+<div class="widget">
+  <div class="controls">
+    <label>matrix <select id="nS">
+      <option value="f2c">Fig 2 · coupled (4 tasks)</option><option value="f2t">Fig 2 · Task2Vec (4 tasks)</option>
+      <option value="f3c">Fig 3 · coupled (5 tasks)</option><option value="f3t">Fig 3 · Task2Vec (5 tasks)</option><option value="f3u">Fig 3 · uncoupled (5 tasks)</option></select></label>
+  </div>
+  <div class="canvas-wrap"><canvas id="nC" height="230"></canvas></div>
+  <div class="readout" id="nRead"></div>
+</div>
+
+<script>
+"use strict";
+
+const GX=[-11.4533778415,-10.4815605347,-9.67355636693,-8.94950454386,-8.27894062366,-7.64616376454,-7.04173840645,-6.45942337758,-5.89480567537,-5.34460544572,-4.80628719209,-4.27782615636,-3.75755977617,-3.244088733,-2.73620834047,-2.23285921863,-1.73309059063,-1.2360320048,-0.740870725286,-0.246832896023,0.246832896023,0.740870725286,1.2360320048,1.73309059063,2.23285921863,2.73620834047,3.244088733,3.75755977617,4.27782615636,4.80628719209,5.34460544572,5.89480567537,6.45942337758,7.04173840645,7.64616376454,8.27894062366,8.94950454386,9.67355636693,10.4815605347,11.4533778415];
+const GW=[1.46183987387e-29,4.8204679402e-25,1.44860943155e-21,1.12227520683e-18,3.38985344325e-16,4.9680885292e-14,4.0376385817e-12,1.98911852603e-10,6.32589718855e-09,1.36034242157e-07,2.04889743608e-06,2.22117714325e-05,0.000177072928799,0.0010558790169,0.00477354488182,0.0165378441426,0.0442745552023,0.0921765791701,0.149921111764,0.191059009662,0.191059009662,0.149921111764,0.0921765791701,0.0442745552023,0.0165378441426,0.00477354488182,0.0010558790169,0.000177072928799,2.22117714325e-05,2.04889743608e-06,1.36034242157e-07,6.32589718855e-09,1.98911852603e-10,4.0376385817e-12,4.9680885292e-14,3.38985344325e-16,1.12227520683e-18,1.44860943155e-21,4.8204679402e-25,1.46183987387e-29];
+const NG=GX.length;
+// a task = list of Gaussian clusters [mean, sd, label, weight]
+const SRC=[[-2,1,0,.5],[2,1,1,.5]], SHARP=[[-1,.5,0,.5],[1,.5,1,.5]];
+const shiftC=(c,s)=>c.map(([m,sd,y,pr])=>[m+s,sd,y,pr]);
+const dispC=(a,b,t)=>a.map((A,i)=>[(1-t)*A[0]+t*b[i][0],(1-t)*A[1]+t*b[i][1],A[2],A[3]]);
+const mixC=(a,b,t)=>a.map(A=>[A[0],A[1],A[2],(1-t)*A[3]]).concat(b.map(B=>[B[0],B[1],B[2],t*B[3]]));
+const interpC=(kind,a,b,t)=>kind==="mix"?mixC(a,b,t):dispC(a,b,t);
+function nodesOf(cl){const n=cl.length*NG,X=new Float64Array(n),Y=new Float64Array(n),W=new Float64Array(n);let k=0;
+  for(const [m,s,y,pr] of cl)for(let i=0;i<NG;i++){X[k]=m+s*GX[i];Y[k]=y;W[k]=pr*GW[i];k++;}return {X,Y,W};}
+const sigm=z=>0.5*(1+Math.tanh(0.5*z));
+function lgh(w,T){let L=0,g0=0,g1=0,h00=0,h01=0,h11=0;const n=T.X.length;
+  for(let i=0;i<n;i++){const x=T.X[i],y=T.Y[i],wt=T.W[i],z=w[0]*x+w[1],p=sigm(z);
+    L+=wt*(Math.log1p(Math.exp(-Math.abs(z)))+Math.max(z,0)-y*z);
+    const r=wt*(p-y);g0+=r*x;g1+=r;const q=wt*p*(1-p);h00+=q*x*x;h01+=q*x;h11+=q;}
+  return {L,g:[g0,g1],H:[h00,h01,h11]};}
+function newton(T,w0){let w=w0.slice();
+  for(let it=0;it<100;it++){const {L,g,H}=lgh(w,T);if(Math.hypot(g[0],g[1])<1e-11)break;
+    const a00=H[0]+1e-13,a11=H[2]+1e-13,det=a00*a11-H[1]*H[1];
+    const s0=(a11*g[0]-H[1]*g[1])/det,s1=(-H[1]*g[0]+a00*g[1])/det;let a=1;
+    while(a>1e-8){if(lgh([w[0]-a*s0,w[1]-a*s1],T).L<=L+1e-14)break;a/=2;}
+    w=[w[0]-a*s0,w[1]-a*s1];}
+  return w;}
+function minPath(a,b,kind,n){const ts=[],ws=[];let w=newton(nodesOf(a),[0,0]);
+  for(let k=0;k<=n;k++){const t=k/n;w=newton(nodesOf(interpC(kind,a,b,t)),w);ts.push(t);ws.push(w);}return {ts,ws};}
+// lengths A (average inside the root), B (outside), TV (loss variation, labels fixed)
+function pathLengths(a,b,kind,ts,ws){let A=0,B=0,TV=0;
+  for(let k=0;k<ts.length-1;k++){const t=0.5*(ts[k]+ts[k+1]),wm=[0.5*(ws[k][0]+ws[k+1][0]),0.5*(ws[k][1]+ws[k+1][1])],
+      d0=ws[k+1][0]-ws[k][0],d1=ws[k+1][1]-ws[k][1];const T=nodesOf(interpC(kind,a,b,t));
+    let f00=0,f01=0,f11=0,bb=0,tv=0;
+    for(let i=0;i<T.X.length;i++){const x=T.X[i],wt=T.W[i],p=sigm(wm[0]*x+wm[1]),q=p*(1-p),dz=d0*x+d1;
+      f00+=wt*q*x*x;f01+=wt*q*x;f11+=wt*q;bb+=wt*Math.sqrt(q)*Math.abs(dz);tv+=wt*Math.abs((T.Y[i]-p)*dz);}
+    A+=Math.sqrt(Math.max(f00*d0*d0+2*f01*d0*d1+f11*d1*d1,0));B+=bb;TV+=tv;}
+  return {A,B,TV};}
+// gradient flow  dw/dtau = -kappa grad L_tau(w)
+function flowPath(a,b,kind,kappa,nSteps){const n=nSteps||Math.min(30000,Math.max(500,Math.ceil(12*kappa)));const dt=1/n;
+  let w=newton(nodesOf(a),[0,0]);const ws=[w.slice()],ts=[0];
+  const grad=(w,t)=>lgh(w,nodesOf(interpC(kind,a,b,t))).g;
+  for(let k=0;k<n;k++){const t=k*dt;
+    const k1=grad(w,t).map(v=>-kappa*v);
+    const k2=grad([w[0]+0.5*dt*k1[0],w[1]+0.5*dt*k1[1]],t+0.5*dt).map(v=>-kappa*v);
+    const k3=grad([w[0]+0.5*dt*k2[0],w[1]+0.5*dt*k2[1]],t+0.5*dt).map(v=>-kappa*v);
+    const k4=grad([w[0]+dt*k3[0],w[1]+dt*k3[1]],t+dt).map(v=>-kappa*v);
+    w=[w[0]+dt/6*(k1[0]+2*k2[0]+2*k3[0]+k4[0]),w[1]+dt/6*(k1[1]+2*k2[1]+2*k3[1]+k4[1])];
+    ws.push(w.slice());ts.push((k+1)*dt);}
+  return {ts,ws};}
+function subsample(P,m){const n=P.ts.length-1,ts=[],ws=[];for(let i=0;i<=m;i++){const k=Math.round(i*n/m);ts.push(P.ts[k]);ws.push(P.ws[k]);}return {ts,ws};}
+
+
+// ---------------------------------------------------------------- helpers
+const $=id=>document.getElementById(id);
+const linspace=(a,b,n)=>Array.from({length:n},(_,i)=>a+(b-a)*i/(n-1));
+const fx=(x,d=3)=>Math.abs(x)>=1e5?x.toExponential(2):(Math.abs(x)<1e-3&&x!==0?x.toExponential(2):x.toFixed(d));
+function css(v){return getComputedStyle(document.documentElement).getPropertyValue(v).trim();}
+function setup(cv){if(!cv.dataset.h)cv.dataset.h=cv.getAttribute("height");const dpr=window.devicePixelRatio||1,w=cv.clientWidth,h=+cv.dataset.h;
+  cv.width=w*dpr;cv.height=h*dpr;cv.style.height=h+"px";const c=cv.getContext("2d");c.setTransform(dpr,0,0,dpr,0,0);return {c,w,h};}
+function Plot(cv,o){
+  const {c,w,h}=setup(cv);const L=o.left??50,R=12,T=o.top??26,B=36;
+  const lx=o.logx,ly=o.logy,tx=x=>lx?Math.log10(x):x,ty=y=>ly?Math.log10(y):y;
+  const x0=tx(o.xlim[0]),x1=tx(o.xlim[1]),y0=ty(o.ylim[0]),y1=ty(o.ylim[1]);
+  const X=x=>L+(tx(x)-x0)/(x1-x0)*(w-L-R), Y=y=>T+(1-(ty(y)-y0)/(y1-y0))*(h-T-B);
+  const ink=css("--ink"),mut=css("--muted"),line=css("--line");
+  c.font="11px -apple-system,Segoe UI,sans-serif";c.strokeStyle=line;c.lineWidth=1;c.fillStyle=mut;c.textAlign="right";
+  for(const t of o.yticks){c.beginPath();c.moveTo(L,Y(t));c.lineTo(w-R,Y(t));c.stroke();c.fillText(o.yfmt?o.yfmt(t):t,L-5,Y(t)+3);}
+  c.textAlign="center";for(const t of o.xticks)c.fillText(o.xfmt?o.xfmt(t):t,X(t),h-B+14);
+  c.fillText(o.xlabel||"",(L+w-R)/2,h-6);c.textAlign="left";
+  if(o.title){c.fillStyle=ink;c.font="600 12px -apple-system,Segoe UI,sans-serif";c.fillText(o.title,L,14);c.font="11px -apple-system,Segoe UI,sans-serif";}
+  if(o.ylabel){c.fillStyle=mut;c.fillText(o.ylabel,L+4,T+10);}
+  const clampY=y=>{const v=ty(y);if(!isFinite(v))return v;const lo=y0-(y1-y0),hi=y1+(y1-y0);return Math.max(lo,Math.min(hi,v));};
+  const Yc=y=>T+(1-(clampY(y)-y0)/(y1-y0))*(h-T-B);
+  const P={c,w,h,X,Y,L,R,T,B,
+    line(xs,ys,col,wd=2,dash=null){c.save();c.beginPath();c.rect(L,T-2,w-L-R,h-T-B+4);c.clip();c.strokeStyle=col;c.lineWidth=wd;if(dash)c.setLineDash(dash);c.beginPath();let on=false;
+      for(let i=0;i<xs.length;i++){const yy=ys[i];if(!isFinite(yy)||(ly&&yy<=0)){on=false;continue;}const px=X(xs[i]),py=Yc(yy);if(!on){c.moveTo(px,py);on=true;}else c.lineTo(px,py);}c.stroke();c.restore();},
+    area(xs,ys,col,alpha,base=0){c.save();c.beginPath();c.rect(L,T-2,w-L-R,h-T-B+4);c.clip();c.globalAlpha=alpha;c.fillStyle=col;c.beginPath();c.moveTo(X(xs[0]),Y(base));for(let i=0;i<xs.length;i++)c.lineTo(X(xs[i]),Yc(ys[i]));c.lineTo(X(xs[xs.length-1]),Y(base));c.closePath();c.fill();c.restore();},
+    vline(x,col,wd=1,dash=null){c.save();c.strokeStyle=col;c.lineWidth=wd;if(dash)c.setLineDash(dash);c.beginPath();c.moveTo(X(x),h-B);c.lineTo(X(x),T);c.stroke();c.restore();},
+    hline(y,col,wd=1,dash=null){c.save();c.strokeStyle=col;c.lineWidth=wd;if(dash)c.setLineDash(dash);c.beginPath();c.moveTo(L,Y(y));c.lineTo(w-R,Y(y));c.stroke();c.restore();},
+    text(s,x,y,col,align="left"){c.save();c.fillStyle=col||mut;c.textAlign=align;c.fillText(s,X(x),Y(y));c.restore();},
+    dot(x,y,col,r=5){c.save();c.fillStyle=col;c.strokeStyle=css("--surface");c.lineWidth=2;c.beginPath();c.arc(X(x),Y(y),r,0,7);c.fill();c.stroke();c.restore();}
+  };
+  c.strokeStyle=css("--grey");c.beginPath();c.moveTo(L,h-B);c.lineTo(w-R,h-B);c.stroke();
+  return P;
+}
+const b2=(p,q)=>2*(p*Math.log(p/q)+(1-p)*Math.log((1-p)/(1-q)));   // 2 KL between two coins
+
+// ---------------------------------------------------------------- 1. the ruler
+function drawRuler(){
+  const z0=+$("rZ").value,d=+$("rD").value;$("rZV").textContent=z0.toFixed(2);$("rDV").textContent=d.toFixed(2);
+  const p=sigm(z0),kl=dd=>b2(p,sigm(z0+dd)),ds=linspace(-4,4,161);
+  const P=Plot($("rC0"),{xlim:[-4,4],ylim:[0,3],xticks:[-4,-2,0,2,4],yticks:[0,1,2,3],xlabel:"logit step δ",title:"cost of a step at the current p",ylabel:"2 KL"});
+  P.line(ds,ds.map(dd=>dd*dd*p*(1-p)),css("--c1"),1.8,[5,3]);P.line(ds,ds.map(kl),css("--c0"),2.2);P.dot(d,kl(d),css("--c0"));
+  const zs=linspace(-6,6,241);
+  const Q=Plot($("rC1"),{xlim:[-6,6],ylim:[0,0.55],xticks:[-6,-3,0,3,6],yticks:[0,0.1,0.2,0.3,0.4,0.5],xlabel:"current logit z₀",title:"speed limit √(p(1−p))",ylabel:"Fisher length per unit logit"});
+  Q.line(zs,zs.map(z=>Math.sqrt(sigm(z)*(1-sigm(z)))),css("--c2"),2.2);Q.dot(z0,Math.sqrt(p*(1-p)),css("--c2"));
+  const ex=kl(d),ap=d*d*p*(1-p);
+  $("rRead").innerHTML=`p = <b>${p.toFixed(4)}</b> · √(p(1−p)) = <b>${Math.sqrt(p*(1-p)).toFixed(4)}</b> (max ½ at p = ½) · step δ = ${d.toFixed(2)}: 2KL = <b>${fx(ex,5)}</b>, quadratic = <b>${fx(ap,5)}</b>, ratio <b>${ap>0?(ex/ap).toFixed(3):"–"}</b>`;
+}
+for(const id of ["rZ","rD"])$(id).addEventListener("input",drawRuler);
+
+// ---------------------------------------------------------------- 2. the simplex
+const TP={p0:[0.9,0.05,0.05],p1:[0.05,0.1,0.85],drag:null};
+function tGeom(cv){const w=cv.clientWidth,h=+cv.dataset.h||380,side=Math.min(w*0.86,(h-78)/0.866),cx=w/2,top=(h-side*0.866)/2+8;
+  const V=[[cx-side/2,top+side*0.866],[cx+side/2,top+side*0.866],[cx,top]];return {w,h,V};}
+const tPos=(p,V)=>[p[0]*V[0][0]+p[1]*V[1][0]+p[2]*V[2][0],p[0]*V[0][1]+p[1]*V[1][1]+p[2]*V[2][1]];
+function tBary(x,y,V){const [x1,y1]=V[0],[x2,y2]=V[1],[x3,y3]=V[2],d=(y2-y3)*(x1-x3)+(x3-x2)*(y1-y3);
+  const a=((y2-y3)*(x-x3)+(x3-x2)*(y-y3))/d,b=((y3-y1)*(x-x3)+(x1-x3)*(y-y3))/d;return [a,b,1-a-b];}
+function clampP(p){let q=p.map(v=>Math.max(0.004,v));const s=q[0]+q[1]+q[2];return q.map(v=>v/s);}
+const fr=(p,q)=>2*Math.acos(Math.min(1,Math.sqrt(p[0]*q[0])+Math.sqrt(p[1]*q[1])+Math.sqrt(p[2]*q[2])));
+const klv=(p,q)=>p.reduce((s,v,i)=>s+v*Math.log(v/q[i]),0);
+function cross(a,b){return [a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]];}
+const nrm=a=>Math.hypot(a[0],a[1],a[2]);
+function drawSimplex(){
+  const cv=$("tC"),{c,w,h}=setup(cv);const {V}=tGeom(cv);TP.V=V;
+  const ink=css("--ink"),mut=css("--muted"),line=css("--line"),c0=css("--c0"),c1=css("--c1");
+  c.strokeStyle=css("--grey");c.lineWidth=1.2;c.beginPath();c.moveTo(...V[0]);c.lineTo(...V[1]);c.lineTo(...V[2]);c.closePath();c.stroke();
+  c.fillStyle=mut;c.font="12px -apple-system,Segoe UI,sans-serif";c.textAlign="center";
+  c.fillText("class 1",V[0][0]-6,V[0][1]+16);c.fillText("class 2",V[1][0]+6,V[1][1]+16);c.fillText("class 3",V[2][0],V[2][1]-8);
+  const p0=TP.p0,p1=TP.p1,u0=p0.map(Math.sqrt),u1=p1.map(Math.sqrt);
+  const dist=fr(p0,p1),th=dist/2;
+  // geodesic
+  const ang=Math.acos(Math.min(1,u0[0]*u1[0]+u0[1]*u1[1]+u0[2]*u1[2]));
+  c.strokeStyle=c0;c.lineWidth=2.4;c.beginPath();
+  for(let i=0;i<=80;i++){const t=i/80,a=Math.sin((1-t)*ang)/Math.sin(ang||1),b=Math.sin(t*ang)/Math.sin(ang||1);
+    const u=[a*u0[0]+b*u1[0],a*u0[1]+b*u1[1],a*u0[2]+b*u1[2]],q=tPos(u.map(v=>v*v),V);i?c.lineTo(...q):c.moveTo(...q);}c.stroke();
+  // ball around p0 through p1
+  let e1=cross(u0,[1,0,0]);if(nrm(e1)<1e-6)e1=cross(u0,[0,1,0]);const n1=nrm(e1);e1=e1.map(v=>v/n1);const e2=cross(u0,e1);
+  c.strokeStyle=c1;c.lineWidth=1.8;c.setLineDash([6,4]);c.beginPath();let pen=false;
+  for(let i=0;i<=360;i++){const ph=i/360*2*Math.PI,cs=Math.cos(th),sn=Math.sin(th),
+      u=[cs*u0[0]+sn*(Math.cos(ph)*e1[0]+Math.sin(ph)*e2[0]),cs*u0[1]+sn*(Math.cos(ph)*e1[1]+Math.sin(ph)*e2[1]),cs*u0[2]+sn*(Math.cos(ph)*e1[2]+Math.sin(ph)*e2[2])];
+    if(u[0]<0||u[1]<0||u[2]<0){pen=false;continue;}const q=tPos(u.map(v=>v*v),V);if(!pen){c.moveTo(...q);pen=true;}else c.lineTo(...q);}
+  c.stroke();c.setLineDash([]);
+  for(const [p,col,lab] of [[p0,c0,"p"],[p1,c1,"q"]]){const q=tPos(p,V);c.fillStyle=col;c.strokeStyle=css("--surface");c.lineWidth=2;c.beginPath();c.arc(q[0],q[1],8,0,7);c.fill();c.stroke();
+    c.fillStyle=ink;c.textAlign="left";c.font="600 12px -apple-system,Segoe UI,sans-serif";c.fillText(lab,q[0]+11,q[1]-9);}
+  // straight line in probability space, FR length
+  let lin=0;for(let i=0;i<400;i++){const a=i/400,b=(i+1)/400,pa=p0.map((v,j)=>(1-a)*v+a*p1[j]),pb=p0.map((v,j)=>(1-b)*v+b*p1[j]);
+    lin+=Math.sqrt(pa.reduce((s,v,j)=>s+((pb[j]-v)**2)/(0.5*(v+pb[j])),0));}
+  $("tRead").innerHTML=`p = (${p0.map(v=>v.toFixed(3)).join(", ")}), q = (${p1.map(v=>v.toFixed(3)).join(", ")}) · Fisher–Rao distance <b>${dist.toFixed(4)}</b> (largest possible: π = 3.1416) · straight line in probabilities has length <b>${lin.toFixed(4)}</b><br>`+
+   `Euclidean distance in probabilities ‖p−q‖ = <b>${Math.hypot(p0[0]-p1[0],p0[1]-p1[1],p0[2]-p1[2]).toFixed(4)}</b> · KL(p‖q) = <b>${klv(p0,p1).toFixed(4)}</b>, KL(q‖p) = <b>${klv(p1,p0).toFixed(4)}</b> (the Fisher–Rao distance is the symmetric one)`;
+}
+(function(){const cv=$("tC");
+  const pos=e=>{const r=cv.getBoundingClientRect();return [e.clientX-r.left,e.clientY-r.top];};
+  cv.addEventListener("pointerdown",e=>{const [x,y]=pos(e),V=TP.V;let best=null,bd=22;
+    for(const k of ["p0","p1"]){const q=tPos(TP[k],V),d=Math.hypot(q[0]-x,q[1]-y);if(d<bd){bd=d;best=k;}}
+    if(best){TP.drag=best;cv.setPointerCapture(e.pointerId);}});
+  cv.addEventListener("pointermove",e=>{if(!TP.drag)return;const [x,y]=pos(e);TP[TP.drag]=clampP(tBary(x,y,TP.V));drawSimplex();});
+  const up=()=>{TP.drag=null;};cv.addEventListener("pointerup",up);cv.addEventListener("pointercancel",up);})();
+
+// ---------------------------------------------------------------- 3. Jensen
+function jensen(sx,a1,b1){
+  const n=500,X=GX.map(g=>sx*g);let A=0,B=0;
+  for(let k=0;k<n;k++){const t0=k/n,t1=(k+1)/n,wa=[1+(a1-1)*t0,b1*t0],wb=[1+(a1-1)*t1,b1*t1];let sk=0,ss=0;
+    for(let i=0;i<NG;i++){const x=X[i],q=Math.max(0,b2(clampProb(sigm(wa[0]*x+wa[1])),clampProb(sigm(wb[0]*x+wb[1]))));sk+=GW[i]*q;ss+=GW[i]*Math.sqrt(q);}
+    A+=Math.sqrt(sk);B+=ss;}
+  return {A,B};}
+const clampProb=p=>Math.min(1-1e-12,Math.max(1e-12,p));
+function drawJensen(){
+  const sx=+$("jS").value,a1=+$("jA").value,b1=+$("jB").value;$("jSV").textContent=sx.toFixed(1);$("jAV").textContent=a1.toFixed(1);$("jBV").textContent=b1.toFixed(1);
+  const xm=Math.max(8,3.2*sx),xs=linspace(-xm,xm,400);
+  const P=Plot($("jC"),{xlim:[-xm,xm],ylim:[0,0.6],xticks:niceTicks(-xm,xm,6),yticks:[0,0.25,0.5],xlabel:"input x",title:"who feels the change"});
+  const dens=xs.map(x=>Math.exp(-x*x/(2*sx*sx))/(sx*Math.sqrt(2*Math.PI)));const dm=Math.max(...dens);
+  P.area(xs,dens.map(v=>0.55*v/dm),css("--grey"),0.35);
+  P.line(xs,xs.map(x=>{const p=sigm(a1*x+b1);return Math.sqrt(p*(1-p));}),css("--c0"),2.2);
+  const {A,B}=jensen(sx,a1,b1);
+  // fraction of inputs with sqrt(p(1-p)) > 0.25 at the final weights
+  let f=0;for(let i=0;i<NG;i++){const p=sigm(a1*sx*GX[i]+b1);if(Math.sqrt(p*(1-p))>0.25)f+=GW[i];}
+  $("jRead").innerHTML=`A = <b>${A.toFixed(4)}</b> · B = <b>${B.toFixed(4)}</b> · B/A = <b>${(B/A).toFixed(3)}</b> · fraction of inputs that still move the prediction noticeably at the end (√(p(1−p)) &gt; ¼): <b>${f.toFixed(3)}</b><br>`+
+   `A ≥ B always (Jensen). B is the average over x of a <i>norm</i> of dw, so it is a Finsler length; A is the length in the Riemannian metric (3).`;
+}
+function niceTicks(a,b,n=5){const span=b-a,step0=span/n,mag=Math.pow(10,Math.floor(Math.log10(step0))),r=step0/mag;
+  const step=(r<1.5?1:r<3?2:r<7?5:10)*mag;const out=[];for(let t=Math.ceil(a/step)*step;t<=b+1e-9*span;t+=step)out.push(+t.toPrecision(12));return out;}
+for(const id of ["jS","jA","jB"])$(id).addEventListener("input",drawJensen);
+
+// ---------------------------------------------------------------- 4. the toy transfer problem
+const M={kind:"disp",s:4,path:{}, len:{}};
+function w2Quantiles(cl,xs,Mq){ // quantile function of a Gaussian-cluster mixture on a grid
+  const dx=xs[1]-xs[0],cdf=new Float64Array(xs.length);let acc=0;
+  for(let i=0;i<xs.length;i++){let d=0;for(const [m,s,,pr] of cl)d+=pr*Math.exp(-((xs[i]-m)**2)/(2*s*s))/(s*Math.sqrt(2*Math.PI));acc+=d*dx;cdf[i]=acc;}
+  const tot=cdf[cdf.length-1],out=new Float64Array(Mq);let k=0;
+  for(let j=0;j<Mq;j++){const u=(j+0.5)/Mq*tot;while(k<xs.length-1&&cdf[k]<u)k++;out[j]=xs[k];}return out;}
+function w2Curve(kind,s){const a=SRC,b=shiftC(SRC,s),xs=linspace(-8,10+s,1600),Mq=500,qs=w2Quantiles(a,xs,Mq);
+  const w2=(q)=>Math.sqrt(qs.reduce((acc,v,i)=>acc+(v-q[i])**2,0)/Mq),full=w2(w2Quantiles(b,xs,Mq)),out=[];
+  for(let i=0;i<=40;i++){const t=i/40;out.push(full>1e-9?w2(w2Quantiles(interpC(kind,a,b,t),xs,Mq))/full:0);}return {ts:linspace(0,1,41),vals:out,full};}
+function recomputeToy(){
+  const s=+$("mS").value;M.s=s;$("mSV").textContent=s.toFixed(2);const b=shiftC(SRC,s);
+  for(const kind of ["disp","mix"]){const P=minPath(SRC,b,kind,160);M.path[kind]=P;M.len[kind]=pathLengths(SRC,b,kind,P.ts,P.ws);M["w2"+kind]=w2Curve(kind,s);}
+  drawToy();}
+function drawToy(){
+  const t=+$("mT").value,s=M.s,kind=M.kind;$("mTV").textContent=t.toFixed(2);
+  const a=SRC,b=shiftC(SRC,s),cl=interpC(kind,a,b,t),xmax=6+s,xs=linspace(-5,xmax,500);
+  const dens=(cl_,cls)=>xs.map(x=>cl_.filter(c=>c[2]===cls).reduce((acc,[m,sd,,pr])=>acc+pr*Math.exp(-((x-m)**2)/(2*sd*sd))/(sd*Math.sqrt(2*Math.PI)),0));
+  const P=Plot($("mC0"),{xlim:[-5,xmax],ylim:[0,1],xticks:niceTicks(-5,xmax,6),yticks:[0,0.5,1],xlabel:"x",title:`the task at τ = ${t.toFixed(2)} (${kind==="disp"?"displacement":"mixture"})`,ylabel:"p(y=1|x) (black)"});
+  const d0=dens(cl,0),d1=dens(cl,1),sc=0.9/0.4;
+  P.area(xs,d0.map(v=>v*sc*0.5*2),css("--c0"),0.3);P.area(xs,d1.map(v=>v*sc*0.5*2),css("--c1"),0.3);
+  const ref=(cl_,col,dash)=>P.line(xs,xs.map((x,i)=>dens(cl_,0)[i]*sc),col,1,dash);
+  const S0=dens(a,0),S1=dens(a,1),T0=dens(b,0),T1=dens(b,1);
+  P.line(xs,S0.map((v,i)=>(v+S1[i])*sc),css("--grey"),1,[2,3]);P.line(xs,T0.map((v,i)=>(v+T1[i])*sc),css("--grey"),1,[6,3]);
+  const path=M.path[kind],idx=Math.round(t*(path.ts.length-1)),w=path.ws[idx];
+  P.line(xs,xs.map(x=>sigm(w[0]*x+w[1])),css("--ink"),2);
+  // W2 curve
+  const Q=Plot($("mC1"),{xlim:[0,1],ylim:[0,1],xticks:[0,0.25,0.5,0.75,1],yticks:[0,0.5,1],xlabel:"τ",title:"W₂(p_source, p_τ) / W₂(p_source, p_target)"});
+  Q.line([0,1],[0,1],css("--grey"),1,[3,3]);
+  Q.line(M.w2disp.ts,M.w2disp.vals,css("--c0"),2.2);Q.line(M.w2mix.ts,M.w2mix.vals,css("--c1"),2.2);Q.vline(t,css("--ink"),1,[3,3]);
+  // weights
+  const tsd=M.path.disp.ts,wmin=Math.min(...M.path.disp.ws.map(v=>v[0]),...M.path.mix.ws.map(v=>v[0]),0),wmax=Math.max(...M.path.disp.ws.map(v=>v[0]),...M.path.mix.ws.map(v=>v[0]))*1.05;
+  const R=Plot($("mC2"),{xlim:[0,1],ylim:[Math.min(0,wmin),wmax],xticks:[0,0.5,1],yticks:niceTicks(Math.min(0,wmin),wmax,4),xlabel:"τ",title:"slope w₁(τ) of the minimiser"});
+  R.line(tsd,M.path.disp.ws.map(v=>v[0]),css("--c0"),2.2);R.line(M.path.mix.ts,M.path.mix.ws.map(v=>v[0]),css("--c1"),2.2);R.vline(t,css("--ink"),1,[3,3]);
+  const b0=[...M.path.disp.ws.map(v=>v[1]),...M.path.mix.ws.map(v=>v[1])],lo=Math.min(...b0,0),hi=Math.max(...b0,0.5);
+  const S=Plot($("mC3"),{xlim:[0,1],ylim:[lo,hi],xticks:[0,0.5,1],yticks:niceTicks(lo,hi,4),xlabel:"τ",title:"bias w₀(τ) of the minimiser"});
+  S.line(tsd,M.path.disp.ws.map(v=>v[1]),css("--c0"),2.2);S.line(M.path.mix.ts,M.path.mix.ws.map(v=>v[1]),css("--c1"),2.2);S.vline(t,css("--ink"),1,[3,3]);
+  const d=M.len.disp,m=M.len.mix,r=(x,y)=>y>1e-9?(x/y).toFixed(2):"–";
+  $("mRead").innerHTML=`<table class="mini"><tr><th>path of the minimiser</th><th>A (eq. 4)</th><th>B (eq. 11)</th><th>TV of loss</th></tr>`+
+   `<tr><td style="color:var(--c0)">displacement</td><td>${d.A.toFixed(3)}</td><td>${d.B.toFixed(3)}</td><td>${d.TV.toFixed(3)}</td></tr>`+
+   `<tr><td style="color:var(--c1)">mixture</td><td>${m.A.toFixed(3)}</td><td>${m.B.toFixed(3)}</td><td>${m.TV.toFixed(3)}</td></tr>`+
+   `<tr><td>mixture / displacement</td><td>${r(m.A,d.A)}</td><td>${r(m.B,d.B)}</td><td>${r(m.TV,d.TV)}</td></tr></table>`+
+   `At s = ${s.toFixed(2)} the displacement path is a straight line in weight space (slope fixed, bias moving by −slope·s), with A = slope·s·√E[p(1−p)].`;
+}
+$("mS").addEventListener("input",recomputeToy);$("mT").addEventListener("input",drawToy);
+$("mKd").addEventListener("click",()=>{M.kind="disp";$("mKd").classList.add("on");$("mKm").classList.remove("on");drawToy();});
+$("mKm").addEventListener("click",()=>{M.kind="mix";$("mKm").classList.add("on");$("mKd").classList.remove("on");drawToy();});
+
+// ---------------------------------------------------------------- 5. the speed of learning
+const KS={dir:"fw",cache:{}};
+function kappaPair(){const v=$("kP").value;return v==="shift"?[SRC,shiftC(SRC,4)]:[SRC,SHARP];}
+function excessAt(a,b,path,every){const out=[];const n=path.ts.length-1;
+  for(let k=0;k<=n;k+=every){const cl=dispC(a,b,path.ts[k]),T=nodesOf(cl),wst=newton(T,path.ws[k]);out.push([path.ts[k],lgh(path.ws[k],T).L-lgh(wst,T).L]);}return out;}
+function drawKappa(){
+  const kap=Math.pow(10,+$("kK").value);$("kKV").textContent=kap.toFixed(kap<10?2:0);
+  const [S,Tg]=kappaPair(),res={};
+  for(const [name,a,b] of [["fw",S,Tg],["bw",Tg,S]]){
+    const key=$("kP").value+name;
+    if(!KS.cache[key]){const P=minPath(a,b,"disp",300);KS.cache[key]={P,L:pathLengths(a,b,"disp",P.ts,P.ws)};}
+    const F=flowPath(a,b,"disp",kap),Fs=subsample(F,400);
+    res[name]={a,b,F,Fs,L:pathLengths(a,b,"disp",Fs.ts,Fs.ws),Q:KS.cache[key]};}
+  const cur=res[KS.dir],a=cur.a,b=cur.b;
+  // decision boundary against time
+  const bd=(ws)=>ws.map(w=>-w[1]/w[0]);
+  const ts=cur.Fs.ts,mid=ts.map(t=>{const cl=dispC(a,b,t);return 0.5*(cl[0][0]+cl[1][0]);});
+  const P1=Plot($("kC0"),{xlim:[0,1],ylim:[-6,12],xticks:[0,0.5,1],yticks:[-4,0,4,8,12],xlabel:"τ",title:"decision boundary x* = −w₀/w₁"});
+  P1.line(ts,mid,css("--grey"),1.6);P1.line(cur.Q.P.ts,bd(cur.Q.P.ws),css("--ink"),1.6,[5,3]);P1.line(ts,bd(cur.Fs.ws),css("--c0"),2.2);
+  const ex=excessAt(a,b,cur.Fs,8);
+  const emax=Math.max(0.05,...ex.map(v=>v[1]));
+  const P2=Plot($("kC1"),{xlim:[0,1],ylim:[0,emax*1.05],xticks:[0,0.5,1],yticks:niceTicks(0,emax*1.05,4),xlabel:"τ",title:"excess loss  L_τ(w(τ)) − min L_τ",left:56});
+  P2.line(ex.map(v=>v[0]),ex.map(v=>v[1]),css("--c0"),2.2);
+  const f=res.fw,g=res.bw,rt=f.L.A/Math.max(g.L.A,1e-12);
+  $("kRead").innerHTML=`<table class="mini"><tr><th></th><th>SGD path A</th><th>B</th><th>minimiser path A</th><th>B</th></tr>`+
+   `<tr><td>forward (source→target)</td><td>${f.L.A.toFixed(4)}</td><td>${f.L.B.toFixed(4)}</td><td>${f.Q.L.A.toFixed(4)}</td><td>${f.Q.L.B.toFixed(4)}</td></tr>`+
+   `<tr><td>backward (target→source)</td><td>${g.L.A.toFixed(4)}</td><td>${g.L.B.toFixed(4)}</td><td>${g.Q.L.A.toFixed(4)}</td><td>${g.Q.L.B.toFixed(4)}</td></tr></table>`+
+   `forward/backward ratio of A: <b>${rt.toFixed(2)}</b> for the SGD path, <b>${(f.Q.L.A/g.Q.L.A).toFixed(3)}</b> for the minimiser path · excess loss at τ = 1 in the plotted direction: <b>${ex[ex.length-1][1].toFixed(4)}</b>`;
+}
+$("kP").addEventListener("change",drawKappa);$("kK").addEventListener("input",drawKappa);
+$("kFw").addEventListener("click",()=>{KS.dir="fw";$("kFw").classList.add("on");$("kBw").classList.remove("on");drawKappa();});
+$("kBw").addEventListener("click",()=>{KS.dir="bw";$("kBw").classList.add("on");$("kFw").classList.remove("on");drawKappa();});
+
+// ---------------------------------------------------------------- 6. empirical Fisher
+function drawEmp(){
+  const py=+$("eP").value;$("ePV").textContent=py.toFixed(3);const ps=linspace(0.005,0.995,300);
+  const P=Plot($("eC"),{xlim:[0,1],ylim:[0.01,100],logy:true,xticks:[0,0.25,0.5,0.75,1],yticks:[0.01,0.1,1,10,100],xlabel:"probability the model gives the observed label, p_y",title:"empirical / true Fisher speed  =  √((1−p_y)/p_y)"});
+  P.hline(1,css("--grey"),1,[4,3]);P.line(ps,ps.map(p=>Math.sqrt((1-p)/p)),css("--c0"),2.2);P.dot(py,Math.sqrt((1-py)/py),css("--c0"));
+  const tr=Math.sqrt(py*(1-py)),em=1-py;
+  $("eRead").innerHTML=`true speed per unit logit √(p(1−p)) = <b>${tr.toFixed(4)}</b> · empirical (1−p<sub>y</sub>) = <b>${em.toFixed(4)}</b> · ratio <b>${(em/tr).toFixed(3)}</b><br>`+
+   (py>0.5?"Confidently right: the empirical Fisher under-counts how much the prediction moves.":py<0.5?"Confidently wrong: the empirical Fisher over-counts.":"At p<sub>y</sub> = ½ the two agree.");
+}
+$("eP").addEventListener("input",drawEmp);
+
+// ---------------------------------------------------------------- 7. Theorem 6
+function drawBound(){
+  const K=+$("bK").value,lN=+$("bN").value,N=Math.pow(10,lN),eps=+$("bE").value,R=+$("bR").value,Mv=+$("bM").value;
+  $("bKV").textContent=K;$("bNV").textContent=lN.toFixed(2);$("bEV").textContent=eps.toFixed(2);$("bRV").textContent=R.toFixed(3);$("bMV").textContent=Mv.toFixed(1);
+  const x=eps-2*R,pr=x>0?Math.exp(-2*K*x*x/(Mv*Mv)):1,mc=n=>x>0?Math.exp(-2*n*K*x*x/(Mv*Mv)):1;
+  const ns=linspace(1,6,120).map(v=>Math.pow(10,v));
+  const P=Plot($("bC"),{xlim:[10,1e6],ylim:[1e-12,1],logx:true,logy:true,xticks:[10,100,1e3,1e4,1e5,1e6],yticks:[1e-12,1e-9,1e-6,1e-3,1],xlabel:"N (samples per time point)",title:"bound on P(average gap > ε)",yfmt:v=>v.toExponential(0),xfmt:v=>v>=1e3?v.toExponential(0).replace("e+","e"):v});
+  P.hline(0.05,css("--grey"),1,[3,3]);
+  P.line(ns,ns.map(()=>pr),css("--bad"),2.2);P.line(ns,ns.map(n=>Math.max(mc(n),1e-13)),css("--c0"),2.2);P.vline(N,css("--ink"),1,[3,3]);
+  const A=K*eps-2*K*R,lamS=x>0?4*x/(Mv*Mv):0,lamP=lamS*K,expo=l=>-l*A+K*l*l*Mv*Mv/8;
+  $("bRead").innerHTML=x<=0?`ε ≤ 2R̄: the theorem says nothing (the bound is 1).`:
+   `at this N: printed (15) = <b>${fx(pr,4)}</b> · with McDiarmid = <b>${mc(N)<1e-300?"< 1e-300":fx(mc(N),4)}</b><br>`+
+   `smallest ε − 2R̄ certified at 95% (M = ${Mv.toFixed(1)}): printed <b>${(Mv*Math.sqrt(Math.log(20)/(2*K))).toFixed(4)}</b> for any N · with McDiarmid <b>${(Mv*Math.sqrt(Math.log(20)/(2*K*N))).toFixed(5)}</b><br>`+
+   `Chernoff exponent −λA + Kλ²M²/8 at the optimum λ* = 4(ε−2R̄)/M² = ${lamS.toFixed(3)}: <b>${expo(lamS).toFixed(3)}</b> · at the printed λ = Kλ* = ${lamP.toFixed(2)}: <b class="${expo(lamP)>0?"bad":""}">${expo(lamP).toFixed(2)}</b> (closed form (2K−4)A²/M² = ${((2*K-4)*A*A/(Mv*Mv)).toFixed(2)})`;
+}
+for(const id of ["bK","bN","bE","bR","bM"])$(id).addEventListener("input",drawBound);
+
+// ---------------------------------------------------------------- 8. Mantel
+const MAT={
+  f2c:{ft:[[0,180,120,23],[930,0,18,7.6],[1100,39,0,45],[1100,200,380,0]],a:[[0,.17,.17,.15],[.24,0,.084,.081],[.3,.099,0,.14],[.31,.14,.23,0]],rep:"r = 0.428, p = 0.13"},
+  f2t:{ft:[[0,180,120,23],[930,0,18,7.6],[1100,39,0,45],[1100,200,380,0]],a:[[0,.037,.047,.059],[.037,0,.044,.056],[.047,.044,0,.071],[.059,.056,.071,0]],rep:"r = 0.03, p = 0.98"},
+  f3c:{ft:[[0,87,87,29,68],[82,0,52,40,110],[120,78,0,26,67],[72,44,57,0,60],[99,41,34,32,0]],a:[[0,.23,.18,.17,.2],[.23,0,.18,.17,.2],[.2,.21,0,.18,.2],[.21,.19,.2,0,.19],[.2,.19,.17,.16,0]],rep:"r = 0.14, p = 0.05"},
+  f3t:{ft:[[0,87,87,29,68],[82,0,52,40,110],[120,78,0,26,67],[72,44,57,0,60],[99,41,34,32,0]],a:[[0,.066,.069,.07,.068],[.066,0,.066,.07,.07],[.069,.066,0,.073,.07],[.07,.07,.073,0,.077],[.068,.07,.07,.077,0]],rep:"r = 0.07, p = 0.17"},
+  f3u:{ft:[[0,87,87,29,68],[82,0,52,40,110],[120,78,0,26,67],[72,44,57,0,60],[99,41,34,32,0]],a:[[0,.29,.18,.18,.28],[.37,0,.2,.2,.32],[.22,.22,0,.3,.24],[.24,.24,.27,0,.31],[.25,.33,.19,.21,0]],rep:"r = 0.12, p = 0.47"}};
+function pearsonOff(a,b,perm){const n=a.length,x=[],y=[];for(let i=0;i<n;i++)for(let j=0;j<n;j++)if(i!==j){x.push(a[perm[i]][perm[j]]);y.push(b[i][j]);}
+  const mx=x.reduce((s,v)=>s+v,0)/x.length,my=y.reduce((s,v)=>s+v,0)/y.length;let sxy=0,sxx=0,syy=0;
+  for(let i=0;i<x.length;i++){sxy+=(x[i]-mx)*(y[i]-my);sxx+=(x[i]-mx)**2;syy+=(y[i]-my)**2;}return sxy/Math.sqrt(sxx*syy);}
+function perms(n){const out=[],rec=(cur,rest)=>{if(!rest.length){out.push(cur);return;}rest.forEach((v,i)=>rec(cur.concat(v),rest.filter((_,j)=>j!==i)));};rec([],Array.from({length:n},(_,i)=>i));return out;}
+function drawMantel(){
+  const d=MAT[$("nS").value],n=d.a.length,ps=perms(n),id=Array.from({length:n},(_,i)=>i),r0=pearsonOff(d.a,d.ft,id),rs=ps.map(p=>pearsonOff(d.a,d.ft,p));
+  const one=rs.filter(r=>r>=r0-1e-12).length/rs.length,two=rs.filter(r=>Math.abs(r)>=Math.abs(r0)-1e-12).length/rs.length;
+  const nb=n===4?24:30,lo=-1,hi=1,cnt=new Array(nb).fill(0);rs.forEach(r=>{cnt[Math.min(nb-1,Math.floor((r-lo)/(hi-lo)*nb))]++;});
+  const ymax=Math.max(...cnt)+1;
+  const P=Plot($("nC"),{xlim:[-1,1],ylim:[0,ymax],xticks:[-1,-0.5,0,0.5,1],yticks:niceTicks(0,ymax,4).map(Math.round).filter((v,i,a)=>a.indexOf(v)===i),xlabel:"Pearson r over the off-diagonal entries",title:`${ps.length} relabellings of ${n} tasks`});
+  const bw=(P.w-P.L-P.R)/nb;P.c.save();P.c.fillStyle=css("--grey");P.c.globalAlpha=0.45;
+  cnt.forEach((v,i)=>{if(v)P.c.fillRect(P.X(lo+(hi-lo)*i/nb)+1,P.Y(v),bw-2,P.Y(0)-P.Y(v));});P.c.restore();
+  P.vline(r0,css("--c1"),2.2);
+  $("nRead").innerHTML=`Pearson r of the printed matrices (true labelling) = <b>${r0.toFixed(3)}</b> · exact p = <b>${one.toFixed(3)}</b> (one-sided), <b>${two.toFixed(3)}</b> (two-sided) · smallest possible p = ${(1/ps.length).toFixed(4)}<br>`+
+   `paper reports: <b>${d.rep}</b>. I could not reproduce the paper's r from the printed matrices under any of 1280 conventions tried (see <code>code/mantel.py</code>).`;
+}
+$("nS").addEventListener("change",drawMantel);
+
+// ---------------------------------------------------------------- go
+function drawAll(){drawRuler();drawSimplex();drawJensen();recomputeToy();drawKappa();drawEmp();drawBound();drawMantel();}
+window.addEventListener("resize",drawAll);
+if(window.matchMedia)matchMedia("(prefers-color-scheme: dark)").addEventListener?.("change",drawAll);
+drawAll();
+window.addEventListener("load",()=>{if(window.renderMathInElement)renderMathInElement(document.body,{delimiters:[{left:"$$",right:"$$",display:true},{left:"$",right:"$",display:false}]});});
+</script>
+</main>
+</body>
+</html>

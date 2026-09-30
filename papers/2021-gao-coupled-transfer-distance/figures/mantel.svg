@@ -1,0 +1,75 @@
+<svg viewBox="0 0 640 250" xmlns="http://www.w3.org/2000/svg" role="img">
+<title>Mantel null distribution for Figure 2</title>
+<desc>With four tasks there are only 24 relabellings, so the smallest p-value is 1/24.</desc>
+<style>
+  text{font-family:ui-sans-serif,-apple-system,"Segoe UI",sans-serif;font-weight:400}
+  .lab{font-size:11px;fill:#57564f} .hd{font-size:13px;font-weight:500;fill:#1a1a19}
+  .sub{font-size:11.5px;fill:#57564f} .tiny{font-size:10px;fill:#57564f} .ink{fill:#1a1a19}
+  .ax{stroke:#c3c2b7;stroke-width:0.8;fill:none} .gd{stroke:#e2e1da;stroke-width:0.6;fill:none}
+  .b{stroke:#2f6fb5;stroke-width:2;fill:none} .bf{fill:#2f6fb5} .bb{fill:#2f6fb5;opacity:.28}
+  .o{stroke:#c2571a;stroke-width:2;fill:none} .of{fill:#c2571a} .ob{fill:#c2571a;opacity:.28}
+  .g{stroke:#0f7a5a;stroke-width:2;fill:none} .gf{fill:#0f7a5a}
+  .p{stroke:#7c3aed;stroke-width:2;fill:none} .pf{fill:#7c3aed}
+  .r{stroke:#b42318;stroke-width:1.6;fill:none} .rf{fill:#b42318}
+  .k{stroke:#1a1a19;stroke-width:1.1;fill:none;stroke-dasharray:4 3} .k0{stroke:#1a1a19;stroke-width:1.3;fill:none}
+  .dash{stroke-dasharray:5 3} .dot{stroke-dasharray:1.5 3}
+  .shade{fill:#8a8880;opacity:.16} .shader{fill:#b42318;opacity:.12}
+  .cell{stroke:#ffffff;stroke-width:1}
+  @media (prefers-color-scheme: dark){
+    .lab,.sub,.tiny{fill:#b6b4ab} .hd,.ink{fill:#eceae3} .ax{stroke:#4a4844} .gd{stroke:#33312e}
+    .b{stroke:#3d8ad8} .bf{fill:#3d8ad8} .bb{fill:#3d8ad8;opacity:.36}
+    .o{stroke:#d8733a} .of{fill:#d8733a} .ob{fill:#d8733a;opacity:.36}
+    .g{stroke:#4cc79a} .gf{fill:#4cc79a} .p{stroke:#b48cff} .pf{fill:#b48cff}
+    .r{stroke:#ff7a6b} .rf{fill:#ff7a6b}
+    .k,.k0{stroke:#eceae3} .shade{fill:#b6b4ab;opacity:.16} .shader{fill:#ff7a6b;opacity:.16}
+    .cell{stroke:#131417}
+  }
+</style>
+<line class="gd" x1="60" x2="580" y1="180.0" y2="180.0"/>
+<text class="tiny" x="55" y="183.0" text-anchor="end">0</text>
+<line class="gd" x1="60" x2="580" y1="142.5" y2="142.5"/>
+<text class="tiny" x="55" y="145.5" text-anchor="end">1</text>
+<line class="gd" x1="60" x2="580" y1="105.0" y2="105.0"/>
+<text class="tiny" x="55" y="108.0" text-anchor="end">2</text>
+<line class="gd" x1="60" x2="580" y1="67.5" y2="67.5"/>
+<text class="tiny" x="55" y="70.5" text-anchor="end">3</text>
+<line class="gd" x1="60" x2="580" y1="30.0" y2="30.0"/>
+<text class="tiny" x="55" y="33.0" text-anchor="end">4</text>
+<text class="tiny" x="60.0" y="193" text-anchor="middle">-1</text>
+<text class="tiny" x="190.0" y="193" text-anchor="middle">-0.5</text>
+<text class="tiny" x="320.0" y="193" text-anchor="middle">0</text>
+<text class="tiny" x="450.0" y="193" text-anchor="middle">0.5</text>
+<text class="tiny" x="580.0" y="193" text-anchor="middle">1</text>
+<line class="ax" x1="60" x2="580" y1="180" y2="180"/>
+<line class="ax" x1="60" x2="60" y1="30" y2="180"/>
+<text class="lab" x="320.0" y="208" text-anchor="middle">Mantel r</text>
+<text class="lab" x="60" y="22">number of the 24 relabellings</text>
+<rect class="bb" x="199.6" y="142.5" width="14" height="37.5"/>
+<rect class="bb" x="201.8" y="142.5" width="14" height="37.5"/>
+<rect class="bb" x="204.6" y="142.5" width="14" height="37.5"/>
+<rect class="bb" x="206.0" y="142.5" width="14" height="37.5"/>
+<rect class="bb" x="206.5" y="142.5" width="14" height="37.5"/>
+<rect class="bb" x="210.5" y="142.5" width="14" height="37.5"/>
+<rect class="bb" x="219.1" y="142.5" width="14" height="37.5"/>
+<rect class="bb" x="233.4" y="142.5" width="14" height="37.5"/>
+<rect class="bb" x="233.6" y="142.5" width="14" height="37.5"/>
+<rect class="bb" x="246.7" y="142.5" width="14" height="37.5"/>
+<rect class="bb" x="256.0" y="142.5" width="14" height="37.5"/>
+<rect class="bb" x="258.1" y="142.5" width="14" height="37.5"/>
+<rect class="bb" x="266.3" y="142.5" width="14" height="37.5"/>
+<rect class="bb" x="273.8" y="142.5" width="14" height="37.5"/>
+<rect class="bb" x="276.9" y="142.5" width="14" height="37.5"/>
+<rect class="bb" x="281.4" y="142.5" width="14" height="37.5"/>
+<rect class="bb" x="295.8" y="142.5" width="14" height="37.5"/>
+<rect class="bb" x="319.6" y="142.5" width="14" height="37.5"/>
+<rect class="bb" x="498.4" y="142.5" width="14" height="37.5"/>
+<rect class="bb" x="502.4" y="142.5" width="14" height="37.5"/>
+<rect class="bb" x="507.8" y="142.5" width="14" height="37.5"/>
+<rect class="bb" x="526.7" y="142.5" width="14" height="37.5"/>
+<rect class="bb" x="533.5" y="142.5" width="14" height="37.5"/>
+<rect class="bb" x="553.6" y="142.5" width="14" height="37.5"/>
+<line class="o" x1="560.6" x2="560.6" y1="30" y2="180"/>
+<text class="lab" x="555.6" y="42" text-anchor="end">coupled vs fine-tuning: r = 0.93</text>
+<line class="r dash" x1="283.4" x2="283.4" y1="30" y2="180"/>
+<text class="lab" x="278.4" y="42" text-anchor="end">Task2Vec: r = -0.14</text>
+</svg>

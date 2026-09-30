@@ -1,0 +1,100 @@
+<svg viewBox="0 0 640 300" xmlns="http://www.w3.org/2000/svg" role="img">
+<title>Length of the minimiser path against the shift</title>
+<desc>Displacement path length grows linearly in the shift; the mixture path is longer by definition B but saturates and is shorter by A for large shifts.</desc>
+<style>
+  text{font-family:ui-sans-serif,-apple-system,"Segoe UI",sans-serif;font-weight:400}
+  .lab{font-size:11px;fill:#57564f} .hd{font-size:13px;font-weight:500;fill:#1a1a19}
+  .sub{font-size:11.5px;fill:#57564f} .tiny{font-size:10px;fill:#57564f} .ink{fill:#1a1a19}
+  .ax{stroke:#c3c2b7;stroke-width:0.8;fill:none} .gd{stroke:#e2e1da;stroke-width:0.6;fill:none}
+  .b{stroke:#2f6fb5;stroke-width:2;fill:none} .bf{fill:#2f6fb5} .bb{fill:#2f6fb5;opacity:.28}
+  .o{stroke:#c2571a;stroke-width:2;fill:none} .of{fill:#c2571a} .ob{fill:#c2571a;opacity:.28}
+  .g{stroke:#0f7a5a;stroke-width:2;fill:none} .gf{fill:#0f7a5a}
+  .p{stroke:#7c3aed;stroke-width:2;fill:none} .pf{fill:#7c3aed}
+  .r{stroke:#b42318;stroke-width:1.6;fill:none} .rf{fill:#b42318}
+  .k{stroke:#1a1a19;stroke-width:1.1;fill:none;stroke-dasharray:4 3} .k0{stroke:#1a1a19;stroke-width:1.3;fill:none}
+  .dash{stroke-dasharray:5 3} .dot{stroke-dasharray:1.5 3}
+  .shade{fill:#8a8880;opacity:.16} .shader{fill:#b42318;opacity:.12}
+  .cell{stroke:#ffffff;stroke-width:1}
+  @media (prefers-color-scheme: dark){
+    .lab,.sub,.tiny{fill:#b6b4ab} .hd,.ink{fill:#eceae3} .ax{stroke:#4a4844} .gd{stroke:#33312e}
+    .b{stroke:#3d8ad8} .bf{fill:#3d8ad8} .bb{fill:#3d8ad8;opacity:.36}
+    .o{stroke:#d8733a} .of{fill:#d8733a} .ob{fill:#d8733a;opacity:.36}
+    .g{stroke:#4cc79a} .gf{fill:#4cc79a} .p{stroke:#b48cff} .pf{fill:#b48cff}
+    .r{stroke:#ff7a6b} .rf{fill:#ff7a6b}
+    .k,.k0{stroke:#eceae3} .shade{fill:#b6b4ab;opacity:.16} .shader{fill:#ff7a6b;opacity:.16}
+    .cell{stroke:#131417}
+  }
+</style>
+<line class="gd" x1="50" x2="290" y1="230.0" y2="230.0"/>
+<text class="tiny" x="45" y="233.0" text-anchor="end">0</text>
+<line class="gd" x1="50" x2="290" y1="187.8" y2="187.8"/>
+<text class="tiny" x="45" y="190.8" text-anchor="end">1</text>
+<line class="gd" x1="50" x2="290" y1="145.6" y2="145.6"/>
+<text class="tiny" x="45" y="148.6" text-anchor="end">2</text>
+<line class="gd" x1="50" x2="290" y1="103.3" y2="103.3"/>
+<text class="tiny" x="45" y="106.3" text-anchor="end">3</text>
+<line class="gd" x1="50" x2="290" y1="61.1" y2="61.1"/>
+<text class="tiny" x="45" y="64.1" text-anchor="end">4</text>
+<text class="tiny" x="50.0" y="243" text-anchor="middle">0</text>
+<text class="tiny" x="110.0" y="243" text-anchor="middle">2</text>
+<text class="tiny" x="170.0" y="243" text-anchor="middle">4</text>
+<text class="tiny" x="230.0" y="243" text-anchor="middle">6</text>
+<text class="tiny" x="290.0" y="243" text-anchor="middle">8</text>
+<line class="ax" x1="50" x2="290" y1="230" y2="230"/>
+<line class="ax" x1="50" x2="50" y1="40" y2="230"/>
+<text class="lab" x="170.0" y="258" text-anchor="middle">translation s of the target</text>
+<text class="hd" x="50" y="26" style="font-size:11.5px">A: average inside the root (eq. 4)</text>
+<polyline class="b" points="65.0,218.9 80.0,207.9 110.0,185.8 140.0,163.7 170.0,141.6 230.0,97.4 290.0,53.1"/>
+<polyline class="o" points="65.0,218.7 80.0,206.5 110.0,179.6 140.0,154.2 170.0,134.4 230.0,110.3 290.0,97.6"/>
+<circle class="bf" cx="65.0" cy="218.9" r="2.5"/>
+<circle class="of" cx="65.0" cy="218.7" r="2.5"/>
+<circle class="bf" cx="80.0" cy="207.9" r="2.5"/>
+<circle class="of" cx="80.0" cy="206.5" r="2.5"/>
+<circle class="bf" cx="110.0" cy="185.8" r="2.5"/>
+<circle class="of" cx="110.0" cy="179.6" r="2.5"/>
+<circle class="bf" cx="140.0" cy="163.7" r="2.5"/>
+<circle class="of" cx="140.0" cy="154.2" r="2.5"/>
+<circle class="bf" cx="170.0" cy="141.6" r="2.5"/>
+<circle class="of" cx="170.0" cy="134.4" r="2.5"/>
+<circle class="bf" cx="230.0" cy="97.4" r="2.5"/>
+<circle class="of" cx="230.0" cy="110.3" r="2.5"/>
+<circle class="bf" cx="290.0" cy="53.1" r="2.5"/>
+<circle class="of" cx="290.0" cy="97.6" r="2.5"/>
+<line class="gd" x1="350" x2="590" y1="230.0" y2="230.0"/>
+<text class="tiny" x="345" y="233.0" text-anchor="end">0</text>
+<line class="gd" x1="350" x2="590" y1="166.7" y2="166.7"/>
+<text class="tiny" x="345" y="169.7" text-anchor="end">1</text>
+<line class="gd" x1="350" x2="590" y1="103.3" y2="103.3"/>
+<text class="tiny" x="345" y="106.3" text-anchor="end">2</text>
+<line class="gd" x1="350" x2="590" y1="40.0" y2="40.0"/>
+<text class="tiny" x="345" y="43.0" text-anchor="end">3</text>
+<text class="tiny" x="350.0" y="243" text-anchor="middle">0</text>
+<text class="tiny" x="410.0" y="243" text-anchor="middle">2</text>
+<text class="tiny" x="470.0" y="243" text-anchor="middle">4</text>
+<text class="tiny" x="530.0" y="243" text-anchor="middle">6</text>
+<text class="tiny" x="590.0" y="243" text-anchor="middle">8</text>
+<line class="ax" x1="350" x2="590" y1="230" y2="230"/>
+<line class="ax" x1="350" x2="350" y1="40" y2="230"/>
+<text class="lab" x="470.0" y="258" text-anchor="middle">translation s of the target</text>
+<text class="hd" x="350" y="26" style="font-size:11.5px">B: average outside (eq. 11, Definition 2)</text>
+<polyline class="b" points="365.0,221.4 380.0,212.9 410.0,195.7 440.0,178.6 470.0,161.4 530.0,127.1 590.0,92.9"/>
+<polyline class="o" points="365.0,221.1 380.0,210.0 410.0,178.4 440.0,141.3 470.0,108.6 530.0,69.3 590.0,51.3"/>
+<circle class="bf" cx="365.0" cy="221.4" r="2.5"/>
+<circle class="of" cx="365.0" cy="221.1" r="2.5"/>
+<circle class="bf" cx="380.0" cy="212.9" r="2.5"/>
+<circle class="of" cx="380.0" cy="210.0" r="2.5"/>
+<circle class="bf" cx="410.0" cy="195.7" r="2.5"/>
+<circle class="of" cx="410.0" cy="178.4" r="2.5"/>
+<circle class="bf" cx="440.0" cy="178.6" r="2.5"/>
+<circle class="of" cx="440.0" cy="141.3" r="2.5"/>
+<circle class="bf" cx="470.0" cy="161.4" r="2.5"/>
+<circle class="of" cx="470.0" cy="108.6" r="2.5"/>
+<circle class="bf" cx="530.0" cy="127.1" r="2.5"/>
+<circle class="of" cx="530.0" cy="69.3" r="2.5"/>
+<circle class="bf" cx="590.0" cy="92.9" r="2.5"/>
+<circle class="of" cx="590.0" cy="51.3" r="2.5"/>
+<line class="b" x1="60" x2="80" y1="276" y2="276"/>
+<text class="lab" x="86" y="280">displacement (coupled)</text>
+<line class="o" x1="260" x2="280" y1="276" y2="276"/>
+<text class="lab" x="286" y="280">mixture (uncoupled)</text>
+</svg>

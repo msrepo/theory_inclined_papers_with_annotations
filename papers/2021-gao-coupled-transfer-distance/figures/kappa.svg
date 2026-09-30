@@ -1,0 +1,68 @@
+<svg viewBox="0 0 640 300" xmlns="http://www.w3.org/2000/svg" role="img">
+<title>Path length against learning speed</title>
+<desc>For a small kappa the weights barely move: the path is short and the excess loss large.</desc>
+<style>
+  text{font-family:ui-sans-serif,-apple-system,"Segoe UI",sans-serif;font-weight:400}
+  .lab{font-size:11px;fill:#57564f} .hd{font-size:13px;font-weight:500;fill:#1a1a19}
+  .sub{font-size:11.5px;fill:#57564f} .tiny{font-size:10px;fill:#57564f} .ink{fill:#1a1a19}
+  .ax{stroke:#c3c2b7;stroke-width:0.8;fill:none} .gd{stroke:#e2e1da;stroke-width:0.6;fill:none}
+  .b{stroke:#2f6fb5;stroke-width:2;fill:none} .bf{fill:#2f6fb5} .bb{fill:#2f6fb5;opacity:.28}
+  .o{stroke:#c2571a;stroke-width:2;fill:none} .of{fill:#c2571a} .ob{fill:#c2571a;opacity:.28}
+  .g{stroke:#0f7a5a;stroke-width:2;fill:none} .gf{fill:#0f7a5a}
+  .p{stroke:#7c3aed;stroke-width:2;fill:none} .pf{fill:#7c3aed}
+  .r{stroke:#b42318;stroke-width:1.6;fill:none} .rf{fill:#b42318}
+  .k{stroke:#1a1a19;stroke-width:1.1;fill:none;stroke-dasharray:4 3} .k0{stroke:#1a1a19;stroke-width:1.3;fill:none}
+  .dash{stroke-dasharray:5 3} .dot{stroke-dasharray:1.5 3}
+  .shade{fill:#8a8880;opacity:.16} .shader{fill:#b42318;opacity:.12}
+  .cell{stroke:#ffffff;stroke-width:1}
+  @media (prefers-color-scheme: dark){
+    .lab,.sub,.tiny{fill:#b6b4ab} .hd,.ink{fill:#eceae3} .ax{stroke:#4a4844} .gd{stroke:#33312e}
+    .b{stroke:#3d8ad8} .bf{fill:#3d8ad8} .bb{fill:#3d8ad8;opacity:.36}
+    .o{stroke:#d8733a} .of{fill:#d8733a} .ob{fill:#d8733a;opacity:.36}
+    .g{stroke:#4cc79a} .gf{fill:#4cc79a} .p{stroke:#b48cff} .pf{fill:#b48cff}
+    .r{stroke:#ff7a6b} .rf{fill:#ff7a6b}
+    .k,.k0{stroke:#eceae3} .shade{fill:#b6b4ab;opacity:.16} .shader{fill:#ff7a6b;opacity:.16}
+    .cell{stroke:#131417}
+  }
+</style>
+<line class="gd" x1="60" x2="580" y1="230.0" y2="230.0"/>
+<text class="tiny" x="55" y="233.0" text-anchor="end">0</text>
+<line class="gd" x1="60" x2="580" y1="172.9" y2="172.9"/>
+<text class="tiny" x="55" y="175.9" text-anchor="end">1</text>
+<line class="gd" x1="60" x2="580" y1="115.7" y2="115.7"/>
+<text class="tiny" x="55" y="118.7" text-anchor="end">2</text>
+<line class="gd" x1="60" x2="580" y1="58.6" y2="58.6"/>
+<text class="tiny" x="55" y="61.6" text-anchor="end">3</text>
+<text class="tiny" x="60.0" y="243" text-anchor="middle">1</text>
+<text class="tiny" x="209.5" y="243" text-anchor="middle">10</text>
+<text class="tiny" x="359.1" y="243" text-anchor="middle">100</text>
+<text class="tiny" x="508.6" y="243" text-anchor="middle">1000</text>
+<line class="ax" x1="60" x2="580" y1="230" y2="230"/>
+<line class="ax" x1="60" x2="60" y1="30" y2="230"/>
+<text class="lab" x="320.0" y="258" text-anchor="middle">kappa  (learning speed / task speed)</text>
+<text class="lab" x="60" y="22">path length A, and worst excess loss (same axis)</text>
+<polyline class="b" points="60.0,226.8 131.4,219.0 209.5,167.4 280.9,130.0 359.1,131.3 430.5,128.6 508.6,123.2 580.0,118.3"/>
+<polyline class="r" points="60.0,27.0 131.4,73.6 209.5,164.6 280.9,205.7 359.1,223.1 430.5,227.6 508.6,229.0 580.0,229.7"/>
+<circle class="bf" cx="60.0" cy="226.8" r="2.5"/>
+<circle class="rf" cx="60.0" cy="27.0" r="2.5"/>
+<circle class="bf" cx="131.4" cy="219.0" r="2.5"/>
+<circle class="rf" cx="131.4" cy="73.6" r="2.5"/>
+<circle class="bf" cx="209.5" cy="167.4" r="2.5"/>
+<circle class="rf" cx="209.5" cy="164.6" r="2.5"/>
+<circle class="bf" cx="280.9" cy="130.0" r="2.5"/>
+<circle class="rf" cx="280.9" cy="205.7" r="2.5"/>
+<circle class="bf" cx="359.1" cy="131.3" r="2.5"/>
+<circle class="rf" cx="359.1" cy="223.1" r="2.5"/>
+<circle class="bf" cx="430.5" cy="128.6" r="2.5"/>
+<circle class="rf" cx="430.5" cy="227.6" r="2.5"/>
+<circle class="bf" cx="508.6" cy="123.2" r="2.5"/>
+<circle class="rf" cx="508.6" cy="229.0" r="2.5"/>
+<circle class="bf" cx="580.0" cy="118.3" r="2.5"/>
+<circle class="rf" cx="580.0" cy="229.7" r="2.5"/>
+<line class="k" x1="60" x2="580" y1="110.3" y2="110.3"/>
+<text class="tiny" x="575.5" y="105.3" text-anchor="end">quasi-static (kappa = infinity): A = 2.09</text>
+<line class="b" x1="120" x2="140" y1="52" y2="52"/>
+<text class="lab" x="146" y="56">length A of the SGD path</text>
+<line class="r" x1="120" x2="140" y1="68" y2="68"/>
+<text class="lab" x="146" y="72">worst excess loss along the way</text>
+</svg>
