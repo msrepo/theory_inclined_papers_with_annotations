@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Conditional Entropy Transfer Explorer</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/contrib/auto-render.min.js"></script>
+<style>
+:root{
+  --bg:#fbfaf7; --surface:#ffffff; --ink:#1c1d21; --muted:#5b5f68; --faint:#8a8880; --line:#e2dfd8; --soft:#f2f0ea;
+  --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a; --s4:#eda100; --neg:#e34948; --radius:12px;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#131417; --surface:#1b1d21; --ink:#ebebed; --muted:#a3a6ae; --faint:#85837b; --line:#2e3138; --soft:#23262b;
+    --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500; --neg:#e66767;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#131417; --surface:#1b1d21; --ink:#ebebed; --muted:#a3a6ae; --faint:#85837b; --line:#2e3138; --soft:#23262b;
+  --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500; --neg:#e66767;
+  color-scheme: dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,sans-serif}
+main{max-width:980px;margin:0 auto;padding:36px 16px 80px}
+a{color:var(--s1)}
+h1{font-size:1.9rem;line-height:1.2;margin:0 0 .4rem}
+h2{font-size:1.3rem;margin:2.6rem 0 .5rem;padding-top:.5rem;border-top:1px solid var(--line)}
+.lede{color:var(--muted);margin-bottom:1.2rem}
+.widget{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:14px;margin:1rem 0}
+.controls{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;margin:.2rem 0 .7rem;font-size:.9rem}
+.controls label{display:flex;align-items:center;gap:6px;color:var(--muted)}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg button{border:0;border-radius:0;border-right:1px solid var(--line)}
+.seg button:last-child{border-right:0}
+button,select,input[type=number]{font:inherit;font-size:.88rem;color:var(--ink);background:var(--soft);border:1px solid var(--line);border-radius:8px;padding:5px 11px;cursor:pointer}
+button:focus-visible,input:focus-visible,select:focus-visible,canvas:focus-visible{outline:2px solid var(--s1);outline-offset:2px}
+input[type=range]{accent-color:var(--s1);width:170px}
+input[type=number]{width:4.3em;padding:3px 5px;text-align:center;cursor:text}
+.readout{font-size:.9rem;color:var(--muted);margin-top:.5rem;font-variant-numeric:tabular-nums}
+.readout b{color:var(--ink)}
+.callout{border-left:3px solid var(--s1);background:var(--soft);padding:10px 14px;border-radius:0 8px 8px 0;margin:1rem 0}
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;align-items:start}
+@media (max-width:760px){.grid2{grid-template-columns:1fr}}
+canvas{display:block;width:100%;height:auto;border-radius:8px}
+.cap{font-size:.82rem;color:var(--muted)}
+.mat{border-collapse:collapse;font-variant-numeric:tabular-nums;font-size:.86rem;margin:.3rem 0;width:100%}
+.mat td,.mat th{border:1px solid var(--line);padding:5px 6px;text-align:center;vertical-align:top}
+.mat th{color:var(--muted);font-weight:500;font-size:.78rem}
+.mat td small{display:block;color:var(--muted);font-size:.72rem;line-height:1.3}
+.dist{display:flex;gap:10px;flex-wrap:wrap;margin:.4rem 0}
+.dist div{background:var(--soft);border-radius:8px;padding:6px 10px;font-variant-numeric:tabular-nums;font-size:.9rem}
+.dist b{font-size:1.05rem}
+.key{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:.8rem;color:var(--muted);margin:.4rem 0}
+.sw{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;vertical-align:-1px}
+.warn{color:var(--s2)}
+</style>
+</head>
+<body>
+<main>
+<h1>Conditional entropy as a transferability score</h1>
+<p class="lede">Companion to the notes on Tran, Nguyen &amp; Hassner, <i>Transferability and Hardness of Supervised Classification Tasks</i> (ICCV 2019). <a href="../index.html">Back to the notes</a></p>
+
+<p>The paper scores how well a network trained on one labelling of some images (the <b>source</b>, labels $z$) will carry over to another labelling of the same images (the <b>target</b>, labels $y$) by <i>counting</i>: how surprising is $y$ once $z$ is known? Four small experiments below take that apart: the counting itself, the one inequality in the proof, what the paper's own 40 attributes say about it, and a bias the counting has when each source class has few images.</p>
+
+<h2>1. Count, then take the entropy</h2>
+<p>Every image has a target label (a row below) and a source label (a column). Type counts into the grid. For the images with a given source label, look at how their target labels are spread. If nearly all agree, knowing $z$ nearly tells you $y$ and the <b>conditional entropy</b> $H(Y\mid Z)$ is close to $0$. If they are spread evenly it is as large as it can be. The unit is <i>nats</i> (natural logarithms): a fair coin is $\ln 2 = 0.693$ nats. The paper's bound then reads $\widetilde{\mathrm{Trf}}\ge \ell_Z - H(Y\mid Z)$, so a smaller $H(Y\mid Z)$ raises the guaranteed floor. Try the presets, then edit the counts.</p>
+<div class="widget">
+  <div class="controls">
+    <span style="color:var(--muted)">Presets:</span>
+    <button data-p="a">Fig 1(a): constant Z, binary Y</button>
+    <button data-p="c">Fig 1(c): one-to-one</button>
+    <button data-p="d">Fig 1(d): Y ignores Z</button>
+    <button data-p="e">Fig 1(e): 4 labels, 2 sources</button>
+    <button data-p="mix">In between</button>
+  </div>
+  <div class="controls">
+    <label>target labels <span class="seg"><button id="yMinus" aria-label="fewer target labels">&minus;</button><button id="yPlus" aria-label="more target labels">+</button></span> <b id="yN"></b></label>
+    <label>source labels <span class="seg"><button id="zMinus" aria-label="fewer source labels">&minus;</button><button id="zPlus" aria-label="more source labels">+</button></span> <b id="zN"></b></label>
+  </div>
+  <div class="grid2">
+    <div>
+      <table class="mat" id="cnt" aria-label="counts of images by target label (rows) and source label (columns)"></table>
+      <div class="cap">Counts of images: rows are target labels $y$, columns are source labels $z$.</div>
+    </div>
+    <div>
+      <table class="mat" id="cond" aria-label="conditional distribution of the target label given the source label"></table>
+      <div class="cap">Each column is $\hat P(y\mid z)$. Shading is the probability; the small number is the cell's share of $H(Y\mid Z)$, in nats.</div>
+    </div>
+  </div>
+  <div class="dist" id="s1box"></div>
+  <div class="controls">
+    <label>source fit $\ell_Z$ (its own average log-likelihood) <input type="range" id="lz" min="-2" max="0" step="0.01" value="-0.3"><span id="lzV"></span></label>
+  </div>
+  <div class="readout" id="s1note"></div>
+</div>
+
+<h2>2. The one inequality: drop all but one term</h2>
+<p>The proof builds a classifier $\bar k$ whose probability for the true target label $y_i$ is a <i>sum</i> over source labels, $\sum_z \hat P(y_i\mid z)\,p(z\mid x_i)$, then keeps only the term with $z=z_i$. That step is where the bound gives something away. With two source labels, the kept term is $a\,c$ (blue) and the dropped one is $b\,(1-c)$ (orange), where $c$ is the source model's confidence in the true $z_i$, $a=\hat P(y_i\mid z_i)$ and $b=\hat P(y_i\mid z_{\text{other}})$. The log of the full bar minus the log of the blue bar is the gap.</p>
+<div class="widget">
+  <div class="controls">
+    <span style="color:var(--muted)">Presets:</span>
+    <button data-q="amb">Ambiguous label ($a=b=\tfrac13$)</button>
+    <button data-q="pure">Label only under its own $z$ ($b=0$)</button>
+    <button data-q="mostly">Mostly its own $z$</button>
+  </div>
+  <div class="controls">
+    <label>$c$ <input type="range" id="cc" min="0.05" max="0.999" step="0.001" value="0.8"><span id="ccV"></span></label>
+    <label>$a$ <input type="range" id="aa" min="0" max="1" step="0.01" value="0.33"><span id="aaV"></span></label>
+    <label>$b$ <input type="range" id="bb" min="0" max="1" step="0.01" value="0.33"><span id="bbV"></span></label>
+  </div>
+  <div class="grid2">
+    <div>
+      <canvas id="bar" width="520" height="200" aria-label="Stacked bar of the kept and dropped terms"></canvas>
+      <div class="dist" id="barBox"></div>
+    </div>
+    <div>
+      <canvas id="gapPlot" width="520" height="260" aria-label="Gap in nats as a function of the source confidence c"></canvas>
+    </div>
+  </div>
+  <div class="readout" id="barNote"></div>
+  <table class="mat" id="sixTab" aria-label="the six-point example, one row per label pattern"></table>
+  <div class="cap">The paper's proof does not quantify this. On six points with $Z=(0,0,0,1,1,1)$, $Y=(0,0,1,1,2,2)$ only the two points with $y=1$ are ambiguous, so the average gap is exactly $\tfrac13\ln(1/c)$.</div>
+</div>
+
+<h2>3. The paper's own 40 attributes</h2>
+<p>Tables 3 and 4 of the paper's appendix give, for each of 40 CelebA face attributes, the conditional entropy given identity ($H(Y\mid\text{ID})$, the paper's measure), the attribute's own label entropy ($H(Y)$, which the paper calls its hardness), and the test accuracy of a linear classifier on face-recognition features. Pick what goes on each axis. The first view is the paper's claim (Figure 3): CE against error. Then swap the x-axis to $H(Y)$, which uses no source at all.</p>
+<div class="widget">
+  <div class="controls">
+    <label>x <select id="xs">
+      <option value="ce">CE = H(Y | identity)</option>
+      <option value="hy">H(Y), label entropy alone</option>
+      <option value="ratio">CE / H(Y)</option>
+      <option value="info">H(Y) &minus; CE, what identity tells</option>
+    </select></label>
+    <label>y <select id="ys">
+      <option value="err">transfer error (SVM on identity features)</option>
+      <option value="errd">dedicated network error</option>
+      <option value="saved">error saved over always guessing the majority</option>
+    </select></label>
+    <label><input type="checkbox" id="win"> Fano window (CE against error only)</label>
+    <label><input type="checkbox" id="nbl"> drop Big Lips</label>
+    <label>highlight <select id="hl"><option value="">none</option></select></label>
+  </div>
+  <canvas id="sc" width="900" height="460" tabindex="0" aria-label="Scatter plot of the 40 CelebA attributes; hover a point for its name"></canvas>
+  <div class="key" id="scKey"></div>
+  <div class="dist" id="scBox"></div>
+  <div class="readout" id="scNote"></div>
+</div>
+
+<h2>4. Counting with few examples per source class</h2>
+<p>The plug-in estimate of $H(Y\mid Z)$ splits the data by $z$ and measures how mixed $y$ is <i>within each small group</i>. A small group looks purer than the truth just by chance: three coin flips are rarely a perfect 50/50. So with few images per source label the count reads low even when $y$ has nothing to do with $z$. This widget draws $y$ independently of $z$ (true $H(Y\mid Z)=H(Y)$) and shows what counting would report. Set the numbers to the paper's identity source with the first button.</p>
+<div class="widget">
+  <div class="controls">
+    <button id="celebA">CelebA identities</button>
+    <label>images $n$ <input type="range" id="nn" min="2" max="6" step="any" value="5.2615"><span id="nnV"></span></label>
+    <label>source labels $|Z|$ <input type="range" id="zz" min="0.3" max="4.5" step="any" value="4.0076"><span id="zzV"></span></label>
+    <label>$P(y=1)$ <input type="range" id="pp" min="0.01" max="0.5" step="0.001" value="0.022"><span id="ppV"></span></label>
+  </div>
+  <div class="dist" id="biasBox"></div>
+  <canvas id="bias" width="900" height="330" aria-label="Shortfall of the plug-in estimate against images per source label"></canvas>
+  <div class="readout" id="biasNote"></div>
+</div>
+
+</main>
+<script>
+"use strict";
+const $ = id => document.getElementById(id);
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const fmt = (x, d = 3) => (Math.abs(x) < 0.5 * Math.pow(10, -d) ? 0 : x).toFixed(d);
+function fit(cv, aspect) {
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  cv.style.width = "100%";
+  const cw = cv.clientWidth || 600;
+  cv.width = Math.round(cw * dpr); cv.height = Math.round(cw * aspect * dpr);
+  cv.style.height = (cw * aspect) + "px";
+  const g = cv.getContext("2d"); g.setTransform(dpr, 0, 0, dpr, 0, 0);
+  return { g, w: cw, h: cw * aspect };
+}
+const colors = () => ({ ink: css("--ink"), muted: css("--muted"), faint: css("--faint"), line: css("--line"), soft: css("--soft"),
+  s1: css("--s1"), s2: css("--s2"), s3: css("--s3"), s4: css("--s4"), surface: css("--surface") });
+function mixed(col, alpha) { // hex or rgb colour -> rgba with alpha
+  const c = document.createElement("canvas").getContext("2d"); c.fillStyle = col; const v = c.fillStyle;
+  if (v[0] === "#") { const n = parseInt(v.slice(1), 16); return `rgba(${n >> 16 & 255},${n >> 8 & 255},${n & 255},${alpha})`; }
+  return v.replace("rgb(", "rgba(").replace(")", `,${alpha})`);
+}
+function niceTicks(lo, hi, k = 6) {
+  const span = hi - lo, raw = span / k, mag = Math.pow(10, Math.floor(Math.log10(raw)));
+  const step = [1, 2, 2.5, 5, 10].map(m => m * mag).find(s => s >= raw);
+  const out = []; for (let v = Math.ceil(lo / step) * step; v <= hi + 1e-9; v += step) out.push(+v.toFixed(10));
+  return out;
+}
+const hb = p => (p <= 0 || p >= 1) ? 0 : -(p * Math.log(p) + (1 - p) * Math.log(1 - p));
+function hbInv(H) { let lo = 0, hi = 0.5; for (let i = 0; i < 60; i++) { const m = (lo + hi) / 2; if (hb(m) < H) lo = m; else hi = m; } return (lo + hi) / 2; }
+const pearson = (a, b) => { const n = a.length, ma = a.reduce((s, v) => s + v, 0) / n, mb = b.reduce((s, v) => s + v, 0) / n;
+  let sab = 0, saa = 0, sbb = 0; for (let i = 0; i < n; i++) { sab += (a[i] - ma) * (b[i] - mb); saa += (a[i] - ma) ** 2; sbb += (b[i] - mb) ** 2; } return sab / Math.sqrt(saa * sbb); };
+const ranks = a => { const idx = a.map((v, i) => [v, i]).sort((p, q) => p[0] - q[0]); const r = new Array(a.length);
+  let i = 0; while (i < idx.length) { let j = i; while (j + 1 < idx.length && idx[j + 1][0] === idx[i][0]) j++; for (let k = i; k <= j; k++) r[idx[k][1]] = (i + j) / 2; i = j + 1; } return r; };
+const spearman = (a, b) => pearson(ranks(a), ranks(b));
+
+/* ---------------------------------------------------------------- 1 */
+const S1 = { ry: 2, cz: 1, n: [[40], [40]] };
+const presets = {
+  a: { ry: 2, cz: 1, n: [[40], [40]] },
+  c: { ry: 2, cz: 2, n: [[40, 0], [0, 40]] },
+  d: { ry: 2, cz: 2, n: [[20, 20], [20, 20]] },
+  e: { ry: 4, cz: 2, n: [[20, 0], [20, 0], [0, 20], [0, 20]] },
+  mix: { ry: 3, cz: 3, n: [[30, 10, 5], [10, 30, 5], [0, 10, 30]] }
+};
+function resizeS1() {
+  while (S1.n.length < S1.ry) S1.n.push(Array(S1.cz).fill(0));
+  S1.n.length = S1.ry;
+  S1.n.forEach((r, i) => { while (r.length < S1.cz) r.push(0); r.length = S1.cz; });
+}
+function buildS1() {
+  resizeS1();
+  $("yN").textContent = S1.ry; $("zN").textContent = S1.cz;
+  let h = "<tr><th></th>" + Array.from({ length: S1.cz }, (_, z) => `<th>z = ${z}</th>`).join("") + "</tr>";
+  for (let y = 0; y < S1.ry; y++) {
+    h += `<tr><th>y = ${y}</th>` + Array.from({ length: S1.cz }, (_, z) =>
+      `<td><input type="number" min="0" max="999" step="1" value="${S1.n[y][z]}" data-y="${y}" data-z="${z}" aria-label="count for y ${y}, z ${z}"></td>`).join("") + "</tr>";
+  }
+  $("cnt").innerHTML = h;
+  $("cnt").querySelectorAll("input").forEach(el => el.addEventListener("input", () => {
+    S1.n[+el.dataset.y][+el.dataset.z] = Math.max(0, Math.min(999, Math.floor(+el.value || 0))); drawS1();
+  }));
+  drawS1();
+}
+function drawS1() {
+  const C = colors(), n = S1.n.flat().reduce((s, v) => s + v, 0);
+  const Nz = Array.from({ length: S1.cz }, (_, z) => S1.n.reduce((s, r) => s + r[z], 0));
+  const Ny = S1.n.map(r => r.reduce((s, v) => s + v, 0));
+  if (n === 0) { $("cond").innerHTML = ""; $("s1box").innerHTML = ""; $("s1note").textContent = "Enter some counts."; return; }
+  let Hyz = 0, Hy = 0, h = "<tr><th></th>" + Array.from({ length: S1.cz }, (_, z) => `<th>z = ${z}<br>${Nz[z]} images</th>`).join("") + "</tr>";
+  for (let y = 0; y < S1.ry; y++) {
+    if (Ny[y] > 0) Hy -= (Ny[y] / n) * Math.log(Ny[y] / n);
+    h += `<tr><th>y = ${y}</th>`;
+    for (let z = 0; z < S1.cz; z++) {
+      const c = S1.n[y][z], p = Nz[z] ? c / Nz[z] : 0, contrib = c ? -(c / n) * Math.log(p) : 0;
+      Hyz += contrib;
+      h += `<td style="background:${mixed(C.s1, 0.08 + 0.55 * p)}">${Nz[z] ? fmt(p, 2) : "&ndash;"}<small>${fmt(contrib, 3)}</small></td>`;
+    }
+    h += "</tr>";
+  }
+  $("cond").innerHTML = h;
+  const I = Hy - Hyz, lz = +$("lz").value, used = Nz.filter(v => v > 0).length;
+  $("lzV").textContent = fmt(lz, 2);
+  $("s1box").innerHTML = `<div>H(Y) <b>${fmt(Hy)}</b></div><div>H(Y|Z) <b>${fmt(Hyz)}</b></div><div>H(Y) &minus; H(Y|Z) <b>${fmt(I)}</b></div><div>bound $\\ell_Z-H$ <b>${fmt(lz - Hyz, 3)}</b></div>`;
+  let note = `Averaging $-\\ln\\hat P(y_i\\mid z_i)$ over the ${n} images gives ${fmt(Hyz, 4)}, the same number: that is Eq. 17 of the paper's appendix. `;
+  if (used === 1) note += `Only one source label is used, so $H(Y\\mid Z)=H(Y)$: the source says nothing, and this is the paper's "trivial source". `;
+  else if (Math.abs(I) < 5e-4) note += `$H(Y)-H(Y\\mid Z)=0$: $y$ is independent of $z$, as if the source were trivial. `;
+  if (Hyz < 5e-4) note += `$H(Y\\mid Z)=0$: $z$ determines $y$ completely. `;
+  note += `A trivial source with 16 balanced target labels would give $\\ln 16 = 4\\ln 2 = 2.773$, the number the paper's text attaches to panels (a) and (b), which have two.`;
+  $("s1note").innerHTML = note;
+  if (window.renderMathInElement) { const o = { delimiters: [{ left: "$$", right: "$$", display: true }, { left: "$", right: "$", display: false }] }; renderMathInElement($("s1box"), o); renderMathInElement($("s1note"), o); }
+}
+document.querySelectorAll("[data-p]").forEach(b => b.addEventListener("click", () => {
+  const p = presets[b.dataset.p]; S1.ry = p.ry; S1.cz = p.cz; S1.n = p.n.map(r => r.slice()); buildS1();
+}));
+$("yPlus").onclick = () => { if (S1.ry < 6) { S1.ry++; buildS1(); } };
+$("yMinus").onclick = () => { if (S1.ry > 1) { S1.ry--; buildS1(); } };
+$("zPlus").onclick = () => { if (S1.cz < 5) { S1.cz++; buildS1(); } };
+$("zMinus").onclick = () => { if (S1.cz > 1) { S1.cz--; buildS1(); } };
+$("lz").addEventListener("input", drawS1);
+
+/* ---------------------------------------------------------------- 2 */
+function drawS2() {
+  const C = colors(), c = +$("cc").value, a = +$("aa").value, b = +$("bb").value;
+  $("ccV").textContent = fmt(c, 3); $("aaV").textContent = fmt(a, 2); $("bbV").textContent = fmt(b, 2);
+  const kept = a * c, drop = b * (1 - c), full = kept + drop;
+  { const { g, w, h } = fit($("bar"), 200 / 520);
+    g.clearRect(0, 0, w, h);
+    const x0 = 14, W = w - 28, y0 = 42, H = 34;
+    g.fillStyle = C.soft; g.fillRect(x0, y0, W, H);
+    g.fillStyle = C.s1; g.fillRect(x0, y0, W * kept, H);
+    g.fillStyle = C.s2; g.fillRect(x0 + W * kept, y0, W * drop, H);
+    g.strokeStyle = C.line; g.strokeRect(x0, y0, W, H);
+    g.fillStyle = C.muted; g.font = "12px -apple-system,Segoe UI,sans-serif"; g.textBaseline = "alphabetic";
+    g.fillText("probability the classifier k̄ gives the true label y_i (full scale = 1)", x0, 30);
+    g.fillStyle = C.s1; g.fillText(`kept  a·c = ${fmt(kept)}`, x0, y0 + H + 20);
+    g.fillStyle = C.s2; g.fillText(`dropped  b·(1−c) = ${fmt(drop)}`, x0, y0 + H + 38);
+    g.fillStyle = C.ink; g.fillText(`full sum ${fmt(full)}`, x0, y0 + H + 56);
+  }
+  const gap = kept > 0 ? Math.log(full / kept) : Infinity;
+  $("barBox").innerHTML = `<div>ln(full) <b>${full > 0 ? fmt(Math.log(full)) : "&minus;∞"}</b></div><div>ln(kept) <b>${kept > 0 ? fmt(Math.log(kept)) : "&minus;∞"}</b></div><div>gap <b>${isFinite(gap) ? fmt(gap) : "∞"}</b> nats</div>`;
+  $("barNote").innerHTML = kept === 0 ? `<span class="warn">$a\\cdot c=0$: the kept term is zero, so the bound is $-\\infty$ for this point.</span>` :
+    (b === 0 ? `$b=0$: no other source label can produce $y_i$, so nothing is dropped and the step is exact.` :
+     (c > 0.99 ? `The source is nearly certain, so the dropped term is tiny.` : `Gap $=\\ln\\!\\big(1+\\tfrac{b(1-c)}{a\\,c}\\big)$. It is largest when the source is unsure (small $c$) and the label is at least as likely under the other class ($b\\ge a$).`));
+  { const { g, w, h } = fit($("gapPlot"), 260 / 520);
+    g.clearRect(0, 0, w, h);
+    const ox = 46, oy = 16, W = w - ox - 14, H = h - oy - 38;
+    const cs = Array.from({ length: 120 }, (_, i) => 0.05 + (0.999 - 0.05) * i / 119);
+    const gp = cs.map(cc => (a * cc > 0) ? Math.log((a * cc + b * (1 - cc)) / (a * cc)) : NaN);
+    const ymax = Math.max(0.5, Math.min(4, Math.max(...gp.filter(isFinite), 0) * 1.1));
+    const X = v => ox + (v - 0.05) / (0.999 - 0.05) * W, Y = v => oy + H - Math.min(v, ymax) / ymax * H;
+    g.strokeStyle = C.line; g.lineWidth = 1; g.fillStyle = C.muted; g.font = "11px -apple-system,Segoe UI,sans-serif";
+    niceTicks(0, ymax, 4).forEach(v => { g.beginPath(); g.moveTo(ox, Y(v)); g.lineTo(ox + W, Y(v)); g.stroke(); g.textAlign = "right"; g.fillText(fmt(v, 1), ox - 5, Y(v) + 4); });
+    [0.1, 0.3, 0.5, 0.7, 0.9].forEach(v => { g.textAlign = "center"; g.fillText(v, X(v), oy + H + 15); });
+    g.strokeRect(ox, oy, W, H);
+    g.strokeStyle = C.s2; g.lineWidth = 2.2; g.beginPath(); let first = true;
+    cs.forEach((cc, i) => { if (!isFinite(gp[i])) return; if (first) { g.moveTo(X(cc), Y(gp[i])); first = false; } else g.lineTo(X(cc), Y(gp[i])); }); g.stroke();
+    if (isFinite(gap)) { g.fillStyle = C.ink; g.beginPath(); g.arc(X(c), Y(gap), 4.5, 0, 6.3); g.fill(); }
+    g.fillStyle = C.muted; g.textAlign = "center"; g.fillText("source confidence c", ox + W / 2, h - 6);
+    g.save(); g.translate(12, oy + H / 2); g.rotate(-Math.PI / 2); g.fillText("gap, nats", 0, 0); g.restore();
+  }
+  // six-point table
+  const rows = [["y = 0 (twice)", 2 / 3, 0], ["y = 1 (twice)", 1 / 3, 1 / 3], ["y = 2 (twice)", 2 / 3, 0]];
+  let tot = 0, t = "<tr><th>points</th><th>a = P̂(y|own z)</th><th>b = P̂(y|other z)</th><th>gap, nats</th></tr>";
+  rows.forEach(([nm, aa, bb]) => { const gg = Math.log((aa * c + bb * (1 - c)) / (aa * c)); tot += gg / 3; t += `<tr><td>${nm}</td><td>${fmt(aa, 3)}</td><td>${fmt(bb, 3)}</td><td>${fmt(gg, 4)}</td></tr>`; });
+  t += `<tr><td colspan="3"><b>average over the six points</b> (uses the same c)</td><td><b>${fmt(tot, 4)}</b> = &#8531; ln(1/c) = ${fmt(Math.log(1 / c) / 3, 4)}</td></tr>`;
+  $("sixTab").innerHTML = t;
+  if (window.renderMathInElement) renderMathInElement($("barNote"), { delimiters: [{ left: "$", right: "$", display: false }] });
+}
+["cc", "aa", "bb"].forEach(id => $(id).addEventListener("input", drawS2));
+document.querySelectorAll("[data-q]").forEach(b => b.addEventListener("click", () => {
+  const v = { amb: [0.8, 1 / 3, 1 / 3], pure: [0.8, 2 / 3, 0], mostly: [0.7, 0.6, 0.1] }[b.dataset.q];
+  $("cc").value = v[0]; $("aa").value = v[1]; $("bb").value = v[2]; drawS2();
+}));
+
+/* ---------------------------------------------------------------- 3 */
+// name, CE = H(Y|identity) [Table 3 row 9], H(Y) [Table 4], transfer accuracy [Table 3 row 11], dedicated accuracy [row 10]
+const ATTR = [
+["Male",.017,.679,.992,.985],["Bald",.026,.107,.991,.990],["Gray Hair",.052,.174,.981,.980],["Mustache",.062,.173,.968,.968],
+["Double Chin",.083,.189,.963,.959],["Chubby",.087,.220,.957,.951],["Sideburns",.088,.217,.976,.976],["Goatee",.089,.235,.973,.974],
+["Young",.095,.535,.899,.879],["Wearing Hat",.107,.194,.988,.991],["Eyeglasses",.109,.241,.996,.997],["Pale Skin",.122,.177,.958,.970],
+["Necktie",.131,.261,.941,.963],["Blurry",.139,.201,.956,.963],["No Beard",.141,.448,.958,.961],["Receding Hairline",.141,.278,.933,.936],
+["5 o'clock Shadow",.145,.349,.937,.942],["Rosy Cheeks",.152,.242,.939,.950],["Blond Hair",.160,.419,.949,.961],["Big Lips",.161,.552,.710,.715],
+["Bushy Eyebrows",.192,.409,.919,.927],["Lipstick",.202,.692,.940,.935],["Big Nose",.232,.545,.845,.828],["Bangs",.236,.425,.950,.961],
+["Narrow Eyes",.252,.357,.863,.875],["Necklace",.252,.373,.865,.859],["Heavy Makeup",.270,.667,.897,.916],["Black Hair",.286,.550,.869,.901],
+["Earrings",.291,.485,.853,.896],["Arched Eyebrows",.306,.580,.822,.834],["Brown Hair",.315,.508,.854,.886],["Bags Under Eyes",.324,.507,.838,.834],
+["Oval Face",.339,.597,.733,.752],["Straight Hair",.339,.512,.812,.836],["Pointy Nose",.341,.591,.769,.769],["Attractive",.361,.693,.820,.823],
+["Wavy Hair",.381,.627,.800,.842],["High Cheekbones",.476,.689,.859,.878],["Smiling",.521,.693,.909,.933],["Mouth Open",.551,.693,.901,.943]
+].map(([name, ce, hy, trf, ded]) => { const base = hbInv(hy); return { name, ce, hy, err: 1 - trf, errd: 1 - ded, base, saved: base - (1 - trf), ratio: ce / hy, info: hy - ce }; });
+const XL = { ce: "CE = H(Y | identity)", hy: "H(Y), label entropy alone", ratio: "CE / H(Y)", info: "H(Y) − CE" };
+const YL = { err: "transfer error", errd: "dedicated-network error", saved: "error saved over the majority guess" };
+ATTR.slice().sort((p, q) => p.name.localeCompare(q.name)).forEach(a => { const o = document.createElement("option"); o.value = a.name; o.textContent = a.name; $("hl").appendChild(o); });
+let hover = -1, scGeom = null;
+function rows3() { return ATTR.filter(a => !($("nbl").checked && a.name === "Big Lips")); }
+function drawS3() {
+  const C = colors(), R = rows3(), xk = $("xs").value, yk = $("ys").value;
+  const xs = R.map(a => a[xk]), ys = R.map(a => a[yk]);
+  const rP = pearson(xs, ys), rS = spearman(xs, ys);
+  const { g, w, h } = fit($("sc"), 460 / 900); g.clearRect(0, 0, w, h);
+  const ox = 58, oy = 14, W = w - ox - 16, H = h - oy - 46;
+  const xlo = Math.min(0, ...xs), xhi = Math.max(...xs) * 1.05, ylo = Math.min(0, ...ys) * 1.1, yhi = Math.max(...ys) * 1.08 + (($("win").checked && xk === "ce" && yk !== "saved") ? 0.0 : 0);
+  const X = v => ox + (v - xlo) / (xhi - xlo) * W, Y = v => oy + H - (v - ylo) / (yhi - ylo) * H;
+  scGeom = { X, Y, R, xk, yk };
+  g.lineWidth = 1; g.font = "11px -apple-system,Segoe UI,sans-serif"; g.fillStyle = C.muted; g.strokeStyle = C.line;
+  niceTicks(ylo, yhi, 6).forEach(v => { g.beginPath(); g.moveTo(ox, Y(v)); g.lineTo(ox + W, Y(v)); g.stroke(); g.textAlign = "right"; g.fillText(fmt(v, 2), ox - 6, Y(v) + 4); });
+  niceTicks(xlo, xhi, 7).forEach(v => { g.textAlign = "center"; g.fillText(fmt(v, 2), X(v), oy + H + 16); });
+  g.strokeStyle = C.faint; g.strokeRect(ox, oy, W, H);
+  const winOn = $("win").checked && xk === "ce" && (yk === "err" || yk === "errd");
+  g.save(); g.beginPath(); g.rect(ox, oy, W, H); g.clip();
+  if (winOn) {
+    const gr = Array.from({ length: 121 }, (_, i) => xhi * i / 120);
+    g.fillStyle = mixed(C.s1, 0.13); g.strokeStyle = C.s1; g.setLineDash([5, 3]); g.lineWidth = 1.2;
+    g.beginPath(); gr.forEach((v, i) => { const f = v / (2 * Math.LN2); i ? g.lineTo(X(v), Y(f)) : g.moveTo(X(v), Y(f)); });
+    gr.slice().reverse().forEach(v => g.lineTo(X(v), Y(hbInv(Math.min(v, Math.LN2)))));
+    g.closePath(); g.fill(); g.stroke(); g.setLineDash([]);
+  }
+  // regression line
+  const n = xs.length, mx = xs.reduce((s, v) => s + v, 0) / n, my = ys.reduce((s, v) => s + v, 0) / n;
+  let sxy = 0, sxx = 0; xs.forEach((v, i) => { sxy += (v - mx) * (ys[i] - my); sxx += (v - mx) ** 2; });
+  const m = sxy / sxx, b0 = my - m * mx;
+  g.strokeStyle = C.faint; g.setLineDash([6, 4]); g.lineWidth = 1.2; g.beginPath(); g.moveTo(X(xlo), Y(m * xlo + b0)); g.lineTo(X(xhi), Y(m * xhi + b0)); g.stroke(); g.setLineDash([]);
+  g.restore();
+  R.forEach((a, i) => {
+    let col = C.s1;
+    if (winOn) { const lo = hbInv(Math.min(a.ce, Math.LN2)), up = a.ce / (2 * Math.LN2), e = a[yk]; col = e > up ? C.s2 : (e < lo - 1e-9 ? C.s3 : C.s1); }
+    g.fillStyle = col; g.strokeStyle = C.surface; g.lineWidth = 1.4;
+    const hot = a.name === $("hl").value || i === hover;
+    g.beginPath(); g.arc(X(a[xk]), Y(a[yk]), hot ? 7 : 4.5, 0, 6.3); g.fill(); g.stroke();
+    if (hot) { g.fillStyle = C.ink; g.textAlign = "left"; g.font = "12px -apple-system,Segoe UI,sans-serif"; g.fillText(a.name, X(a[xk]) + 10, Y(a[yk]) - 8); }
+  });
+  g.fillStyle = C.muted; g.textAlign = "center"; g.font = "12px -apple-system,Segoe UI,sans-serif"; g.fillText(XL[xk], ox + W / 2, h - 8);
+  g.save(); g.translate(14, oy + H / 2); g.rotate(-Math.PI / 2); g.fillText(YL[yk], 0, 0); g.restore();
+  $("scBox").innerHTML = `<div>Pearson r <b>${fmt(rP, 2)}</b></div><div>Spearman ρ <b>${fmt(rS, 2)}</b></div><div>points <b>${n}</b></div>`;
+  $("scKey").innerHTML = winOn ? `<span><span class="sw" style="background:var(--s1)"></span>inside the window</span><span><span class="sw" style="background:var(--s2)"></span>above: the head does worse than an identity lookup</span><span><span class="sw" style="background:var(--s3)"></span>below: the features know more than the identity label</span>` : "";
+  const parts = [];
+  if (xk === "ce" && yk === "err") parts.push(`The paper's Figure 3 prints r = 0.78 for this pair; recomputed from Tables 3 and 4 it is ${fmt(rP, 2)} (0.73 without Big Lips).`);
+  if (xk === "hy" && yk === "err") { const ce = R.map(a => a.ce);
+    parts.push(`With no source involved at all, the label entropy ties the paper's measure on Pearson r (${fmt(rP, 2)} against ${fmt(pearson(ce, ys), 2)}) but trails it on rank correlation (${fmt(rS, 2)} against ${fmt(spearman(ce, ys), 2)}). The paper reports only Pearson.`); }
+  if (yk === "saved") parts.push(`"Saved" assumes plain accuracy: the majority guess errs at the rarer class's rate, recovered from H(Y). The paper does not say whether its tables are plain or class-balanced accuracy.`);
+  if (winOn) parts.push(`For a binary target no guesser that sees only $z$ can have error outside [h⁻¹(CE), CE/(2 ln 2)]; the plug-in CE is also biased low (section 4), so the true window sits a little higher.`);
+  if (hover >= 0) { const a = R[hover]; parts.unshift(`<b>${a.name}</b>: CE ${fmt(a.ce)}, H(Y) ${fmt(a.hy)}, transfer error ${fmt(a.err)}, dedicated error ${fmt(a.errd)}, majority-guess error ${fmt(a.base)}.`); }
+  $("scNote").innerHTML = parts.join(" ");
+  if (window.renderMathInElement) renderMathInElement($("scNote"), { delimiters: [{ left: "$", right: "$", display: false }] });
+}
+$("sc").addEventListener("mousemove", ev => {
+  if (!scGeom) return; const r = $("sc").getBoundingClientRect(), mx = ev.clientX - r.left, my = ev.clientY - r.top;
+  let best = -1, bd = 14 * 14; scGeom.R.forEach((a, i) => { const dx = scGeom.X(a[scGeom.xk]) - mx, dy = scGeom.Y(a[scGeom.yk]) - my, d = dx * dx + dy * dy; if (d < bd) { bd = d; best = i; } });
+  if (best !== hover) { hover = best; drawS3(); }
+});
+$("sc").addEventListener("mouseleave", () => { hover = -1; drawS3(); });
+["xs", "ys", "win", "nbl", "hl"].forEach(id => $(id).addEventListener("input", () => { hover = -1; drawS3(); }));
+
+/* ---------------------------------------------------------------- 4 */
+const LF = [0]; for (let i = 1; i <= 410; i++) LF[i] = LF[i - 1] + Math.log(i);
+function nullPlug(p, m) {            // integer m >= 1: exact E[h(K/m)], K ~ Bin(m, p)
+  if (m < 1) return 0; let t = 0; const lp = Math.log(p), lq = Math.log(1 - p);
+  for (let k = 0; k <= m; k++) t += Math.exp(LF[m] - LF[k] - LF[m - k] + (k ? k * lp : 0) + ((m - k) ? (m - k) * lq : 0)) * hb(k / m);
+  return t;
+}
+function nullPlugReal(p, m) {
+  if (m > 400) return Math.max(0, hb(p) - 1 / (2 * m));
+  const m0 = Math.floor(m), f = m - m0; return (1 - f) * nullPlug(p, m0) + f * nullPlug(p, m0 + 1);
+}
+function drawS4() {
+  const C = colors(), n = Math.pow(10, +$("nn").value), Z = Math.pow(10, +$("zz").value), p = +$("pp").value, m = n / Z;
+  $("nnV").textContent = Math.round(n).toLocaleString(); $("zzV").textContent = Math.max(1, Math.round(Z)).toLocaleString(); $("ppV").textContent = fmt(p, 3);
+  const H = hb(p), E = nullPlugReal(p, m), mm = 1 / (2 * m);
+  $("biasBox").innerHTML = `<div>images per source label <b>${fmt(m, 1)}</b></div><div>true H(Y|Z) = H(Y) <b>${fmt(H, 4)}</b></div><div>counting reports <b>${fmt(E, 4)}</b></div><div>shortfall <b>${fmt(H - E, 4)}</b></div><div>first order 1/(2m) <b>${fmt(mm, 4)}</b></div>`;
+  $("biasNote").innerHTML = m < 1 ? `<span class="warn">Fewer images than source labels: every group has one image, so counting reports exactly 0 whatever $y$ is. A source with as many labels as images looks perfectly informative.</span>` :
+    (H - E > 0.017 ? `The shortfall (${fmt(H - E, 3)}) is larger than the paper's smallest reported CE for CelebA (Male, 0.017).` : `The shortfall is below the paper's smallest reported CE (Male, 0.017).`) +
+    (m > 400 ? " (First-order approximation used for more than 400 images per label.)" : "");
+  if (window.renderMathInElement) renderMathInElement($("biasNote"), { delimiters: [{ left: "$", right: "$", display: false }] });
+  const { g, w, h } = fit($("bias"), 330 / 900); g.clearRect(0, 0, w, h);
+  const ox = 56, oy = 14, W = w - ox - 16, Hh = h - oy - 44, ymax = 0.36, ymin = -0.03;
+  const lmin = Math.log(1), lmax = Math.log(400);
+  const X = v => ox + (Math.log(Math.max(v, 1)) - lmin) / (lmax - lmin) * W, Y = v => oy + Hh - (v - ymin) / (ymax - ymin) * Hh;
+  g.font = "11px -apple-system,Segoe UI,sans-serif"; g.lineWidth = 1; g.strokeStyle = C.line; g.fillStyle = C.muted;
+  [0, 0.1, 0.2, 0.3].forEach(v => { g.beginPath(); g.moveTo(ox, Y(v)); g.lineTo(ox + W, Y(v)); g.stroke(); g.textAlign = "right"; g.fillText(fmt(v, 2), ox - 6, Y(v) + 4); });
+  [1, 2, 5, 10, 20, 50, 100, 400].forEach(v => { g.textAlign = "center"; g.fillText(v, X(v), oy + Hh + 16); });
+  g.strokeStyle = C.faint; g.strokeRect(ox, oy, W, Hh);
+  g.setLineDash([4, 3]); g.strokeStyle = C.s2; [["Bald 0.026", 0.026], ["Male 0.017", 0.017]].forEach(([nm, v], i) => { g.beginPath(); g.moveTo(ox, Y(v)); g.lineTo(ox + W, Y(v)); g.stroke(); g.fillStyle = C.s2; g.textAlign = "left"; g.fillText("reported CE of " + nm, ox + 6, Y(v) + (i ? 13 : -4)); }); g.setLineDash([]);
+  const ms = Array.from({ length: 90 }, (_, i) => Math.exp(lmin + (lmax - lmin) * i / 89));
+  g.strokeStyle = C.s1; g.lineWidth = 2.2; g.beginPath(); ms.forEach((mv, i) => { const v = H - nullPlugReal(p, mv); i ? g.lineTo(X(mv), Y(v)) : g.moveTo(X(mv), Y(v)); }); g.stroke();
+  g.strokeStyle = C.faint; g.setLineDash([5, 3]); g.lineWidth = 1.2; g.beginPath(); ms.forEach((mv, i) => { const v = 1 / (2 * mv); i ? g.lineTo(X(mv), Y(v)) : g.moveTo(X(mv), Y(v)); }); g.stroke(); g.setLineDash([]);
+  g.fillStyle = C.ink; g.beginPath(); g.arc(X(m), Y(H - E), 5, 0, 6.3); g.fill();
+  g.fillStyle = C.muted; g.textAlign = "center"; g.font = "12px -apple-system,Segoe UI,sans-serif"; g.fillText("images per source label m (log scale); solid: exact shortfall for this P(y=1), dashed: 1/(2m)", ox + W / 2, h - 8);
+  g.save(); g.translate(13, oy + Hh / 2); g.rotate(-Math.PI / 2); g.fillText("H(Y) minus counted, nats", 0, 0); g.restore();
+}
+["nn", "zz", "pp"].forEach(id => $(id).addEventListener("input", drawS4));
+$("celebA").onclick = () => { $("nn").value = Math.log10(182626); $("zz").value = Math.log10(10177); $("pp").value = 0.022; drawS4(); };
+
+function all() { drawS1(); drawS2(); drawS3(); drawS4(); }
+buildS1(); drawS2(); drawS3(); drawS4();
+window.addEventListener("load", () => { if (window.renderMathInElement) { renderMathInElement(document.body, { delimiters: [{ left: "$$", right: "$$", display: true }, { left: "$", right: "$", display: false }] }); all(); } });
+window.addEventListener("resize", () => { drawS2(); drawS3(); drawS4(); });
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change", all);
+</script>
+</body>
+</html>

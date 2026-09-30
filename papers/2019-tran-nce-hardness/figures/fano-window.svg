@@ -1,0 +1,117 @@
+<svg viewBox="0 0 760 400" xmlns="http://www.w3.org/2000/svg" role="img">
+<title>Test error against the Fano window of the conditional entropy</title>
+<desc>Forty CelebA attributes plotted by conditional entropy and linear SVM test error, with the window a Z-only guesser can reach shaded.</desc>
+<style>
+  text{font-family:ui-sans-serif,-apple-system,"Segoe UI",sans-serif;font-weight:400}
+  .lab{font-size:11px;fill:#57564f} .hd{font-size:13px;font-weight:500;fill:#1a1a19}
+  .sm{font-size:10.5px;fill:#57564f} .v{font-size:10.5px;fill:#1a1a19}
+  .ax{stroke:#8a8880;stroke-width:0.9;fill:none} .box{fill:none;stroke:#c9c7bf;stroke-width:1}
+  .gd{stroke:#e2e1da;stroke-width:0.6;fill:none}
+  .s1{stroke:#2a78d6} .s2{stroke:#eb6834} .s3{stroke:#1baf7a} .s4{stroke:#eda100} .s5{stroke:#8a8880}
+  .f1{fill:#2a78d6} .f2{fill:#eb6834} .f3{fill:#1baf7a} .f4{fill:#eda100}
+  .ln{stroke-width:2.2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+  .seg{stroke-width:4;stroke-linecap:round;fill:none}
+  .dash{stroke-width:1.3;fill:none;stroke-dasharray:5 3}
+  .win{fill:#2a78d6;opacity:.13} .gap{fill:#eb6834;opacity:.18}
+  .ring{stroke:#fdfdfc;stroke-width:1.2} .arr{fill:#6f6d66}
+  @media (prefers-color-scheme: dark){
+    .lab,.sm{fill:#b6b4ab} .hd,.v{fill:#eceae3} .ax{stroke:#85837b} .box{stroke:#4a4844} .gd{stroke:#33312e}
+    .s1{stroke:#3987e5} .s2{stroke:#d95926} .s3{stroke:#199e70} .s4{stroke:#c98500} .s5{stroke:#85837b}
+    .f1{fill:#3987e5} .f2{fill:#d95926} .f3{fill:#199e70} .f4{fill:#c98500}
+    .win{fill:#3987e5;opacity:.18} .gap{fill:#d95926;opacity:.24} .ring{stroke:#161615} .arr{fill:#a3a19a}
+  }
+</style>
+<text x="64" y="24" class="hd">Where the SVM's test error falls against the window H(Y|Z) allows</text>
+<clipPath id="pl"><rect x="64" y="40" width="460" height="300"/></clipPath>
+<path d="M 64,340.0 H 524" class="gd"/>
+<text x="58" y="344.0" class="sm" text-anchor="end">0.00</text>
+<path d="M 64,302.5 H 524" class="gd"/>
+<text x="58" y="306.5" class="sm" text-anchor="end">0.05</text>
+<path d="M 64,265.0 H 524" class="gd"/>
+<text x="58" y="269.0" class="sm" text-anchor="end">0.10</text>
+<path d="M 64,227.5 H 524" class="gd"/>
+<text x="58" y="231.5" class="sm" text-anchor="end">0.15</text>
+<path d="M 64,190.0 H 524" class="gd"/>
+<text x="58" y="194.0" class="sm" text-anchor="end">0.20</text>
+<path d="M 64,152.5 H 524" class="gd"/>
+<text x="58" y="156.5" class="sm" text-anchor="end">0.25</text>
+<path d="M 64,115.0 H 524" class="gd"/>
+<text x="58" y="119.0" class="sm" text-anchor="end">0.30</text>
+<path d="M 64,77.5 H 524" class="gd"/>
+<text x="58" y="81.5" class="sm" text-anchor="end">0.35</text>
+<path d="M 64,40.0 H 524" class="gd"/>
+<text x="58" y="44.0" class="sm" text-anchor="end">0.40</text>
+<text x="64.0" y="355" class="sm" text-anchor="middle">0.0</text>
+<text x="140.7" y="355" class="sm" text-anchor="middle">0.1</text>
+<text x="217.3" y="355" class="sm" text-anchor="middle">0.2</text>
+<text x="294.0" y="355" class="sm" text-anchor="middle">0.3</text>
+<text x="370.7" y="355" class="sm" text-anchor="middle">0.4</text>
+<text x="447.3" y="355" class="sm" text-anchor="middle">0.5</text>
+<text x="524.0" y="355" class="sm" text-anchor="middle">0.6</text>
+<path d="M 64.0,340.0 L 67.8,337.3 L 71.7,334.6 L 75.5,331.9 L 79.3,329.2 L 83.2,326.5 L 87.0,323.8 L 90.8,321.1 L 94.7,318.4 L 98.5,315.7 L 102.3,312.9 L 106.2,310.2 L 110.0,307.5 L 113.8,304.8 L 117.7,302.1 L 121.5,299.4 L 125.3,296.7 L 129.2,294.0 L 133.0,291.3 L 136.8,288.6 L 140.7,285.9 L 144.5,283.2 L 148.3,280.5 L 152.2,277.8 L 156.0,275.1 L 159.8,272.4 L 163.7,269.7 L 167.5,267.0 L 171.3,264.3 L 175.2,261.6 L 179.0,258.8 L 182.8,256.1 L 186.7,253.4 L 190.5,250.7 L 194.3,248.0 L 198.2,245.3 L 202.0,242.6 L 205.8,239.9 L 209.7,237.2 L 213.5,234.5 L 217.3,231.8 L 221.2,229.1 L 225.0,226.4 L 228.8,223.7 L 232.7,221.0 L 236.5,218.3 L 240.3,215.6 L 244.2,212.9 L 248.0,210.2 L 251.8,207.5 L 255.7,204.7 L 259.5,202.0 L 263.3,199.3 L 267.2,196.6 L 271.0,193.9 L 274.8,191.2 L 278.7,188.5 L 282.5,185.8 L 286.3,183.1 L 290.2,180.4 L 294.0,177.7 L 297.8,175.0 L 301.7,172.3 L 305.5,169.6 L 309.3,166.9 L 313.2,164.2 L 317.0,161.5 L 320.8,158.8 L 324.7,156.1 L 328.5,153.4 L 332.3,150.6 L 336.2,147.9 L 340.0,145.2 L 343.8,142.5 L 347.7,139.8 L 351.5,137.1 L 355.3,134.4 L 359.2,131.7 L 363.0,129.0 L 366.8,126.3 L 370.7,123.6 L 374.5,120.9 L 378.3,118.2 L 382.2,115.5 L 386.0,112.8 L 389.8,110.1 L 393.7,107.4 L 397.5,104.7 L 401.3,102.0 L 405.2,99.3 L 409.0,96.5 L 412.8,93.8 L 416.7,91.1 L 420.5,88.4 L 424.3,85.7 L 428.2,83.0 L 432.0,80.3 L 435.8,77.6 L 439.7,74.9 L 443.5,72.2 L 447.3,69.5 L 451.2,66.8 L 455.0,64.1 L 458.8,61.4 L 462.7,58.7 L 466.5,56.0 L 470.3,53.3 L 474.2,50.6 L 478.0,47.9 L 481.8,45.1 L 485.7,42.4 L 489.5,39.7 L 493.3,37.0 L 497.2,34.3 L 501.0,31.6 L 504.8,28.9 L 508.7,26.2 L 512.5,23.5 L 516.3,20.8 L 520.2,18.1 L 524.0,15.4 L 524.0,124.3 L 520.2,128.4 L 516.3,132.3 L 512.5,136.2 L 508.7,139.9 L 504.8,143.6 L 501.0,147.2 L 497.2,150.7 L 493.3,154.1 L 489.5,157.4 L 485.7,160.7 L 481.8,163.9 L 478.0,167.1 L 474.2,170.1 L 470.3,173.2 L 466.5,176.1 L 462.7,179.0 L 458.8,181.9 L 455.0,184.7 L 451.2,187.5 L 447.3,190.2 L 443.5,192.9 L 439.7,195.5 L 435.8,198.1 L 432.0,200.7 L 428.2,203.2 L 424.3,205.7 L 420.5,208.1 L 416.7,210.5 L 412.8,212.9 L 409.0,215.3 L 405.2,217.6 L 401.3,219.9 L 397.5,222.1 L 393.7,224.3 L 389.8,226.5 L 386.0,228.7 L 382.2,230.8 L 378.3,232.9 L 374.5,235.0 L 370.7,237.0 L 366.8,239.1 L 363.0,241.1 L 359.2,243.0 L 355.3,245.0 L 351.5,246.9 L 347.7,248.8 L 343.8,250.7 L 340.0,252.6 L 336.2,254.4 L 332.3,256.2 L 328.5,258.0 L 324.7,259.8 L 320.8,261.6 L 317.0,263.3 L 313.2,265.0 L 309.3,266.7 L 305.5,268.4 L 301.7,270.1 L 297.8,271.7 L 294.0,273.3 L 290.2,274.9 L 286.3,276.5 L 282.5,278.1 L 278.7,279.6 L 274.8,281.2 L 271.0,282.7 L 267.2,284.2 L 263.3,285.6 L 259.5,287.1 L 255.7,288.6 L 251.8,290.0 L 248.0,291.4 L 244.2,292.8 L 240.3,294.2 L 236.5,295.5 L 232.7,296.9 L 228.8,298.2 L 225.0,299.5 L 221.2,300.8 L 217.3,302.1 L 213.5,303.4 L 209.7,304.6 L 205.8,305.9 L 202.0,307.1 L 198.2,308.3 L 194.3,309.5 L 190.5,310.7 L 186.7,311.9 L 182.8,313.0 L 179.0,314.1 L 175.2,315.3 L 171.3,316.4 L 167.5,317.4 L 163.7,318.5 L 159.8,319.6 L 156.0,320.6 L 152.2,321.6 L 148.3,322.6 L 144.5,323.6 L 140.7,324.6 L 136.8,325.6 L 133.0,326.5 L 129.2,327.5 L 125.3,328.4 L 121.5,329.3 L 117.7,330.1 L 113.8,331.0 L 110.0,331.8 L 106.2,332.7 L 102.3,333.5 L 98.5,334.2 L 94.7,335.0 L 90.8,335.7 L 87.0,336.5 L 83.2,337.1 L 79.3,337.8 L 75.5,338.4 L 71.7,339.0 L 67.8,339.6 L 64.0,340.0 Z" class="win" clip-path="url(#pl)"/>
+<path d="M 64.0,340.0 L 524.0,15.4" class="dash s1" clip-path="url(#pl)"/>
+<path d="M 64.0,340.0 L 67.8,339.6 L 71.7,339.0 L 75.5,338.4 L 79.3,337.8 L 83.2,337.1 L 87.0,336.5 L 90.8,335.7 L 94.7,335.0 L 98.5,334.2 L 102.3,333.5 L 106.2,332.7 L 110.0,331.8 L 113.8,331.0 L 117.7,330.1 L 121.5,329.3 L 125.3,328.4 L 129.2,327.5 L 133.0,326.5 L 136.8,325.6 L 140.7,324.6 L 144.5,323.6 L 148.3,322.6 L 152.2,321.6 L 156.0,320.6 L 159.8,319.6 L 163.7,318.5 L 167.5,317.4 L 171.3,316.4 L 175.2,315.3 L 179.0,314.1 L 182.8,313.0 L 186.7,311.9 L 190.5,310.7 L 194.3,309.5 L 198.2,308.3 L 202.0,307.1 L 205.8,305.9 L 209.7,304.6 L 213.5,303.4 L 217.3,302.1 L 221.2,300.8 L 225.0,299.5 L 228.8,298.2 L 232.7,296.9 L 236.5,295.5 L 240.3,294.2 L 244.2,292.8 L 248.0,291.4 L 251.8,290.0 L 255.7,288.6 L 259.5,287.1 L 263.3,285.6 L 267.2,284.2 L 271.0,282.7 L 274.8,281.2 L 278.7,279.6 L 282.5,278.1 L 286.3,276.5 L 290.2,274.9 L 294.0,273.3 L 297.8,271.7 L 301.7,270.1 L 305.5,268.4 L 309.3,266.7 L 313.2,265.0 L 317.0,263.3 L 320.8,261.6 L 324.7,259.8 L 328.5,258.0 L 332.3,256.2 L 336.2,254.4 L 340.0,252.6 L 343.8,250.7 L 347.7,248.8 L 351.5,246.9 L 355.3,245.0 L 359.2,243.0 L 363.0,241.1 L 366.8,239.1 L 370.7,237.0 L 374.5,235.0 L 378.3,232.9 L 382.2,230.8 L 386.0,228.7 L 389.8,226.5 L 393.7,224.3 L 397.5,222.1 L 401.3,219.9 L 405.2,217.6 L 409.0,215.3 L 412.8,212.9 L 416.7,210.5 L 420.5,208.1 L 424.3,205.7 L 428.2,203.2 L 432.0,200.7 L 435.8,198.1 L 439.7,195.5 L 443.5,192.9 L 447.3,190.2 L 451.2,187.5 L 455.0,184.7 L 458.8,181.9 L 462.7,179.0 L 466.5,176.1 L 470.3,173.2 L 474.2,170.1 L 478.0,167.1 L 481.8,163.9 L 485.7,160.7 L 489.5,157.4 L 493.3,154.1 L 497.2,150.7 L 501.0,147.2 L 504.8,143.6 L 508.7,139.9 L 512.5,136.2 L 516.3,132.3 L 520.2,128.4 L 524.0,124.3" class="dash s1" clip-path="url(#pl)"/>
+<rect x="64" y="40" width="460" height="300" class="box"/>
+<circle cx="77.0" cy="334.0" r="4" class="f1 ring"/>
+<circle cx="83.9" cy="333.2" r="4" class="f1 ring"/>
+<circle cx="103.9" cy="325.8" r="4" class="f1 ring"/>
+<circle cx="111.5" cy="316.0" r="4" class="f1 ring"/>
+<circle cx="127.6" cy="312.2" r="4" class="f1 ring"/>
+<circle cx="130.7" cy="307.8" r="4" class="f1 ring"/>
+<circle cx="131.5" cy="322.0" r="4" class="f1 ring"/>
+<circle cx="132.2" cy="319.8" r="4" class="f1 ring"/>
+<circle cx="136.8" cy="264.2" r="4" class="f2 ring"/>
+<circle cx="146.0" cy="331.0" r="4" class="f3 ring"/>
+<circle cx="147.6" cy="337.0" r="4" class="f3 ring"/>
+<circle cx="157.5" cy="308.5" r="4" class="f1 ring"/>
+<circle cx="164.4" cy="295.7" r="4" class="f1 ring"/>
+<circle cx="170.6" cy="307.0" r="4" class="f1 ring"/>
+<circle cx="172.1" cy="308.5" r="4" class="f1 ring"/>
+<circle cx="172.1" cy="289.8" r="4" class="f1 ring"/>
+<circle cx="175.2" cy="292.8" r="4" class="f1 ring"/>
+<circle cx="180.5" cy="294.2" r="4" class="f1 ring"/>
+<circle cx="186.7" cy="301.7" r="4" class="f1 ring"/>
+<circle cx="187.4" cy="122.5" r="4" class="f2 ring"/>
+<circle cx="211.2" cy="279.2" r="4" class="f1 ring"/>
+<circle cx="218.9" cy="295.0" r="4" class="f1 ring"/>
+<circle cx="241.9" cy="223.8" r="4" class="f1 ring"/>
+<circle cx="244.9" cy="302.5" r="4" class="f3 ring"/>
+<circle cx="257.2" cy="237.2" r="4" class="f1 ring"/>
+<circle cx="257.2" cy="238.8" r="4" class="f1 ring"/>
+<circle cx="271.0" cy="262.8" r="4" class="f1 ring"/>
+<circle cx="283.3" cy="241.8" r="4" class="f1 ring"/>
+<circle cx="287.1" cy="229.8" r="4" class="f1 ring"/>
+<circle cx="298.6" cy="206.5" r="4" class="f1 ring"/>
+<circle cx="305.5" cy="230.5" r="4" class="f1 ring"/>
+<circle cx="312.4" cy="218.5" r="4" class="f1 ring"/>
+<circle cx="323.9" cy="139.8" r="4" class="f2 ring"/>
+<circle cx="323.9" cy="199.0" r="4" class="f1 ring"/>
+<circle cx="325.4" cy="166.8" r="4" class="f1 ring"/>
+<circle cx="340.8" cy="205.0" r="4" class="f1 ring"/>
+<circle cx="356.1" cy="190.0" r="4" class="f1 ring"/>
+<circle cx="428.9" cy="234.2" r="4" class="f3 ring"/>
+<circle cx="463.4" cy="271.8" r="4" class="f3 ring"/>
+<circle cx="486.4" cy="265.8" r="4" class="f3 ring"/>
+<text x="144.8" y="267.8" class="sm" text-anchor="start">Young</text>
+<text x="155.6" y="340.5" class="sm" text-anchor="start">Eyeglasses, Wearing Hat</text>
+<text x="195.4" y="126.0" class="sm" text-anchor="start">Big Lips</text>
+<text x="315.9" y="143.2" class="sm" text-anchor="end">Oval Face</text>
+<text x="420.9" y="237.8" class="sm" text-anchor="end">High Cheekbones</text>
+<text x="455.4" y="275.2" class="sm" text-anchor="end">Smiling, Mouth Open</text>
+<text x="370.7" y="66.2" class="sm" style="fill:#2a78d6" text-anchor="middle">error &lt;= CE / (2 ln 2)</text>
+<text x="386.0" y="306.2" class="sm" style="fill:#2a78d6" text-anchor="middle">error &gt;= h⁻¹(CE)</text>
+<text x="294.0" y="374" class="lab" text-anchor="middle">CE = H(Y | identity)</text>
+<text x="18" y="190.0" class="lab" transform="rotate(-90 18 190.0)" text-anchor="middle">transfer error, 1 - accuracy</text>
+<circle cx="550" cy="67" r="4.5" class="f1 ring"/>
+<text x="562" y="70" class="sm">31 inside the window</text>
+<circle cx="550" cy="87" r="4.5" class="f2 ring"/>
+<text x="562" y="90" class="sm">3 above: the linear head does</text>
+<text x="562" y="110" class="sm">   worse than an identity lookup</text>
+<circle cx="550" cy="127" r="4.5" class="f3 ring"/>
+<text x="562" y="130" class="sm">6 below: the features know</text>
+<text x="562" y="150" class="sm">   more than the identity label</text>
+<text x="550" y="198" class="sm">Shaded: what the best guesser that</text>
+<text x="550" y="213" class="sm">sees only the identity can reach</text>
+<text x="550" y="228" class="sm">(Fano and concavity, both</text>
+<text x="550" y="243" class="sm">ends attained).</text>
+</svg>
