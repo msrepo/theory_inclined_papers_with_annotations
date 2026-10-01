@@ -30,8 +30,9 @@ status: read
 - **[Achille 2019 — task reachability](../2019-achille-task-reachability/index.html#transferability-scores-use-only-features-open-weight-models-come-without-data)** — LogME's evidence is exactly that paper's task complexity $\min_QC_\beta$, restricted to a linear head on frozen features (at $\beta=1$ with a summed loss). The paper's static distance is the *extra* complexity of the target on top of the source, and its dynamic factor, whether SGD can reach the target solution, is what no frozen-feature score sees. The linked section compares all the scores here.
 - **[Runnable code](https://github.com/msrepo/theory_inclined_papers_with_annotations/blob/main/papers/2021-you-logme/code/logme.py)** —
   Eq. 2 against an independent derivation, the fixed point against a grid search, $\gamma$
-  spanning $[0,D]$, and the $D>n$ table that is the whole argument for the method.
-  `make verify` runs it.
+  spanning $[0,D]$, the $D>n$ table that is the whole argument for the method, and Figure 2
+  run forwards as a sampler (labels correlated through $w$ exactly as far as the features
+  overlap). `make verify` runs it; `python3 logme.py --figures` redraws the figure.
 - **[Column, null & residual spaces](../four-fundamental-subspaces/index.html)** — why that table happens: with $D\ge n$ the
   column space is all of $\mathbb R^n$, and residual degrees of freedom $n-p$, which $\gamma$ generalises.
 
@@ -80,6 +81,14 @@ w\sim\mathcal{N}(0,\alpha^{-1}I),
 \qquad
 y_i\mid f_i,w,\beta\ \sim\ \mathcal{N}(w^\top f_i,\ \beta^{-1})
 $$
+
+<img src="figures/graphical-model.svg" alt="The paper's Figure 2, redrawn. A bottom row holds the blue hyperparameter alpha at the far left and the shaded observed features f-1, f-i and f-n. A top row holds the shaded observed labels y-1, y-i and y-n. The open latent weight vector w sits at the left of the middle row and the blue hyperparameter beta at the right. A blue arrow runs from alpha to w. Every label has three arrows into it: a black one from w, a black vertical one from its own feature, and a blue one from beta. Annotations give w as zero-mean Gaussian with covariance alpha-inverse times the identity, and each label as Gaussian with mean w transpose f-i and variance beta-inverse.">
+
+The paper gives no legend for its Figure 2, so this is the usual reading: shaded nodes are observed, the open black node $w$ is latent, and the two blue circles $\alpha$ and $\beta$ are hyperparameters — numbers with no prior of their own. That is the reading consistent with Equation 1, which integrates over $w$ alone; $\alpha$ and $\beta$ are fixed afterwards by maximising the result (below), not integrated. Three things the arrows say:
+
+- **The joint factorises as** $p(w\mid\alpha)\prod_i p(y_i\mid f_i,w,\beta)$. The features $f_i$ have no distribution: they are conditioned on, never modelled. So what the figure computes is $p(y\mid F,\alpha,\beta)$, not $p(y,F)$.
+- **Given $w$, the labels are independent.** Each has the same three parents ($w$, its own $f_i$, and $\beta$), which is why the likelihood is a product over points.
+- **Integrate $w$ out and they are not.** A shared parent couples its children: $\operatorname{Cov}(y_i,y_j)=f_i^\top f_j/\alpha$ for $i\ne j$, the off-diagonal part of the $\alpha^{-1}FF^\top+\beta^{-1}I$ used in the check below. The graph shows that a connection exists, not how strong it is, and the strength is the overlap of the two features. Sampling 400,000 draws from the graph as drawn ($\alpha=2$, $\beta=5$, item 5 of the script) reproduces that matrix to within 0.0011. Two identical features give correlation 0.714, and two orthogonal ones give 0 (0.001 sampled): $y_1$ and $y_3$ are connected through $w$ and still uncorrelated, which for a jointly Gaussian pair means independent.
 
 The naive move is to fit $w^*$ by regression and score $p(y\mid F,w^*)$. The paper rejects it in
 one sentence — "likelihood is prone to over-fitting" — and that is the load-bearing design

@@ -1,0 +1,57 @@
+<svg viewBox="0 0 760 358" xmlns="http://www.w3.org/2000/svg" role="img">
+<title>The directed graphical model for calculating the evidence in LogME</title>
+<desc>Three rows of nodes. The bottom row holds the hyperparameter alpha at the left and the observed features f1, f-i, f-n. The top row holds the observed labels y1, y-i, y-n. The latent weight vector w sits at the left of the middle row and the hyperparameter beta at the right. Alpha points to w. Every label y-i has three parents: w, its own feature f-i, and beta. The prior on w is a zero-mean Gaussian with precision alpha, and each label is Gaussian with mean w transpose f-i and precision beta.</desc>
+<style>
+  text{font-family:ui-sans-serif,-apple-system,"Segoe UI",sans-serif;font-weight:400}
+  .hd{font-size:13px;font-weight:500;fill:#1a1a19} .v{font-size:12.5px;fill:#1a1a19}
+  .sm{font-size:11.5px;fill:#57564f} .dots{font-size:20px;fill:#57564f}
+  .nm{font-size:18px;font-style:italic;fill:#1a1a19} .nmb{font-size:18px;font-style:italic;fill:#2f6fb5}
+  .row{font-size:22px;font-style:italic;fill:#8a8880}
+  .it{font-style:italic} .sb{font-size:72%} .sp{font-size:72%}
+  .obs{fill:#e4e2d8;stroke:#1a1a19;stroke-width:1.6}
+  .lat{fill:none;stroke:#1a1a19;stroke-width:1.6}
+  .hyp{fill:none;stroke:#2f6fb5;stroke-width:1.6}
+  .e{stroke:#1a1a19;stroke-width:1.5;fill:none} .eb{stroke:#2f6fb5;stroke-width:1.5;fill:none}
+  .ah{fill:#1a1a19} .ahb{fill:#2f6fb5}
+  @media (prefers-color-scheme: dark){
+    .hd,.v,.nm{fill:#eceae3} .sm,.dots{fill:#b6b4ab} .row{fill:#85837b}
+    .nmb{fill:#7fb2e8}
+    .obs{fill:#3a3835;stroke:#eceae3} .lat{stroke:#eceae3} .hyp{stroke:#7fb2e8}
+    .e{stroke:#eceae3} .eb{stroke:#7fb2e8} .ah{fill:#eceae3} .ahb{fill:#7fb2e8}
+  }
+</style>
+<defs><marker id="ah" viewBox="0 0 10 8" refX="10" refY="4" markerWidth="10" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto"><path d="M0,0 L10,4 L0,8 Z" class="ah"/></marker><marker id="ahb" viewBox="0 0 10 8" refX="10" refY="4" markerWidth="10" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto"><path d="M0,0 L10,4 L0,8 Z" class="ahb"/></marker></defs>
+<text x="14" y="22" class="hd">The paper's Figure 2, redrawn: the model whose evidence LogME computes</text>
+<path d="M 105.0,269.0 L 105.0,227.0" class="eb" marker-end="url(#ahb)"/>
+<path d="M 124.1,191.2 L 235.9,116.8" class="e" marker-end="url(#ah)"/>
+<path d="M 255.0,269.0 L 255.0,127.0" class="e" marker-end="url(#ah)"/>
+<path d="M 642.7,198.6 L 277.3,109.4" class="eb" marker-end="url(#ahb)"/>
+<path d="M 126.9,196.8 L 388.1,111.2" class="e" marker-end="url(#ah)"/>
+<path d="M 410.0,269.0 L 410.0,127.0" class="e" marker-end="url(#ah)"/>
+<path d="M 643.6,195.6 L 431.4,112.4" class="eb" marker-end="url(#ahb)"/>
+<path d="M 127.5,199.1 L 542.5,108.9" class="e" marker-end="url(#ah)"/>
+<path d="M 565.0,269.0 L 565.0,127.0" class="e" marker-end="url(#ah)"/>
+<path d="M 648.7,187.7 L 581.3,120.3" class="eb" marker-end="url(#ahb)"/>
+<text x="410" y="60" class="v" text-anchor="middle"><tspan class="it">y</tspan><tspan class="it sb" dy="4">i</tspan><tspan dy="-4"> ∼ N(</tspan><tspan class="it">w</tspan><tspan class="sp" dy="-6">T</tspan><tspan class="it" dy="6">f</tspan><tspan class="it sb" dy="4">i</tspan><tspan dy="-4">, </tspan><tspan class="it">β</tspan><tspan class="sp" dy="-6">−1</tspan><tspan dy="6">)</tspan></text>
+<text x="14" y="168" class="v"><tspan class="it">w</tspan><tspan> ∼ N(0, </tspan><tspan class="it">α</tspan><tspan class="sp" dy="-6">−1</tspan><tspan class="it" dy="6">I</tspan><tspan>)</tspan></text>
+<circle cx="105" cy="204" r="21" class="lat"/><text x="105" y="210" class="nm" text-anchor="middle"><tspan>w</tspan></text>
+<circle cx="105" cy="292" r="21" class="hyp"/><text x="105" y="298" class="nmb" text-anchor="middle"><tspan>α</tspan></text>
+<circle cx="665" cy="204" r="21" class="hyp"/><text x="665" y="210" class="nmb" text-anchor="middle"><tspan>β</tspan></text>
+<circle cx="255" cy="104" r="21" class="obs"/><text x="255" y="110" class="nm" text-anchor="middle"><tspan>y</tspan><tspan class="it sb" dy="4">1</tspan></text>
+<circle cx="255" cy="292" r="21" class="obs"/><text x="255" y="298" class="nm" text-anchor="middle"><tspan>f</tspan><tspan class="it sb" dy="4">1</tspan></text>
+<circle cx="410" cy="104" r="21" class="obs"/><text x="410" y="110" class="nm" text-anchor="middle"><tspan>y</tspan><tspan class="it sb" dy="4">i</tspan></text>
+<circle cx="410" cy="292" r="21" class="obs"/><text x="410" y="298" class="nm" text-anchor="middle"><tspan>f</tspan><tspan class="it sb" dy="4">i</tspan></text>
+<circle cx="565" cy="104" r="21" class="obs"/><text x="565" y="110" class="nm" text-anchor="middle"><tspan>y</tspan><tspan class="it sb" dy="4">n</tspan></text>
+<circle cx="565" cy="292" r="21" class="obs"/><text x="565" y="298" class="nm" text-anchor="middle"><tspan>f</tspan><tspan class="it sb" dy="4">n</tspan></text>
+<text x="332" y="108" class="dots" text-anchor="middle">…</text>
+<text x="332" y="208" class="dots" text-anchor="middle">…</text>
+<text x="332" y="296" class="dots" text-anchor="middle">…</text>
+<text x="488" y="108" class="dots" text-anchor="middle">…</text>
+<text x="488" y="208" class="dots" text-anchor="middle">…</text>
+<text x="488" y="296" class="dots" text-anchor="middle">…</text>
+<text x="724" y="111" class="row" text-anchor="middle">y</text>
+<text x="724" y="299" class="row" text-anchor="middle">F</text>
+<circle cx="26" cy="338" r="8" class="obs"/><text x="42" y="342" class="sm">observed: the features and the labels</text>
+<circle cx="290" cy="338" r="8" class="lat"/><text x="306" y="342" class="sm">latent: integrated out</text>
+<circle cx="462" cy="338" r="8" class="hyp"/><text x="478" y="342" class="sm">hyperparameter: a number, not random</text>
+</svg>
