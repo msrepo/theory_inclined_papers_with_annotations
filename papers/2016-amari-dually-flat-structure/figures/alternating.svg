@@ -1,0 +1,56 @@
+<svg viewBox="0 0 560 392" xmlns="http://www.w3.org/2000/svg" role="img">
+<title>The em algorithm converges, and here to one value</title>
+<desc>Five random starts of the alternating projection between an m-flat set K and the e-flat independence model S. The divergence decreases at every half-step and all runs reach the minimum 0.192745.</desc>
+<style>
+  text{font-family:ui-sans-serif,-apple-system,"Segoe UI",sans-serif;font-weight:400}
+  .lab{font-size:11px;fill:#57564f} .hd{font-size:13px;font-weight:500;fill:#1a1a19}
+  .sm{font-size:10.5px;fill:#57564f} .v{font-size:11px;fill:#1a1a19}
+  .ax{stroke:#8a8880;stroke-width:0.9;fill:none} .gd{stroke:#e2e1da;stroke-width:0.6;fill:none}
+  .s1{stroke:#2a78d6} .s2{stroke:#eb6834} .s3{stroke:#1baf7a} .s4{stroke:#eda100} .s0{stroke:#8a8880}
+  .f1{fill:#2a78d6} .f2{fill:#eb6834} .f3{fill:#1baf7a} .f4{fill:#eda100} .f0{fill:#8a8880}
+  .ln{stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+  .thin{stroke-width:1;fill:none}
+  .dash{stroke-width:1.4;fill:none;stroke-dasharray:5 3}
+  .con{stroke-width:0.9;fill:none;opacity:.75}
+  .fillS{fill:#2a78d6;opacity:.08}
+  .ring{stroke:#fdfdfc;stroke-width:1.5}
+  @media (prefers-color-scheme: dark){
+    .lab,.sm{fill:#b6b4ab} .hd,.v{fill:#eceae3} .ax{stroke:#85837b} .gd{stroke:#33312e}
+    .s1{stroke:#3987e5} .s2{stroke:#d95926} .s3{stroke:#199e70} .s4{stroke:#c98500} .s0{stroke:#85837b}
+    .f1{fill:#3987e5} .f2{fill:#d95926} .f3{fill:#199e70} .f4{fill:#c98500} .f0{fill:#85837b}
+    .fillS{fill:#3987e5}
+    .ring{stroke:#161615}
+  }
+</style>
+<line class="gd" x1="56" y1="268.6" x2="436" y2="268.6"/>
+<text class="sm" x="50" y="272.1" text-anchor="end">−15</text>
+<line class="gd" x1="56" y1="194.4" x2="436" y2="194.4"/>
+<text class="sm" x="50" y="197.9" text-anchor="end">−10</text>
+<line class="gd" x1="56" y1="120.2" x2="436" y2="120.2"/>
+<text class="sm" x="50" y="123.7" text-anchor="end">−5</text>
+<line class="gd" x1="56" y1="46.0" x2="436" y2="46.0"/>
+<text class="sm" x="50" y="49.5" text-anchor="end">0</text>
+<line class="gd" x1="56.0" y1="46" x2="56.0" y2="276"/>
+<text class="sm" x="56.0" y="291" text-anchor="middle">0</text>
+<line class="gd" x1="151.0" y1="46" x2="151.0" y2="276"/>
+<text class="sm" x="151.0" y="291" text-anchor="middle">6</text>
+<line class="gd" x1="246.0" y1="46" x2="246.0" y2="276"/>
+<text class="sm" x="246.0" y="291" text-anchor="middle">12</text>
+<line class="gd" x1="341.0" y1="46" x2="341.0" y2="276"/>
+<text class="sm" x="341.0" y="291" text-anchor="middle">18</text>
+<line class="gd" x1="436.0" y1="46" x2="436.0" y2="276"/>
+<text class="sm" x="436.0" y="291" text-anchor="middle">24</text>
+<line class="ax" x1="56" y1="276" x2="436" y2="276"/>
+<line class="ax" x1="56" y1="46" x2="56" y2="276"/>
+<text class="lab" x="246.0" y="308" text-anchor="middle">half-step (projection onto K, then onto S)</text>
+<text class="lab" transform="translate(16,161.0) rotate(-90)" text-anchor="middle">log₁₀(D_t − D*)</text>
+<text class="hd" x="56" y="34">alternating projections, five random starts</text>
+<polyline class="ln s1" points="71.8,65.9 87.7,93.8 103.5,99.7 119.3,105.6 135.2,111.5 151.0,117.4 166.8,123.3 182.7,129.2 198.5,135.1 214.3,141.0 230.2,146.9 246.0,152.8 261.8,158.7 277.7,164.6 293.5,170.6 309.3,176.5 325.2,182.4 341.0,188.3 356.8,194.2 372.7,200.1 388.5,206.0 404.3,211.9 420.2,217.8 436.0,223.7"/>
+<polyline class="ln s2" points="71.8,74.8 87.7,83.5 103.5,89.5 119.3,95.4 135.2,101.3 151.0,107.2 166.8,113.1 182.7,119.0 198.5,125.0 214.3,130.9 230.2,136.8 246.0,142.7 261.8,148.6 277.7,154.5 293.5,160.4 309.3,166.3 325.2,172.2 341.0,178.1 356.8,184.0 372.7,189.9 388.5,195.8 404.3,201.7 420.2,207.6 436.0,213.5"/>
+<polyline class="ln s3" points="71.8,55.3 87.7,67.5 103.5,74.3 119.3,80.5 135.2,86.5 151.0,92.4 166.8,98.4 182.7,104.3 198.5,110.2 214.3,116.1 230.2,122.0 246.0,127.9 261.8,133.8 277.7,139.7 293.5,145.6 309.3,151.5 325.2,157.4 341.0,163.3 356.8,169.2 372.7,175.1 388.5,181.0 404.3,186.9 420.2,192.9 436.0,198.8"/>
+<polyline class="ln s4" points="71.8,53.5 87.7,67.9 103.5,74.7 119.3,80.8 135.2,86.8 151.0,92.8 166.8,98.7 182.7,104.6 198.5,110.5 214.3,116.4 230.2,122.3 246.0,128.2 261.8,134.1 277.7,140.0 293.5,145.9 309.3,151.9 325.2,157.8 341.0,163.7 356.8,169.6 372.7,175.5 388.5,181.4 404.3,187.3 420.2,193.2 436.0,199.1"/>
+<polyline class="ln s0" points="71.8,60.9 87.7,94.6 103.5,100.6 119.3,106.5 135.2,112.4 151.0,118.3 166.8,124.2 182.7,130.1 198.5,136.0 214.3,141.9 230.2,147.8 246.0,153.7 261.8,159.6 277.7,165.5 293.5,171.4 309.3,177.3 325.2,183.2 341.0,189.1 356.8,195.0 372.7,200.9 388.5,206.8 404.3,212.8 420.2,218.7 436.0,224.6"/>
+<text class="sm" x="60" y="338">K = {P₀₀ = P₁₁ = 0.4} is m-flat; S = the independence model is e-flat.</text>
+<text class="sm" x="60" y="356">Every start lowers D at every half-step (1.124) and all five reach the same</text>
+<text class="sm" x="60" y="374">value; straight lines mean a constant shrink factor per step.</text>
+</svg>

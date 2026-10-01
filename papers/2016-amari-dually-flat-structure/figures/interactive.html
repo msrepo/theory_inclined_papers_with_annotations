@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dually Flat Explorer</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/contrib/auto-render.min.js"></script>
+<style>
+:root{
+  --bg:#fbfaf7; --surface:#ffffff; --ink:#1c1d21; --muted:#5b5f68; --faint:#8a8880; --line:#e2dfd8; --soft:#f2f0ea;
+  --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a; --s4:#eda100; --radius:12px;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#131417; --surface:#1b1d21; --ink:#ebebed; --muted:#a3a6ae; --faint:#85837b; --line:#2e3138; --soft:#23262b;
+    --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#131417; --surface:#1b1d21; --ink:#ebebed; --muted:#a3a6ae; --faint:#85837b; --line:#2e3138; --soft:#23262b;
+  --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500;
+  color-scheme: dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,sans-serif}
+main{max-width:980px;margin:0 auto;padding:36px 16px 80px}
+a{color:var(--s1)}
+h1{font-size:1.9rem;line-height:1.2;margin:0 0 .4rem}
+h2{font-size:1.3rem;margin:2.6rem 0 .5rem;padding-top:.5rem;border-top:1px solid var(--line)}
+.lede{color:var(--muted);margin-bottom:1.2rem}
+.widget{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:14px;margin:1rem 0}
+.controls{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center;margin:.2rem 0 .7rem;font-size:.9rem}
+.controls label{display:flex;align-items:center;gap:6px;color:var(--muted)}
+.controls output{color:var(--ink);font-variant-numeric:tabular-nums;min-width:3.4em;display:inline-block}
+button,select{font:inherit;font-size:.88rem;color:var(--ink);background:var(--soft);border:1px solid var(--line);border-radius:8px;padding:5px 11px;cursor:pointer}
+button:focus-visible,input:focus-visible,canvas:focus-visible,select:focus-visible{outline:2px solid var(--s1);outline-offset:2px}
+input[type=range]{accent-color:var(--s1);width:150px}
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;align-items:start}
+@media (max-width:760px){.grid2{grid-template-columns:1fr}}
+canvas{display:block;width:100%;height:auto;border-radius:8px;touch-action:none}
+.cap{font-size:.82rem;color:var(--muted)}
+.stats{display:flex;gap:10px;flex-wrap:wrap;margin:.5rem 0}
+.stats div{background:var(--soft);border-radius:8px;padding:6px 10px;font-variant-numeric:tabular-nums;font-size:.88rem;color:var(--muted)}
+.stats b{font-size:1.02rem;color:var(--ink)}
+.callout{border-left:3px solid var(--s1);background:var(--soft);padding:10px 14px;border-radius:0 8px 8px 0;margin:1rem 0}
+.key{display:flex;flex-wrap:wrap;gap:4px 16px;font-size:.8rem;color:var(--muted);margin:.4rem 0}
+.sw{display:inline-block;width:18px;height:0;border-top:2.5px solid;margin-right:6px;vertical-align:3px}
+.sw.dash{border-top-style:dashed}
+</style>
+</head>
+<body>
+<main>
+<h1>The dually flat structure, by hand</h1>
+<p class="lede">Companion to the notes on Chapter 1 of Amari's <i>Information Geometry and Its Applications</i>. <a href="../index.html">Back to the notes</a>.
+Everything here lives on the simplest non-trivial manifold: the distributions $p=(p_0,p_1,p_2)$ on three outcomes (think: a 3-class softmax output). The two coordinate systems of the chapter are the <b>logits</b> $\theta_i=\log(p_i/p_0)$ and the <b>probabilities</b> $\eta_i=p_i$. Drag the grey points inside the triangles, or focus a triangle with <kbd>Tab</kbd>, press <kbd>P</kbd> or <kbd>Q</kbd> to choose a point and move it with the arrow keys.</p>
+
+<h2>1. Two kinds of straight line</h2>
+<p>A path that is straight in $\theta$ is an <b>e-geodesic</b> (blue); one that is straight in $\eta$ is an <b>m-geodesic</b> (orange). Both join $P$ to $Q$. The green curve is the shortest path in the Fisher metric, the usual Riemannian geodesic, which is neither.</p>
+<div class="widget" id="w1">
+  <div class="controls">
+    <label>position $t$ <input type="range" id="w1t" min="0" max="1" step="0.01" value="0.5"><output id="w1to"></output></label>
+    <label><input type="checkbox" id="w1fr" checked> show the Fisher–Rao geodesic</label>
+  </div>
+  <div class="grid2">
+    <div><canvas id="w1a" width="460" height="400" tabindex="0" aria-label="Logit chart with the e-geodesic, m-geodesic and Fisher-Rao geodesic from P to Q"></canvas><div class="cap">logit chart $(\theta_1,\theta_2)$: the e-geodesic is a straight line</div></div>
+    <div><canvas id="w1b" width="460" height="400" tabindex="0" aria-label="Probability triangle with the same three paths; drag P and Q"></canvas><div class="cap">probability triangle: the m-geodesic is a straight line</div></div>
+  </div>
+  <div class="key"><span><span class="sw" style="border-color:var(--s1)"></span>e-geodesic (geometric mixture)</span><span><span class="sw" style="border-color:var(--s2)"></span>m-geodesic (ordinary mixture)</span><span><span class="sw" style="border-color:var(--s3)"></span>Fisher–Rao geodesic</span></div>
+  <div class="stats" id="w1s"></div>
+</div>
+
+<h2>2. The Pythagorean theorem</h2>
+<p>Take the m-geodesic from $P$ to $Q$. Leave $Q$ along an e-geodesic whose direction is orthogonal to it (in the Fisher metric) and stop at $R$. Then $D(R{:}P)=D(Q{:}P)+D(R{:}Q)$ exactly, with $D$ the Bregman divergence of $\psi$, which on these coordinates is a KL divergence with its arguments reversed. Tilt the direction away from orthogonal and the sum stops matching, by exactly the amount the proof of Theorem 1.2 predicts.</p>
+<div class="widget" id="w2">
+  <div class="controls">
+    <label>distance $t$ along the e-geodesic <input type="range" id="w2t" min="-3" max="3" step="0.05" value="1.6"><output id="w2to"></output></label>
+    <label>tilt away from orthogonal <input type="range" id="w2p" min="-60" max="60" step="1" value="0"><output id="w2po"></output></label>
+  </div>
+  <canvas id="w2a" width="920" height="420" tabindex="0" aria-label="Probability triangle showing P, Q, R, the m-geodesic PQ and the e-geodesic QR"></canvas>
+  <div class="key"><span><span class="sw" style="border-color:var(--s2)"></span>m-geodesic $P\to Q$</span><span><span class="sw" style="border-color:var(--s1)"></span>e-geodesic through $Q$</span></div>
+  <div class="stats" id="w2s"></div>
+  <div class="cap" id="w2n"></div>
+</div>
+
+<h2>3. Projecting onto a submanifold</h2>
+<p>Given $P$ and a curve $S$, which point of $S$ is closest in divergence? Pick the divergence, pick $S$, and drag $P$. For an e-flat $S$ (straight in $\theta$) and $\mathrm{KL}[P{:}R]$ there is always exactly one critical point on $S$, and it is the minimum. For a curved $S$ there can be several, and the orthogonality condition does not tell them apart.</p>
+<div class="widget" id="w3">
+  <div class="controls">
+    <label>submanifold $S$ <select id="w3s"><option value="e">e-flat line (straight in θ)</option><option value="m">m-flat line (straight in η)</option><option value="c">curved arc</option></select></label>
+    <label>divergence <select id="w3d"><option value="a">KL[P : R]  (R varies in the second slot)</option><option value="b">KL[R : P]</option></select></label>
+  </div>
+  <div class="grid2">
+    <div><canvas id="w3a" width="460" height="400" tabindex="0" aria-label="Probability triangle with the submanifold S, the point P and the critical points of the divergence along S"></canvas></div>
+    <div><canvas id="w3b" width="460" height="400" aria-label="The divergence from P to the point of S at arclength s"></canvas><div class="cap">divergence along $S$, from one end to the other; dots mark critical points</div></div>
+  </div>
+  <div class="stats" id="w3st"></div>
+  <div class="cap" id="w3n"></div>
+</div>
+</main>
+
+<script>
+"use strict";
+const H3 = Math.sqrt(3) / 2;
+const TV = [[0, 0], [1, 0], [0.5, H3]];
+const css = () => getComputedStyle(document.documentElement);
+const col = n => css().getPropertyValue(n).trim();
+const fmt = (x, d = 4) => (Math.abs(x) < 5e-5 && x !== 0 ? x.toExponential(1) : x.toFixed(d)).replace("-", "−");
+
+// ---- the model: three-outcome categorical
+const bary2xy = p => [p[0] * TV[0][0] + p[1] * TV[1][0] + p[2] * TV[2][0], p[0] * TV[0][1] + p[1] * TV[1][1] + p[2] * TV[2][1]];
+function xy2bary(x, y) { const p2 = y / H3, p1 = x - 0.5 * p2; return [1 - p1 - p2, p1, p2]; }
+const theta = p => [Math.log(p[1] / p[0]), Math.log(p[2] / p[0])];
+function fromTheta(t) { const m = Math.max(0, t[0], t[1]); const e = [Math.exp(-m), Math.exp(t[0] - m), Math.exp(t[1] - m)]; const s = e[0] + e[1] + e[2]; return e.map(v => v / s); }
+const eta = p => [p[1], p[2]];
+const kl = (p, q) => p[0] * Math.log(p[0] / q[0]) + p[1] * Math.log(p[1] / q[1]) + p[2] * Math.log(p[2] / q[2]);
+const D = (a, b) => kl(fromTheta(b), fromTheta(a));          // D_psi[theta_a : theta_b] = KL[p_b : p_a]
+const dot = (a, b) => a[0] * b[0] + a[1] * b[1];
+const mix = (p, q, t) => [0, 1, 2].map(i => (1 - t) * p[i] + t * q[i]);
+const ePath = (p, q, t) => { const a = theta(p), b = theta(q); return fromTheta([(1 - t) * a[0] + t * b[0], (1 - t) * a[1] + t * b[1]]); };
+function frPath(p, q, t) {
+  const a = p.map(Math.sqrt), b = q.map(Math.sqrt); const om = Math.acos(Math.min(1, Math.max(-1, dot3(a, b))));
+  if (om < 1e-9) return p.slice();
+  const s = [0, 1, 2].map(i => (Math.sin((1 - t) * om) * a[i] + Math.sin(t * om) * b[i]) / Math.sin(om)); return s.map(v => v * v);
+}
+const dot3 = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+const clampP = p => { const m = 0.025; let q = p.map(v => Math.max(v, m)); const s = q[0] + q[1] + q[2]; return q.map(v => v / s); };
+
+// ---- drawing helpers
+function logical(canvas) {                      // the width/height attributes are rewritten for hi-dpi, so remember the CSS-pixel size once
+  if (!canvas.dataset.w) { canvas.dataset.w = canvas.getAttribute("width"); canvas.dataset.h = canvas.getAttribute("height"); }
+  return [+canvas.dataset.w, +canvas.dataset.h];
+}
+function setup(canvas) {
+  const dpr = Math.min(window.devicePixelRatio || 1, 2); const [w, h] = logical(canvas);
+  canvas.width = w * dpr; canvas.height = h * dpr; const g = canvas.getContext("2d"); g.setTransform(dpr, 0, 0, dpr, 0, 0); return { g, w, h };
+}
+class Simplex {
+  constructor(canvas, pad = 34) { Object.assign(this, setup(canvas)); this.pad = pad; const sc = Math.min((this.w - 2 * pad), (this.h - 2 * pad) / H3); this.sc = sc; this.ox = (this.w - sc) / 2; this.oy = (this.h + sc * H3) / 2; }
+  X(x) { return this.ox + x * this.sc; } Y(y) { return this.oy - y * this.sc; }
+  pt(p) { const [x, y] = bary2xy(p); return [this.X(x), this.Y(y)]; }
+  inv(px, py) { return xy2bary((px - this.ox) / this.sc, (this.oy - py) / this.sc); }
+  frame() {
+    const g = this.g; g.clearRect(0, 0, this.w, this.h);
+    g.beginPath(); TV.forEach((v, i) => g[i ? "lineTo" : "moveTo"](this.X(v[0]), this.Y(v[1]))); g.closePath();
+    g.fillStyle = "color-mix(in srgb, " + col("--s1") + " 8%, transparent)"; g.fill(); g.strokeStyle = col("--faint"); g.lineWidth = 1; g.stroke();
+    g.fillStyle = col("--muted"); g.font = "12px sans-serif";
+    g.textAlign = "left"; g.fillText("outcome 0", this.X(0), this.Y(0) + 18); g.textAlign = "right"; g.fillText("outcome 1", this.X(1), this.Y(0) + 18);
+    g.textAlign = "center"; g.fillText("outcome 2", this.X(0.5), this.Y(H3) - 10);
+  }
+  path(ps, color, dash, width = 2.2) { const g = this.g; g.beginPath(); ps.forEach((p, i) => { const [x, y] = this.pt(p); g[i ? "lineTo" : "moveTo"](x, y); }); g.strokeStyle = color; g.lineWidth = width; g.setLineDash(dash || []); g.stroke(); g.setLineDash([]); }
+  dot(p, color, label, r = 6) { const [x, y] = this.pt(p); const g = this.g; g.beginPath(); g.arc(x, y, r, 0, 6.2832); g.fillStyle = color; g.fill(); g.lineWidth = 2; g.strokeStyle = col("--surface"); g.stroke(); if (label) { g.fillStyle = col("--ink"); g.font = "13px sans-serif"; g.textAlign = "left"; g.fillText(label, x + 9, y - 8); } }
+}
+class Chart {
+  constructor(canvas, xr, yr) { Object.assign(this, setup(canvas)); this.xr = xr; this.yr = yr; this.l = 44; this.r = 12; this.t = 14; this.b = 34; }
+  X(x) { return this.l + (x - this.xr[0]) / (this.xr[1] - this.xr[0]) * (this.w - this.l - this.r); }
+  Y(y) { return this.h - this.b - (y - this.yr[0]) / (this.yr[1] - this.yr[0]) * (this.h - this.t - this.b); }
+  frame(xt, yt, xl, yl) {
+    const g = this.g; g.clearRect(0, 0, this.w, this.h); g.font = "11px sans-serif"; g.fillStyle = col("--muted"); g.strokeStyle = col("--line"); g.lineWidth = 1;
+    g.textAlign = "right"; yt.forEach(y => { g.beginPath(); g.moveTo(this.l, this.Y(y)); g.lineTo(this.w - this.r, this.Y(y)); g.stroke(); g.fillText(String(y).replace("-", "−"), this.l - 6, this.Y(y) + 4); });
+    g.textAlign = "center"; xt.forEach(x => { g.beginPath(); g.moveTo(this.X(x), this.t); g.lineTo(this.X(x), this.h - this.b); g.stroke(); g.fillText(String(x).replace("-", "−"), this.X(x), this.h - this.b + 15); });
+    g.fillText(xl, (this.l + this.w - this.r) / 2, this.h - 6); g.save(); g.translate(12, (this.t + this.h - this.b) / 2); g.rotate(-Math.PI / 2); g.fillText(yl, 0, 0); g.restore();
+    g.strokeStyle = col("--faint"); g.beginPath(); g.moveTo(this.l, this.t); g.lineTo(this.l, this.h - this.b); g.lineTo(this.w - this.r, this.h - this.b); g.stroke();
+  }
+  path(xy, color, dash, width = 2.2) { const g = this.g; g.save(); g.beginPath(); g.rect(this.l, this.t, this.w - this.l - this.r, this.h - this.t - this.b); g.clip(); g.beginPath(); xy.forEach((q, i) => g[i ? "lineTo" : "moveTo"](this.X(q[0]), this.Y(q[1]))); g.strokeStyle = color; g.lineWidth = width; g.setLineDash(dash || []); g.stroke(); g.restore(); }
+  dot(x, y, color, label, r = 5.5) { const g = this.g; g.beginPath(); g.arc(this.X(x), this.Y(y), r, 0, 6.2832); g.fillStyle = color; g.fill(); g.lineWidth = 2; g.strokeStyle = col("--surface"); g.stroke(); if (label) { g.fillStyle = col("--ink"); g.font = "13px sans-serif"; g.textAlign = "left"; g.fillText(label, this.X(x) + 8, this.Y(y) - 8); } }
+}
+
+// ---- dragging points on a Simplex canvas
+function draggable(canvas, getSim, points, onChange) {
+  let active = null, which = 0;
+  const pos = e => { const r = canvas.getBoundingClientRect(), [w, h] = logical(canvas); return [(e.clientX - r.left) * w / r.width, (e.clientY - r.top) * h / r.height]; };
+  canvas.addEventListener("pointerdown", e => {
+    const sim = getSim(); const [x, y] = pos(e); let best = 24 * 24, idx = null;
+    points.forEach((pt, i) => { const [px, py] = sim.pt(pt.get()); const d = (px - x) ** 2 + (py - y) ** 2; if (d < best) { best = d; idx = i; } });
+    if (idx !== null) { active = idx; which = idx; canvas.setPointerCapture(e.pointerId); } });
+  canvas.addEventListener("pointermove", e => { if (active === null) return; const sim = getSim(); const [x, y] = pos(e); points[active].set(clampP(sim.inv(x, y))); onChange(); });
+  const up = () => { active = null; }; canvas.addEventListener("pointerup", up); canvas.addEventListener("pointercancel", up);
+  canvas.addEventListener("keydown", e => {
+    const k = e.key.toLowerCase(); if (k === "p") { which = 0; return; } if (k === "q" && points.length > 1) { which = 1; return; }
+    const d = { arrowleft: [-1, 0], arrowright: [1, 0], arrowup: [0, 1], arrowdown: [0, -1] }[k]; if (!d) return; e.preventDefault();
+    const [x, y] = bary2xy(points[which].get()); points[which].set(clampP(xy2bary(x + d[0] * 0.01, y + d[1] * 0.01))); onChange(); });
+}
+
+// ================= widget 1
+(function () {
+  let P = [0.7, 0.2, 0.1], Q = [0.1, 0.3, 0.6];
+  const t = document.getElementById("w1t"), to = document.getElementById("w1to"), fr = document.getElementById("w1fr"), stats = document.getElementById("w1s");
+  const cA = document.getElementById("w1a"), cB = document.getElementById("w1b");
+  const N = 80;
+  function draw() {
+    const tt = +t.value; to.textContent = tt.toFixed(2);
+    const S = new Simplex(cB), C = new Chart(cA, [-4, 4], [-4, 4]);
+    S.frame(); C.frame([-4, -2, 0, 2, 4], [-4, -2, 0, 2, 4], "θ₁ = log(p₁/p₀)", "θ₂ = log(p₂/p₀)");
+    const ts = Array.from({ length: N + 1 }, (_, i) => i / N);
+    const e = ts.map(u => ePath(P, Q, u)), m = ts.map(u => mix(P, Q, u)), f = ts.map(u => frPath(P, Q, u));
+    S.path(e, col("--s1")); S.path(m, col("--s2")); if (fr.checked) S.path(f, col("--s3"), [6, 4]);
+    C.path(e.map(theta), col("--s1")); C.path(m.map(theta), col("--s2")); if (fr.checked) C.path(f.map(theta), col("--s3"), [6, 4]);
+    const pe = ePath(P, Q, tt), pm = mix(P, Q, tt), pf = frPath(P, Q, tt);
+    S.dot(pe, col("--s1"), "", 4.5); S.dot(pm, col("--s2"), "", 4.5); if (fr.checked) S.dot(pf, col("--s3"), "", 4.5);
+    const th = x => theta(x);
+    C.dot(th(pe)[0], th(pe)[1], col("--s1"), "", 4.5); C.dot(th(pm)[0], th(pm)[1], col("--s2"), "", 4.5); if (fr.checked) C.dot(th(pf)[0], th(pf)[1], col("--s3"), "", 4.5);
+    S.dot(P, col("--faint"), "P"); S.dot(Q, col("--faint"), "Q"); C.dot(th(P)[0], th(P)[1], col("--faint"), "P"); C.dot(th(Q)[0], th(Q)[1], col("--faint"), "Q");
+    const r = x => x.map(v => v.toFixed(3)).join(", ");
+    stats.innerHTML = `<div>KL[P:Q] <b>${fmt(kl(P, Q))}</b></div><div>KL[Q:P] <b>${fmt(kl(Q, P))}</b></div>` +
+      `<div>e-point <b>(${r(pe)})</b></div><div>m-point <b>(${r(pm)})</b></div>` + (fr.checked ? `<div>Fisher–Rao <b>(${r(pf)})</b></div>` : "");
+  }
+  draggable(cB, () => new Simplex(cB), [{ get: () => P, set: v => P = v }, { get: () => Q, set: v => Q = v }], draw);
+  t.addEventListener("input", draw); fr.addEventListener("change", draw); window.addEventListener("w1redraw", draw); draw();
+  window.__w1 = draw;
+})();
+
+// ================= widget 2
+(function () {
+  let P = [0.7, 0.2, 0.1], Q = [0.1, 0.3, 0.6];
+  const tS = document.getElementById("w2t"), tO = document.getElementById("w2to"), pS = document.getElementById("w2p"), pO = document.getElementById("w2po");
+  const stats = document.getElementById("w2s"), note = document.getElementById("w2n"), cv = document.getElementById("w2a");
+  function geom() {
+    const dEta = [Q[1] - P[1], Q[2] - P[2]], n = Math.hypot(dEta[0], dEta[1]) || 1e-9;
+    const vperp = [-dEta[1] / n, dEta[0] / n], u = [dEta[0] / n, dEta[1] / n];
+    const phi = (+pS.value) * Math.PI / 180;
+    const v = [Math.cos(phi) * vperp[0] + Math.sin(phi) * u[0], Math.cos(phi) * vperp[1] + Math.sin(phi) * u[1]];
+    const thQ = theta(Q), thP = theta(P), tt = +tS.value;
+    const thR = [thQ[0] + tt * v[0], thQ[1] + tt * v[1]];
+    return { thP, thQ, thR, R: fromTheta(thR), v, tt, dEta, phi };
+  }
+  function draw() {
+    tO.textContent = (+tS.value).toFixed(2); pO.textContent = pS.value + "°";
+    const S = new Simplex(cv, 30); S.frame();
+    const G = geom(); const ts = Array.from({ length: 81 }, (_, i) => i / 80);
+    S.path(ts.map(u => mix(P, Q, u)), col("--s2"));
+    const ext = Array.from({ length: 121 }, (_, i) => { const s = -4 + 8 * i / 120; return fromTheta([G.thQ[0] + s * G.v[0], G.thQ[1] + s * G.v[1]]); });
+    S.path(ext, col("--s1"), [5, 4], 1.4); S.path(Array.from({ length: 41 }, (_, i) => fromTheta([G.thQ[0] + G.tt * i / 40 * G.v[0], G.thQ[1] + G.tt * i / 40 * G.v[1]])), col("--s1"));
+    S.dot(P, col("--faint"), "P"); S.dot(Q, col("--faint"), "Q"); S.dot(G.R, col("--s4"), "R");
+    const dQP = D(G.thQ, G.thP), dRQ = D(G.thR, G.thQ), dRP = D(G.thR, G.thP);
+    const resid = dQP + dRQ - dRP, eP = eta(P), eQ = eta(Q), eR = eta(G.R);
+    const mine = (G.thQ[0] - G.thR[0]) * (eQ[0] - eP[0]) + (G.thQ[1] - G.thR[1]) * (eQ[1] - eP[1]);
+    const printed = (G.thP[0] - G.thQ[0]) * (eQ[0] - eR[0]) + (G.thP[1] - G.thQ[1]) * (eQ[1] - eR[1]);
+    stats.innerHTML = `<div>D(Q:P) <b>${fmt(dQP)}</b></div><div>D(R:Q) <b>${fmt(dRQ)}</b></div><div>sum <b>${fmt(dQP + dRQ)}</b></div><div>D(R:P) <b>${fmt(dRP)}</b></div><div>sum − D(R:P) <b>${fmt(resid)}</b></div>`;
+    note.innerHTML = `Residual predicted by $(\\theta_Q-\\theta_R)\\cdot(\\eta_Q-\\eta_P)$: <b>${fmt(mine)}</b>. The same expression with the indices as printed in (1.114), $(\\theta_P-\\theta_Q)\\cdot(\\eta_Q-\\eta_R)$: <b>${fmt(printed)}</b>. At zero tilt the residual is 0 to rounding, whatever $t$ is.`;
+    if (window.renderMathInElement) renderMathInElement(note, { delimiters: [{ left: "$", right: "$", display: false }] });
+  }
+  draggable(cv, () => new Simplex(cv, 30), [{ get: () => P, set: v => P = v }, { get: () => Q, set: v => Q = v }], draw);
+  tS.addEventListener("input", draw); pS.addEventListener("input", draw); draw(); window.__w2 = draw;
+})();
+
+// ================= widget 3
+(function () {
+  let P = [0.15, 0.25, 0.60];
+  const selS = document.getElementById("w3s"), selD = document.getElementById("w3d"), st = document.getElementById("w3st"), note = document.getElementById("w3n");
+  const cA = document.getElementById("w3a"), cB = document.getElementById("w3b");
+  const M = 600;
+  const curves = {
+    e: s => fromTheta([0.3 + s * 4 * 0.819, -0.6 + s * 4 * 0.573]),                                 // s in [-1, 1]
+    m: s => clampP(mix([0.6, 0.15, 0.25], [0.1, 0.55, 0.35], (s + 1) / 2)),
+    c: s => { const a = (270 + 85 * s) * Math.PI / 180, x = 0.5 + 0.2 * Math.cos(a), y = 0.33 + 0.2 * Math.sin(a); return xy2bary(x, y); }   // arc of a circle in the triangle
+  };
+  const ss = Array.from({ length: M + 1 }, (_, i) => -1 + 2 * i / M);
+  function draw() {
+    const kind = selS.value, which = selD.value, S = new Simplex(cA); S.frame();
+    const pts = ss.map(curves[kind]).map(p => p.map(v => Math.max(v, 1e-9)));
+    const f = p => which === "a" ? kl(P, p) : kl(p, P);
+    const vals = pts.map(f);
+    // contours of the divergence on a grid: draw a few level sets as scattered dots (cheap and robust)
+    const g = S.g; g.save(); g.fillStyle = col("--s1"); g.globalAlpha = 0.22;
+    const lev = [0.08, 0.2, 0.4, 0.7, 1.1], n = 70;
+    for (let i = 0; i <= n; i++) for (let j = 0; j <= n * H3; j++) {
+      const x = i / n, y = j / n; const b = xy2bary(x, y); if (b[0] < 0.01 || b[1] < 0.01 || b[2] < 0.01) continue;
+      const v = which === "a" ? kl(P, b) : kl(b, P); for (const L of lev) if (Math.abs(v - L) < 0.012) { g.fillRect(S.X(x) - 0.8, S.Y(y) - 0.8, 1.6, 1.6); break; }
+    }
+    g.restore();
+    S.path(pts, col("--s2"), null, 2.6); S.dot(P, col("--faint"), "P");
+    // critical points along S
+    const crit = [];
+    for (let i = 1; i < M; i++) { const a = vals[i] - vals[i - 1], b = vals[i + 1] - vals[i]; if (a < 0 && b >= 0) crit.push({ i, kind: "min" }); else if (a > 0 && b <= 0) crit.push({ i, kind: "max" }); }
+    crit.forEach(c => S.dot(pts[c.i], c.kind === "min" ? col("--s3") : col("--s4"), c.kind, 5));
+    const C = new Chart(cB, [-1, 1], [0, Math.max(...vals) * 1.08 || 1]); const top = Math.ceil(C.yr[1] * 10) / 10;
+    C.yr = [0, top]; C.frame([-1, -0.5, 0, 0.5, 1], [0, +(top / 2).toFixed(2), top], "position s along S", "divergence");
+    C.path(ss.map((s, i) => [s, vals[i]]), col("--s1"));
+    crit.forEach(c => C.dot(ss[c.i], vals[c.i], c.kind === "min" ? col("--s3") : col("--s4"), "", 5));
+    const mins = crit.filter(c => c.kind === "min"), maxs = crit.filter(c => c.kind === "max");
+    const gi = vals.indexOf(Math.min(...vals));
+    st.innerHTML = `<div>interior critical points <b>${crit.length}</b> (${mins.length} min, ${maxs.length} max)</div><div>smallest value on S <b>${fmt(vals[gi])}</b></div><div>at the end points <b>${fmt(vals[0], 3)}</b>, <b>${fmt(vals[M], 3)}</b></div>`;
+    const flat = (kind === "e" && which === "a") || (kind === "m" && which === "b");
+    if (flat) note.textContent = "S is flat in the sense Theorem 1.5 needs for this divergence, so Pythagoras holds for every point of S: at most one critical point, and it is the minimum (it can sit beyond the drawn end of the piece).";
+    else if (kind === "c") note.textContent = `A curved S: the orthogonality condition marks every critical point, minima and maxima alike (${mins.length} min and ${maxs.length} max inside the arc here). With KL[R : P] and P near the centre of the arc, two separate minima appear.`;
+    else note.textContent = `S is flat, but in the other sense, so the theorem does not apply and nothing forces a single critical point (${crit.length} here).`;
+  }
+  draggable(cA, () => new Simplex(cA), [{ get: () => P, set: v => P = v }], draw);
+  selS.addEventListener("change", draw); selD.addEventListener("change", draw); draw(); window.__w3 = draw;
+})();
+
+window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => { window.__w1(); window.__w2(); window.__w3(); });
+document.addEventListener("DOMContentLoaded", () => { const go = () => window.renderMathInElement && renderMathInElement(document.body, { delimiters: [{ left: "$$", right: "$$", display: true }, { left: "$", right: "$", display: false }], throwOnError: false }); window.addEventListener("load", go); go(); });
+</script>
+</body>
+</html>
