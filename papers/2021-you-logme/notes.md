@@ -32,7 +32,8 @@ status: read
   Eq. 2 against an independent derivation, the fixed point against a grid search, $\gamma$
   spanning $[0,D]$, the $D>n$ table that is the whole argument for the method, and Figure 2
   run forwards as a sampler (labels correlated through $w$ exactly as far as the features
-  overlap). `make verify` runs it; `python3 logme.py --figures` redraws the figure.
+  overlap), and the over-fitting paragraph in two dimensions (same best fit, different
+  evidence). `make verify` runs it; `python3 logme.py --figures` redraws both figures.
 - **[Column, null & residual spaces](../four-fundamental-subspaces/index.html)** — why that table happens: with $D\ge n$ the
   column space is all of $\mathbb R^n$, and residual degrees of freedom $n-p$, which $\gamma$ generalises.
 
@@ -113,6 +114,74 @@ and scores badly.
 
 Maximum likelihood calls all three a perfect fit and cannot separate signal from noise at all.
 The evidence orders them correctly. That single table is the argument for LogME.
+
+### The paper's paragraph on over-fitting, read slowly
+
+Section 4.1's paragraph makes three moves, and each leans on one symbol.
+
+**The symbols, in words.**
+
+- $p(y\mid F,w)$ is the **likelihood**, a score for one particular guess of the weights: "if the
+  weights were exactly $w$, how probable would the labels I actually have be?" Higher means that
+  guess explains the labels better.
+- $w^*$ is the guess with the highest score, which is what ordinary regression finds. So
+  $p(y\mid F,w^*)$ is **the score of the best guess**.
+- $p(w)$ is how plausible each guess is *before* seeing any labels: a bell curve centred at zero,
+  whose width is set by $\alpha$.
+- $\int\cdots\,\mathrm{d}w$ means "add this up over every possible $w$". Weighted by $p(w)$, that
+  is an **average of the likelihood over all the guesses**, not its value at the best one.
+
+**Why the best guess over-fits.** $w^*$ is chosen after looking at $y$, like a student who sees
+the exam before answering. The more knobs the model has, the better it can match any exam. With
+$D\ge n$ the knobs can reproduce the labels exactly whatever the features are, which is why the
+table above gives $R^2=1$ to signal and noise alike. So the best-guess score measures how
+*flexible* the feature set is as much as how *informative* it is, and a score that cannot tell
+the two apart cannot rank pre-trained models.
+
+**What the average asks instead.** Run the graph above forwards: draw $w$ from the prior before
+seeing anything, then generate labels from it. How probable is it that this blind process
+produces the labels we actually have? A feature set that can produce anything produces any *one*
+label vector with small probability, because probability has to be shared out over everything it
+could have produced. A feature set whose possible outputs sit near the real labels gets a large
+share.
+
+**The smallest example I could find**, with two labels so that it can be drawn. Model A has one
+weight, so it can only produce labels along the line $y_2=2y_1$. Model B has two weights and can
+produce any labels. The point $P=(1,2)$ is on A's line and $Q=(1,-2)$ is not.
+
+<img src="figures/best-fit-vs-average.svg" alt="Two panels in the plane of two labels. In the left panel, model A's prediction is a narrow tilted ellipse along the line y2 equals 2 y1, with a dotted line marking where A can fit exactly. Point P is on that line inside the inner contour; point Q is off it, between the two contours. In the right panel, model B's prediction is a round blob, and P and Q sit at the same distance from its centre, between the contours. Under each panel are the best log-likelihood and the log evidence for P and Q.">
+
+| data | model | best $w$ | best log-likelihood | log evidence |
+|---|---|---|---|---|
+| $P$ | A (one weight) | 1.00 | −1.84 | **−3.15** |
+| $P$ | B (two weights) | (1.00, 2.00) | −1.84 | −3.78 |
+| $Q$ | A | −0.60 | −3.44 | −4.48 |
+| $Q$ | B | (1.00, −2.00) | −1.84 | **−3.78** |
+
+The evidence is in nats (natural-log units), so a gap of 0.63 means a probability ratio of
+$e^{0.63}\approx1.88$.
+
+- **At $P$ both models fit exactly** and the best-fit scores tie. The evidence still prefers A, by
+  0.63 nats (a factor of 1.88). A could only produce labels along one line and $P$ happens to lie
+  on it, so A had put its probability where the data turned out to be, while B spread the same
+  probability over the whole plane.
+- **At $Q$ A cannot fit** (−3.44 against −1.84) and the evidence flips: B wins by 0.70 nats (a
+  factor of 2.02).
+- **Maximum likelihood can never prefer A**, because B contains A and so can never fit worse.
+  Only the average can prefer the smaller model, and it does exactly when the smaller model's
+  narrower bet was right.
+
+In the picture the evidence is the height of each model's blob at the labels seen. That blob is
+$\mathcal{N}(0,\ \alpha^{-1}FF^\top+\beta^{-1}I)$, the same marginal used for the independent
+check below; here $\alpha=\beta=1$. Equation 2's Occam factor is this idea with the bookkeeping
+done: it charges each model for the share of probability it spent on labels that never happened.
+
+**What the citation does and does not show.** The paper says the over-fitting of likelihood is
+"experimentally observed in Supplementary B". That section compares LogME with training a
+classification or regression head and scoring the head's accuracy or MSE, and its Figure 7 shows
+that correlation can *fall* as the number of hyper-parameter trials grows. It never scores
+$p(y\mid F,w^*)$ itself. The likelihood-against-evidence comparison the sentence needs is the
+$D>n$ table above (script items 4 and 6), not that supplement.
 
 ## Equation 1, and Equation 2 term by term
 
@@ -269,6 +338,12 @@ H-score breaks, which is a concrete prediction and is consistent with what that 
 - **No convergence guarantee.** The MacKay alternation is applied to a coupled non-concave
   problem, justified entirely by "empirically converges with no more than three iterations". It
   did converge cleanly everywhere I tried, but nothing rules out multimodality.
+- **The cited evidence for "likelihood over-fits" is about something else.** Section 4.1 points to
+  Supplementary B, which compares LogME with re-training a head and scoring its accuracy or MSE
+  (Figure 7: correlation can fall as hyper-parameter trials grow). That is over-fitting of a tuned
+  head's validation score, not of $p(y\mid F,w^*)$, which no experiment I could find in the paper
+  scores. I read the supplement as extracted text, including the Figure 7 caption, not the plotted points.
+  The claim is true and easy to show — the $D>n$ table does it — but the paper does not.
 - **The interpolating regime is undefined**, as above, and unremarked.
 - **It scores a linear head on frozen features.** If you intend to fine-tune the whole network,
   the quantity estimated is not the quantity you care about — the same caveat as LEEP and

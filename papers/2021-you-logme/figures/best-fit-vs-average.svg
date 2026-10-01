@@ -1,0 +1,70 @@
+<svg viewBox="0 0 760 462" xmlns="http://www.w3.org/2000/svg" role="img">
+<title>Two models with the same best fit but different evidence</title>
+<desc>Two panels in the plane of two labels. Model A, with one weight, predicts labels along a narrow ellipse stretched along the line y2 equals 2 y1. Model B, with two weights, predicts labels in a round blob. Point P on A's line has the same best log-likelihood under both models, -1.84, but log evidence -3.15 under A against -3.78 under B. Point Q off the line has best log-likelihood -3.44 under A and -1.84 under B, and log evidence -4.48 under A against -3.78 under B.</desc>
+<style>
+  text{font-family:ui-sans-serif,-apple-system,"Segoe UI",sans-serif;font-weight:400}
+  .hd{font-size:13px;font-weight:500;fill:#1a1a19} .v{font-size:12.5px;fill:#1a1a19}
+  .sm{font-size:11.5px;fill:#57564f} .dots{font-size:20px;fill:#57564f}
+  .nm{font-size:18px;font-style:italic;fill:#1a1a19} .nmb{font-size:18px;font-style:italic;fill:#2f6fb5}
+  .row{font-size:22px;font-style:italic;fill:#8a8880}
+  .it{font-style:italic} .sb{font-size:72%} .sp{font-size:72%}
+  .obs{fill:#e4e2d8;stroke:#1a1a19;stroke-width:1.6}
+  .lat{fill:none;stroke:#1a1a19;stroke-width:1.6}
+  .hyp{fill:none;stroke:#2f6fb5;stroke-width:1.6}
+  .e{stroke:#1a1a19;stroke-width:1.5;fill:none} .eb{stroke:#2f6fb5;stroke-width:1.5;fill:none}
+  .ah{fill:#1a1a19} .ahb{fill:#2f6fb5}
+  @media (prefers-color-scheme: dark){
+    .hd,.v,.nm{fill:#eceae3} .sm,.dots{fill:#b6b4ab} .row{fill:#85837b}
+    .nmb{fill:#7fb2e8}
+    .obs{fill:#3a3835;stroke:#eceae3} .lat{stroke:#eceae3} .hyp{stroke:#7fb2e8}
+    .e{stroke:#eceae3} .eb{stroke:#7fb2e8} .ah{fill:#eceae3} .ahb{fill:#7fb2e8}
+  }
+
+  .ax{stroke:#c9c7bf;stroke-width:0.9;fill:none} .box{fill:none;stroke:#c9c7bf;stroke-width:1}
+  .ca1{fill:none;stroke:#2f6fb5;stroke-width:1.8} .ca2{fill:none;stroke:#2f6fb5;stroke-width:1.2;stroke-dasharray:5 3}
+  .cb1{fill:none;stroke:#c8702f;stroke-width:1.8} .cb2{fill:none;stroke:#c8702f;stroke-width:1.2;stroke-dasharray:5 3}
+  .line{stroke:#8a8880;stroke-width:1.1;stroke-dasharray:2 3;fill:none}
+  .pt{fill:#1a1a19;stroke:#fbfaf6;stroke-width:1.4} .pq{fill:#fbfaf6;stroke:#1a1a19;stroke-width:1.8}
+  .halo{paint-order:stroke;stroke:#fbfaf6;stroke-width:3.5px;stroke-linejoin:round}
+  .ta{font-size:11.5px;fill:#2f6fb5} .tb{font-size:11.5px;fill:#c8702f}
+  @media (prefers-color-scheme: dark){
+    .ax{stroke:#4a4844} .box{stroke:#4a4844}
+    .ca1,.ca2{stroke:#7fb2e8} .cb1,.cb2{stroke:#e09a5f} .line{stroke:#85837b}
+    .pt{fill:#eceae3;stroke:#161615} .pq{fill:#161615;stroke:#eceae3}
+    .halo{stroke:#161615} .ta{fill:#7fb2e8} .tb{fill:#e09a5f}
+  }
+</style>
+<text x="14" y="22" class="hd">Same best fit, different evidence: the evidence is the height of the model's own prediction at the labels seen</text>
+<text x="50" y="48" class="ta">Model A: one weight, so it predicts labels along one line</text>
+<rect x="50" y="62" width="300" height="300" class="box"/>
+<path d="M 50.0,212.0 H 350.0 M 200.0,362.0 V 62.0" class="ax"/>
+<text x="346.0" y="206.0" class="sm" text-anchor="end"><tspan class="it">y</tspan><tspan class="it sb" dy="4">1</tspan></text>
+<text x="206.0" y="76.0" class="sm"><tspan class="it">y</tspan><tspan class="it sb" dy="4">2</tspan></text>
+<path d="M 151.2,187.6 L 154.4,181.4 L 157.7,175.2 L 161.2,169.2 L 164.7,163.3 L 168.3,157.5 L 172.1,151.9 L 175.9,146.4 L 179.7,141.1 L 183.7,136.0 L 187.6,131.1 L 191.6,126.5 L 195.7,122.0 L 199.7,117.8 L 203.7,113.9 L 207.8,110.2 L 211.8,106.9 L 215.7,103.8 L 219.7,101.0 L 223.5,98.5 L 227.4,96.3 L 231.1,94.4 L 234.7,92.9 L 238.3,91.7 L 241.8,90.8 L 245.1,90.3 L 248.3,90.0 L 251.4,90.2 L 254.3,90.6 L 257.1,91.4 L 259.8,92.5 L 262.2,93.9 L 264.5,95.7 L 266.6,97.8 L 268.6,100.2 L 270.3,102.9 L 271.9,105.9 L 273.3,109.2 L 274.4,112.8 L 275.4,116.6 L 276.1,120.7 L 276.7,125.1 L 277.0,129.7 L 277.1,134.5 L 277.0,139.5 L 276.7,144.7 L 276.2,150.2 L 275.5,155.8 L 274.6,161.5 L 273.5,167.4 L 272.1,173.4 L 270.6,179.5 L 268.9,185.7 L 267.0,191.9 L 264.9,198.3 L 262.6,204.6 L 260.1,211.0 L 257.5,217.4 L 254.8,223.8 L 251.8,230.1 L 248.8,236.4 L 245.6,242.6 L 242.3,248.8 L 238.8,254.8 L 235.3,260.7 L 231.7,266.5 L 227.9,272.1 L 224.1,277.6 L 220.3,282.9 L 216.3,288.0 L 212.4,292.9 L 208.4,297.5 L 204.3,302.0 L 200.3,306.2 L 196.3,310.1 L 192.2,313.8 L 188.2,317.1 L 184.3,320.2 L 180.3,323.0 L 176.5,325.5 L 172.6,327.7 L 168.9,329.6 L 165.3,331.1 L 161.7,332.3 L 158.2,333.2 L 154.9,333.7 L 151.7,334.0 L 148.6,333.8 L 145.7,333.4 L 142.9,332.6 L 140.2,331.5 L 137.8,330.1 L 135.5,328.3 L 133.4,326.2 L 131.4,323.8 L 129.7,321.1 L 128.1,318.1 L 126.7,314.8 L 125.6,311.2 L 124.6,307.4 L 123.9,303.3 L 123.3,298.9 L 123.0,294.3 L 122.9,289.5 L 123.0,284.5 L 123.3,279.3 L 123.8,273.8 L 124.5,268.2 L 125.4,262.5 L 126.5,256.6 L 127.9,250.6 L 129.4,244.5 L 131.1,238.3 L 133.0,232.1 L 135.1,225.7 L 137.4,219.4 L 139.9,213.0 L 142.5,206.6 L 145.2,200.2 L 148.2,193.9 L 151.2,187.6 Z" class="ca2"/>
+<path d="M 175.6,199.8 L 177.2,196.7 L 178.9,193.6 L 180.6,190.6 L 182.4,187.6 L 184.2,184.8 L 186.0,181.9 L 187.9,179.2 L 189.9,176.6 L 191.8,174.0 L 193.8,171.6 L 195.8,169.2 L 197.8,167.0 L 199.8,164.9 L 201.9,163.0 L 203.9,161.1 L 205.9,159.4 L 207.9,157.9 L 209.8,156.5 L 211.8,155.2 L 213.7,154.2 L 215.5,153.2 L 217.4,152.5 L 219.1,151.8 L 220.9,151.4 L 222.5,151.1 L 224.2,151.0 L 225.7,151.1 L 227.2,151.3 L 228.6,151.7 L 229.9,152.2 L 231.1,153.0 L 232.3,153.9 L 233.3,154.9 L 234.3,156.1 L 235.2,157.4 L 236.0,158.9 L 236.6,160.6 L 237.2,162.4 L 237.7,164.3 L 238.1,166.4 L 238.3,168.5 L 238.5,170.8 L 238.6,173.2 L 238.5,175.8 L 238.4,178.4 L 238.1,181.1 L 237.8,183.9 L 237.3,186.7 L 236.7,189.7 L 236.1,192.7 L 235.3,195.7 L 234.4,198.8 L 233.5,202.0 L 232.4,205.1 L 231.3,208.3 L 230.1,211.5 L 228.8,214.7 L 227.4,217.9 L 225.9,221.1 L 224.4,224.2 L 222.8,227.3 L 221.1,230.4 L 219.4,233.4 L 217.6,236.4 L 215.8,239.2 L 214.0,242.1 L 212.1,244.8 L 210.1,247.4 L 208.2,250.0 L 206.2,252.4 L 204.2,254.8 L 202.2,257.0 L 200.2,259.1 L 198.1,261.0 L 196.1,262.9 L 194.1,264.6 L 192.1,266.1 L 190.2,267.5 L 188.2,268.8 L 186.3,269.8 L 184.5,270.8 L 182.6,271.5 L 180.9,272.2 L 179.1,272.6 L 177.5,272.9 L 175.8,273.0 L 174.3,272.9 L 172.8,272.7 L 171.4,272.3 L 170.1,271.8 L 168.9,271.0 L 167.7,270.1 L 166.7,269.1 L 165.7,267.9 L 164.8,266.6 L 164.0,265.1 L 163.4,263.4 L 162.8,261.6 L 162.3,259.7 L 161.9,257.6 L 161.7,255.5 L 161.5,253.2 L 161.4,250.8 L 161.5,248.2 L 161.6,245.6 L 161.9,242.9 L 162.2,240.1 L 162.7,237.3 L 163.3,234.3 L 163.9,231.3 L 164.7,228.3 L 165.6,225.2 L 166.5,222.0 L 167.6,218.9 L 168.7,215.7 L 169.9,212.5 L 171.2,209.3 L 172.6,206.1 L 174.1,202.9 L 175.6,199.8 Z" class="ca1"/>
+<path d="M 125.0,362.0 L 275.0,62.0" class="line"/>
+<text x="60" y="82" class="sm halo">fits exactly only</text>
+<text x="60" y="96" class="sm halo">on the dotted line</text>
+<circle cx="227.3" cy="157.5" r="5" class="pt"/>
+<text x="236.3" y="161.5" class="v halo">P</text>
+<circle cx="227.3" cy="266.5" r="5" class="pq"/>
+<text x="236.3" y="270.5" class="v halo">Q</text>
+<text x="50" y="384" class="v">P: best log-likelihood -1.84, <tspan class="it">log evidence -3.15</tspan></text>
+<text x="50" y="401" class="v">Q: best log-likelihood -3.44, <tspan class="it">log evidence -4.48</tspan></text>
+<text x="410" y="48" class="tb">Model B: two weights, so it predicts labels anywhere</text>
+<rect x="410" y="62" width="300" height="300" class="box"/>
+<path d="M 410.0,212.0 H 710.0 M 560.0,362.0 V 62.0" class="ax"/>
+<text x="706.0" y="206.0" class="sm" text-anchor="end"><tspan class="it">y</tspan><tspan class="it sb" dy="4">1</tspan></text>
+<text x="566.0" y="76.0" class="sm"><tspan class="it">y</tspan><tspan class="it sb" dy="4">2</tspan></text>
+<path d="M 637.1,212.0 L 637.0,208.0 L 636.7,203.9 L 636.2,199.9 L 635.5,196.0 L 634.5,192.0 L 633.4,188.2 L 632.0,184.4 L 630.5,180.6 L 628.7,177.0 L 626.8,173.4 L 624.7,170.0 L 622.4,166.7 L 619.9,163.5 L 617.3,160.4 L 614.5,157.5 L 611.6,154.7 L 608.5,152.1 L 605.3,149.6 L 602.0,147.3 L 598.6,145.2 L 595.0,143.3 L 591.4,141.5 L 587.6,140.0 L 583.8,138.6 L 580.0,137.5 L 576.0,136.5 L 572.1,135.8 L 568.1,135.3 L 564.0,135.0 L 560.0,134.9 L 556.0,135.0 L 551.9,135.3 L 547.9,135.8 L 544.0,136.5 L 540.0,137.5 L 536.2,138.6 L 532.4,140.0 L 528.6,141.5 L 525.0,143.3 L 521.4,145.2 L 518.0,147.3 L 514.7,149.6 L 511.5,152.1 L 508.4,154.7 L 505.5,157.5 L 502.7,160.4 L 500.1,163.5 L 497.6,166.7 L 495.3,170.0 L 493.2,173.4 L 491.3,177.0 L 489.5,180.6 L 488.0,184.4 L 486.6,188.2 L 485.5,192.0 L 484.5,196.0 L 483.8,199.9 L 483.3,203.9 L 483.0,208.0 L 482.9,212.0 L 483.0,216.0 L 483.3,220.1 L 483.8,224.1 L 484.5,228.0 L 485.5,232.0 L 486.6,235.8 L 488.0,239.6 L 489.5,243.4 L 491.3,247.0 L 493.2,250.6 L 495.3,254.0 L 497.6,257.3 L 500.1,260.5 L 502.7,263.6 L 505.5,266.5 L 508.4,269.3 L 511.5,271.9 L 514.7,274.4 L 518.0,276.7 L 521.4,278.8 L 525.0,280.7 L 528.6,282.5 L 532.4,284.0 L 536.2,285.4 L 540.0,286.5 L 544.0,287.5 L 547.9,288.2 L 551.9,288.7 L 556.0,289.0 L 560.0,289.1 L 564.0,289.0 L 568.1,288.7 L 572.1,288.2 L 576.0,287.5 L 580.0,286.5 L 583.8,285.4 L 587.6,284.0 L 591.4,282.5 L 595.0,280.7 L 598.6,278.8 L 602.0,276.7 L 605.3,274.4 L 608.5,271.9 L 611.6,269.3 L 614.5,266.5 L 617.3,263.6 L 619.9,260.5 L 622.4,257.3 L 624.7,254.0 L 626.8,250.6 L 628.7,247.0 L 630.5,243.4 L 632.0,239.6 L 633.4,235.8 L 634.5,232.0 L 635.5,228.0 L 636.2,224.1 L 636.7,220.1 L 637.0,216.0 L 637.1,212.0 Z" class="cb2"/>
+<path d="M 598.6,212.0 L 598.5,210.0 L 598.4,208.0 L 598.1,206.0 L 597.7,204.0 L 597.3,202.0 L 596.7,200.1 L 596.0,198.2 L 595.2,196.3 L 594.4,194.5 L 593.4,192.7 L 592.3,191.0 L 591.2,189.3 L 590.0,187.7 L 588.7,186.2 L 587.3,184.7 L 585.8,183.3 L 584.3,182.0 L 582.7,180.8 L 581.0,179.7 L 579.3,178.6 L 577.5,177.6 L 575.7,176.8 L 573.8,176.0 L 571.9,175.3 L 570.0,174.7 L 568.0,174.3 L 566.0,173.9 L 564.0,173.6 L 562.0,173.5 L 560.0,173.4 L 558.0,173.5 L 556.0,173.6 L 554.0,173.9 L 552.0,174.3 L 550.0,174.7 L 548.1,175.3 L 546.2,176.0 L 544.3,176.8 L 542.5,177.6 L 540.7,178.6 L 539.0,179.7 L 537.3,180.8 L 535.7,182.0 L 534.2,183.3 L 532.7,184.7 L 531.3,186.2 L 530.0,187.7 L 528.8,189.3 L 527.7,191.0 L 526.6,192.7 L 525.6,194.5 L 524.8,196.3 L 524.0,198.2 L 523.3,200.1 L 522.7,202.0 L 522.3,204.0 L 521.9,206.0 L 521.6,208.0 L 521.5,210.0 L 521.4,212.0 L 521.5,214.0 L 521.6,216.0 L 521.9,218.0 L 522.3,220.0 L 522.7,222.0 L 523.3,223.9 L 524.0,225.8 L 524.8,227.7 L 525.6,229.5 L 526.6,231.3 L 527.7,233.0 L 528.8,234.7 L 530.0,236.3 L 531.3,237.8 L 532.7,239.3 L 534.2,240.7 L 535.7,242.0 L 537.3,243.2 L 539.0,244.3 L 540.7,245.4 L 542.5,246.4 L 544.3,247.2 L 546.2,248.0 L 548.1,248.7 L 550.0,249.3 L 552.0,249.7 L 554.0,250.1 L 556.0,250.4 L 558.0,250.5 L 560.0,250.6 L 562.0,250.5 L 564.0,250.4 L 566.0,250.1 L 568.0,249.7 L 570.0,249.3 L 571.9,248.7 L 573.8,248.0 L 575.7,247.2 L 577.5,246.4 L 579.3,245.4 L 581.0,244.3 L 582.7,243.2 L 584.3,242.0 L 585.8,240.7 L 587.3,239.3 L 588.7,237.8 L 590.0,236.3 L 591.2,234.7 L 592.3,233.0 L 593.4,231.3 L 594.4,229.5 L 595.2,227.7 L 596.0,225.8 L 596.7,223.9 L 597.3,222.0 L 597.7,220.0 L 598.1,218.0 L 598.4,216.0 L 598.5,214.0 L 598.6,212.0 Z" class="cb1"/>
+<text x="420" y="82" class="sm halo">fits any point exactly</text>
+<circle cx="587.3" cy="157.5" r="5" class="pt"/>
+<text x="596.3" y="161.5" class="v halo">P</text>
+<circle cx="587.3" cy="266.5" r="5" class="pq"/>
+<text x="596.3" y="270.5" class="v halo">Q</text>
+<text x="410" y="384" class="v">P: best log-likelihood -1.84, <tspan class="it">log evidence -3.78</tspan></text>
+<text x="410" y="401" class="v">Q: best log-likelihood -1.84, <tspan class="it">log evidence -3.78</tspan></text>
+<text x="14" y="432" class="sm">P = (1, 2) lies on A's line, Q = (1, −2) does not.</text>
+<text x="14" y="448" class="sm">Contours are 1 and 2 standard deviations of what each model predicts for (y₁, y₂) before seeing any labels (α = β = 1).</text>
+</svg>

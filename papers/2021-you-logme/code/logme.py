@@ -19,7 +19,10 @@ Checked here:
   * evidence resists over-fitting where likelihood does not, at D > n;
   * the paper's Figure 2, read as a generative process: w is a shared parent, so
     the labels are correlated through it, and by exactly as much as the
-    features overlap -- f_i orthogonal to f_j gives uncorrelated labels.
+    features overlap -- f_i orthogonal to f_j gives uncorrelated labels;
+  * the paper's one paragraph on over-fitting, in the plane: two models with
+    the same best fit but different evidence, because the evidence is the
+    density each model's own prior predictive puts on the labels actually seen.
 
 The Sec 4.3 speedup is used throughout rather than tested separately: F^T F is
 eigendecomposed once and every step inside the loop is matrix-VECTOR.
@@ -217,6 +220,52 @@ def graph_couples_the_labels():
     print("   that couples them.\n")
 
 
+def _toy_cases(alpha=1.0, beta=1.0):
+    """Two models, two data sets, all in the plane so they can be drawn.
+
+    Model A has one weight (the two points have features 1 and 2), so it can only
+    produce labels along the line y_2 = 2 y_1. Model B has two weights and the
+    identity as its features, so it can produce any labels. P lies on A's line;
+    Q does not."""
+    models = {"A": np.array([[1.0], [2.0]]), "B": np.eye(2)}
+    data = {"P": np.array([1.0, 2.0]), "Q": np.array([1.0, -2.0])}
+    rows = {}
+    for m, F in models.items():
+        for d, y in data.items():
+            w = np.linalg.lstsq(F, y, rcond=None)[0]
+            n = len(y)
+            best = ((n / 2) * np.log(beta / (2 * np.pi))
+                    - (beta / 2) * float(np.sum((F @ w - y) ** 2)))
+            rows[m, d] = dict(w=w, best=best, ev=evidence_marginal(F, y, alpha, beta),
+                              eq2=evidence(F, y, alpha, beta))
+    return models, data, rows
+
+
+def best_fit_versus_average():
+    print("6. The paper's over-fitting paragraph in two dimensions: best guess or average?\n")
+    alpha = beta = 1.0
+    _, _, r = _toy_cases(alpha, beta)
+    print(f"   alpha = beta = {alpha:g}. Model A has one weight and can only produce labels")
+    print("   on the line y_2 = 2 y_1. Model B has two weights and can produce anything.")
+    print("   P = (1, 2) is on A's line; Q = (1, -2) is not.\n")
+    print(f"   {'data':>5} {'model':>6}  {'best w':>14}  {'max log-lik':>11}"
+          f"  {'log evidence':>12}  {'Eq 2 - marginal':>15}")
+    for d in "PQ":
+        for m in "AB":
+            x = r[m, d]
+            ws = "(" + ", ".join(f"{v:.2f}" for v in x["w"]) + ")"
+            print(f"   {d:>5} {m:>6}  {ws:>14}  {x['best']:>11.4f}  {x['ev']:>12.4f}"
+                  f"  {abs(x['eq2'] - x['ev']):>15.1e}")
+    dP = r["A", "P"]["ev"] - r["B", "P"]["ev"]
+    dQ = r["B", "Q"]["ev"] - r["A", "Q"]["ev"]
+    print(f"\n   Maximum likelihood ties at P and prefers B at Q: B contains A, so B's best")
+    print(f"   fit can never be worse, and it can never prefer the simpler model.")
+    print(f"   The evidence prefers A at P by {dP:.4f} nats (a factor {np.exp(dP):.2f}) and B at Q by")
+    print(f"   {dQ:.4f} nats (a factor {np.exp(dQ):.2f}): it rewards the model that was flexible")
+    print("   enough and no more. Evidence is the density each model's own prior")
+    print("   predictive N(0, a^-1 F F^T + b^-1 I) assigns to the labels actually seen.\n")
+
+
 # ------------------------------------------------------------------ figures
 STYLE = """<style>
   text{font-family:ui-sans-serif,-apple-system,"Segoe UI",sans-serif;font-weight:400}
@@ -325,10 +374,88 @@ def fig_graphical_model():
             f"{STYLE}\n" + "\n".join(body) + "\n</svg>\n")
 
 
+STYLE_PREDICTIVE = STYLE.replace("</style>", """
+  .ax{stroke:#c9c7bf;stroke-width:0.9;fill:none} .box{fill:none;stroke:#c9c7bf;stroke-width:1}
+  .ca1{fill:none;stroke:#2f6fb5;stroke-width:1.8} .ca2{fill:none;stroke:#2f6fb5;stroke-width:1.2;stroke-dasharray:5 3}
+  .cb1{fill:none;stroke:#c8702f;stroke-width:1.8} .cb2{fill:none;stroke:#c8702f;stroke-width:1.2;stroke-dasharray:5 3}
+  .line{stroke:#8a8880;stroke-width:1.1;stroke-dasharray:2 3;fill:none}
+  .pt{fill:#1a1a19;stroke:#fbfaf6;stroke-width:1.4} .pq{fill:#fbfaf6;stroke:#1a1a19;stroke-width:1.8}
+  .halo{paint-order:stroke;stroke:#fbfaf6;stroke-width:3.5px;stroke-linejoin:round}
+  .ta{font-size:11.5px;fill:#2f6fb5} .tb{font-size:11.5px;fill:#c8702f}
+  @media (prefers-color-scheme: dark){
+    .ax{stroke:#4a4844} .box{stroke:#4a4844}
+    .ca1,.ca2{stroke:#7fb2e8} .cb1,.cb2{stroke:#e09a5f} .line{stroke:#85837b}
+    .pt{fill:#eceae3;stroke:#161615} .pq{fill:#161615;stroke:#eceae3}
+    .halo{stroke:#161615} .ta{fill:#7fb2e8} .tb{fill:#e09a5f}
+  }
+</style>""")
+
+
+def fig_best_fit_vs_average():
+    models, data, rows = _toy_cases()
+    lim, size, y0 = 5.5, 300, 62
+    sc = size / (2 * lim)
+    body = ['<text x="14" y="22" class="hd">Same best fit, different evidence: the evidence is the height of the '
+            'model\'s own prediction at the labels seen</text>']
+    panels = (("A", 50, "ca", "ta", "Model A: one weight, so it predicts labels along one line"),
+              ("B", 410, "cb", "tb", "Model B: two weights, so it predicts labels anywhere"))
+    for m, x0, cc, tc, title in panels:
+        F = models[m]
+        X = lambda v, x0=x0: x0 + (v + lim) * sc            # noqa: E731
+        Y = lambda v: y0 + (lim - v) * sc                   # noqa: E731
+        body.append(f'<text x="{x0}" y="{y0 - 14}" class="{tc}">{title}</text>')
+        body.append(f'<rect x="{x0}" y="{y0}" width="{size}" height="{size}" class="box"/>')
+        body.append(f'<path d="M {X(-lim):.1f},{Y(0):.1f} H {X(lim):.1f} M {X(0):.1f},{Y(-lim):.1f} V {Y(lim):.1f}" class="ax"/>')
+        body.append(f'<text x="{X(lim) - 4:.1f}" y="{Y(0) - 6:.1f}" class="sm" text-anchor="end">'
+                    + _rich([("y", "it"), ("1", "sub")]) + "</text>")
+        body.append(f'<text x="{X(0) + 6:.1f}" y="{Y(lim) + 14:.1f}" class="sm">'
+                    + _rich([("y", "it"), ("2", "sub")]) + "</text>")
+        C = F @ F.T + np.eye(2)                              # alpha = beta = 1
+        lam, V = np.linalg.eigh(C)
+        th = np.linspace(0, 2 * np.pi, 121)
+        circle = np.vstack([np.cos(th), np.sin(th)])
+        for k in (2, 1):
+            pts = k * V @ (np.sqrt(lam)[:, None] * circle)
+            d = "M " + " L ".join(f"{X(a):.1f},{Y(b):.1f}" for a, b in pts.T) + " Z"
+            body.append(f'<path d="{d}" class="{cc}{k}"/>')
+        if m == "A":
+            t = 2.75
+            body.append(f'<path d="M {X(-t):.1f},{Y(-2 * t):.1f} L {X(t):.1f},{Y(2 * t):.1f}" class="line"/>')
+            body.append(f'<text x="{x0 + 10}" y="{y0 + 20}" class="sm halo">fits exactly only</text>')
+            body.append(f'<text x="{x0 + 10}" y="{y0 + 34}" class="sm halo">on the dotted line</text>')
+        else:
+            body.append(f'<text x="{x0 + 10}" y="{y0 + 20}" class="sm halo">fits any point exactly</text>')
+        for tag, y in data.items():
+            if tag == "P":
+                body.append(f'<circle cx="{X(y[0]):.1f}" cy="{Y(y[1]):.1f}" r="5" class="pt"/>')
+                body.append(f'<text x="{X(y[0]) + 9:.1f}" y="{Y(y[1]) + 4:.1f}" class="v halo">P</text>')
+            else:
+                body.append(f'<circle cx="{X(y[0]):.1f}" cy="{Y(y[1]):.1f}" r="5" class="pq"/>')
+                body.append(f'<text x="{X(y[0]) + 9:.1f}" y="{Y(y[1]) + 4:.1f}" class="v halo">Q</text>')
+        for r, tag in enumerate("PQ"):
+            x = rows[m, tag]
+            body.append(f'<text x="{x0}" y="{y0 + size + 22 + 17 * r}" class="v">'
+                        f'{tag}: best log-likelihood {x["best"]:.2f}, <tspan class="it">log evidence {x["ev"]:.2f}</tspan></text>')
+    body.append(f'<text x="14" y="{y0 + size + 70}" class="sm">P = (1, 2) lies on A\'s line, Q = (1, −2) does not.</text>')
+    body.append(f'<text x="14" y="{y0 + size + 86}" class="sm">Contours are 1 and 2 standard deviations of what each '
+                'model predicts for (y₁, y₂) before seeing any labels (α = β = 1).</text>')
+    return (f'<svg viewBox="0 0 760 {y0 + size + 100}" xmlns="http://www.w3.org/2000/svg" role="img">\n'
+            "<title>Two models with the same best fit but different evidence</title>\n"
+            "<desc>Two panels in the plane of two labels. Model A, with one weight, predicts labels along a "
+            "narrow ellipse stretched along the line y2 equals 2 y1. Model B, with two weights, predicts labels "
+            "in a round blob. Point P on A's line has the same best log-likelihood under both models, "
+            f"{rows['A', 'P']['best']:.2f}, but log evidence {rows['A', 'P']['ev']:.2f} under A against "
+            f"{rows['B', 'P']['ev']:.2f} under B. Point Q off the line has best log-likelihood "
+            f"{rows['A', 'Q']['best']:.2f} under A and {rows['B', 'Q']['best']:.2f} under B, and log evidence "
+            f"{rows['A', 'Q']['ev']:.2f} under A against {rows['B', 'Q']['ev']:.2f} under B.</desc>\n"
+            f"{STYLE_PREDICTIVE}\n" + "\n".join(body) + "\n</svg>\n")
+
+
 def write_figures():
     d = Path(__file__).resolve().parent.parent / "figures"
     d.mkdir(exist_ok=True)
-    files = {"graphical-model.svg": fig_graphical_model()}
+    files = {"graphical-model.svg": fig_graphical_model(),
+             "best-fit-vs-average.svg": fig_best_fit_vs_average()}
     for name, text in files.items():
         (d / name).write_text(text)
     print("figures: wrote", ", ".join(sorted(files)))
@@ -343,5 +470,6 @@ if __name__ == "__main__":
     gamma_is_effective_parameters(rng)
     evidence_beats_likelihood(rng)
     graph_couples_the_labels()
+    best_fit_versus_average()
     if "--figures" in sys.argv:
         write_figures()
