@@ -1,0 +1,83 @@
+<svg viewBox="0 0 760 348" xmlns="http://www.w3.org/2000/svg" role="img">
+<title>Statistical resolution of a rank correlation over ten models</title>
+<desc>Two panels. On the left, the power to detect a true Kendall tau of 0.3 rises from 0.14 with ten models to 0.74 with eighty. On the right, the smallest absolute tau that reaches p below 0.05 falls from 0.467 with ten models to 0.192 with fifty. A dashed line marks a reported tau of 0.270, which is below the threshold at ten models.</desc>
+<style>
+  text{font-family:ui-sans-serif,-apple-system,"Segoe UI",sans-serif;font-weight:400}
+  .hd{font-size:14.5px;font-weight:500;fill:#1a1a19} .v{font-size:13px;fill:#1a1a19}
+  .b{font-weight:500} .sm{font-size:12px;fill:#57564f} .tiny{font-size:11px;fill:#57564f}
+  .it{font-style:italic} .sb{font-size:72%}
+  .bgcard{fill:#fbfaf6}
+  .box{fill:#f1efe7;stroke:#8a8880;stroke-width:1.3}
+  .slow{fill:#f7e7d8;stroke:#c8702f;stroke-width:1.5} .fast{fill:#dfeaf6;stroke:#2f6fb5;stroke-width:1.5}
+  .need{fill:#dfeaf6;stroke:#2f6fb5;stroke-width:1.8} .free{fill:#f7e7d8;stroke:#c8702f;stroke-width:1.8}
+  .e{stroke:#1a1a19;stroke-width:1.5;fill:none} .ah{fill:#1a1a19}
+  .ax{stroke:#8a8880;stroke-width:0.9;fill:none} .gd{stroke:#e2e1da;stroke-width:0.7;fill:none}
+  .frame{fill:none;stroke:#c9c7bf;stroke-width:1}
+  .sb1{stroke:#2f6fb5;stroke-width:2.2;fill:none} .sb2{stroke:#c8702f;stroke-width:2.2;fill:none}
+  .db1{stroke:#2f6fb5;stroke-width:2.2;fill:none;stroke-dasharray:6 4}
+  .db2{stroke:#c8702f;stroke-width:2.2;fill:none;stroke-dasharray:6 4}
+  .p1{fill:#2f6fb5;stroke:#fbfaf6;stroke-width:1.2} .p2{fill:#c8702f;stroke:#fbfaf6;stroke-width:1.2}
+  .band{fill:#c8702f;opacity:.10} .ref{stroke:#8a8880;stroke-width:1.1;stroke-dasharray:3 3;fill:none}
+  .refd{stroke:#1a1a19;stroke-width:1.3;stroke-dasharray:6 4;fill:none}
+  .blue{fill:#2f6fb5} .orange{fill:#c8702f}
+  @media (prefers-color-scheme: dark){
+    .hd,.v{fill:#eceae3} .sm,.tiny{fill:#b6b4ab} .bgcard{fill:#161615}
+    .box{fill:#25241f;stroke:#85837b}
+    .slow{fill:#3a2a1c;stroke:#e09a5f} .fast{fill:#1d2f45;stroke:#7fb2e8}
+    .need{fill:#1d2f45;stroke:#7fb2e8} .free{fill:#3a2a1c;stroke:#e09a5f}
+    .e{stroke:#eceae3} .ah{fill:#eceae3}
+    .ax{stroke:#85837b} .gd{stroke:#33312e} .frame{stroke:#4a4844}
+    .sb1,.db1{stroke:#7fb2e8} .sb2,.db2{stroke:#e09a5f}
+    .p1{fill:#7fb2e8;stroke:#161615} .p2{fill:#e09a5f;stroke:#161615}
+    .band{fill:#e09a5f;opacity:.14} .ref{stroke:#85837b} .refd{stroke:#eceae3}
+    .blue{fill:#7fb2e8} .orange{fill:#e09a5f}
+  }
+</style>
+<defs><marker id="ah" viewBox="0 0 10 8" refX="10" refY="4" markerWidth="10" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto"><path d="M0,0 L10,4 L0,8 Z" class="ah"/></marker></defs>
+<rect width="760" height="348" rx="6" class="bgcard"/>
+<text x="14" y="24" class="hd" text-anchor="start">What a rank correlation over a handful of models can resolve (the Chaves tables)</text>
+<text x="70" y="46" class="v b" text-anchor="start">Power to detect a true τ = 0.3</text>
+<path d="M 70,270.0 H 340" class="gd"/><text x="63" y="274" class="tiny" text-anchor="end">0</text>
+<path d="M 70,217.5 H 340" class="gd"/><text x="63" y="221.5" class="tiny" text-anchor="end">0.25</text>
+<path d="M 70,165.0 H 340" class="gd"/><text x="63" y="169.0" class="tiny" text-anchor="end">0.5</text>
+<path d="M 70,112.5 H 340" class="gd"/><text x="63" y="116.5" class="tiny" text-anchor="end">0.75</text>
+<path d="M 70,60.0 H 340" class="gd"/><text x="63" y="64" class="tiny" text-anchor="end">1</text>
+<text x="100.0" y="287" class="tiny" text-anchor="middle">10</text>
+<text x="130.0" y="287" class="tiny" text-anchor="middle">20</text>
+<text x="160.0" y="287" class="tiny" text-anchor="middle">30</text>
+<text x="220.0" y="287" class="tiny" text-anchor="middle">50</text>
+<text x="310.0" y="287" class="tiny" text-anchor="middle">80</text>
+<rect x="70" y="60" width="270" height="210" class="frame"/>
+<path d="M 100.0,240.6 L 130.0,221.7 L 160.0,196.5 L 220.0,162.9 L 310.0,114.6" class="sb1"/>
+<circle cx="100.0" cy="240.6" r="4.2" class="p1"/>
+<text x="100.0" y="230.6" class="tiny" text-anchor="middle">0.14</text>
+<circle cx="130.0" cy="221.7" r="4.2" class="p1"/>
+<text x="130.0" y="211.7" class="tiny" text-anchor="middle">0.23</text>
+<circle cx="160.0" cy="196.5" r="4.2" class="p1"/>
+<text x="160.0" y="186.5" class="tiny" text-anchor="middle">0.35</text>
+<circle cx="220.0" cy="162.9" r="4.2" class="p1"/>
+<text x="220.0" y="152.89999999999998" class="tiny" text-anchor="middle">0.51</text>
+<circle cx="310.0" cy="114.6" r="4.2" class="p1"/>
+<text x="310.0" y="104.6" class="tiny" text-anchor="middle">0.74</text>
+<text x="205.0" y="308" class="sm" text-anchor="middle">number of models ranked, n</text>
+<text x="430" y="46" class="v b" text-anchor="start">Smallest |τ| that clears p &lt; 0.05</text>
+<path d="M 430,270.0 H 700" class="gd"/><text x="423" y="274.0" class="tiny" text-anchor="end">0</text>
+<path d="M 430,200.0 H 700" class="gd"/><text x="423" y="204.0" class="tiny" text-anchor="end">0.2</text>
+<path d="M 430,130.0 H 700" class="gd"/><text x="423" y="133.99999999999997" class="tiny" text-anchor="end">0.4</text>
+<path d="M 430,60.0 H 700" class="gd"/><text x="423" y="64.0" class="tiny" text-anchor="end">0.6</text>
+<text x="475.0" y="287" class="tiny" text-anchor="middle">10</text>
+<text x="520.0" y="287" class="tiny" text-anchor="middle">20</text>
+<text x="655.0" y="287" class="tiny" text-anchor="middle">50</text>
+<rect x="430" y="60" width="270" height="210" class="frame"/>
+<path d="M 475.0,106.5 L 520.0,159.4 L 655.0,202.8" class="sb2"/>
+<circle cx="475.0" cy="106.5" r="4.2" class="p2"/>
+<text x="483.0" y="97.54999999999998" class="tiny" text-anchor="start">0.467</text>
+<circle cx="520.0" cy="159.4" r="4.2" class="p2"/>
+<text x="528.0" y="150.39999999999998" class="tiny" text-anchor="start">0.316</text>
+<circle cx="655.0" cy="202.8" r="4.2" class="p2"/>
+<text x="663.0" y="193.8" class="tiny" text-anchor="start">0.192</text>
+<path d="M 430,175.5 H 700" class="refd"/>
+<text x="438" y="192.5" class="sm" text-anchor="start">a reported τ = 0.270</text>
+<text x="565.0" y="308" class="sm" text-anchor="middle">number of models ranked, n</text>
+<text x="14" y="330" class="sm" text-anchor="start">At n = 10 the null standard deviation of τ is 0.248; the 42 cells of Table 2 were each computed from ten models.</text>
+</svg>

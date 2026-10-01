@@ -8,6 +8,9 @@ on:
     paths-ignore:
       - 'README.md'
       - '.gitignore'
+      # Slide decks are not part of the site, so a push that only touches them
+      # has nothing to rebuild. (A push that also touches another path still runs.)
+      - 'presentation/**'
   workflow_dispatch:
 
 permissions:

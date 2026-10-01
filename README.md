@@ -25,6 +25,8 @@ inequality comes from, what an assumption is buying — are written down explici
 │   └── <slug>/notes.md       background maths the annotations lean on
 ├── topics/
 │   └── <slug>/notes.md       themes spanning several papers
+├── presentation/             slide decks (Marp); not built into the site
+│   └── <slug>/               slides.md, figures/, code/
 ├── tools/
 │   ├── build.py              notes.md -> build/<slug>/index.html, plus the index page
 │   ├── new_paper.py          scaffolds a new papers/<slug>/notes.md
@@ -51,8 +53,8 @@ connection the first time they are opened.
 
 ## Publishing
 
-Every push to `main` that touches `papers/`, `tools/` or the `Makefile` triggers
-`.github/workflows/pages.yml`, which runs `make` and deploys `build/` to GitHub Pages.
+Every push to `main` triggers `.github/workflows/pages.yml`, which runs `make` and deploys `build/`
+to GitHub Pages, except a push that only touches `README.md`, `.gitignore` or `presentation/`.
 
 The workflow deliberately does **not** run `make fetch`, so no paper PDF is ever published
 to the site. A paper whose front matter carries a `pdf_url` gets a link out to the
@@ -189,6 +191,17 @@ Themes that cut across several papers.
 | *Applications of Gaussianity: uncertainty, dense prediction, test-time adaptation* — [read online](https://msrepo.github.io/theory_inclined_papers_with_annotations/gaussianity-in-practice/) · [source](topics/gaussianity-in-practice/notes.md) | the applied literature that assumes CLIP features are Gaussian, with close reads of Zhou et al. 2025 (CVPR), Venkataramanan et al. 2025 (UAI) and C. Huang et al. 2024 (IJCAI) |
 | *MICCAI 2026: domain adaptation and generalisation — the mathematical constructs* — [read online](https://msrepo.github.io/theory_inclined_papers_with_annotations/miccai2026-domain-adaptation/) · [interactive](https://msrepo.github.io/theory_inclined_papers_with_annotations/miccai2026-domain-adaptation/figures/interactive.html) · [source](topics/miccai2026-domain-adaptation/notes.md) | the core mathematical construct of each of 26 MICCAI 2026 DA/DG/TTA/OOD papers (Mahalanobis residuals, deep EM, OT and Schrödinger bridges, flow-matching TTA, InfoMax, variational logit energies, GRPO), with a construct map, one toy-computed figure per paper, and a *What to watch* per paper |
 | *MICCAI 2026: image quality assessment — the mathematical constructs* — [read online](https://msrepo.github.io/theory_inclined_papers_with_annotations/miccai2026-image-quality-assessment/) · [interactive](https://msrepo.github.io/theory_inclined_papers_with_annotations/miccai2026-image-quality-assessment/figures/interactive.html) · [source](topics/miccai2026-image-quality-assessment/notes.md) | the core mathematical construct of each of 11 MICCAI 2026 papers tagged image quality assessment (cross-sectional self-consistency for label noise, prototype-guided flow matching, few-shot prototypical networks with FiLM and gradient reversal, a failure-driven MLLM data engine, loss-GMM pseudo-label filtering, generalised Lehmer pooling, Dice under class imbalance, set encoders for missing metadata, non-negative PU learning, masked autoencoders with LoRA, CORN and concept MIL), with a what-is-graded table, a construct map, one interactive widget per paper, and a *What to watch* per paper |
+
+## Presentations
+
+Slide decks built from the notes, kept apart from the site: `tools/build.py` does not read `presentation/`, so
+nothing here is rendered to HTML, and a push that only touches it does not run the Pages workflow. Each deck is a
+[Marp](https://marp.app) Markdown file (`slides.md`; slides separated by `---`, HTML comments are presenter notes).
+Preview it with the Marp extension for VS Code, or export it with `npx @marp-team/marp-cli slides.md`.
+
+| Deck | Covers |
+|---|---|
+| *Transferability estimation: the problem, the scores, the gaps, the open problems* — [source](presentation/transferability-talk/slides.md) · [code](presentation/transferability-talk/code/) | the transferability literature as one talk: the problem in symbols with its labelled and unlabelled variants, then one slide each for NCE → LEEP → H-score → LogME → SFDA → PAS, the two medical-imaging benchmarks (Chaves 2023, Claßen 2026) and what they leave open, and seven open problems |
 
 ## Papers
 

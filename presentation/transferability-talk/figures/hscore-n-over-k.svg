@@ -1,0 +1,98 @@
+<svg viewBox="0 0 760 392" xmlns="http://www.w3.org/2000/svg" role="img">
+<title>H-score stability collapses below n over k of about two</title>
+<desc>Line chart on a log axis of target images per feature dimension. LEEP's seed-to-seed stability falls smoothly as n over k shrinks. H-score's stays near one above n over k of two, then drops to about zero and slightly below, where the covariance matrix is ill-conditioned. A marker shows that the Breast target at a five percent subset, with ResNet-18 features, sits at about 0.05.</desc>
+<style>
+  text{font-family:ui-sans-serif,-apple-system,"Segoe UI",sans-serif;font-weight:400}
+  .hd{font-size:14.5px;font-weight:500;fill:#1a1a19} .v{font-size:13px;fill:#1a1a19}
+  .b{font-weight:500} .sm{font-size:12px;fill:#57564f} .tiny{font-size:11px;fill:#57564f}
+  .it{font-style:italic} .sb{font-size:72%}
+  .bgcard{fill:#fbfaf6}
+  .box{fill:#f1efe7;stroke:#8a8880;stroke-width:1.3}
+  .slow{fill:#f7e7d8;stroke:#c8702f;stroke-width:1.5} .fast{fill:#dfeaf6;stroke:#2f6fb5;stroke-width:1.5}
+  .need{fill:#dfeaf6;stroke:#2f6fb5;stroke-width:1.8} .free{fill:#f7e7d8;stroke:#c8702f;stroke-width:1.8}
+  .e{stroke:#1a1a19;stroke-width:1.5;fill:none} .ah{fill:#1a1a19}
+  .ax{stroke:#8a8880;stroke-width:0.9;fill:none} .gd{stroke:#e2e1da;stroke-width:0.7;fill:none}
+  .frame{fill:none;stroke:#c9c7bf;stroke-width:1}
+  .sb1{stroke:#2f6fb5;stroke-width:2.2;fill:none} .sb2{stroke:#c8702f;stroke-width:2.2;fill:none}
+  .db1{stroke:#2f6fb5;stroke-width:2.2;fill:none;stroke-dasharray:6 4}
+  .db2{stroke:#c8702f;stroke-width:2.2;fill:none;stroke-dasharray:6 4}
+  .p1{fill:#2f6fb5;stroke:#fbfaf6;stroke-width:1.2} .p2{fill:#c8702f;stroke:#fbfaf6;stroke-width:1.2}
+  .band{fill:#c8702f;opacity:.10} .ref{stroke:#8a8880;stroke-width:1.1;stroke-dasharray:3 3;fill:none}
+  .refd{stroke:#1a1a19;stroke-width:1.3;stroke-dasharray:6 4;fill:none}
+  .blue{fill:#2f6fb5} .orange{fill:#c8702f}
+  @media (prefers-color-scheme: dark){
+    .hd,.v{fill:#eceae3} .sm,.tiny{fill:#b6b4ab} .bgcard{fill:#161615}
+    .box{fill:#25241f;stroke:#85837b}
+    .slow{fill:#3a2a1c;stroke:#e09a5f} .fast{fill:#1d2f45;stroke:#7fb2e8}
+    .need{fill:#1d2f45;stroke:#7fb2e8} .free{fill:#3a2a1c;stroke:#e09a5f}
+    .e{stroke:#eceae3} .ah{fill:#eceae3}
+    .ax{stroke:#85837b} .gd{stroke:#33312e} .frame{stroke:#4a4844}
+    .sb1,.db1{stroke:#7fb2e8} .sb2,.db2{stroke:#e09a5f}
+    .p1{fill:#7fb2e8;stroke:#161615} .p2{fill:#e09a5f;stroke:#161615}
+    .band{fill:#e09a5f;opacity:.14} .ref{stroke:#85837b} .refd{stroke:#eceae3}
+    .blue{fill:#7fb2e8} .orange{fill:#e09a5f}
+  }
+</style>
+<defs><marker id="ah" viewBox="0 0 10 8" refX="10" refY="4" markerWidth="10" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto"><path d="M0,0 L10,4 L0,8 Z" class="ah"/></marker></defs>
+<rect width="760" height="392" rx="6" class="bgcard"/>
+<text x="14" y="24" class="hd" text-anchor="start">Seed-to-seed stability against target images per feature dimension (the Claßen sweep)</text>
+<rect x="78" y="52" width="353.6" height="250" class="band"/>
+<path d="M 78,255.7 H 718" class="ref"/>
+<text x="70" y="259.7037037037037" class="tiny" text-anchor="end">0</text>
+<path d="M 78,163.1 H 718" class="gd"/>
+<text x="70" y="167.11111111111114" class="tiny" text-anchor="end">0.5</text>
+<path d="M 78,70.5 H 718" class="gd"/>
+<text x="70" y="74.51851851851853" class="tiny" text-anchor="end">1</text>
+<path d="M 121.0,302 v 5" class="ax"/>
+<text x="121.01178721216347" y="321" class="tiny" text-anchor="middle">0.05</text>
+<path d="M 179.4,302 v 5" class="ax"/>
+<text x="179.37514576328618" y="321" class="tiny" text-anchor="middle">0.1</text>
+<path d="M 314.9,302 v 5" class="ax"/>
+<text x="314.89066769512254" y="321" class="tiny" text-anchor="middle">0.5</text>
+<path d="M 373.3,302 v 5" class="ax"/>
+<text x="373.2540262462453" y="321" class="tiny" text-anchor="middle">1</text>
+<path d="M 431.6,302 v 5" class="ax"/>
+<text x="431.617384797368" y="321" class="tiny" text-anchor="middle">2</text>
+<path d="M 508.8,302 v 5" class="ax"/>
+<text x="508.7695481780817" y="321" class="tiny" text-anchor="middle">5</text>
+<path d="M 567.1,302 v 5" class="ax"/>
+<text x="567.1329067292043" y="321" class="tiny" text-anchor="middle">10</text>
+<path d="M 659.6,302 v 5" class="ax"/>
+<text x="659.6366414488773" y="321" class="tiny" text-anchor="middle">30</text>
+<rect x="78" y="52" width="640" height="250" class="frame"/>
+<path d="M 431.6,52 V 302" class="refd"/>
+<text x="437.617384797368" y="66" class="sm" text-anchor="start">n / k ≈ 2</text>
+<path d="M 121.0,52 V 302" class="ref"/>
+<text x="127.01178721216347" y="66" class="sm" text-anchor="start">Breast, 5% subset, ResNet-18: n / k ≈ 0.05</text>
+<text x="149.3429271766342" y="177.92592592592592" class="sm" text-anchor="start">cond(S_T) ≈</text>
+<text x="149.3429271766342" y="192.92592592592592" class="sm" text-anchor="start">8e16 to 2e18</text>
+<text x="548.3441018996134" y="122.37037037037038" class="sm" text-anchor="middle">cond(S_T) ≈ 2–36</text>
+<path d="M 314.9,141.3 L 373.3,110.9 L 431.6,90.7 L 662.4,70.5" class="sb1"/>
+<circle cx="314.9" cy="141.3" r="4.2" class="p1"/>
+<circle cx="373.3" cy="110.9" r="4.2" class="p1"/>
+<circle cx="431.6" cy="90.7" r="4.2" class="p1"/>
+<circle cx="662.4" cy="70.5" r="4.2" class="p1"/>
+<path d="M 314.9,222.7 L 373.3,260.1 L 431.6,72.7 L 662.4,70.5" class="sb2"/>
+<circle cx="314.9" cy="222.7" r="4.2" class="p2"/>
+<circle cx="373.3" cy="260.1" r="4.2" class="p2"/>
+<circle cx="431.6" cy="72.7" r="4.2" class="p2"/>
+<circle cx="662.4" cy="70.5" r="4.2" class="p2"/>
+<path d="M 314.9,100.9 L 373.3,92.9 L 431.6,89.6" class="db1"/>
+<circle cx="314.9" cy="100.9" r="4.2" class="p1"/>
+<circle cx="373.3" cy="92.9" r="4.2" class="p1"/>
+<circle cx="431.6" cy="89.6" r="4.2" class="p1"/>
+<path d="M 314.9,272.7 L 373.3,253.5 L 431.6,70.5" class="db2"/>
+<circle cx="314.9" cy="272.7" r="4.2" class="p2"/>
+<circle cx="373.3" cy="253.5" r="4.2" class="p2"/>
+<circle cx="431.6" cy="70.5" r="4.2" class="p2"/>
+<text x="398.0" y="342" class="sm" text-anchor="middle">n / k   (target images per feature dimension, log scale)</text>
+<text transform="translate(22,177.0) rotate(-90)" class="sm" text-anchor="middle">seed-to-seed stability</text>
+<path d="M 86,364 h 26" class="sb1"/><circle cx="99" cy="364" r="4" class="p1"/>
+<text x="120" y="368" class="sm" text-anchor="start">LEEP, k = 64</text>
+<path d="M 244,364 h 26" class="sb2"/><circle cx="257" cy="364" r="4" class="p2"/>
+<text x="278" y="368" class="sm" text-anchor="start">H-score, k = 64</text>
+<path d="M 402,364 h 26" class="db1"/><circle cx="415" cy="364" r="4" class="p1"/>
+<text x="436" y="368" class="sm" text-anchor="start">LEEP, k = 256</text>
+<path d="M 560,364 h 26" class="db2"/><circle cx="573" cy="364" r="4" class="p2"/>
+<text x="594" y="368" class="sm" text-anchor="start">H-score, k = 256</text>
+</svg>
