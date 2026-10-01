@@ -268,7 +268,7 @@ Two remarks help when reading these papers:
   plan.
 - **Transferability / dataset distance**: OTDD (Alvarez-Melis & Fusi, 2020) and OTCE
   (Tan et al., 2021) are OT-based cousins of [LEEP](../2020-nguyen-leep/index.html),
-  [LogME](../2021-you-logme/index.html) and [H-score](../2022-bao-hscore-transferability/index.html).
+  [LogME](../2021-you-logme/index.html) and [H-score](../2019-bao-hscore-transferability/index.html).
 - **Libraries**: `POT` (Python Optimal Transport), `geomloss`, `ott-jax`.
 
 ## Cheat sheet

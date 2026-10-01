@@ -16,7 +16,7 @@ status: read
 
 - **[arXiv:2604.09863](https://arxiv.org/abs/2604.09863)** — preprint; ICLR 2026.
 - The measures it cannot use, and says so:
-  [Bao 2022 — H-score](../2022-bao-hscore-transferability/index.html),
+  [Bao 2019 — H-score](../2019-bao-hscore-transferability/index.html),
   [Nguyen 2020 — LEEP](../2020-nguyen-leep/index.html),
   [Tran 2019 — NCE](../2019-tran-nce-hardness/index.html) — all three need target labels.
 - **[You 2021 — LogME](../2021-you-logme/index.html)** — the Bayesian-evidence measure,
@@ -32,7 +32,7 @@ status: read
 ## In one paragraph
 
 Unsupervised domain adaptation has no target labels, so every transferability measure in the
-[Theory](../2022-bao-hscore-transferability/index.html) section is unavailable — each of them
+[Theory](../2019-bao-hscore-transferability/index.html) section is unavailable — each of them
 needs a target partition. PAS builds one out of the *source* instead: form a centroid per source
 class in a frozen embedding, and for each unlabelled target sample measure how much closer it is
 to its nearest centroid than to the runner-up. Average that relative margin and you have the
@@ -209,7 +209,7 @@ embedding is confidently mistaken. ImageCLEF's 0.44 Pearson — their weakest be
 
 ## Where it sits relative to the other three
 
-| | [H-score](../2022-bao-hscore-transferability/index.html) | [LEEP](../2020-nguyen-leep/index.html) / [NCE](../2019-tran-nce-hardness/index.html) | **PAS** |
+| | [H-score](../2019-bao-hscore-transferability/index.html) | [LEEP](../2020-nguyen-leep/index.html) / [NCE](../2019-tran-nce-hardness/index.html) | **PAS** |
 |---|---|---|---|
 | needs target labels | yes | yes | **no** |
 | setting | supervised transfer | supervised transfer | **unsupervised DA** |

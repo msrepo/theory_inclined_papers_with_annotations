@@ -26,7 +26,7 @@ short_title: "Column, null & residual spaces"
   apart two column spaces are), and **[LDA / Fisher discriminant](../lda-fisher-discriminant/index.html)**
   (rank caps on scatter matrices).
 - Where these ideas do real work in the paper notes: §9 below has the list. The short version:
-  **[H-score](../2022-bao-hscore-transferability/index.html)** is a projection onto a column
+  **[H-score](../2019-bao-hscore-transferability/index.html)** is a projection onto a column
   space and its loss is the residual, **[LogME](../2021-you-logme/index.html)** exists because
   of what happens when the column space is everything, and the
   **[NTK](../2018-jacot-neural-tangent-kernel/index.html)** never learns what lies in its
@@ -416,7 +416,7 @@ norm, an ellipse for full Mahalanobis.</figcaption>
 
 | page | which subspace | what it buys |
 |---|---|---|
-| [H-score, Bao et al. 2022](../2022-bao-hscore-transferability/index.html) | column space of the features, and its residual | the score *is* the captured part of a Pythagoras split; one principal angle is forced to $90^\circ$ by centring |
+| [H-score, Bao et al. 2019](../2019-bao-hscore-transferability/index.html) | column space of the features, and its residual | the score *is* the captured part of a Pythagoras split; one principal angle is forced to $90^\circ$ by centring |
 | [LogME, You et al. 2021](../2021-you-logme/index.html) | column space $=\mathbb R^n$, big null space | why maximum likelihood cannot rank features when $D>n$, and what "effective degrees of freedom" means |
 | [LDA](../lda-fisher-discriminant/index.html) and [SFDA, Shao et al. 2022](../2022-shao-sfda/index.html) | column spaces of $S_b$, null space of $S_w$ | the $g-1$ direction cap; the small-sample singularity and the PCA fix |
 | [NTK, Jacot et al. 2018](../2018-jacot-neural-tangent-kernel/index.html) | null space of the kernel | the component the network never learns |

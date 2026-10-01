@@ -180,7 +180,7 @@ which never converged although its static distance (0.68) is smaller than that o
 Both halves are right, and the second is worth separating by which quantity needs which data.
 
 - **What the usual scores do.** [LEEP](../2020-nguyen-leep/index.html), [NCE](../2019-tran-nce-hardness/index.html),
-  [LogME](../2021-you-logme/index.html), [H-score](../2022-bao-hscore-transferability/index.html),
+  [LogME](../2021-you-logme/index.html), [H-score](../2019-bao-hscore-transferability/index.html),
   [SFDA](../2022-shao-sfda/index.html) and [PAS](../2026-diniz-pas/index.html) pass the target data through
   the frozen pre-trained model once and score how well its features (or its source-label predictions) fit
   the target labels. They need only the weights and the target data, and they implicitly model a
@@ -208,7 +208,7 @@ factors.** All of them are *static* in the paper's sense: none models a path.
 | [NCE](../2019-tran-nce-hardness/index.html) | conditional entropy of the target labels given the source model's predicted labels | source-model predictions and target labels | a data-level distance between label sets, with no training |
 | [LEEP](../2020-nguyen-leep/index.html) | likelihood of the target labels under a classifier built from the source model's soft predictions | the same | static, one hand-built classifier instead of the best one |
 | [LogME](../2021-you-logme/index.html) | evidence of the target labels for a Bayesian linear head on frozen features | features and target labels | **exactly the paper's complexity $\min_QC_\beta$ of the target task**, restricted to the last layer (at $\beta=1$ with a summed loss, $\beta=1/N$ with the paper's average; see the [task-complexity notes](../2020-achille-task-complexity/index.html)) |
-| [H-score](../2022-bao-hscore-transferability/index.html) | how much of the feature covariance the target class means explain | features and target labels | static |
+| [H-score](../2019-bao-hscore-transferability/index.html) | how much of the feature covariance the target class means explain | features and target labels | static |
 | [SFDA](../2022-shao-sfda/index.html) | class separability in a Fisher-discriminant projection, after deliberately making the target task harder | features and target labels | static, with a heuristic meant to imitate fine-tuning: the closest any of them comes to the dynamic factor |
 | [PAS](../2026-diniz-pas/index.html) | a nearest-centroid margin of the target features | features and target inputs, no target labels | static |
 | [Chaves et al.](../2023-chaves-medical-transferability/index.html), [Claßen et al.](../2026-classen-te-robustness/index.html) | evaluations of these scores on medical targets | — | the rankings do not carry over to medical tasks and are not stable across random seeds: evidence that frozen-feature scores miss part of what decides fine-tuning |

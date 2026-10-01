@@ -20,7 +20,7 @@ status: read
 - **[Tran 2019 — NCE](../2019-tran-nce-hardness/index.html)** — the predecessor this
   measure generalises, and the source of Property 2. Its proof turns on the empirical
   conditional being *hard*, which is exactly why the same step does not close here.
-- **[Bao 2022 — H-score](../2022-bao-hscore-transferability/index.html)** — the measure this
+- **[Bao 2019 — H-score](../2019-bao-hscore-transferability/index.html)** — the measure this
   one is competing with, and the more interesting comparison. Read that first.
 - **[Diniz 2026 — PAS](../2026-diniz-pas/index.html)** — the unsupervised counterpart:
   scores a source/backbone pair without any target labels, which this measure requires.
@@ -207,7 +207,7 @@ $\frac1n\sum\log\theta(x_i)_{z_i}$ is precisely the measure of how much there is
 Both answer the same question with one forward pass and no training, and differ on essentially
 every design axis.
 
-| | [**H-score**](../2022-bao-hscore-transferability/index.html) | **LEEP** |
+| | [**H-score**](../2019-bao-hscore-transferability/index.html) | **LEEP** |
 |---|---|---|
 | what plays the role of feature | penultimate $h(x)\in\mathbb{R}^k$ | source softmax $\theta(x)\in\Delta(\mathcal{Z})$ |
 | the head | optimal linear head, solved in closed form then **eliminated** | one specific head $\hat P(y\mid z)$, by counting |

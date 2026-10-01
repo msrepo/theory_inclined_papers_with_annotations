@@ -37,7 +37,7 @@ status: read
   (a task distance that is asymmetric because SGD is irreversible) and
   [The Information Complexity of Learning Tasks](../2020-achille-task-complexity/index.html) (the information-theoretic
   task distance this paper compares itself with in Section 6). See also [LEEP](../2020-nguyen-leep/index.html),
-  [LogME](../2021-you-logme/index.html) and [H-score](../2022-bao-hscore-transferability/index.html) for cheap
+  [LogME](../2021-you-logme/index.html) and [H-score](../2019-bao-hscore-transferability/index.html) for cheap
   transferability scores.
 
 Gao & Chaudhari, *An Information-Geometric Distance on the Space of Tasks*, ICML 2021.

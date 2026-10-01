@@ -37,7 +37,7 @@ status: read
 - Other transferability notes in this collection that this paper's picture speaks to:
   [Achille 2019, task reachability](../2019-achille-task-reachability/index.html) (a fine-tuning success also depends on the starting weights),
   [Nguyen 2020, LEEP](../2020-nguyen-leep/index.html), [You 2021, LogME](../2021-you-logme/index.html),
-  [Bao 2022, H-score](../2022-bao-hscore-transferability/index.html),
+  [Bao 2019, H-score](../2019-bao-hscore-transferability/index.html),
   [Chaves 2023](../2023-chaves-medical-transferability/index.html) and [Claßen 2026](../2026-classen-te-robustness/index.html)
   (the scores fail on medical tasks), [Jacot 2018, NTK](../2018-jacot-neural-tangent-kernel/index.html) and
   [Fort 2020](../2020-fort-deep-vs-kernel/index.html) (the lazy regime that the paper's tiny-initialisation limit is the opposite of).
@@ -595,7 +595,7 @@ number of features. Two consequences.
 1. **Ranking source models on one fixed target set.** $R_{sc}$ is the same for every candidate model, so ranking
    by $\mathcal T$ is ranking by the bracket: the linear-probe residual $\rho_m$ plus a variance term that
    grows with the feature dimension. Scores in this collection that measure how well *frozen features linearly explain
-   the target labels* ([LogME](../2021-you-logme/index.html) and [H-score](../2022-bao-hscore-transferability/index.html);
+   the target labels* ([LogME](../2021-you-logme/index.html) and [H-score](../2019-bao-hscore-transferability/index.html);
    [LEEP](../2020-nguyen-leep/index.html) instead reads the source classifier's own outputs) are trying to estimate
    $\rho_m$-like quantities, and here that is theoretically the right thing to estimate for linear transfer. This says nothing about whether fine-tuning
    agrees: eq. (15) says fine-tuning depends on the *null-space* geometry ($\cos\theta$ against $\tfrac12$), which a

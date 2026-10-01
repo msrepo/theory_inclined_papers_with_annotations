@@ -41,7 +41,7 @@ status: read
   (the source of Eq 6, the SGD path integral) and [Where is the Information in a Deep Neural Network?](../2020-achille-information-in-weights/index.html)
   (the same Lagrangian applied to the weights and activations of one network).
 - **[NCE](../2019-tran-nce-hardness/index.html)**, **[LEEP](../2020-nguyen-leep/index.html)** and
-  **[H-score](../2022-bao-hscore-transferability/index.html)**: practical transferability scores from the same
+  **[H-score](../2019-bao-hscore-transferability/index.html)**: practical transferability scores from the same
   line of work, which estimate transfer without the information-theoretic machinery used here.
 
 Achille, Paolini, Mbeng & Soatto, *The Information Complexity of Learning Tasks, their Structure and their

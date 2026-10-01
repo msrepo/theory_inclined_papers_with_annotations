@@ -19,7 +19,7 @@ status: read
 - The three measures it benchmarks:
   [Tran 2019 — NCE](../2019-tran-nce-hardness/index.html),
   [Nguyen 2020 — LEEP](../2020-nguyen-leep/index.html),
-  [Bao 2022 — H-score](../2022-bao-hscore-transferability/index.html).
+  [Bao 2019 — H-score](../2019-bao-hscore-transferability/index.html).
 - **[Chaves 2023 — medical TE](../2023-chaves-medical-transferability/index.html)** —
   the study this one follows up, and whose open question about the evaluation metric it
   takes up directly.
@@ -129,7 +129,7 @@ on the same data disagree worse than chance. The boundary is tracked exactly by
 $\operatorname{cond}(S_T)$ jumping from $\sim10^1$ to $\sim10^{17}$.
 
 That is the ill-conditioning already documented in
-[the H-score notes](../2022-bao-hscore-transferability/index.html), where forming
+[the H-score notes](../2019-bao-hscore-transferability/index.html), where forming
 $S_T=Z^\top Z$ squares the condition number. And it **locates** their finding rather than merely
 agreeing with it: ResNet-18 gives $k=512$, and *Breast* at a 5% fraction is about 27 images, so
 $n/k\approx0.05$ — an order of magnitude the wrong side of the boundary. Their result is not

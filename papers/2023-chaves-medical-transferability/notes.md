@@ -20,7 +20,7 @@ status: read
   [Tran 2019 — NCE](../2019-tran-nce-hardness/index.html),
   [Nguyen 2020 — LEEP](../2020-nguyen-leep/index.html),
   [You 2021 — LogME](../2021-you-logme/index.html),
-  [Bao 2022 — H-score](../2022-bao-hscore-transferability/index.html).
+  [Bao 2019 — H-score](../2019-bao-hscore-transferability/index.html).
 - **[Claßen 2026 — TE robustness](../2026-classen-te-robustness/index.html)** — the direct
   follow-up, which takes up this paper's own call for robustness work and separates the
   evaluation-metric question this one leaves open.

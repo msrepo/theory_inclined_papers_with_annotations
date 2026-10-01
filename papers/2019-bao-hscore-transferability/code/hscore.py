@@ -440,7 +440,7 @@ def conditioning(rng):
 
 if __name__ == "__main__":
     rng = np.random.default_rng(0)
-    print("H-score (Bao et al. 2022), checked on a discrete joint")
+    print("H-score (Bao et al. 2019), checked on a discrete joint")
     print("=" * 66, "\n")
     exact_identities(rng)
     invariance_and_redundancy(rng)

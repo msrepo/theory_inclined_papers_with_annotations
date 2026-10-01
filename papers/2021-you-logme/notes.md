@@ -19,7 +19,7 @@ status: read
 - The measures it generalises past:
   [Tran 2019 — NCE](../2019-tran-nce-hardness/index.html),
   [Nguyen 2020 — LEEP](../2020-nguyen-leep/index.html),
-  [Bao 2022 — H-score](../2022-bao-hscore-transferability/index.html),
+  [Bao 2019 — H-score](../2019-bao-hscore-transferability/index.html),
   and the label-free [Diniz 2026 — PAS](../2026-diniz-pas/index.html).
 - **[Chaves 2023 — medical TE](../2023-chaves-medical-transferability/index.html)** —
   evaluates this score on medical targets, including out-of-distribution ones.
@@ -237,7 +237,7 @@ of [Claßen et al.](../2026-classen-te-robustness/index.html)
 |---|---|---|---|
 | [NCE](../2019-tran-nce-hardness/index.html) | two label sequences, shared inputs | ✗ | ✗ |
 | [LEEP](../2020-nguyen-leep/index.html) | source **softmax** + target labels | ✗ | ✗ |
-| [H-score](../2022-bao-hscore-transferability/index.html) | features + target labels | ✗ | ✓ |
+| [H-score](../2019-bao-hscore-transferability/index.html) | features + target labels | ✗ | ✓ |
 | **LogME** | features + target labels | **✓** | **✓** |
 | [PAS](../2026-diniz-pas/index.html) | features + **no** target labels | ✗ | ✓ |
 

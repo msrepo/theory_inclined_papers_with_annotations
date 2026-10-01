@@ -19,7 +19,7 @@ status: read
 - The measures it builds on and competes with:
   [Nguyen 2020 — LEEP](../2020-nguyen-leep/index.html),
   [You 2021 — LogME](../2021-you-logme/index.html),
-  [Bao 2022 — H-score](../2022-bao-hscore-transferability/index.html).
+  [Bao 2019 — H-score](../2019-bao-hscore-transferability/index.html).
 - **[Claßen 2026 — TE robustness](../2026-classen-te-robustness/index.html)** — reports SFDA
   producing NaNs on medical targets, "due to all source models being assigned the same score".
 - **[LDA / Fisher discriminant](../lda-fisher-discriminant/index.html)** and

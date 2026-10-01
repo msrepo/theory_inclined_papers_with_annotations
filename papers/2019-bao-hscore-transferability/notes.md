@@ -2,10 +2,10 @@
 title: "An Information-Theoretic Approach to Transferability in Task Transfer Learning"
 category: "Transferability"
 subcategory: "Theory"
-short_title: "Bao 2022 — H-score"
+short_title: "Bao 2019 — H-score"
 authors: "Yajie Bao, Yang Li, Shao-Lun Huang, Lin Zhang, Lizhong Zheng, Amir Zamir, Leonidas Guibas (Tsinghua-Berkeley Shenzhen, MIT, Stanford, UC Berkeley)"
-venue: "arXiv"
-year: 2022
+venue: "ICIP 2019 (arXiv upload December 2022)"
+year: 2019
 url: "https://arxiv.org/abs/2212.10082"
 pdf_url: "https://arxiv.org/pdf/2212.10082"
 tags: [transfer-learning, transferability, information-geometry, error-exponent, hgr-correlation, feature-selection, taskonomy]
@@ -14,8 +14,10 @@ status: read
 
 ## Links
 
-- **[arXiv:2212.10082](https://arxiv.org/abs/2212.10082)** — preprint; arXiv carries no
-  journal reference, though the paper is laid out as a conference submission.
+- **[arXiv:2212.10082](https://arxiv.org/abs/2212.10082)** — uploaded to arXiv in December
+  2022, but the paper is the ICIP 2019 one (*2019 IEEE International Conference on Image
+  Processing*, pp. 2309–2313), which is the journal reference the arXiv page gives. That is why
+  these notes are dated 2019.
 - **[Supplementary material and code](http://yangli-feasibility.com/home/ttl.html)** — the
   authors' page. S1 derives Eq. 4, S2 is the error-exponent argument.
 - **[Authors' reference implementation](https://github.com/YaojieBao/An-Information-theoretic-Metric-of-Transferability/blob/master/3D_scene_understanding/H-score_1st_order.py)**
@@ -39,7 +41,7 @@ status: read
 - **[Shao 2022 — SFDA](../2022-shao-sfda/index.html)** — the measure that imitates
   fine-tuning dynamics rather than scoring a static representation.
 - **[Achille 2019 — task reachability](../2019-achille-task-reachability/index.html#transferability-scores-use-only-features-open-weight-models-come-without-data)** — a dynamics-based view of the same question. The H-score is static in that paper's sense: a fit of frozen features, with nothing about whether fine-tuning can reach a good solution from the source weights. The linked section places the H-score and the other scores against the paper's two factors.
-- **[Runnable code](https://github.com/msrepo/theory_inclined_papers_with_annotations/blob/main/papers/2022-bao-hscore-transferability/code/hscore.py)** —
+- **[Runnable code](https://github.com/msrepo/theory_inclined_papers_with_annotations/blob/main/papers/2019-bao-hscore-transferability/code/hscore.py)** —
   Equations 2, 3 and 4 checked to machine precision on a discrete joint where $\tilde B$ can
   actually be built, plus the invariance, redundancy and locality questions, the six equivalent
   forms of the score, and the conditioning comparison. `make verify` runs it.

@@ -458,7 +458,7 @@ Its relatives summarise the same kind of object differently:
 | COCO, constrained covariance (Gretton et al., JMLR 2005) | $s_1$, the single best pair of features $f,g$ | no |
 | kernel canonical correlation (Bach & Jordan, JMLR 2002) | the best pair, divided by their spreads (with regularisation) | yes: correlations |
 | HGR maximal correlation ([inequalities page](../inequalities-and-concentration/index.html)) | the best pair over *all* functions | yes |
-| $\chi^2(P_{XY}\Vert P_XP_Y)$ and the H-score ([Bao et al. note](../2022-bao-hscore-transferability/index.html)) | $\lVert\tilde B\rVert_F^2$, a sum of squared maximal correlations | yes |
+| $\chi^2(P_{XY}\Vert P_XP_Y)$ and the H-score ([Bao et al. note](../2019-bao-hscore-transferability/index.html)) | $\lVert\tilde B\rVert_F^2$, a sum of squared maximal correlations | yes |
 
 In the random linear example of §2 the top singular value is $s_1=1.0623$, so
 $s_1^2=1.1284$ out of HSIC's $1.1545$: 97.7% of the dependence lies along one direction, and

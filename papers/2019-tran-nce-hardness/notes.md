@@ -23,7 +23,7 @@ status: read
   predictor; and see how far counting reads low when each source class has few images.
 - **[Nguyen 2020 — LEEP](../2020-nguyen-leep/index.html)** — the direct successor, which
   replaces the ground-truth source labels here with a source model's soft predictions.
-- **[Bao 2022 — H-score](../2022-bao-hscore-transferability/index.html)** — the third member
+- **[Bao 2019 — H-score](../2019-bao-hscore-transferability/index.html)** — the third member
   of the set, approaching the same question from feature-space geometry.
 - **[Diniz 2026 — PAS](../2026-diniz-pas/index.html)** — the unsupervised counterpart:
   scores a source/backbone pair without any target labels, which this measure requires.
@@ -342,7 +342,7 @@ task $T^Z$ is fixed, the log-likelihood $l_Z(w_Z,h_Z)$ is a constant. In this ca
 transferability only depends on the CE $H(Y\mid Z)$."
 
 But NCE is subsequently used — by [LEEP](../2020-nguyen-leep/index.html), by
-[H-score](../2022-bao-hscore-transferability/index.html), and as a baseline generally — for
+[H-score](../2019-bao-hscore-transferability/index.html), and as a baseline generally — for
 **source selection**: fixed target, varying source. There $l_Z$ is not constant, and dropping it
 is an extra, unstated assumption.
 
@@ -482,7 +482,7 @@ guesser seeing only the identity could reach:
   and Mouth Open the window starts at $0.215$ and $0.240$ and the SVM gets $0.091$ and $0.099$. The
   representation encodes expression the identity label does not. This is the cleanest evidence that
   a label-only number describes $Z$, not what the network learned, and it is the gap that the
-  feature-space scores ([H-score](../2022-bao-hscore-transferability/index.html),
+  feature-space scores ([H-score](../2019-bao-hscore-transferability/index.html),
   [LogME](../2021-you-logme/index.html)) exist to close.
 
 ### The estimator is biased low, and by about the size of the smallest values
@@ -526,7 +526,7 @@ That is a fair transfer experiment and not a test of the theorem, and its printe
 
 ## How the three measures relate
 
-| | **NCE** (this paper) | [**LEEP**](../2020-nguyen-leep/index.html) | [**H-score**](../2022-bao-hscore-transferability/index.html) |
+| | **NCE** (this paper) | [**LEEP**](../2020-nguyen-leep/index.html) | [**H-score**](../2019-bao-hscore-transferability/index.html) |
 |---|---|---|---|
 | what it reads | two ground-truth label sequences | source model's softmax $\theta(x)$ | penultimate features $h(x)$ |
 | needs a trained source model | **no** (for the measure) | yes | yes |

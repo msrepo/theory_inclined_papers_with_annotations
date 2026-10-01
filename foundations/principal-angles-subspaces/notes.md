@@ -16,7 +16,7 @@ status: living
   arccos accuracy trap, and the CCA equivalence. `make verify` runs it.
 - **[Eckart–Young / low-rank SVD](../eckart-young-lowrank-svd/index.html)** — the other place
   singular values answer a geometric question about subspaces.
-- **[Bao 2022 — H-score](../2022-bao-hscore-transferability/index.html)** — where this page
+- **[Bao 2019 — H-score](../2019-bao-hscore-transferability/index.html)** — where this page
   came from: H-score turns out to be $\sum_i\cos^2\theta_i$ between feature space and label
   indicators.
 - **[Column, null & residual spaces](../four-fundamental-subspaces/index.html)** — the four fundamental subspaces, projectors
@@ -145,7 +145,7 @@ $\sin\Theta$ between the true and perturbed invariant subspaces, in terms of the
 size over the eigenvalue gap. The $\sin$ is not decorative — it is there for exactly the
 numerical reason above.
 
-**[H-score](../2022-bao-hscore-transferability/index.html).** Bao et al.'s transferability
+**[H-score](../2019-bao-hscore-transferability/index.html).** Bao et al.'s transferability
 metric, written $\operatorname{tr}(\Sigma_T^{-1}\Sigma_B)$, is
 $\sum_i\cos^2\theta_i$ between the span of the centred features and the span of the class
 indicators. Reading it that way makes three of its properties immediate: invariance under

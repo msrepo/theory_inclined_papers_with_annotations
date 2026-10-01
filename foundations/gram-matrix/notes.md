@@ -217,7 +217,7 @@ and its eigenvectors are the directions in function space that gradient descent 
 | [NTK-Selector (Wang et al.)](../2026-wang-ntk-selector/index.html) | gradient Gram between general and domain data | picks general examples whose gradients align with the small domain set |
 | [InfoNCE (Betser et al.)](../2026-betser-infonce-gaussian/index.html), [alignment/uniformity](../2020-wang-isola-alignment-uniformity/index.html) | normalised embeddings, $ZZ^\top/\tau$ | row-wise softmax of the cosine Gram matrix is the contrastive loss; uniformity is an RBF-kernel mean over it |
 | [Spectral contrastive (HaoChen et al.)](../2021-haochen-spectral-contrastive/index.html) | augmentation-graph adjacency | the loss is a low-rank factorisation $\approx FF^\top$ of a normalised graph matrix |
-| [H-score](../2022-bao-hscore-transferability/index.html), [LogME](../2021-you-logme/index.html) | $X^\top X$ (feature side) and $XX^\top$ (sample side) | covariance of features; LogME's dual switch when $d>n$ |
+| [H-score](../2019-bao-hscore-transferability/index.html), [LogME](../2021-you-logme/index.html) | $X^\top X$ (feature side) and $XX^\top$ (sample side) | covariance of features; LogME's dual switch when $d>n$ |
 | [Four subspaces](../four-fundamental-subspaces/index.html) | $A^\top A$ | normal equations, and why it squares the condition number (§9) |
 
 A further standard use not covered by a paper here: **neural style transfer** compares the
