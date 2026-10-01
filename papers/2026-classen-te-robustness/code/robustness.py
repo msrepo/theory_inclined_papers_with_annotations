@@ -119,9 +119,9 @@ def coefficients_disagree():
     print("   Two candidate metrics scored against the same reference ranking of")
     print("   10 sources. A gets the top of the list right and the tail wrong;")
     print("   B gets the tail right and the top wrong.\n")
-    ref = np.arange(10)[::-1].astype(float)              # 9 is best
-    A = ref.copy(); A[:5] = A[:5][::-1]                  # scramble the WORST five
-    B = ref.copy(); B[5:] = B[5:][::-1]                  # scramble the BEST five
+    ref = np.arange(10)[::-1].astype(float)              # position 0 holds the best source (value 9)
+    A = ref.copy(); A[5:] = A[5:][::-1]                  # positions 5-9 are the WORST five: scrambled
+    B = ref.copy(); B[:5] = B[:5][::-1]                  # positions 0-4 are the BEST five: scrambled
     print(f"   {'':>14}  {'tau':>8}  {'weighted tau':>14}  {'spearman':>10}")
     for tag, v in (("metric A", A), ("metric B", B)):
         print(f"   {tag:>14}  {kendall_tau(ref, v):>8.3f}"

@@ -97,10 +97,10 @@ tail right and scrambles the top.
 
 | | $\tau$ | weighted $\tau$ | $\rho$ |
 |---|---|---|---|
-| metric A | 0.556 | 0.307 | 0.758 |
-| metric B | 0.556 | **0.804** | 0.758 |
+| metric A | 0.556 | **0.804** | 0.758 |
+| metric B | 0.556 | 0.307 | 0.758 |
 
-Plain $\tau$ and $\rho$ call it a tie; top-weighted $\tau$ prefers B decisively. Both verdicts
+Plain $\tau$ and $\rho$ call it a tie; top-weighted $\tau$ prefers A decisively. Both verdicts
 are defensible — $\tau_w$ is the usual choice because you deploy the top-ranked source, but it
 presumes a clear winner exists, which the paper explicitly notes is not guaranteed. Reporting a
 single coefficient silently picks a verdict.
