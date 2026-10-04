@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Two-coin ELBO Explorer</title>
+<style>
+:root{
+  --bg:#fbfaf7; --surface:#ffffff; --ink:#1c1d21; --muted:#5b5f68; --line:#e2dfd8;
+  --s1:#2a78d6; --s2:#eb6834; --radius:12px; color-scheme: light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#131417; --surface:#1b1d21; --ink:#ebebed; --muted:#a3a6ae; --line:#2e3138;
+    --s1:#3987e5; --s2:#d95926; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#131417; --surface:#1b1d21; --ink:#ebebed; --muted:#a3a6ae; --line:#2e3138;
+  --s1:#3987e5; --s2:#d95926; color-scheme: dark;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,sans-serif}
+main{max-width:760px;margin:0 auto;padding:32px 16px 64px}
+h1{font-size:1.7rem;line-height:1.2;margin:0 0 .4rem}
+.lede{color:var(--muted);margin:0 0 1rem}
+.widget{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:14px}
+.controls{display:grid;grid-template-columns:minmax(120px,170px) 1fr 3.2em;gap:8px 10px;align-items:center;margin-bottom:10px;font-size:.92rem}
+.controls label{color:var(--muted)}
+.controls output{font-variant-numeric:tabular-nums}
+svg{width:100%;height:auto;display:block}
+table{width:100%;border-collapse:collapse;margin-top:8px;font-size:.92rem}
+td{padding:3px 6px;border-top:1px solid var(--line)}
+td.n{text-align:right;font-variant-numeric:tabular-nums}
+td.c{color:var(--muted)}
+#note{margin-top:8px;color:var(--muted);font-size:.92rem}
+</style>
+</head>
+<body>
+<main>
+<h1>Two-coin ELBO explorer</h1>
+<p class="lede">A bag holds a fair coin (heads with probability 0.5) and a biased coin. You pick one blindly, flip it, and see <b>heads</b>. Drag <b>q</b>, your guess for which coin it was, and watch the ELBO, the ceiling log&nbsp;p(x), and the gap between them.</p>
+<div class="widget">
+<div class="controls">
+<label for="q">q(biased), your guess</label><input id="q" type="range" min="1" max="99" value="50"><output id="qv"></output>
+<label for="pi">prior P(biased)</label><input id="pi" type="range" min="5" max="95" value="50"><output id="piv"></output>
+<label for="b">P(heads | biased)</label><input id="b" type="range" min="55" max="99" value="90"><output id="bv"></output>
+</div>
+<svg id="plot" viewBox="0 0 680 300" role="img" aria-label="ELBO as a function of q"></svg>
+<table id="tab"></table>
+<div id="note"></div>
+</div>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+const NS='http://www.w3.org/2000/svg';
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+function model(){
+  const pb=+$('pi').value/100, hb=+$('b').value/100, hf=0.5;
+  const jf=(1-pb)*hf, jb=pb*hb, m=jf+jb;
+  return {pb,hb,hf,jf,jb,m,post:jb/m};
+}
+function elbo(q,M){
+  const qs=[1-q,q], j=[M.jf,M.jb]; let e=0;
+  for(let z=0;z<2;z++) if(qs[z]>0) e+=qs[z]*(Math.log(j[z])-Math.log(qs[z]));
+  return e;
+}
+function klab(q,p){let k=0; if(q>0)k+=q*Math.log(q/p); if(q<1)k+=(1-q)*Math.log((1-q)/(1-p)); return k;}
+function el(tag,attrs,text){const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);if(text!==undefined)e.textContent=text;return e;}
+function draw(){
+  const M=model(), q=+$('q').value/100, ink=css('--ink'), c1=css('--s1'), c2=css('--s2');
+  $('qv').textContent=q.toFixed(2); $('piv').textContent=M.pb.toFixed(2); $('bv').textContent=M.hb.toFixed(2);
+  const L=Math.log(M.m);
+  const rec=(1-q)*Math.log(M.hf)+q*Math.log(M.hb);
+  const klp=klab(q,M.pb), E=elbo(q,M), klq=klab(q,M.post);
+  const svg=$('plot'); svg.innerHTML='';
+  const x0=60,x1=650,y0=20,y1=250;
+  let ymin=Infinity; for(let i=1;i<100;i++) ymin=Math.min(ymin,elbo(i/100,M));
+  ymin=Math.floor((ymin-0.1)*2)/2; const ymax=Math.ceil((L+0.05)*10)/10+0.1;
+  const X=v=>x0+v*(x1-x0), Y=v=>y1-(v-ymin)/(ymax-ymin)*(y1-y0);
+  svg.appendChild(el('line',{x1:x0,y1:y1,x2:x1,y2:y1,stroke:ink,opacity:.5}));
+  svg.appendChild(el('line',{x1:x0,y1:y0,x2:x0,y2:y1,stroke:ink,opacity:.5}));
+  [0,.25,.5,.75,1].forEach(v=>svg.appendChild(el('text',{x:X(v),y:y1+16,'text-anchor':'middle','font-size':12,fill:ink},v)));
+  svg.appendChild(el('text',{x:(x0+x1)/2,y:y1+36,'text-anchor':'middle','font-size':12,fill:ink},'q(biased)'));
+  for(let t=Math.ceil(ymin);t<=Math.floor(ymax);t++){
+    svg.appendChild(el('text',{x:x0-6,y:Y(t)+4,'text-anchor':'end','font-size':12,fill:ink},t));
+    svg.appendChild(el('line',{x1:x0-3,y1:Y(t),x2:x0,y2:Y(t),stroke:ink,opacity:.5}));
+  }
+  svg.appendChild(el('line',{x1:x0,y1:Y(L),x2:x1,y2:Y(L),stroke:c2,'stroke-width':2,'stroke-dasharray':'6 4'}));
+  svg.appendChild(el('text',{x:x1,y:Y(L)-6,'text-anchor':'end','font-size':12,fill:c2},'log p(x) = '+L.toFixed(3)+' (ceiling)'));
+  let d=''; for(let i=1;i<100;i++){const v=i/100; d+=(i==1?'M':'L')+X(v)+','+Y(elbo(v,M));}
+  svg.appendChild(el('path',{d,fill:'none',stroke:c1,'stroke-width':3}));
+  svg.appendChild(el('text',{x:X(.04),y:Y(elbo(.04,M))-8,'font-size':12,fill:c1},'ELBO(q)'));
+  svg.appendChild(el('line',{x1:X(M.post),y1:Y(L),x2:X(M.post),y2:y1,stroke:ink,'stroke-dasharray':'3 4',opacity:.5}));
+  svg.appendChild(el('text',{x:X(M.post),y:y1-6,'text-anchor':'middle','font-size':12,fill:ink,opacity:.8},'posterior '+M.post.toFixed(2)));
+  svg.appendChild(el('line',{x1:X(q),y1:Y(E),x2:X(q),y2:Y(L),stroke:c2,'stroke-width':4}));
+  svg.appendChild(el('circle',{cx:X(q),cy:Y(E),r:6,fill:c1}));
+  svg.appendChild(el('text',{x:X(q)+(q>.7?-10:10),y:(Y(E)+Y(L))/2+4,'text-anchor':q>.7?'end':'start','font-size':12,fill:c2},'gap = KL = '+klq.toFixed(3)));
+  const row=(a,b,c)=>`<tr><td>${a}</td><td class="n">${b}</td><td class="c">${c||''}</td></tr>`;
+  $('tab').innerHTML=
+    row('marginal p(heads)',M.m.toFixed(3),M.jf.toFixed(3)+' (fair route) + '+M.jb.toFixed(3)+' (biased route)')+
+    row('posterior P(biased | heads)',M.post.toFixed(3))+
+    row('reconstruction E<sub>q</sub>[log p(x|z)]',rec.toFixed(3))+
+    row('KL(q ‖ prior)',klp.toFixed(3))+
+    row('ELBO = reconstruction − KL(q ‖ prior)',E.toFixed(3))+
+    row('KL(q ‖ posterior)',klq.toFixed(3))+
+    row('ELBO + KL(q ‖ posterior)',(E+klq).toFixed(3),'always equals log p(x) = '+L.toFixed(3));
+  $('note').textContent = klq<0.002 ? 'q is at the posterior: the gap is zero and the bound is tight.' :
+    'The blue dot slides along the curve; the orange gap is the KL to the posterior. The curve peaks at the posterior.';
+}
+['q','pi','b'].forEach(i=>$(i).addEventListener('input',draw)); draw();
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change',draw);
+</script>
+</body>
+</html>
