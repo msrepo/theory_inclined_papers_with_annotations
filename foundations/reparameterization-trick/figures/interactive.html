@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Reparameterization trick, interactive</title>
+<style>
+:root{--bg:#fdfdfc;--fg:#1a1a19;--mut:#57564f;--line:#d9d8d0;--blue:#2a78d6;--orange:#eb6834;--green:#1baf7a}
+@media (prefers-color-scheme:dark){:root{--bg:#161615;--fg:#eceae3;--mut:#b6b4ab;--line:#3a3935;--blue:#3987e5;--orange:#d95926;--green:#199e70}}
+body{margin:0;padding:20px;max-width:720px;margin-inline:auto;background:var(--bg);color:var(--fg);font:15px/1.6 ui-sans-serif,-apple-system,"Segoe UI",sans-serif}
+h2{font-size:17px;font-weight:500;margin:34px 0 4px} p{margin:2px 0 10px;color:var(--mut)} svg{width:100%;height:auto;display:block}
+.row{display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin:6px 0;color:var(--mut)} .row input[type=range]{flex:1;min-width:140px}
+button{font:inherit;color:var(--fg);background:transparent;border:1px solid var(--line);border-radius:8px;padding:4px 12px;cursor:pointer}
+text{font-family:inherit} .ax{stroke:var(--line);stroke-width:1}.lab{fill:var(--mut);font-size:12px}.tk{fill:var(--mut);font-size:10px}
+</style></head><body>
+<h1 style="font-size:20px;font-weight:500">Reparameterization trick</h1>
+<h2>1. Fixed noise, moving samples</h2>
+<p>The blue dots (noise ε) never change. Moving mu or sigma slides and stretches the green samples z = mu + sigma·ε smoothly.</p>
+<div class="row"><label>mu <input type="range" id="mu1" min="-2" max="6" step="0.1" value="0"></label><b id="mu1o">0.0</b>
+<label>sigma <input type="range" id="sg1" min="0.3" max="2.5" step="0.1" value="1"></label><b id="sg1o">1.0</b></div>
+<svg id="s1" viewBox="0 0 680 320"></svg>
+
+<h2>2. Two gradient estimators, same target</h2>
+<p>Each dot is one single-sample estimate of the gradient with respect to mu at mu = 0 for the loss E[(z − 3)²]. The dashed line is the true gradient.</p>
+<div class="row"><button id="go">Draw 40 new samples</button><button id="more">Add 40 more</button><span id="cnt"></span></div>
+<svg id="s2" viewBox="0 0 680 230"></svg>
+
+<h2>3. How samples push mu (REINFORCE)</h2>
+<p>Dark samples have high loss. Each grey arrow is one sample's push on mu, away from itself and harder if its loss is high. The green arrow is their average.</p>
+<div class="row"><label>mu <input type="range" id="mu3" min="-2" max="6" step="0.1" value="0"></label><b id="mu3o">0.0</b><button id="re">New samples</button></div>
+<svg id="s3" viewBox="0 0 680 360"><defs><marker id="ar" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></marker></defs></svg>
+<script>
+const NS="http://www.w3.org/2000/svg";
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+function mk(svg){return (t,a,x)=>{const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);if(x!==undefined)e.textContent=x;svg.appendChild(e);return e;};}
+function clear(svg){[...svg.children].forEach(n=>{if(n.tagName!=='defs')n.remove();});}
+function randn(){let u=0;while(!u)u=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*Math.random());}
+const X0=-4,X1=9,L=20,W=640,sx=v=>L+(v-X0)/(X1-X0)*W;
+const pdf=(x,m,s)=>Math.exp(-0.5*((x-m)/s)**2)/(s*Math.sqrt(2*Math.PI));
+function curve(m,s,y,h){let d='';for(let i=0;i<=200;i++){const x=X0+(X1-X0)*i/200;d+=(i?'L':'M')+sx(x).toFixed(1)+' '+(y-pdf(x,m,s)*h).toFixed(1);}return d;}
+function ticks(el,y){for(let t=X0;t<=X1;t++)el('text',{x:sx(t),y:y,'text-anchor':'middle',class:'tk'},t);}
+
+const E1=[-1.9,-1.4,-1.0,-0.7,-0.45,-0.2,0,0.15,0.4,0.65,0.95,1.3,1.8];
+function d1(){const svg=document.getElementById('s1');clear(svg);const el=mk(svg);
+ const mu=+mu1.value,sg=+sg1.value;mu1o.textContent=mu.toFixed(1);sg1o.textContent=sg.toFixed(1);
+ const B=css('--blue'),G=css('--green'),O=css('--orange'),top=100,bot=290;
+ el('text',{x:L,y:18,class:'lab'},'Step 1: draw noise  ε ~ N(0, 1)  (no dependence on mu or sigma)');
+ el('line',{x1:L,x2:L+W,y1:top,y2:top,class:'ax'});el('path',{d:curve(0,1,top,150),fill:'none',stroke:B,'stroke-width':1.5});
+ el('text',{x:L,y:195,class:'lab'},'Step 2: z = mu + sigma · ε  (a plain differentiable function)');
+ el('line',{x1:L,x2:L+W,y1:bot,y2:bot,class:'ax'});el('path',{d:curve(mu,sg,bot,150),fill:'none',stroke:G,'stroke-width':1.5});
+ el('line',{x1:sx(3),x2:sx(3),y1:215,y2:bot+6,stroke:O,'stroke-width':1.5,'stroke-dasharray':'4 3'});
+ el('text',{x:sx(3)+5,y:226,class:'lab',fill:O},'target z = 3');
+ E1.forEach(e=>el('line',{x1:sx(e),y1:top+4,x2:sx(mu+sg*e),y2:bot-4,class:'ax'}));
+ E1.forEach(e=>{el('circle',{cx:sx(e),cy:top,r:4.5,fill:B});el('circle',{cx:sx(mu+sg*e),cy:bot,r:4.5,fill:G});});
+ ticks(el,bot+22);}
+mu1.oninput=sg1.oninput=d1;d1();
+
+let A=[],Bb=[];
+function add(n){for(let i=0;i<n;i++){const e=randn();A.push(-6+2*e);Bb.push((e-3)*(e-3)*e);}}
+const lo=-60,hi=40,L2=110,W2=550,sx2=v=>L2+(Math.min(hi,Math.max(lo,v))-lo)/(hi-lo)*W2;
+function d2(){const svg=document.getElementById('s2');clear(svg);const el=mk(svg);
+ [[A,70,css('--green'),'Reparameterized'],[Bb,160,css('--orange'),'Score function']].forEach(([d,y,c,nm])=>{
+  el('line',{x1:L2,x2:L2+W2,y1:y,y2:y,class:'ax'});el('text',{x:L2-10,y:y+4,'text-anchor':'end',class:'lab',fill:css('--fg')},nm);
+  d.forEach((v,i)=>el('circle',{cx:sx2(v),cy:y+((i*37)%21)-10,r:3.5,fill:c,'fill-opacity':.55}));});
+ el('line',{x1:sx2(-6),x2:sx2(-6),y1:30,y2:195,stroke:css('--blue'),'stroke-width':1.5,'stroke-dasharray':'4 3'});
+ el('text',{x:sx2(-6),y:22,'text-anchor':'middle',class:'lab',fill:css('--blue')},'true gradient');
+ for(let t=lo;t<=hi;t+=20)el('text',{x:sx2(t),y:218,'text-anchor':'middle',class:'tk'},t);
+ cnt.textContent=A.length+' estimates each';}
+go.onclick=()=>{A=[];Bb=[];add(40);d2();};more.onclick=()=>{add(40);d2();};add(40);d2();
+
+let E3=[];function rs(){E3=[];for(let i=0;i<14;i++)E3.push(randn());}
+function mix(t){const a=[245,196,179],b=[153,60,29];return 'rgb('+a.map((x,i)=>Math.round(x+(b[i]-x)*t)).join(',')+')';}
+function d3(){const svg=document.getElementById('s3');clear(svg);const el=mk(svg);
+ const mu=+mu3.value;mu3o.textContent=mu.toFixed(1);const base=150,B=css('--blue'),G=css('--green'),O=css('--orange');
+ let d='M'+sx(X0)+' '+base;for(let i=0;i<=200;i++){const x=X0+(X1-X0)*i/200;d+='L'+sx(x).toFixed(1)+' '+(base-110*Math.exp(-0.5*(x-mu)**2)).toFixed(1);}
+ el('path',{d:d+'L'+sx(X1)+' '+base+'Z',fill:B,'fill-opacity':.12,stroke:B,'stroke-width':1.5});
+ el('line',{x1:L,x2:L+W,y1:base,y2:base,class:'ax'});
+ el('line',{x1:sx(3),x2:sx(3),y1:20,y2:330,stroke:O,'stroke-width':1.2,'stroke-dasharray':'4 3'});
+ el('text',{x:sx(3)+5,y:32,class:'lab',fill:O},'target 3 (loss is zero)');
+ el('text',{x:sx(mu),y:base-118,'text-anchor':'middle',class:'lab',fill:B},'N(mu, 1)');
+ el('text',{x:sx(mu),y:base+18,'text-anchor':'middle',class:'lab',fill:B},'mu');
+ el('text',{x:L,y:204,class:'lab'},'Each sample pushes mu away from itself, harder if its loss is high');
+ let sum=0;E3.forEach((e,i)=>{const z=mu+e,loss=(z-3)**2,push=-loss*(z-mu);sum+=push;
+  el('circle',{cx:sx(z),cy:base,r:5,fill:mix(Math.min(1,loss/25)),stroke:'#712B13','stroke-width':.5});
+  const len=Math.max(-70,Math.min(70,push*3.5)),y=235+(i%5)*10;
+  el('line',{x1:sx(z),y1:base+6,x2:sx(z),y2:y,class:'ax'});
+  el('line',{x1:sx(mu),y1:y,x2:sx(mu)+len,y2:y,stroke:css('--mut'),'stroke-width':1.5,'marker-end':'url(#ar)'});});
+ const alen=Math.max(-120,Math.min(120,sum/E3.length*3.5));
+ el('line',{x1:sx(mu),y1:322,x2:sx(mu)+alen,y2:322,stroke:G,'stroke-width':3,'marker-end':'url(#ar)'});
+ el('text',{x:L,y:346,class:'lab',fill:G},'Average push (the gradient step on mu)');
+ for(let t=X0;t<=X1;t++)el('text',{x:sx(t),y:base+34,'text-anchor':'middle',class:'tk'},t);}
+mu3.oninput=d3;re.onclick=()=>{rs();d3();};rs();d3();
+</script></body></html>

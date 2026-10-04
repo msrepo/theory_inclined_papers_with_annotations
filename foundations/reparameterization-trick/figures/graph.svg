@@ -1,0 +1,39 @@
+<svg viewBox="0 0 680 380" xmlns="http://www.w3.org/2000/svg" role="img">
+<title>Computation graph with and without the reparameterization trick</title>
+<desc>Left: a random draw node sits between the parameters and the loss, so the gradient cannot flow back. Right: z equals mu plus sigma times epsilon, with epsilon a parameter-free side input, so the gradient has a path.</desc>
+<style>
+  text{font-family:ui-sans-serif,-apple-system,"Segoe UI",sans-serif;font-weight:400}
+  .hd{font-size:14px;font-weight:500;fill:#1a1a19} .t{font-size:14px;fill:#1a1a19} .sm{font-size:12px;fill:#57564f}
+  .box{fill:#f1efe8;stroke:#8a8880;stroke-width:1} .par{fill:#e6f1fb;stroke:#2a78d6;stroke-width:1}
+  .rnd{fill:#fbe9e2;stroke:#eb6834;stroke-width:1} .noi{fill:#e1f5ee;stroke:#1baf7a;stroke-width:1}
+  .fw{stroke:#57564f;stroke-width:1.5;fill:none} .ok{stroke:#1baf7a;stroke-width:2.2;fill:none} .bad{stroke:#eb6834;stroke-width:1.6;fill:none;stroke-dasharray:5 4}
+  .div{stroke:#e2e1da;stroke-width:1} .okt{font-size:12px;fill:#0f6e56} .badt{font-size:12px;fill:#b2441a}
+  @media (prefers-color-scheme: dark){
+    .hd,.t{fill:#eceae3} .sm{fill:#b6b4ab}
+    .box{fill:#2a2926;stroke:#85837b} .par{fill:#1c2b3d;stroke:#3987e5} .rnd{fill:#3a2218;stroke:#d95926} .noi{fill:#15302a;stroke:#199e70}
+    .fw{stroke:#b6b4ab} .ok{stroke:#199e70} .bad{stroke:#d95926} .div{stroke:#33312e} .okt{fill:#5dcaa5} .badt{fill:#f0997b}
+  }
+</style>
+<defs><marker id="m" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+<text class="hd" x="170" y="22" text-anchor="middle">Without the trick</text>
+<text class="hd" x="510" y="22" text-anchor="middle">With the trick</text>
+<line class="div" x1="340" y1="34" x2="340" y2="360"/>
+<rect class="par" x="110" y="48" width="120" height="40" rx="6"/><text class="t" x="170" y="73" text-anchor="middle">mu, sigma</text>
+<line class="fw" x1="170" y1="88" x2="170" y2="134" marker-end="url(#m)"/>
+<rect class="rnd" x="90" y="140" width="160" height="50" rx="6"/><text class="t" x="170" y="161" text-anchor="middle">z ~ N(mu, sigma²)</text><text class="sm" x="170" y="179" text-anchor="middle">random draw</text>
+<line class="fw" x1="170" y1="190" x2="170" y2="236" marker-end="url(#m)"/>
+<rect class="box" x="110" y="242" width="120" height="40" rx="6"/><text class="t" x="170" y="267" text-anchor="middle">loss f(z)</text>
+<path class="bad" d="M110 262 H60 V68 H104" marker-end="url(#m)"/>
+<text class="badt" x="52" y="170" text-anchor="end">gradient</text><text class="badt" x="52" y="186" text-anchor="end">tries to go back</text>
+<circle cx="60" cy="160" r="11" class="rnd"/><path d="M54 154 L66 166 M66 154 L54 166" class="bad" style="stroke-dasharray:none"/>
+<text class="sm" x="170" y="320" text-anchor="middle">Backprop hits the random draw</text><text class="sm" x="170" y="338" text-anchor="middle">and stops: mu gets no gradient.</text>
+<rect class="par" x="400" y="48" width="120" height="40" rx="6"/><text class="t" x="460" y="73" text-anchor="middle">mu, sigma</text>
+<rect class="noi" x="560" y="48" width="100" height="40" rx="6"/><text class="t" x="610" y="73" text-anchor="middle">ε ~ N(0,1)</text>
+<line class="fw" x1="460" y1="88" x2="490" y2="144" marker-end="url(#m)"/><line class="fw" x1="610" y1="88" x2="540" y2="144" marker-end="url(#m)"/>
+<rect class="box" x="440" y="150" width="170" height="42" rx="6"/><text class="t" x="525" y="176" text-anchor="middle">z = mu + sigma · ε</text>
+<line class="fw" x1="525" y1="192" x2="525" y2="236" marker-end="url(#m)"/>
+<rect class="box" x="465" y="242" width="120" height="40" rx="6"/><text class="t" x="525" y="267" text-anchor="middle">loss f(z)</text>
+<path class="ok" d="M465 262 H410 V68 H394" marker-end="url(#m)"/>
+<text class="okt" x="402" y="170" text-anchor="end">gradient</text><text class="okt" x="402" y="186" text-anchor="end">flows back</text>
+<text class="sm" x="510" y="320" text-anchor="middle">The randomness is a side input.</text><text class="sm" x="510" y="338" text-anchor="middle">mu and sigma get a clear path.</text>
+</svg>

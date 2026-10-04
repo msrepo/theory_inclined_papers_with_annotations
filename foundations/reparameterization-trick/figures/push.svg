@@ -1,0 +1,37 @@
+<svg viewBox="0 0 680 320" xmlns="http://www.w3.org/2000/svg" role="img">
+<title>Score-function idea: samples push the mean away, harder if their loss is high</title>
+<desc>A Gaussian centred at mu with samples coloured by loss; arrows show each sample's push on mu, and one arrow shows the average push toward the target at 3.</desc>
+<style>
+text{font-family:ui-sans-serif,-apple-system,"Segoe UI",sans-serif}
+.lab{font-size:12px;fill:#57564f}.tk{font-size:10px;fill:#57564f}.ax{stroke:#c9c8c0;stroke-width:.7}
+.bell{fill:#2a78d6;fill-opacity:.12;stroke:#2a78d6;stroke-width:1.5}.gr{stroke:#57564f;stroke-width:1.5}
+.avg{stroke:#1baf7a;stroke-width:3}.tg{stroke:#eb6834;stroke-width:1.2;stroke-dasharray:4 3}.tgt{font-size:12px;fill:#b2441a}.gt{font-size:12px;fill:#0f6e56}.bt{font-size:12px;fill:#185fa5}
+@media (prefers-color-scheme:dark){.lab,.tk{fill:#b6b4ab}.ax{stroke:#3a3935}.gr{stroke:#b6b4ab}.tgt{fill:#f0997b}.gt{fill:#5dcaa5}.bt{fill:#85b7eb}.bell{stroke:#3987e5;fill:#3987e5}.avg{stroke:#199e70}.tg{stroke:#d95926}}
+</style>
+<defs><marker id="m" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+<path class="bell" d="M20.0 140L20.0 140.0L23.2 140.0L26.4 139.9L29.6 139.9L32.8 139.9L36.0 139.9L39.2 139.9L42.4 139.8L45.6 139.8L48.8 139.7L52.0 139.6L55.2 139.5L58.4 139.4L61.6 139.3L64.8 139.2L68.0 139.0L71.2 138.7L74.4 138.5L77.6 138.2L80.8 137.8L84.0 137.4L87.2 136.9L90.4 136.3L93.6 135.7L96.8 134.9L100.0 134.0L103.2 133.1L106.4 132.0L109.6 130.7L112.8 129.3L116.0 127.8L119.2 126.1L122.4 124.2L125.6 122.1L128.8 119.9L132.0 117.4L135.2 114.8L138.4 112.0L141.6 109.0L144.8 105.8L148.0 102.5L151.2 99.0L154.4 95.4L157.6 91.6L160.8 87.8L164.0 83.9L167.2 80.0L170.4 76.0L173.6 72.1L176.8 68.3L180.0 64.5L183.2 60.9L186.4 57.5L189.6 54.3L192.8 51.3L196.0 48.6L199.2 46.3L202.4 44.3L205.6 42.6L208.8 41.4L212.0 40.5L215.2 40.1L218.4 40.0L221.6 40.5L224.8 41.3L228.0 42.5L231.2 44.1L234.4 46.1L237.6 48.4L240.8 51.1L244.0 54.0L247.2 57.2L250.4 60.6L253.6 64.2L256.8 68.0L260.0 71.8L263.2 75.7L266.4 79.7L269.6 83.6L272.8 87.5L276.0 91.3L279.2 95.1L282.4 98.7L285.6 102.2L288.8 105.6L292.0 108.7L295.2 111.7L298.4 114.6L301.6 117.2L304.8 119.7L308.0 121.9L311.2 124.0L314.4 125.9L317.6 127.6L320.8 129.2L324.0 130.6L327.2 131.9L330.4 133.0L333.6 134.0L336.8 134.8L340.0 135.6L343.2 136.3L346.4 136.9L349.6 137.4L352.8 137.8L356.0 138.2L359.2 138.5L362.4 138.7L365.6 139.0L368.8 139.1L372.0 139.3L375.2 139.4L378.4 139.5L381.6 139.6L384.8 139.7L388.0 139.8L391.2 139.8L394.4 139.8L397.6 139.9L400.8 139.9L404.0 139.9L407.2 139.9L410.4 140.0L413.6 140.0L416.8 140.0L420.0 140.0L423.2 140.0L426.4 140.0L429.6 140.0L432.8 140.0L436.0 140.0L439.2 140.0L442.4 140.0L445.6 140.0L448.8 140.0L452.0 140.0L455.2 140.0L458.4 140.0L461.6 140.0L464.8 140.0L468.0 140.0L471.2 140.0L474.4 140.0L477.6 140.0L480.8 140.0L484.0 140.0L487.2 140.0L490.4 140.0L493.6 140.0L496.8 140.0L500.0 140.0L503.2 140.0L506.4 140.0L509.6 140.0L512.8 140.0L516.0 140.0L519.2 140.0L522.4 140.0L525.6 140.0L528.8 140.0L532.0 140.0L535.2 140.0L538.4 140.0L541.6 140.0L544.8 140.0L548.0 140.0L551.2 140.0L554.4 140.0L557.6 140.0L560.8 140.0L564.0 140.0L567.2 140.0L570.4 140.0L573.6 140.0L576.8 140.0L580.0 140.0L583.2 140.0L586.4 140.0L589.6 140.0L592.8 140.0L596.0 140.0L599.2 140.0L602.4 140.0L605.6 140.0L608.8 140.0L612.0 140.0L615.2 140.0L618.4 140.0L621.6 140.0L624.8 140.0L628.0 140.0L631.2 140.0L634.4 140.0L637.6 140.0L640.8 140.0L644.0 140.0L647.2 140.0L650.4 140.0L653.6 140.0L656.8 140.0L660.0 140.0L660.0 140Z"/>
+<line class="ax" x1="20" y1="140" x2="660" y2="140"/>
+<line class="tg" x1="364.6" y1="20" x2="364.6" y2="300"/><text class="tgt" x="369.6" y="32">target 3 (loss is zero)</text>
+<text class="bt" x="216.9" y="30" text-anchor="middle">N(mu, 1)</text>
+<text class="bt" x="216.9" y="156" text-anchor="middle">mu</text>
+<circle cx="128.3" cy="140" r="5" fill="#a04729" stroke="#712b13" stroke-width="0.5"/>
+<circle cx="162.8" cy="140" r="5" fill="#b7694e" stroke="#712b13" stroke-width="0.5"/>
+<circle cx="192.3" cy="140" r="5" fill="#c8816a" stroke="#712b13" stroke-width="0.5"/>
+<circle cx="226.8" cy="140" r="5" fill="#d89984" stroke="#712b13" stroke-width="0.5"/>
+<circle cx="256.3" cy="140" r="5" fill="#e3aa96" stroke="#712b13" stroke-width="0.5"/>
+<circle cx="285.8" cy="140" r="5" fill="#ecb6a4" stroke="#712b13" stroke-width="0.5"/>
+<circle cx="320.3" cy="140" r="5" fill="#f2c0ae" stroke="#712b13" stroke-width="0.5"/>
+<circle cx="354.8" cy="140" r="5" fill="#f5c4b3" stroke="#712b13" stroke-width="0.5"/>
+<line class="ax" x1="128.3" y1="146" x2="128.3" y2="215"/><line class="gr" x1="216.9" y1="215" x2="296.9" y2="215" marker-end="url(#m)"/>
+<line class="ax" x1="162.8" y1="146" x2="162.8" y2="226"/><line class="gr" x1="216.9" y1="226" x2="272.4" y2="226" marker-end="url(#m)"/>
+<line class="ax" x1="192.3" y1="146" x2="192.3" y2="237"/><line class="gr" x1="216.9" y1="237" x2="235.3" y2="237" marker-end="url(#m)"/>
+<line class="ax" x1="226.8" y1="146" x2="226.8" y2="248"/><line class="gr" x1="216.9" y1="248" x2="212.2" y2="248" marker-end="url(#m)"/>
+<line class="ax" x1="256.3" y1="146" x2="256.3" y2="215"/><line class="gr" x1="216.9" y1="215" x2="205.3" y2="215" marker-end="url(#m)"/>
+<line class="ax" x1="285.8" y1="146" x2="285.8" y2="226"/><line class="gr" x1="216.9" y1="226" x2="206.2" y2="226" marker-end="url(#m)"/>
+<line class="ax" x1="320.3" y1="146" x2="320.3" y2="237"/><line class="gr" x1="216.9" y1="237" x2="211.8" y2="237" marker-end="url(#m)"/>
+<line class="ax" x1="354.8" y1="146" x2="354.8" y2="248"/><line class="gr" x1="216.9" y1="248" x2="216.6" y2="248" marker-end="url(#m)"/>
+<text class="tk" x="20.0" y="170" text-anchor="middle">-4</text><text class="tk" x="69.2" y="170" text-anchor="middle">-3</text><text class="tk" x="118.5" y="170" text-anchor="middle">-2</text><text class="tk" x="167.7" y="170" text-anchor="middle">-1</text><text class="tk" x="216.9" y="170" text-anchor="middle">0</text><text class="tk" x="266.2" y="170" text-anchor="middle">1</text><text class="tk" x="315.4" y="170" text-anchor="middle">2</text><text class="tk" x="364.6" y="170" text-anchor="middle">3</text><text class="tk" x="413.8" y="170" text-anchor="middle">4</text><text class="tk" x="463.1" y="170" text-anchor="middle">5</text><text class="tk" x="512.3" y="170" text-anchor="middle">6</text><text class="tk" x="561.5" y="170" text-anchor="middle">7</text><text class="tk" x="610.8" y="170" text-anchor="middle">8</text><text class="tk" x="660.0" y="170" text-anchor="middle">9</text>
+<text class="lab" x="20" y="198">Each sample pushes mu away from itself, harder if its loss is high (dark = high loss)</text>
+<line class="avg" x1="216.9" y1="300" x2="286.9" y2="300" marker-end="url(#m)"/>
+<text class="gt" x="20" y="316">Average push: the gradient step on mu</text>
+</svg>
