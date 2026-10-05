@@ -56,6 +56,15 @@ $$
 A=\begin{bmatrix}1&0\\1&1\\1&2\end{bmatrix},\qquad a_1=\begin{bmatrix}1\\1\\1\end{bmatrix},\quad a_2=\begin{bmatrix}0\\1\\2\end{bmatrix}.
 $$
 
+<figure>
+<img src="figures/concrete-subspaces.svg" alt="Two panels for the 3 by 2 matrix A. Left, the input space R^2 drawn as a flat plane: the row space is the whole plane (dimension 2) and the null space is only the origin, marked by an orange dot. An arrow labelled A points right. Right, the output space R^3 turned so that the column space lies flat: a blue plane spanned by a1 = (1,1,1) and a2 = (0,1,2). An orange line through the origin along (1,-2,1) stands perpendicular to the plane, with a right-angle mark at the origin; it is the residual space.">
+<figcaption><b>The four subspaces of this $A$, previewed.</b> <b>Left:</b> inputs live in $\mathbb R^2$. Both
+columns are needed, so the row space is all of $\mathbb R^2$ and the null space is only $\{0\}$.
+<b>Right:</b> outputs live in $\mathbb R^3$. The column space is the plane spanned by $a_1,a_2$, and the
+residual space is the one line perpendicular to it. Sections 2 to 4 define each of these; the figure
+is here so you can see where they sit.</figcaption>
+</figure>
+
 Multiplying by $x=(x_1,x_2)$ does exactly one thing:
 
 $$
