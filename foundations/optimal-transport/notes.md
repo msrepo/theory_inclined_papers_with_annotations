@@ -2,7 +2,7 @@
 title: "Optimal transport and the Wasserstein distance"
 authors: "Background notes"
 venue: "Foundations"
-tags: [optimal-transport, wasserstein, coupling, sinkhorn, flow-matching, background]
+tags: [optimal-transport, wasserstein, coupling, sinkhorn, sinkhorn-divergence, entropic-regularization, flow-matching, background]
 status: living
 category: "Foundations"
 subcategory: "Probability"
@@ -208,6 +208,157 @@ $P=\operatorname{diag}(u)\,K\operatorname{diag}(v)$ with $K_{ij}=e^{-C_{ij}/\var
 **Sinkhorn** (Cuturi, 2013) finds $u,v$ by alternately rescaling rows to match $a$ and
 columns to match $b$. It uses only matrix–vector products, so it's GPU-friendly and
 differentiable. For small $\varepsilon$, run it in the log domain to avoid underflow.
+
+The next four subsections unpack this: where the form $\operatorname{diag}(u)K\operatorname{diag}(v)$
+comes from, what the alternating rescaling does, what $\varepsilon$ changes, and the
+**Sinkhorn divergence**, which removes the bias that $\varepsilon$ introduces.
+
+#### Where the form $\operatorname{diag}(u)\,K\operatorname{diag}(v)$ comes from
+
+Without the entropy term, the best plan tends to use a few sharp routes, and with a
+distance cost it need not even be unique. Adding $-\varepsilon H(P)$ makes the objective
+strictly convex, so there is exactly one best plan, and it is smooth in $C$, $a$ and $b$.
+
+To find it, give each row constraint a multiplier $f_i$ and each column constraint a
+multiplier $g_j$, and set the derivative with respect to $P_{ij}$ to zero:
+
+$$C_{ij}+\varepsilon\log P_{ij}=f_i+g_j\quad\Longrightarrow\quad
+P_{ij}=e^{f_i/\varepsilon}\;e^{-C_{ij}/\varepsilon}\;e^{g_j/\varepsilon}=u_i\,K_{ij}\,v_j,$$
+
+where $u_i=e^{f_i/\varepsilon}$, $v_j=e^{g_j/\varepsilon}$ and $K_{ij}=e^{-C_{ij}/\varepsilon}$. In
+words: $K$ is a table that is large for cheap routes and tiny for expensive ones, and the
+optimal plan is $K$ with row $i$ multiplied by a number $u_i$ and column $j$ multiplied by a
+number $v_j$. Instead of $n\times m$ unknowns there are only $n+m$ scaling factors.
+
+#### Sinkhorn: rescale the rows, then the columns
+
+The scaling factors are fixed by the two marginal conditions. Row sums must equal $a$ and
+column sums must equal $b$:
+
+$$u_i\,(Kv)_i=a_i,\qquad v_j\,(K^{\top}u)_j=b_j .$$
+
+If $v$ is held fixed, the first condition is solved at once by $u=a/(Kv)$ (elementwise
+division). If $u$ is held fixed, the second is solved by $v=b/(K^{\top}u)$. Sinkhorn simply
+alternates:
+
+$$u\leftarrow a\,/\,(Kv),\qquad v\leftarrow b\,/\,(K^{\top}u).$$
+
+![Sinkhorn alternately rescales rows and columns](figures/sinkhorn-scaling.svg)
+
+Each update makes one set of sums exactly right and spoils the other, but the spoiling
+shrinks every round. Geometrically, each update is the table closest to the current one (in
+the KL sense) that has the right row sums, then the right column sums: alternating
+projections between two constraint sets (Benamou et al., 2015). Each round costs two
+matrix–vector products, about $nm$ operations, far less than solving the exact linear
+program. In practice it slows down as $\varepsilon$ shrinks, and for small $\varepsilon$ the
+entries of $K$ underflow, which is why the log-domain version (below) is used.
+
+#### What $\varepsilon$ does
+
+$\varepsilon$ behaves like a **temperature**. Looking at the plan row of one source point,
+a small $\varepsilon$ sends nearly all of its mass to the cheapest destination; a large
+$\varepsilon$ spreads it over many.
+
+![epsilon as a temperature](figures/sinkhorn-temperature.svg)
+
+Across the whole plan this is the blur you see when $\varepsilon$ is large, and the
+sharpening toward the exact optimal plan as it shrinks:
+
+![the Sinkhorn plan for decreasing epsilon](figures/sinkhorn-epsilon.svg)
+
+- **Large $\varepsilon$:** $K$ is almost constant, so the plan approaches $a\,b^{\top}$, the
+  "independent" plan that pays no attention to geometry.
+- **Small $\varepsilon$:** the plan approaches the exact optimal plan. (For the squared cost in
+  1-D that plan is unique, which is why the right-hand panel is a clean curve.)
+- **The price:** the entropic cost $\langle P,C\rangle$ is always at or above the true
+  optimal cost, so $\varepsilon$ trades accuracy against speed and stability.
+
+#### The Sinkhorn divergence: removing the bias
+
+Write the regularised value as
+
+$$\mathrm{OT}_\varepsilon(\mu,\nu)=\min_{P\in\Pi(a,b)}\ \langle P,C\rangle+\varepsilon\,\mathrm{KL}(P\,\|\,a\otimes b),$$
+
+where $a\otimes b$ is the independent plan with entries $a_ib_j$. (This differs from
+$-\varepsilon H(P)$ only by a constant that depends on $a$ and $b$, so the minimising plan is
+the same.) The problem: even $\mathrm{OT}_\varepsilon(\mu,\mu)$ is not zero, because the
+entropy term makes the plan spread mass even when no moving is needed. So as a loss, it is
+not minimised by setting the generated distribution equal to the data.
+
+The fix is to subtract each distribution's value against itself (Feydy et al., 2019):
+
+$$S_\varepsilon(\mu,\nu)=\mathrm{OT}_\varepsilon(\mu,\nu)-\tfrac12\,\mathrm{OT}_\varepsilon(\mu,\mu)-\tfrac12\,\mathrm{OT}_\varepsilon(\nu,\nu).$$
+
+It is zero when $\mu=\nu$. For the squared-distance cost and any $\varepsilon>0$ it is also
+nonnegative and zero only then (Feydy et al., 2019), so it behaves like a proper distance.
+
+![Sinkhorn divergence removes the entropic bias](figures/sinkhorn-divergence.svg)
+
+$\varepsilon$ also sets what the divergence looks at. As $\varepsilon\to0$ it tends to the
+optimal-transport cost. As $\varepsilon\to\infty$, with the squared cost, it tends to the
+squared distance between the two **means**, since
+$\mathbb E|X-Y|^2-\tfrac12\mathbb E|X-X'|^2-\tfrac12\mathbb E|Y-Y'|^2=\lVert\mathbb E X-\mathbb E Y\rVert^2$
+(here $X,X'$ are independent draws from $\mu$ and $Y,Y'$ from $\nu$). In between it is a kernel
+distance (MMD) built from the cost. That is the sense in which the Sinkhorn divergence
+"interpolates between optimal transport and MMD".
+
+#### Using it as a training loss
+
+Because every step is a plain tensor operation, the loss can be differentiated end to end,
+with no critic and no Lipschitz constraint (compare the WGAN critic above). The gradient has a
+simple reading: the derivative of $\mathrm{OT}_\varepsilon$ with respect to a cost entry
+$C_{ij}$ is the plan entry $P_{ij}$, so a generated point $x_i$ is pulled toward the data
+points $y_j$ it sends mass to,
+
+$$\nabla_{x_i}\mathrm{OT}_\varepsilon=2\sum_j P_{ij}\,(x_i-y_j)\qquad\text{(squared cost)}.$$
+
+An illustrative PyTorch version (log-domain updates; with the potentials $f,g$ below,
+$\mathrm{OT}_\varepsilon=\langle a,f\rangle+\langle b,g\rangle$ once the iteration has converged):
+
+```python
+import numpy as np, torch
+
+def ot_eps(x, y, eps=0.1, iters=50):
+    n, m = len(x), len(y)
+    C = torch.cdist(x, y) ** 2
+    log_a = torch.full((n,), -np.log(n)); log_b = torch.full((m,), -np.log(m))
+    f, g = torch.zeros(n), torch.zeros(m)
+    for _ in range(iters):                       # alternate: rows, then columns
+        f = -eps * torch.logsumexp(log_b[None, :] + (g[None, :] - C) / eps, dim=1)
+        g = -eps * torch.logsumexp(log_a[:, None] + (f[:, None] - C) / eps, dim=0)
+    return (log_a.exp() * f).sum() + (log_b.exp() * g).sum()
+
+def sinkhorn_divergence(x, y, eps=0.1, iters=50):
+    return ot_eps(x, y, eps, iters) - 0.5 * ot_eps(x, x, eps, iters) - 0.5 * ot_eps(y, y, eps, iters)
+
+# training: generator G maps noise to points; the loss is differentiable through the iterations
+#   loss = sinkhorn_divergence(G(torch.randn(256, 2)), real_batch)
+#   opt.zero_grad(); loss.backward(); opt.step()
+```
+
+Since the real batch does not depend on the generator, the $\mathrm{OT}_\varepsilon(y,y)$ term
+adds nothing to the gradient and can be dropped when only the gradient is needed. Two costs
+to keep in mind: each loss evaluation forms an $n\times m$ cost table, and $\varepsilon$ and
+the number of iterations have to be chosen together, since a small $\varepsilon$ converges
+slowly.
+
+#### Sources for this part
+
+- Cuturi (2013), *Sinkhorn Distances: Lightspeed Computation of Optimal Transport*, NeurIPS:
+  entropic regularisation for OT in machine learning.
+- Peyré and Cuturi (2019), *Computational Optimal Transport*, Foundations and Trends in
+  Machine Learning: the standard reference for everything above, including the log-domain form.
+- Sinkhorn and Knopp (1967), *Concerning nonnegative matrices and doubly stochastic matrices*,
+  Pacific Journal of Mathematics: the original alternating row and column scaling.
+- Benamou, Carlier, Cuturi, Nenna and Peyré (2015), *Iterative Bregman Projections for
+  Regularized Transportation Problems*, SIAM Journal on Scientific Computing: the
+  alternating-projection view.
+- Altschuler, Weed and Rigollet (2017), *Near-linear time approximation algorithms for optimal
+  transport via Sinkhorn iteration*, NeurIPS: running-time guarantees.
+- Genevay, Peyré and Cuturi (2018), *Learning Generative Models with Sinkhorn Divergences*,
+  AISTATS: differentiating through Sinkhorn to train generators.
+- Feydy, Séjourné, Vialard, Amari, Trouvé and Peyré (2019), *Interpolating between Optimal
+  Transport and MMD using Sinkhorn Divergences*, AISTATS: the debiased divergence.
 
 ### Duality: the shipping company's view
 
