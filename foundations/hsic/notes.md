@@ -96,7 +96,6 @@ The two brackets are entries of Gram matrices: $\tilde K=\tilde x\tilde x^\top$ 
 products of the centred $x$ values (for numbers, a dot product is just a product) and
 $\tilde L=\tilde y\tilde y^\top$ does the same for $y$. So **squared covariance already measures
 how well two centred Gram matrices agree, entry by entry**. That is HSIC with the linear kernel.
-The code checks it on 50 random pairs: both sides give $0.021972$.
 
 **Vectors.** Let $x\in\mathbb R^p$ and $y\in\mathbb R^q$, stacked as rows of $X$ ($n\times p$)
 and $Y$ ($n\times q$). Now there are $p\times q$ covariances, one for each coordinate of $x$
@@ -132,8 +131,7 @@ so $\mathrm{HSIC}=0^2+(\frac13)^2=\frac19\approx0.111$, and $\frac19\operatornam
 gives the same number.
 
 Two remarks that will matter later. First, $\lVert C\rVert_F^2$ is the **sum of the squared
-singular values** of $C$ (for a random 3-D against 2-D example in the code, both are
-$1.154484$). HSIC adds up the dependence along every direction, not only along the strongest
+singular values** of $C$. HSIC adds up the dependence along every direction, not only along the strongest
 one; §9 compares measures that keep only the strongest. Second, a shuffle test with the linear
 kernel is *exactly* a shuffle test of Pearson's $r$: shuffling $y$ changes neither
 $\operatorname{Var}(x)$ nor $\operatorname{Var}(y)$, so ranking shuffles by $\operatorname{Cov}^2$
@@ -168,20 +166,16 @@ Put this $k$ into $K$, keep $L=yy^\top$, compute $\frac{1}{n^2}\operatorname{tr}
 and out comes $7.84$ again, without ever writing down the cross-covariance matrix. This is what
 makes it possible to use very many features, even infinitely many.
 
-With $n=200$ samples and the features $(x,x^2,x^3)$ against $(y,y^2,y^3)$, each kind of
-dependence lights up a different cell of the $3\times3$ table of correlations:
+With the features $(x,x^2,x^3)$ against $(y,y^2,y^3)$, each kind of dependence lights up a different
+cell of the $3\times3$ table of correlations between a feature of $x$ and a feature of $y$:
 
-| Data set | Cell that lights up | Correlation |
-|---|---|---|
-| parabola | $x^2$ with $y$ | $0.95$ |
-| circle | $x^2$ with $y^2$ | $-0.91$ (because $x^2+y^2\approx1$) |
-| funnel | $x^2$ with $y^2$ | $0.27$ (big $\lvert x\rvert$, big spread of $y$) |
+- **parabola:** $x^2$ with $y$, because $y$ is $x^2$.
+- **circle:** $x^2$ with $y^2$, negatively, because $x^2+y^2\approx1$.
+- **funnel:** $x^2$ with $y^2$, positively: big $\lvert x\rvert$ means a big spread of $y$.
 
-The funnel is the hardest of the three. Its $x^2$-with-$y^2$ correlation is $0.426$ in the
-population ($\sqrt{2/11}$, confirmed on $10^6$ samples), but only $0.27$ in this sample, and two
-cells that are exactly zero in the population by symmetry ($x$ and $x^3$ with $y^2$) read $0.18$
-and $0.22$. $y^2$ has heavy tails, so its sample correlations are noisy. This matches the funnel's
-weaker p-value in Figure 1. Widget 2 of the [interactive page](figures/interactive.html) lets you raise the degree
+The funnel is the hardest of the three. Its $y^2$ has heavy tails, so the sample correlations that
+involve it are noisy, and cells that are exactly zero in the population by symmetry can read as small
+nonzero values in a sample. This matches the funnel's weaker p-value in Figure 1. Widget 2 of the [interactive page](figures/interactive.html) lets you raise the degree
 and watch cells appear.
 
 **The Gaussian kernel includes every degree.** Expand the Gaussian (RBF) kernel for numbers:
@@ -293,14 +287,12 @@ together for real pairs. The second is the same measurement when the $x$ values 
 values have nothing to do with each other. The third is the cross term. If $x$ and $y$ are independent, the
 averages factor and all three terms equal $\mathbb E[k]\,\mathbb E[l]$, so
 $\mathrm{HSIC}=(1+1-2)\,\mathbb E[k]\,\mathbb E[l]=0$. The sample version of this expansion, with the three averages taken
-over the data, equals the trace formula exactly. On a noisy five-point parabola the code gets
-$0.4878+0.4629-0.9190=0.0317156010$ both ways.
+over the data, equals the trace formula exactly.
 
 **HSIC is a distance between two data sets.** Build a fake "independent" version of the data by
 pairing every $x_a$ with every $y_b$: $n^2$ pairs, in which any link between $x$ and $y$ is gone
 by construction. HSIC is the squared **MMD** (maximum mean discrepancy) between the real cloud of
-$n$ pairs and this fake cloud, using the similarity $k(x,x')\,l(y,y')$ between pairs. The code
-builds the 5 real and 25 fake pairs of the same example and gets $0.0317156010$ again.
+$n$ pairs and this fake cloud, using the similarity $k(x,x')\,l(y,y')$ between pairs.
 
 MMD in one line: map every point to its feature vector, average the feature vectors of each
 data set, and measure the distance between the two averages. With a **characteristic** kernel,
@@ -339,25 +331,12 @@ Both extremes throw the advantage away (compare [Gram matrix §7](../gram-matrix
   depend on how the $y$'s are paired with the $x$'s. A test built on it cannot tell the real
   pairing from a shuffled one.
 
-For the $n=200$ parabola (median bandwidths $\sigma_x=0.567$, $\sigma_y=0.276$), scaling both
-bandwidths by a common factor gives:
-
-| $\sigma$ / median | shuffle-test $p$ | observed, in null standard deviations above the shuffle mean | note |
-|---|---|---|---|
-| $0.001$ | $0.34$ | $-0.07$ | the 999 shuffled values spread by only 0.06% of their mean |
-| $0.01$ | $0.21$ | $0.78$ | |
-| $0.1$ | $0.001$ | $23.5$ | |
-| $1$ | $0.001$ | $41.7$ | the median heuristic |
-| $10$ | $0.16$ | $0.78$ | |
-| $100$ | $0.32$ | $-0.02$ | $\mathrm{HSIC}\cdot\sigma_x^2\sigma_y^2$ is within 1.1% of linear HSIC, whose $p=0.33$ |
-
-In between, the parabola is found overwhelmingly. The **median heuristic** is the usual default
+Between the two failure modes the parabola is found easily. The **median heuristic** is the usual default
 because it puts $\sigma$ at the typical scale of the data, between the two failure modes. It
-has no optimality guarantee, though. Put 150 points on the dark squares of a $5\times5$
-checkerboard: the squares are $0.4$ wide, smaller than the median distance of $0.61$, and
-Pearson $r=-0.04$. At the median bandwidth the test finds nothing ($p=0.29$). At a fifth of it,
-$p=0.001$ and the data sit 6.9 null standard deviations above the shuffle average. A kernel
-wider than the pattern blurs it away. Widget 4 of the [interactive page](figures/interactive.html)
+has no optimality guarantee, though. Put points on the dark squares of a $5\times5$
+checkerboard: the squares are narrower than the typical distance between points, and Pearson $r$ is
+near zero. At the median bandwidth the test finds nothing. At a fifth of it, the pattern stands out
+clearly. A kernel wider than the pattern blurs it away. Widget 4 of the [interactive page](figures/interactive.html)
 plots this whole curve for any data set.
 
 ## 7. Is it big enough? The permutation test
@@ -384,14 +363,7 @@ centring commutes with reordering, so $\tilde L$ can be shuffled directly. Each 
 costs one $n\times n$ elementwise product.
 
 **Why not compare with zero?** Because $\mathrm{HSIC}_b$ is positive even under independence.
-For independent data with the median-bandwidth Gaussian kernel, the average over shuffles is
-
-| $n$ | 50 | 100 | 200 | 400 |
-|---|---|---|---|---|
-| mean HSIC under shuffling | 0.00365 | 0.00192 | 0.00101 | 0.00051 |
-| $n\times$ mean | 0.182 | 0.192 | 0.203 | 0.203 |
-
-It shrinks like $1/n$ but never reaches zero. Song et al. (2012) give an unbiased estimator that
+For independent data, the average over shuffles is positive. It shrinks like $1/n$ but never reaches zero. Song et al. (2012) give an unbiased estimator that
 removes the diagonal's head start. Gretton et al. (2007) avoid shuffling altogether by fitting a
 gamma distribution to the null. For moderate $n$ the shuffle test is the easiest to trust.
 
@@ -417,17 +389,7 @@ $$
 $$
 
 the feature-side form of §2, which stores a $p\times q$ matrix instead of two $n\times n$ ones. Linear CKA is the
-same quantity as the older RV coefficient of multivariate statistics. The code checks what it
-ignores and what it does not, on a 10-feature representation $X$ with 500 samples:
-
-| $Y$ | linear CKA$(X,Y)$ |
-|---|---|
-| $XQ$, $Q$ a random rotation | $1.0000$ |
-| $3X$ | $1.0000$ |
-| $X$ with its five lowest-variance directions shrunk tenfold | $0.9553$ |
-| $\tanh(X)$ | $0.8368$ |
-
-It ignores rotations and overall scale, as a comparison of embedding spaces should
+same quantity as the older RV coefficient of multivariate statistics. Linear CKA ignores rotations and overall scale, as a comparison of embedding spaces should
 ([Gram matrix §3](../gram-matrix/index.html)). It is *not* invariant to every invertible linear
 map, unlike CCA. Kornblith et al. argue that this is deliberate: a similarity index that ignores
 all invertible linear maps gives the same answer for any two representations whose rank equals
@@ -442,10 +404,10 @@ $$
 $$
 
 so each pair of principal directions counts in proportion to the *product of their
-variances*. The code builds two 10-feature representations that share exactly one direction and
-are otherwise unrelated noise. When the shared direction has the same variance as the others,
-linear CKA is $0.125$. When its standard deviation is $3\times$ the others', linear CKA is
-$0.888$, with nine of the ten directions still unrelated.
+variances*. Take two representations that share exactly one direction and are otherwise unrelated noise. If the
+shared direction has the same variance as the others, linear CKA is small. Make that one direction
+much higher in variance and linear CKA becomes large, even though nine of ten directions are still
+unrelated.
 
 ## 9. Relatives: COCO, HGR maximal correlation and the H-score
 
@@ -504,9 +466,8 @@ correlation approaches HGR as the kernel becomes rich and the regularisation van
 - The Gram matrices are $n\times n$: $10^4$ samples means $10^8$ entries each. Random Fourier
   features and Nyström approximations make this cheaper. How much they change the calibration of
   the permutation test is worth checking before relying on them.
-- When HSIC is a training penalty (ReBias, Greenfeld & Shalit), it is estimated on mini-batches. At batch
-  size 64 the null mean alone is about $0.2/64\approx0.003$ for the kernel used here, which may
-  be comparable to the dependence being removed. Whether the penalty then targets real dependence
+- When HSIC is a training penalty (ReBias, Greenfeld & Shalit), it is estimated on mini-batches. The null mean alone
+  shrinks only like $1/n$, so at a small batch size it may be comparable to the dependence being removed. Whether the penalty then targets real dependence
   or estimator noise seems under-examined.
 
 ## Takeaways
