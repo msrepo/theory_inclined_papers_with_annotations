@@ -1,0 +1,340 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lagrange multiplier notes</title>
+<style>
+:root{
+ --page:#ffffff;--text-primary:#1a1a18;--text-secondary:#5f5e5a;--surface-1:#f4f3ee;
+ --border:rgba(0,0,0,.12);--border-strong:rgba(0,0,0,.28);--bg-accent:#E6F1FB;--radius:8px;
+ --font-sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+ --font-voice:Georgia,"Times New Roman",serif;--font-mono:ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root{
+ --page:#1c1c1a;--text-primary:#ecebe6;--text-secondary:#a9a8a0;--surface-1:#2a2a27;
+ --border:rgba(255,255,255,.14);--border-strong:rgba(255,255,255,.3);--bg-accent:#0C447C;}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--text-primary);font-family:var(--font-sans);font-size:16px;line-height:1.7}
+main{max-width:760px;margin:0 auto;padding:32px 16px 80px}
+h1{font-size:28px;font-weight:500;margin:0 0 6px}
+h2{font-size:21px;font-weight:500;margin:2.6rem 0 .4rem;border-top:.5px solid var(--border);padding-top:1.4rem}
+h3{font-size:17px;font-weight:500;margin:1.6rem 0 .2rem}
+p,li{margin:.6rem 0}
+ul,ol{padding-left:1.3rem}
+code{font-family:var(--font-mono);font-size:.9em;background:var(--surface-1);padding:1px 5px;border-radius:4px}
+.eq{background:var(--surface-1);border-radius:var(--radius);padding:.8rem 1.1rem;margin:1rem 0;font-family:var(--font-voice);font-size:18px;text-align:center}
+.credit,.say{background:var(--surface-1);border-radius:var(--radius);padding:.9rem 1.1rem;margin:1rem 0;font-size:15px}
+.say{border-left:3px solid #534AB7;border-radius:0}
+.fig{margin:1.4rem 0}
+.fig svg{display:block;width:100%;height:auto}
+.cap{font-size:14px;color:var(--text-secondary);margin:.3rem 0 0}
+.ctl{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin:0 0 6px}
+.ctl label{font-size:14px;color:var(--text-secondary);min-width:170px}
+.ctl input{flex:1;min-width:140px}
+.ctl span{font-size:14px;font-weight:500;min-width:48px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-top:6px}
+.card{background:var(--surface-1);border-radius:var(--radius);padding:.9rem 1rem}
+.card b{display:block;font-weight:500;font-size:22px;line-height:1.3}
+.card i{display:block;font-style:normal;font-size:13px;color:var(--text-secondary)}
+table{border-collapse:collapse;width:100%;font-size:15px;margin:1rem 0}
+td,th{border-bottom:.5px solid var(--border);padding:6px 8px;text-align:left;vertical-align:top}
+th{font-weight:500}
+a{color:#185FA5}
+@media (prefers-color-scheme:dark){a{color:#85B7EB}}
+.t{fill:var(--text-primary);font-family:var(--font-sans)}
+.ts{fill:var(--text-secondary);font-family:var(--font-sans)}
+</style>
+</head>
+<body>
+<main>
+<h1>The Lagrange multiplier: interactive figures</h1>
+<p style="color:var(--text-secondary)">Companion to the <a href="../index.html">notes page</a>. Story credit: <a href="https://www.youtube.com/watch?v=54EP7DSVWPE">youtube.com/watch?v=54EP7DSVWPE</a>.</p>
+<h2 style="border-top:none;padding-top:0">1. The best point on a trail</h2>
+<div class="fig">
+<div class="ctl"><label>Walk along the trail</label><input type="range" id="tr-s" min="0" max="1000" value="120" step="1"></div>
+<svg viewBox="0 0 680 330" role="img" aria-label="Contour map with a trail and a height profile">
+<defs><marker id="tr-ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+<rect x="20" y="10" width="400" height="310" rx="8" fill="var(--surface-1)"/>
+<g id="tr-cont"></g>
+<path id="tr-trail" fill="none" stroke="#534AB7" stroke-width="3"/>
+<circle id="tr-peakm" r="7" fill="none" stroke="var(--text-secondary)" stroke-width="1.5" stroke-dasharray="3 3"/>
+<circle cx="220" cy="165" r="4" fill="var(--text-secondary)"/>
+<text x="228" y="160" font-size="12" class="ts">summit</text>
+<line id="tr-tg" stroke="#534AB7" stroke-width="2.5" marker-end="url(#tr-ah)"/>
+<line id="tr-gr" stroke="#D85A30" stroke-width="2.5" marker-end="url(#tr-ah)"/>
+<circle id="tr-hk" r="6" fill="var(--text-primary)"/>
+<text x="30" y="30" font-size="12" fill="#D85A30" style="font-family:var(--font-sans)">orange: ∇F, steepest uphill</text>
+<text x="30" y="46" font-size="12" fill="#7F77DD" style="font-family:var(--font-sans)">purple: direction you walk</text>
+<line x1="460" y1="280" x2="660" y2="280" stroke="var(--border-strong)" stroke-width="0.5"/>
+<line x1="460" y1="50" x2="460" y2="280" stroke="var(--border-strong)" stroke-width="0.5"/>
+<path id="tr-prof" fill="none" stroke="#534AB7" stroke-width="2.5"/>
+<line id="tr-pk" stroke="var(--text-secondary)" stroke-width="1" stroke-dasharray="3 3"/>
+<circle id="tr-ph" r="6" fill="var(--text-primary)"/>
+<text x="560" y="305" font-size="13" text-anchor="middle" class="ts">distance along the trail</text>
+<text transform="translate(446,165) rotate(-90)" font-size="13" text-anchor="middle" class="ts">your height</text>
+<text id="tr-pkt" font-size="12" class="ts" text-anchor="middle">highest on trail</text>
+</svg>
+<div class="cards"><div class="card"><i>What the trail is doing to your height</i><b id="tr-st" style="font-size:17px">climbing</b></div></div>
+<p class="cap">Left: contour map (every point on one ellipse has the same height) with the trail passing beside the summit. Right: your height as you walk.</p>
+</div>
+<h2>3. The map picture: the trail must touch a contour</h2>
+<div class="fig">
+<svg viewBox="0 0 680 250" role="img" aria-label="Before, at, and after the peak">
+<defs><marker id="ba-ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+<g id="ba-panels"></g>
+</svg>
+<p class="cap">Same trail, three moments. The orange contour is the one through the hiker. Only at the peak does the trail touch it without crossing.</p>
+</div>
+<h2>5. A first concrete example: nearest point on a line</h2>
+<div class="fig">
+<div class="ctl"><label>Slide along the line</label><input type="range" id="tg-t" min="-100" max="100" value="-70" step="1"></div>
+<div class="ctl"><label>Move the line (c)</label><input type="range" id="tg-c" min="50" max="250" value="100" step="5"></div>
+<svg viewBox="0 0 680 420" role="img" aria-label="Tangency of circle and line">
+<defs><marker id="tg-ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+<g id="tg-circ"></g>
+<line x1="20" y1="330" x2="660" y2="330" stroke="var(--border-strong)" stroke-width="0.5"/>
+<line x1="200" y1="20" x2="200" y2="400" stroke="var(--border-strong)" stroke-width="0.5"/>
+<line id="tg-ln" stroke="#534AB7" stroke-width="2"/>
+<circle id="tg-cur" fill="none" stroke="#D85A30" stroke-width="2"/>
+<line id="tg-gf" stroke="#D85A30" stroke-width="2.5" marker-end="url(#tg-ah)"/>
+<line id="tg-gg" stroke="#534AB7" stroke-width="2.5" marker-end="url(#tg-ah)"/>
+<circle id="tg-pt" r="6" fill="var(--text-primary)"/>
+<circle id="tg-opt" r="5" fill="none" stroke="var(--text-secondary)" stroke-width="1.5" stroke-dasharray="3 3"/>
+<text x="470" y="40" font-size="13" fill="#D85A30" style="font-family:var(--font-sans)">∇F: straight away from origin</text>
+<text x="470" y="60" font-size="13" fill="#7F77DD" style="font-family:var(--font-sans)">∇G: perpendicular to the line</text>
+</svg>
+<div class="cards">
+<div class="card"><i>Angle between the arrows</i><b id="tg-ang">0°</b></div>
+<div class="card"><i>Squared distance here</i><b id="tg-fv">0</b></div>
+<div class="card"><i>Best on this line</i><b id="tg-fb">0</b></div>
+</div>
+<p class="cap" id="tg-msg"></p>
+</div>
+<h2>6. The fence by the river, and what λ really means</h2>
+<div class="fig">
+<div class="ctl"><label>Fence length (the budget)</label><input type="range" id="fn-L" min="20" max="60" value="40" step="1"><span id="fn-Lo">40 m</span></div>
+<div class="ctl"><label>Side along the river</label><input type="range" id="fn-v" min="0" max="100" value="33" step="1"><span id="fn-xo">13 m</span></div>
+<svg viewBox="0 0 680 290" role="img" aria-label="Fenced field and area curve">
+<rect x="20" y="20" width="310" height="8" fill="#85B7EB"/>
+<text x="25" y="16" font-size="12" class="ts">river (needs no fence)</text>
+<rect id="fn-fld" x="20" y="28" rx="2" fill="var(--bg-accent)" stroke="#534AB7" stroke-width="2.5"/>
+<text id="fn-fx" font-size="13" text-anchor="middle" class="t"></text>
+<text id="fn-fy" font-size="13" class="t"></text>
+<line x1="360" y1="260" x2="660" y2="260" stroke="var(--border-strong)" stroke-width="0.5"/>
+<line x1="360" y1="30" x2="360" y2="260" stroke="var(--border-strong)" stroke-width="0.5"/>
+<path id="fn-cv" fill="none" stroke="#534AB7" stroke-width="2.5"/>
+<line id="fn-bl" stroke="var(--text-secondary)" stroke-width="1" stroke-dasharray="3 3"/>
+<circle id="fn-bp" r="5" fill="none" stroke="var(--text-secondary)" stroke-width="1.5"/>
+<text id="fn-bt" font-size="12" text-anchor="middle" class="ts">best: river side twice the others</text>
+<circle id="fn-ep" r="4" fill="#D85A30"/>
+<text id="fn-et" font-size="12" text-anchor="middle" fill="#D85A30" style="font-family:var(--font-sans)">even split</text>
+<circle id="fn-pt" r="6" fill="var(--text-primary)"/>
+<text x="510" y="282" font-size="13" text-anchor="middle" class="ts">side along the river</text>
+<text transform="translate(346,145) rotate(-90)" font-size="13" text-anchor="middle" class="ts">area</text>
+</svg>
+<div class="cards">
+<div class="card"><i>Area of this shape</i><b id="fn-ar">0</b></div>
+<div class="card"><i>Best area for this fence</i><b id="fn-ba">0</b></div>
+<div class="card"><i>One more meter adds</i><b id="fn-gain">0</b></div>
+<div class="card"><i>Multiplier λ at the best shape</i><b id="fn-lam">0</b></div>
+</div>
+<p class="cap">The last two cards agree: λ is what one more meter of fence is worth. The gain is a hair above λ because λ is the instantaneous rate and a full meter is a finite step on a curve that still bends upward.</p>
+</div>
+<h2>8. Maximum entropy: a box of gas, or a die</h2>
+<div class="fig">
+<div class="ctl"><label>Required average roll</label><input type="range" id="dd-m" min="150" max="550" value="350" step="5"><span id="dd-mo">3.5</span></div>
+<svg viewBox="0 0 680 300" role="img" aria-label="Maximum entropy distribution for a die">
+<line x1="40" y1="250" x2="660" y2="250" stroke="var(--border-strong)" stroke-width="0.5"/>
+<line id="dd-uni" x1="40" x2="660" stroke="var(--text-secondary)" stroke-width="1" stroke-dasharray="4 4"/>
+<text id="dd-ut" x="664" font-size="12" class="ts" text-anchor="end" dy="-6">uniform: no constraint</text>
+<g id="dd-bars"></g>
+</svg>
+<div class="cards">
+<div class="card"><i>Multiplier λ (price of the average)</i><b id="dd-lam">0</b></div>
+<div class="card"><i>Entropy</i><b id="dd-ent">0</b></div>
+</div>
+<p class="cap" id="dd-msg"></p>
+</div>
+<h2>9. θ and η: two addresses for the same distribution</h2>
+<div class="fig">
+<div class="ctl"><label>θ (natural parameter)</label><input type="range" id="te-th" min="-150" max="150" value="40" step="1"><span id="te-tho">0.4</span></div>
+<div class="ctl"><label>η (average roll)</label><input type="range" id="te-et" min="130" max="570" value="400" step="1"><span id="te-eto">4.0</span></div>
+<svg viewBox="0 0 680 330" role="img" aria-label="Theta versus eta curve and matching distribution">
+<line x1="60" y1="270" x2="400" y2="270" stroke="var(--border-strong)" stroke-width="0.5"/>
+<line x1="60" y1="20" x2="60" y2="270" stroke="var(--border-strong)" stroke-width="0.5"/>
+<line id="te-zero" y1="20" y2="270" stroke="var(--border)" stroke-width="0.5" stroke-dasharray="3 3"/>
+<text x="230" y="300" font-size="13" text-anchor="middle" class="ts">θ: multiplier / natural coordinate</text>
+<text transform="translate(18,145) rotate(-90)" font-size="13" text-anchor="middle" class="ts">η: expected value</text>
+<path id="te-cv" fill="none" stroke="#534AB7" stroke-width="2.5"/>
+<line id="te-tan" stroke="#D85A30" stroke-width="2"/>
+<line id="te-dx" stroke="#7F77DD" stroke-width="1" stroke-dasharray="3 3"/>
+<line id="te-dy" stroke="#D85A30" stroke-width="1" stroke-dasharray="3 3"/>
+<circle id="te-pt" r="6" fill="var(--text-primary)"/>
+<text x="62" y="36" font-size="12" fill="#D85A30" style="font-family:var(--font-sans)">orange line: slope = variance</text>
+<g id="te-bars"></g>
+<text x="550" y="22" font-size="13" text-anchor="middle" class="ts">the same distribution</text>
+</svg>
+<div class="cards"><div class="card"><i>Variance of the roll (slope)</i><b id="te-vr">0</b></div></div>
+</div>
+</main>
+
+<script>
+(function(){
+const NS='http://www.w3.org/2000/svg';
+function mk(n,a,p){const e=document.createElementNS(NS,n);for(const k in a)e.setAttribute(k,a[k]);if(p)p.appendChild(e);return e;}
+function setA(el,o){for(const k in o)el.setAttribute(k,o[k]);}
+const hill={F:(x,y)=>Math.exp(-(x*x/1.6+y*y/0.9)),
+ gr:(x,y)=>{const f=Math.exp(-(x*x/1.6+y*y/0.9));return [-f*2*x/1.6,-f*2*y/0.9];},
+ tx:s=>-2+4*s, ty:s=>0.7+0.3*Math.sin(1.3*(-2+4*s))};
+
+/* trail */
+(function(){
+ const $=id=>document.getElementById('tr-'+id);
+ const K=85,CX=220,CY=165,MX=x=>CX+K*x,MY=y=>CY-K*y;
+ const cont=$('cont');
+ [0.15,0.3,0.45,0.6,0.75,0.9].forEach(h=>{const q=-Math.log(h);
+  mk('ellipse',{cx:CX,cy:CY,rx:K*Math.sqrt(1.6*q),ry:K*Math.sqrt(0.9*q),fill:'none',stroke:'var(--border-strong)','stroke-width':1},cont);});
+ let d='',pd='',best=0,bs=0;
+ for(let i=0;i<=200;i++){const s=i/200,x=hill.tx(s),y=hill.ty(s),f=hill.F(x,y);
+  d+=(i?'L':'M')+MX(x).toFixed(1)+' '+MY(y).toFixed(1);
+  pd+=(i?'L':'M')+(460+200*s).toFixed(1)+' '+(280-220*f).toFixed(1);
+  if(f>best){best=f;bs=s;}}
+ $('trail').setAttribute('d',d);$('prof').setAttribute('d',pd);
+ setA($('peakm'),{cx:MX(hill.tx(bs)),cy:MY(hill.ty(bs))});
+ setA($('pk'),{x1:460+200*bs,x2:460+200*bs,y1:280-220*best,y2:280});
+ setA($('pkt'),{x:460+200*bs,y:280-220*best-12});
+ function draw(){
+  const s=$('s').value/1000,x=hill.tx(s),y=hill.ty(s),f=hill.F(x,y);
+  const e=1e-3,dx=hill.tx(s+e)-hill.tx(s-e),dy=hill.ty(s+e)-hill.ty(s-e),L=Math.hypot(dx,dy),ux=dx/L,uy=dy/L;
+  const g=hill.gr(x,y),gl=Math.hypot(g[0],g[1]),gx=g[0]/gl,gy=g[1]/gl,px=MX(x),py=MY(y);
+  setA($('hk'),{cx:px,cy:py});
+  setA($('tg'),{x1:px,y1:py,x2:px+55*ux,y2:py-55*uy});
+  setA($('gr'),{x1:px,y1:py,x2:px+55*gx,y2:py-55*gy});
+  setA($('ph'),{cx:460+200*s,cy:280-220*f});
+  const along=g[0]*ux+g[1]*uy;
+  $('st').textContent=Math.abs(s-bs)<0.012?'touching a contour: neither up nor down. Highest point on the trail.':(along>0?'climbing: the trail still crosses onto higher contours':'descending: the trail now crosses onto lower contours');
+ }
+ $('s').oninput=draw;draw();
+})();
+
+/* before/at/after */
+(function(){
+ const P=document.getElementById('ba-panels');
+ let best=0,bs=0;for(let i=0;i<=2000;i++){const s=i/2000,f=hill.F(hill.tx(s),hill.ty(s));if(f>best){best=f;bs=s;}}
+ const K=48,W=200,H=180,titles=['before the peak','at the peak','after the peak'],
+  subs=['crossing up to higher contours','touching one contour, not crossing','crossing down to lower contours'];
+ [bs-0.22,bs,bs+0.22].forEach((sp,idx)=>{
+  const ox=15+idx*222,oy=15,cx=ox+W/2,cy=oy+H/2+6,MX=x=>cx+K*x,MY=y=>cy-K*y;
+  mk('rect',{x:ox,y:oy,width:W,height:H,rx:8,fill:'var(--surface-1)'},P);
+  [0.15,0.3,0.45,0.6,0.75,0.9].forEach(h=>{const q=-Math.log(h);
+   mk('ellipse',{cx:cx,cy:cy,rx:K*Math.sqrt(1.6*q),ry:K*Math.sqrt(0.9*q),fill:'none',stroke:'var(--border-strong)','stroke-width':1},P);});
+  let d='';for(let i=0;i<=120;i++){const s=0.15+0.7*i/120;d+=(i?'L':'M')+MX(hill.tx(s)).toFixed(1)+' '+MY(hill.ty(s)).toFixed(1);}
+  mk('path',{d:d,fill:'none',stroke:'#534AB7','stroke-width':2.5},P);
+  const x=hill.tx(sp),y=hill.ty(sp),f=hill.F(x,y),q=-Math.log(f);
+  mk('ellipse',{cx:cx,cy:cy,rx:K*Math.sqrt(1.6*q),ry:K*Math.sqrt(0.9*q),fill:'none',stroke:'#D85A30','stroke-width':2},P);
+  const px=MX(x),py=MY(y),e=1e-3,dx=hill.tx(sp+e)-hill.tx(sp-e),dy=hill.ty(sp+e)-hill.ty(sp-e),L=Math.hypot(dx,dy);
+  const g=hill.gr(x,y),gl=Math.hypot(g[0],g[1]);
+  mk('line',{x1:px,y1:py,x2:px+36*dx/L,y2:py-36*dy/L,stroke:'#534AB7','stroke-width':2,'marker-end':'url(#ba-ah)'},P);
+  mk('line',{x1:px,y1:py,x2:px+36*g[0]/gl,y2:py-36*g[1]/gl,stroke:'#D85A30','stroke-width':2,'marker-end':'url(#ba-ah)'},P);
+  mk('circle',{cx:px,cy:py,r:5,fill:'var(--text-primary)'},P);
+  const t=mk('text',{x:ox+W/2,y:oy+H+20,'text-anchor':'middle','font-size':13,class:'t'},P);t.textContent=titles[idx];
+  const t2=mk('text',{x:ox+W/2,y:oy+H+38,'text-anchor':'middle','font-size':12,class:'ts'},P);t2.textContent=subs[idx];
+ });
+})();
+
+/* tangency */
+(function(){
+ const $=id=>document.getElementById('tg-'+id);
+ const S=130,OX=200,OY=330,X=x=>OX+S*x,Y=y=>OY-S*y;
+ [0.5,1,1.5,2,2.5,3].forEach(r=>mk('circle',{cx:X(0),cy:Y(0),r:S*r,fill:'none',stroke:'var(--border-strong)','stroke-width':0.8},$('circ')));
+ function draw(){
+  const c=$('c').value/100,t=$('t').value/100*1.5,x=c/2+t,y=c/2-t,r=Math.hypot(x,y);
+  setA($('ln'),{x1:X(-0.7),y1:Y(c+0.7),x2:X(c+0.7),y2:Y(-0.7)});
+  setA($('pt'),{cx:X(x),cy:Y(y)});setA($('opt'),{cx:X(c/2),cy:Y(c/2)});
+  setA($('cur'),{cx:X(0),cy:Y(0),r:S*r});
+  const fx=x/r,fy=y/r,g=Math.SQRT1_2,L=70;
+  setA($('gf'),{x1:X(x),y1:Y(y),x2:X(x)+L*fx,y2:Y(y)-L*fy});
+  setA($('gg'),{x1:X(x),y1:Y(y),x2:X(x)+L*g,y2:Y(y)-L*g});
+  const a=Math.acos(Math.max(-1,Math.min(1,(fx+fy)*g)))*180/Math.PI;
+  $('ang').textContent=a.toFixed(0)+'°';$('fv').textContent=(x*x+y*y).toFixed(2);$('fb').textContent=(c*c/2).toFixed(2);
+  $('msg').textContent=a<1.5?'Arrows parallel: the circle just touches the line. No allowed step improves F. This is the constrained minimum.':'Arrows disagree: part of the push of F lies along the line, so sliding along it would still shrink the circle.';
+ }
+ $('t').oninput=draw;$('c').oninput=draw;draw();
+})();
+
+/* fence */
+(function(){
+ const $=id=>document.getElementById('fn-'+id),A=(x,L)=>x*(L-x)/2;
+ function draw(){
+  const L=+$('L').value,f=0.03+0.94*$('v').value/100,x=f*L,y=(L-x)/2;
+  $('Lo').textContent=L+' m';$('xo').textContent=x.toFixed(1)+' m';
+  const k=5,w=k*x,h=k*y;
+  setA($('fld'),{width:w,height:h});
+  setA($('fx'),{x:20+w/2,y:28+h+16});$('fx').textContent=x.toFixed(1)+' m';
+  setA($('fy'),{x:20+w+6,y:28+h/2+4});$('fy').textContent=y.toFixed(1)+' m';
+  const SY=220/450;let p='';
+  for(let i=0;i<=100;i++){const xx=L*i/100;p+=(i?'L':'M')+(360+5*xx).toFixed(1)+' '+(260-SY*A(xx,L)).toFixed(1);}
+  $('cv').setAttribute('d',p);
+  const bx=L/2,ba=A(bx,L);
+  setA($('bl'),{x1:360+5*bx,x2:360+5*bx,y1:260-SY*ba,y2:260});
+  setA($('bp'),{cx:360+5*bx,cy:260-SY*ba});setA($('bt'),{x:360+5*bx,y:260-SY*ba-12});
+  const ex=L/3;setA($('ep'),{cx:360+5*ex,cy:260-SY*A(ex,L)});setA($('et'),{x:360+5*ex-8,y:260-SY*A(ex,L)+18});
+  setA($('pt'),{cx:360+5*x,cy:260-SY*A(x,L)});
+  $('ar').textContent=A(x,L).toFixed(1)+' m²';$('ba').textContent=ba.toFixed(1)+' m²';
+  $('gain').textContent='+'+(A((L+1)/2,L+1)-ba).toFixed(1)+' m²';$('lam').textContent=(L/4).toFixed(1);
+ }
+ $('L').oninput=draw;$('v').oninput=draw;draw();
+})();
+
+/* die max-entropy */
+function dist(l,sign){const w=[1,2,3,4,5,6].map(k=>Math.exp(sign*l*k)),z=w.reduce((a,b)=>a+b);return w.map(v=>v/z);}
+function mean(p){return p.reduce((a,v,i)=>a+v*(i+1),0);}
+function vari(p){const m=mean(p);return p.reduce((a,v,i)=>a+v*(i+1-m)*(i+1-m),0);}
+(function(){
+ const $=id=>document.getElementById('dd-'+id),bars=$('bars'),rects=[];
+ for(let i=0;i<6;i++){
+  rects.push(mk('rect',{x:70+i*100,width:70,rx:4,fill:'#534AB7'},bars));
+  const t=mk('text',{x:105+i*100,y:272,'text-anchor':'middle','font-size':13,class:'ts'},bars);t.textContent='face '+(i+1);
+ }
+ const H=450;
+ function draw(){
+  const m=$('m').value/100;$('mo').textContent=m.toFixed(1);
+  let lo=-5,hi=5;for(let k=0;k<60;k++){const mid=(lo+hi)/2;if(mean(dist(mid,-1))>m)lo=mid;else hi=mid;}
+  const l=(lo+hi)/2,p=dist(l,-1);
+  p.forEach((v,i)=>setA(rects[i],{y:250-H*v,height:H*v}));
+  setA($('uni'),{y1:250-H/6,y2:250-H/6});setA($('ut'),{y:250-H/6});
+  $('lam').textContent=(Math.abs(l)<0.005?0:l).toFixed(2);
+  $('ent').textContent=(-p.reduce((a,v)=>a+v*Math.log(v),0)).toFixed(2);
+  $('msg').textContent=Math.abs(m-3.5)<0.03?'Average 3.5 is what a fair die already gives, so the rule costs nothing: λ = 0, flat bars, the most entropy possible.':(m>3.5?'Higher average forced: weight tilts to large faces. λ is negative; entropy drops.':'Lower average forced: weight tilts to small faces. λ is positive; entropy drops.');
+ }
+ $('m').oninput=draw;draw();
+})();
+
+/* theta-eta */
+(function(){
+ const $=id=>document.getElementById('te-'+id);
+ const X=t=>60+(t+1.5)/3*340,Y=e=>270-(e-1)/5*250;
+ setA($('zero'),{x1:X(0),x2:X(0)});
+ let d='';for(let i=0;i<=120;i++){const t=-1.5+3*i/120;d+=(i?'L':'M')+X(t).toFixed(1)+' '+Y(mean(dist(t,1))).toFixed(1);}
+ $('cv').setAttribute('d',d);
+ const bars=$('bars'),rects=[];
+ for(let i=0;i<6;i++){rects.push(mk('rect',{x:440+i*40,width:30,rx:3,fill:'#534AB7'},bars));
+  const t=mk('text',{x:455+i*40,y:290,'text-anchor':'middle','font-size':12,class:'ts'},bars);t.textContent=i+1;}
+ function draw(t){
+  const p=dist(t,1),e=mean(p),v=vari(p),px=X(t),py=Y(e),sl=v*250/5/(340/3),dx=70;
+  setA($('tan'),{x1:px-dx,y1:py+dx*sl,x2:px+dx,y2:py-dx*sl});
+  setA($('pt'),{cx:px,cy:py});
+  setA($('dx'),{x1:px,x2:px,y1:py,y2:270});setA($('dy'),{x1:60,x2:px,y1:py,y2:py});
+  p.forEach((q,i)=>{const h=q*220;setA(rects[i],{y:270-h,height:h});});
+  $('tho').textContent=t.toFixed(2);$('eto').textContent=e.toFixed(2);$('vr').textContent=v.toFixed(2);
+  return e;
+ }
+ $('th').oninput=()=>{const e=draw($('th').value/100);$('et').value=Math.round(e*100);};
+ $('et').oninput=()=>{const m=$('et').value/100;let lo=-1.5,hi=1.5;for(let k=0;k<50;k++){const mid=(lo+hi)/2;if(mean(dist(mid,1))<m)lo=mid;else hi=mid;}const t=(lo+hi)/2;draw(t);$('th').value=Math.round(t*100);};
+ $('th').oninput();
+})();
+})();
+</script>
+</body>
+</html>
