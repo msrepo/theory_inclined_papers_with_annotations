@@ -1,12 +1,12 @@
 ---
-title: "Column space, null space and residuals: the four fundamental subspaces"
+title: "Four Fundamental Subspaces"
 authors: "Background notes"
 venue: "Foundations"
 tags: [linear-algebra, column-space, null-space, residuals, least-squares, projection, pseudo-inverse, svd, pca, background]
 status: living
 category: "Foundations"
 subcategory: "Linear algebra"
-short_title: "Column, null & residual spaces"
+short_title: "Four Fundamental Subspaces"
 ---
 
 ## Links
