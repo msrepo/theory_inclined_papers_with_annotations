@@ -34,23 +34,23 @@ short_title: "Column, null & residual spaces"
 
 ## In one paragraph
 
-A matrix $A$ is a machine: it takes an input vector $x$ and returns $Ax$, which is always some
-mix of $A$'s columns. Two questions about that machine explain most of linear algebra's
-"subspace" vocabulary. **What can it produce?** The set of all possible outputs is the
+A matrix $A$ takes an input vector $x$ to an output vector $Ax$, which is always a combination of
+$A$'s columns. Two questions about that map explain most of linear algebra's
+"subspace" vocabulary. **Which outputs are possible?** The set of all possible outputs is the
 **column space**. A target outside it cannot be hit exactly, and the best you can do is the
 closest point inside it. The miss, $b-Ax$, is the **residual**, and it always points
 perpendicular to the column space, into a space of its own: the **residual space** (formally
-the left null space $N(A^\top)$). **What can it not see?** The inputs that the machine turns
-into zero form the **null space**. Adding anything from the null space to an input changes
+the left null space $N(A^\top)$). **Which inputs does it not see?** The inputs that $A$ sends
+to zero form the **null space**. Adding anything from the null space to an input changes
 nothing about the output, so any equation $Ax=b$ that has a solution has a whole family of them,
 and a learning rule has to pick one. Gradient descent picks in a very particular way. Row space
 and column space are the halves that matter; null space and residual space are the halves that
 get thrown away. Everything else on this page, including least squares, the pseudo-inverse,
 PCA residual detectors, H-score and the NTK's frozen component, follows from that split.
 
-## 1. A matrix is a recipe for mixing its columns
+## 1. A matrix times a vector is a combination of its columns
 
-Start with a concrete machine. Take
+Start with a concrete matrix. Take
 
 $$
 A=\begin{bmatrix}1&0\\1&1\\1&2\end{bmatrix},\qquad a_1=\begin{bmatrix}1\\1\\1\end{bmatrix},\quad a_2=\begin{bmatrix}0\\1\\2\end{bmatrix}.
@@ -71,15 +71,24 @@ $$
 Ax = x_1\,a_1 + x_2\,a_2 .
 $$
 
-"Take $x_1$ copies of the first column and $x_2$ copies of the second, and add them." The inputs
-are the recipe amounts; the columns are the ingredients; the output is the dish. This column view
-is the one to keep in your head, because every subspace below is a statement about which dishes
-are possible and which recipes taste the same.
+In words: take $x_1$ times the first column, $x_2$ times the second, and add. The input $x$ holds
+the weights and the output is the weighted sum of the columns. This column view is the one to keep in
+your head, because every subspace below is a statement about which weighted sums are possible and
+which different weights give the same sum.
 
 This particular $A$ is not arbitrary. It is the **design matrix for fitting a straight line**
 $y=c_0+c_1t$ through three points at $t=0,1,2$. Row $i$ is $(1,t_i)$, so $Ax$ is the list of the
 line's heights at the three $t$ values when $x=(c_0,c_1)$ is (intercept, slope). It is the
 running example for the rest of the page.
+
+<figure>
+<img src="figures/design-matrix.svg" alt="Left: a graph with three vertical guides at t = 0, 1, 2 and a rising straight line. The line starts at height c0 on the t = 0 guide and rises by c1 for each step in t, so its heights at the three guides are c0, c0 plus c1 and c0 plus 2 c1, marked by blue, green and purple dots. Right: the matrix with rows (1,0), (1,1), (1,2), colour-matched to the three dots, times the vector (c0, c1), equals the column of the three heights. The first column of the matrix is all ones and the second column is the t values.">
+<figcaption><b>Where this $A$ comes from.</b> <b>Left:</b> three measurements at $t=0,1,2$ and a straight line
+$y=c_0+c_1t$ through them; $c_0$ is the height at the start and $c_1$ is the rise per step. The line's
+height at each $t$ is a sum of two terms: $c_0$ times $1$, plus $c_1$ times $t$. <b>Right:</b>
+write each height as a row $(1,t_i)$ and stack the three rows: that stack is $A$, and $Ax$ is the three
+heights at once. The first column is the $1$s, the second is the $t$ values.</figcaption>
+</figure>
 
 | Symbol | Meaning |
 |---|---|
@@ -94,10 +103,10 @@ running example for the rest of the page.
 | $A^+$ | Moore–Penrose pseudo-inverse |
 | $V^\perp$ | orthogonal complement: every vector perpendicular to all of $V$ |
 
-## 2. Column space: what the machine can produce
+## 2. Column space: which outputs are possible
 
-**Plain words.** The column space is the set of every output you can get by choosing some
-recipe. With two columns in $\mathbb R^3$ it is a plane through the origin: all combinations
+**Plain words.** The column space is the set of every output $Ax$ you can get by choosing some
+input $x$. With two columns in $\mathbb R^3$ it is a plane through the origin: all combinations
 $x_1a_1+x_2a_2$ (the shaded plane in Figure 3).
 
 **Formally.** $\operatorname{col}(A)=\{Ax : x\in\mathbb R^n\}=\operatorname{span}(a_1,\dots,a_n)$.
@@ -106,7 +115,7 @@ Its dimension is the rank $r$.
 **Why it matters.** The equation $Ax=b$ has a solution **if and only if $b$ lies in the column
 space**. With three data points and a two-parameter line, the heights $b=(1,3,2)$ are not on
 any straight line (check: the line through the first two points, $1+2t$, predicts 5 at $t=2$,
-not 2). So $b\notin\operatorname{col}(A)$ and no recipe produces it exactly. That is the normal
+not 2). So $b\notin\operatorname{col}(A)$ and no input $x$ produces it exactly. That is the normal
 situation in data fitting: more equations than unknowns, so the reachable set is a thin slice of
 the space the data lives in.
 
@@ -115,10 +124,10 @@ reachable directions. The rank counts only the independent ones. In the singular
 Figure 1 the matrix has two columns but they point the same way, so the column space is only a
 line and the rank is 1.
 
-## 3. Null space: what the machine cannot see
+## 3. Null space: which inputs are invisible
 
-**Plain words.** The null space is the set of recipes that produce *nothing*: inputs the
-machine maps to zero. They are the directions of input space that $A$ is blind to.
+**Plain words.** The null space is the set of inputs that produce *nothing*: inputs
+that $A$ maps to zero. They are the directions of input space that $A$ is blind to.
 
 **Formally.** $N(A)=\{x\in\mathbb R^n : Ax=0\}$.
 
@@ -287,16 +296,7 @@ $$
 \mathbb E\lVert r\rVert^2=\sigma^2\operatorname{tr}(I-P)=\sigma^2(m-p).
 $$
 
-Measured over 20,000 noise draws with $m=50$ and $\sigma^2=0.49$:
-
-| columns $p$ | mean $\lVert r\rVert^2$ | $\sigma^2(m-p)$ | naive $\lVert r\rVert^2/m$ | $\lVert r\rVert^2/(m-p)$ |
-|---|---|---|---|---|
-| 1 | 23.94 | 24.01 | 0.479 | 0.488 |
-| 5 | 22.05 | 22.05 | 0.441 | 0.490 |
-| 20 | 14.72 | 14.70 | 0.294 | 0.491 |
-| 45 | 2.46 | 2.45 | 0.049 | 0.492 |
-
-Dividing by $m$ underestimates the noise more and more as the model grows, because each column
+Dividing by $m$ underestimates the noise, and by more as the model grows, because each column
 you add removes one more dimension the noise could have used. Dividing by the dimension of the
 residual space, $m-p$, is right at every size. LogME's $\beta$ update is this estimator with
 $p$ replaced by an effective count $\gamma$ (§9).
@@ -343,10 +343,8 @@ $A^\top(Ax-b)$, which is a combination of rows of $A$, so it always lies in the 
 step therefore changes only the row-space part of $x$. The null-space part is frozen at whatever
 it was at initialisation:
 
-| start $x_0$ | null-space coordinate of $x_0$ | lands at | null-space coordinate at the end |
-|---|---|---|---|
-| $(0,0)$ | $0$ | $(0.8,1.6)=A^+b$ | $0$ |
-| $(3,3)$ | $1.3416$ | $(2,1)=A^+b+0.6\,(2,-1)$ | $1.3416$ |
+A start at the origin has no null-space part, so it lands exactly on $A^+b$. A start elsewhere, such as
+$(3,3)$ in Figure 4, keeps the null-space part it began with and lands at $(2,1)$.
 
 So **gradient descent from zero initialisation returns the minimum-norm solution**, and from any
 other start it returns the minimum-norm solution plus the null-space component it started with.
@@ -465,17 +463,8 @@ $\mu_c-\mu$ satisfy one linear relation (their weighted sum is zero), so
 $\dim\operatorname{col}(S_b)\le g-1$. Every direction in $N(S_b)$ has zero between-class spread,
 so the Fisher criterion is zero there. That is why LDA yields at most $g-1$ directions and why
 SFDA's Fisher space is **one-dimensional for a binary task**. The within-class scatter has rank at
-most $N-g$, so when $N<n+g$ it has a nontrivial null space and $S_w^{-1}$ does not exist. The code
-tabulates it:
-
-| $n$ | $g$ | $N$ | $\operatorname{rank}S_b$ | $\operatorname{rank}S_w$ | $\dim N(S_w)$ |
-|---|---|---|---|---|---|
-| 10 | 3 | 300 | 2 | 10 | 0 |
-| 10 | 2 | 300 | 1 | 10 | 0 |
-| 50 | 3 | 30 | 2 | 27 | 23 |
-| 50 | 5 | 40 | 4 | 35 | 15 |
-
-A direction in $N(S_w)$ has zero within-class spread, so the Fisher ratio is infinite there. The
+most $N-g$, so when $N<n+g$ it has a nontrivial null space and $S_w^{-1}$ does not exist. A direction in $N(S_w)$ has zero within-class spread, so the Fisher ratio is
+infinite there. The
 PCA-then-LDA fix restricts attention to a subspace where $S_w$ has no null space; SFDA's
 shrinkage term does the same job by adding a multiple of the identity.
 

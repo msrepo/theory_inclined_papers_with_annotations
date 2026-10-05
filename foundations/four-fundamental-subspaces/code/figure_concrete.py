@@ -81,7 +81,7 @@ def build():
     g.append(text(20, 52, "row space row(A) = the whole plane", "sm cst"))
     g.append(text(20, 67, "every input direction is “seen” (dimension 2)", "sm"))
     g.append(text(o[0] + 14, o[1] + 34, "null space N(A) = {0}", "sm nst"))
-    g.append(text(o[0] + 14, o[1] + 49, "only the origin: no recipe makes 0", "sm"))
+    g.append(text(o[0] + 14, o[1] + 49, "only the origin: no other input gives 0", "sm"))
 
     # right: R^3 viewed so the column plane is the floor and the residual line stands on it.
     # Coordinates (p, q, h) are the ambient vector's components along the orthonormal
