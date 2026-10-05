@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bayesian evidence, interactive</title>
+<style>
+  :root{--bg:#faf9f5;--fg:#1a1a19;--mut:#57564f;--ln:#d8d6cc;--a:#2f6fb5;--b:#c2642a;--card:#fff}
+  @media (prefers-color-scheme: dark){:root{--bg:#1c1b19;--fg:#eceae3;--mut:#b6b4ab;--ln:#3a3834;--a:#7fb2e8;--b:#e0955c;--card:#242320}}
+  body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.5 ui-sans-serif,-apple-system,"Segoe UI",sans-serif}
+  main{max-width:860px;margin:0 auto;padding:20px 16px 60px}
+  h1{font-size:20px;margin:0 0 4px} h2{font-size:16px;margin:0 0 6px}
+  p.s{color:var(--mut);margin:0 0 14px}
+  section{background:var(--card);border:1px solid var(--ln);border-radius:10px;padding:14px 16px;margin:18px 0}
+  .row{display:flex;flex-wrap:wrap;gap:12px 22px;margin:8px 0}
+  label{font-size:13px;color:var(--mut);display:flex;flex-direction:column;gap:2px;min-width:170px}
+  input[type=range]{width:200px}
+  canvas{width:100%;height:auto;display:block;border:1px solid var(--ln);border-radius:6px;background:var(--bg)}
+  .out{font-size:13px;color:var(--mut)} .out b{color:var(--fg);font-weight:600}
+  button{font:inherit;padding:4px 12px;border:1px solid var(--ln);background:var(--bg);color:var(--fg);border-radius:6px;cursor:pointer}
+</style>
+</head>
+<body>
+<main>
+<h1>Bayesian evidence: three things to poke</h1>
+<p class="s">Companion to the notes on Knuth et al. (2015). Each panel is drawn live in your browser.</p>
+
+<section>
+  <h2>1. The Occam factor</h2>
+  <p class="s">The parameter is a mean with a flat prior of width Δx. Data narrow the likelihood to a bump. Widen the prior,
+  or add data, and watch the evidence move: the evidence is the area of the bump divided by Δx.</p>
+  <div class="row">
+    <label>prior width Δx <input id="o_dx" type="range" min="2" max="40" step="0.5" value="10"></label>
+    <label>number of data n <input id="o_n" type="range" min="1" max="100" step="1" value="10"></label>
+    <label>noise σ <input id="o_s" type="range" min="0.5" max="4" step="0.1" value="1.5"></label>
+    <label>sample mean <input id="o_m" type="range" min="-8" max="8" step="0.1" value="0.5"></label>
+  </div>
+  <canvas id="c1" width="800" height="260"></canvas>
+  <div class="out" id="o1"></div>
+  <p class="s" style="margin-top:8px">Model M₀ has no free parameter: the mean is fixed at 0. M₁ has the mean free over the flat prior. The ratio
+  shown is Z₁/Z₀ (the Bayes factor for the flexible theory).</p>
+</section>
+
+<section>
+  <h2>2. Nested sampling, step by step</h2>
+  <p class="s">A narrow Gaussian likelihood on a square prior. N live points; each step deletes the worst and replaces it by a new draw
+  from the prior restricted to higher likelihood (here by plain rejection, which is fine in two dimensions). The estimate of the prior mass
+  uses X shrinking by e<sup>−1/N</sup> per step.</p>
+  <div class="row">
+    <label>live points N <input id="n_N" type="range" min="5" max="200" step="1" value="25"></label>
+    <label>likelihood width <input id="n_w" type="range" min="0.05" max="0.5" step="0.01" value="0.15"></label>
+    <button id="n_step">step ×1</button><button id="n_step20">step ×20</button><button id="n_reset">reset</button>
+  </div>
+  <canvas id="c2" width="800" height="300"></canvas>
+  <div class="out" id="o2"></div>
+</section>
+
+<section>
+  <h2>3. Estimating a ratio of normalisers by importance sampling</h2>
+  <p class="s">Target p (unnormalised) and proposal q (unnormalised): Gaussians with different widths. The true ratio Z<sub>p</sub>/Z<sub>q</sub> is known here.
+  Below the picture, two estimates are printed: the plain average of p/q over samples from q (the estimator derived in eq. 37) and the expression printed as eq. (38),
+  Σp²/q² ÷ Σp/q. Press the button repeatedly.</p>
+  <div class="row">
+    <label>target width <input id="i_p" type="range" min="0.6" max="2" step="0.05" value="1"></label>
+    <label>proposal width <input id="i_q" type="range" min="0.5" max="2" step="0.05" value="1.4"></label>
+    <label>samples <input id="i_n" type="range" min="20" max="2000" step="10" value="300"></label>
+    <button id="i_go">draw again</button>
+  </div>
+  <canvas id="c3" width="800" height="200"></canvas>
+  <div class="out" id="o3"></div>
+</section>
+</main>
+
+<script>
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const $=id=>document.getElementById(id);
+function gauss(x,m,s){return Math.exp(-0.5*((x-m)/s)**2)/(s*Math.sqrt(2*Math.PI));}
+function randn(){let u=0,v=0;while(!u)u=Math.random();v=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);}
+
+/* ---- 1. Occam ---- */
+function occam(){
+  const dx=+$('o_dx').value,n=+$('o_n').value,s=+$('o_s').value,m=+$('o_m').value;
+  const c=$('c1'),g=c.getContext('2d'),W=c.width,H=c.height;g.clearRect(0,0,W,H);
+  const X=x=>W/2+x*(W/60), base=H-30;
+  const sd=s/Math.sqrt(n);
+  // likelihood bump (relative to its peak), drawn at fixed height; prior drawn as flat band of height 1/dx scaled
+  g.strokeStyle=css('--ln');g.beginPath();g.moveTo(0,base);g.lineTo(W,base);g.stroke();
+  g.fillStyle=css('--mut');g.globalAlpha=.2;g.fillRect(X(-dx/2),base-40,X(dx/2)-X(-dx/2),40);g.globalAlpha=1;
+  g.fillStyle=css('--mut');g.font='12px sans-serif';g.fillText('prior, width Δx',X(-dx/2)+4,base-46);
+  g.strokeStyle=css('--a');g.lineWidth=2;g.beginPath();
+  for(let px=0;px<=W;px++){const x=(px-W/2)/(W/60);const y=Math.exp(-0.5*((x-m)/sd)**2);px?g.lineTo(px,base-(H-70)*y):g.moveTo(px,base-(H-70)*y);}g.stroke();
+  // occam factor and evidence
+  const inside=(Math.abs(m)<dx/2);
+  const erf=z=>{const t=1/(1+0.3275911*Math.abs(z));const y=1-(((((1.061405429*t-1.453152027)*t)+1.421413741)*t-0.284496736)*t+0.254829592)*t*Math.exp(-z*z);return z>=0?y:-y;};
+  const mass=0.5*(erf((dx/2-m)/(Math.SQRT2*sd))+erf((dx/2+m)/(Math.SQRT2*sd)));
+  const W_occ=Math.sqrt(2*Math.PI)*sd/dx*mass;
+  // log likelihood peak for given data: use v = sigma^2 so data are "typical"
+  const logLmax=-0.5*n*Math.log(2*Math.PI*s*s)-0.5*n;
+  const logL0=-0.5*n*Math.log(2*Math.PI*s*s)-0.5*n*(1+(m/s)**2);
+  const logZ1=logLmax+Math.log(W_occ);
+  const logBF=logZ1-logL0;
+  $('o1').innerHTML=`likelihood bump width ≈ σ/√n = <b>${sd.toFixed(2)}</b> · Occam factor W ≈ <b>${W_occ.toExponential(2)}</b> · log best-fit gain over M₀: <b>${(logLmax-logL0).toFixed(2)}</b> · log Occam factor: <b>${Math.log(W_occ).toFixed(2)}</b> · log(Z₁/Z₀) = <b>${logBF.toFixed(2)}</b> ${logBF>0?'(flexible theory favoured)':'(simple theory favoured)'}`;
+}
+['o_dx','o_n','o_s','o_m'].forEach(i=>$(i).addEventListener('input',occam));occam();
+
+/* ---- 2. Nested sampling ---- */
+let ns;
+function nsReset(){
+  const N=+$('n_N').value;
+  ns={N,pts:[],L:[],it:0,Z:0,Xprev:1,trace:[]};
+  for(let i=0;i<N;i++){const p=[Math.random(),Math.random()];ns.pts.push(p);ns.L.push(lik(p));}
+  draw2();
+}
+function lik(p){const w=+$('n_w').value;const dx=p[0]-0.5,dy=p[1]-0.5;return Math.exp(-(dx*dx+dy*dy)/(2*w*w));}
+function nsStep(){
+  let k=0;for(let i=1;i<ns.N;i++)if(ns.L[i]<ns.L[k])k=i;
+  const Lmin=ns.L[k];ns.it++;
+  const X=Math.exp(-ns.it/ns.N);ns.Z+=Lmin*(ns.Xprev-X);ns.Xprev=X;ns.trace.push([X,Lmin]);
+  let p,tries=0;do{p=[Math.random(),Math.random()];tries++;}while(lik(p)<=Lmin&&tries<200000);
+  ns.pts[k]=p;ns.L[k]=lik(p);
+}
+function draw2(){
+  const c=$('c2'),g=c.getContext('2d'),W=c.width,H=c.height;g.clearRect(0,0,W,H);
+  const S=H-20;
+  g.strokeStyle=css('--ln');g.strokeRect(10,10,S,S);
+  g.fillStyle=css('--fg');
+  ns.pts.forEach(p=>{g.beginPath();g.arc(10+p[0]*S,10+(1-p[1])*S,3,0,7);g.fill();});
+  // contour of current worst likelihood
+  let Lmin=Math.min(...ns.L);const w=+$('n_w').value;const r=Math.sqrt(-2*w*w*Math.log(Lmin));
+  g.strokeStyle=css('--b');g.beginPath();g.arc(10+0.5*S,10+0.5*S,r*S,0,7);g.stroke();
+  // L(X) panel
+  const x0=S+60,x1=W-20,top=20,base=H-30,ymax=1;
+  g.strokeStyle=css('--ln');g.beginPath();g.moveTo(x0,base);g.lineTo(x1,base);g.moveTo(x0,top);g.lineTo(x0,base);g.stroke();
+  g.fillStyle=css('--mut');g.font='12px sans-serif';g.fillText('X (prior mass above L), 0 → 1',x0,base+18);g.fillText('L',x0-14,top+8);
+  g.fillStyle=css('--a');g.globalAlpha=.25;let prev=1;
+  ns.trace.forEach(([X,L])=>{const xa=x0+(x1-x0)*X,xb=x0+(x1-x0)*prev;g.fillRect(xa,base-(base-top)*L,xb-xa,(base-top)*L);prev=X;});
+  g.globalAlpha=1;g.strokeStyle=css('--a');g.beginPath();
+  ns.trace.forEach(([X,L],i)=>{const x=x0+(x1-x0)*X,y=base-(base-top)*L;i?g.lineTo(x,y):g.moveTo(x,y);});g.stroke();
+  // true Z for comparison (analytic, ignoring edge effects of the square)
+  const trueZ=2*Math.PI*w*w*0.995;
+  $('o2').innerHTML=`step <b>${ns.it}</b> · log X ≈ <b>${(-ns.it/ns.N).toFixed(2)}</b> · running Z estimate <b>${ns.Z.toFixed(4)}</b> · exact area of the Gaussian bump 2πw² ≈ <b>${trueZ.toFixed(4)}</b> (the estimate rises to it and flattens once the strips fall below the bump)`;
+}
+$('n_step').onclick=()=>{nsStep();draw2();};
+$('n_step20').onclick=()=>{for(let i=0;i<20;i++)nsStep();draw2();};
+$('n_reset').onclick=nsReset;$('n_N').oninput=nsReset;$('n_w').oninput=nsReset;nsReset();
+
+/* ---- 3. Importance sampling ---- */
+function imp(){
+  const sp=+$('i_p').value,sq=+$('i_q').value,n=+$('i_n').value;
+  // unnormalised p(x)=exp(-x^2/2sp^2), q(x)=exp(-x^2/2sq^2); Zp=sp sqrt(2pi), Zq=sq sqrt(2pi); true ratio sp/sq
+  const p=x=>Math.exp(-x*x/(2*sp*sp)),q=x=>Math.exp(-x*x/(2*sq*sq));
+  let s1=0,s2=0,s3=0;
+  for(let i=0;i<n;i++){const x=sq*randn();const r=p(x)/q(x);s1+=r;s2+=r*r;}
+  const good=s1/n,bad=s2/s1,truth=sp/sq;
+  const c=$('c3'),g=c.getContext('2d'),W=c.width,H=c.height;g.clearRect(0,0,W,H);
+  const X=x=>W/2+x*(W/16),base=H-24;
+  g.strokeStyle=css('--ln');g.beginPath();g.moveTo(0,base);g.lineTo(W,base);g.stroke();
+  [[p,'--a','target p'],[q,'--b','proposal q']].forEach(([f,col,lab],j)=>{g.strokeStyle=css(col);g.lineWidth=2;g.beginPath();
+    for(let px=0;px<=W;px++){const x=(px-W/2)/(W/16);const y=base-(H-50)*f(x);px?g.lineTo(px,y):g.moveTo(px,y);}g.stroke();
+    g.fillStyle=css(col);g.font='12px sans-serif';g.fillText(lab,12,22+16*j);});
+  $('o3').innerHTML=`true Z<sub>p</sub>/Z<sub>q</sub> = <b>${truth.toFixed(3)}</b> · mean of p/q (eq. 37) = <b>${good.toFixed(3)}</b> · Σp²/q² ÷ Σp/q (eq. 38 as printed) = <b>${bad.toFixed(3)}</b>. The second tends to ∫p²/q ÷ ∫p, not to the ratio; it only coincides when p/q is constant.`;
+}
+['i_p','i_q','i_n'].forEach(i=>$(i).addEventListener('input',imp));$('i_go').onclick=imp;imp();
+</script>
+</body>
+</html>

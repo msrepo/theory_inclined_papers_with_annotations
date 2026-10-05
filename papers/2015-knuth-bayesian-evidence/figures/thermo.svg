@@ -1,0 +1,39 @@
+<svg viewBox="0 0 780 300" xmlns="http://www.w3.org/2000/svg" role="img">
+<title>Thermodynamic integration</title>
+<desc>A rising curve of the tempered average of the log-likelihood against inverse temperature beta from 0 to 1, with the area between the curve and zero shaded and approximated by eight rectangles.</desc>
+<style>
+  text{font-family:ui-sans-serif,-apple-system,"Segoe UI",sans-serif;font-weight:400}
+  .lab{font-size:12px;fill:#57564f} .hd{font-size:13px;font-weight:500;fill:#1a1a19}
+  .ax{stroke:#c3c2b7;stroke-width:0.8;fill:none}
+  .a{fill:none;stroke:#2f6fb5;stroke-width:2}
+  .b{fill:none;stroke:#c2642a;stroke-width:2}
+  .k{fill:none;stroke:#1a1a19;stroke-width:1;stroke-dasharray:3 3}
+  .fa{fill:#2f6fb5;opacity:0.18;stroke:none} .fb{fill:#c2642a;opacity:0.18;stroke:none}
+  .fg{fill:#8a8880;opacity:0.16;stroke:#8a8880;stroke-width:0.6}
+  .dot{fill:#1a1a19;stroke:none}
+  @media (prefers-color-scheme: dark){
+    .lab{fill:#b6b4ab} .hd{fill:#eceae3} .ax{stroke:#4a4844}
+    .a{stroke:#7fb2e8} .b{stroke:#e0955c} .k{stroke:#eceae3}
+    .fa{fill:#7fb2e8} .fb{fill:#e0955c} .fg{fill:#b6b4ab;stroke:#b6b4ab} .dot{fill:#eceae3}
+  }
+</style>
+<text x="385" y="24" class="hd" text-anchor="middle">Thermodynamic integration: the area under the average log-likelihood is log Z</text>
+<path d="M 70,40 H 700" class="ax"/><path d="M 70,40 V 260" class="ax"/>
+<path d="M 70.0,40.0 L 70.0,256.4 L 76.3,252.0 L 82.6,247.6 L 88.9,243.3 L 95.2,239.0 L 101.5,234.8 L 107.8,230.6 L 114.1,226.5 L 120.4,222.5 L 126.7,218.5 L 133.0,214.5 L 139.3,210.6 L 145.6,206.8 L 151.9,203.0 L 158.2,199.2 L 164.5,195.6 L 170.8,191.9 L 177.1,188.3 L 183.4,184.8 L 189.7,181.3 L 196.0,177.9 L 202.3,174.5 L 208.6,171.2 L 214.9,167.9 L 221.2,164.7 L 227.5,161.5 L 233.8,158.4 L 240.1,155.3 L 246.4,152.3 L 252.7,149.3 L 259.0,146.3 L 265.3,143.5 L 271.6,140.6 L 277.9,137.9 L 284.2,135.1 L 290.5,132.5 L 296.8,129.8 L 303.1,127.2 L 309.4,124.7 L 315.7,122.2 L 322.0,119.8 L 328.3,117.4 L 334.6,115.1 L 340.9,112.8 L 347.2,110.5 L 353.5,108.3 L 359.8,106.2 L 366.1,104.1 L 372.4,102.0 L 378.7,100.0 L 385.0,98.0 L 391.3,96.1 L 397.6,94.3 L 403.9,92.4 L 410.2,90.7 L 416.5,88.9 L 422.8,87.3 L 429.1,85.6 L 435.4,84.0 L 441.7,82.5 L 448.0,81.0 L 454.3,79.5 L 460.6,78.1 L 466.9,76.7 L 473.2,75.4 L 479.5,74.1 L 485.8,72.9 L 492.1,71.7 L 498.4,70.5 L 504.7,69.4 L 511.0,68.3 L 517.3,67.3 L 523.6,66.3 L 529.9,65.4 L 536.2,64.5 L 542.5,63.6 L 548.8,62.8 L 555.1,62.0 L 561.4,61.2 L 567.7,60.5 L 574.0,59.9 L 580.3,59.2 L 586.6,58.7 L 592.9,58.1 L 599.2,57.6 L 605.5,57.1 L 611.8,56.7 L 618.1,56.3 L 624.4,55.9 L 630.7,55.6 L 637.0,55.3 L 643.3,55.0 L 649.6,54.8 L 655.9,54.6 L 662.2,54.4 L 668.5,54.3 L 674.8,54.2 L 681.1,54.1 L 687.4,54.0 L 693.7,54.0 L 700.0,54.0 L 700.0,40.0 Z" class="fa"/>
+<rect x="70.0" y="40" width="78.8" height="216.4" class="fg"/>
+<rect x="148.8" y="40" width="78.8" height="164.9" class="fg"/>
+<rect x="227.5" y="40" width="78.8" height="121.5" class="fg"/>
+<rect x="306.2" y="40" width="78.8" height="86.0" class="fg"/>
+<rect x="385.0" y="40" width="78.8" height="58.0" class="fg"/>
+<rect x="463.8" y="40" width="78.8" height="37.4" class="fg"/>
+<rect x="542.5" y="40" width="78.8" height="23.6" class="fg"/>
+<rect x="621.2" y="40" width="78.8" height="16.1" class="fg"/>
+<path d="M 70.0,256.4 L 76.3,252.0 L 82.6,247.6 L 88.9,243.3 L 95.2,239.0 L 101.5,234.8 L 107.8,230.6 L 114.1,226.5 L 120.4,222.5 L 126.7,218.5 L 133.0,214.5 L 139.3,210.6 L 145.6,206.8 L 151.9,203.0 L 158.2,199.2 L 164.5,195.6 L 170.8,191.9 L 177.1,188.3 L 183.4,184.8 L 189.7,181.3 L 196.0,177.9 L 202.3,174.5 L 208.6,171.2 L 214.9,167.9 L 221.2,164.7 L 227.5,161.5 L 233.8,158.4 L 240.1,155.3 L 246.4,152.3 L 252.7,149.3 L 259.0,146.3 L 265.3,143.5 L 271.6,140.6 L 277.9,137.9 L 284.2,135.1 L 290.5,132.5 L 296.8,129.8 L 303.1,127.2 L 309.4,124.7 L 315.7,122.2 L 322.0,119.8 L 328.3,117.4 L 334.6,115.1 L 340.9,112.8 L 347.2,110.5 L 353.5,108.3 L 359.8,106.2 L 366.1,104.1 L 372.4,102.0 L 378.7,100.0 L 385.0,98.0 L 391.3,96.1 L 397.6,94.3 L 403.9,92.4 L 410.2,90.7 L 416.5,88.9 L 422.8,87.3 L 429.1,85.6 L 435.4,84.0 L 441.7,82.5 L 448.0,81.0 L 454.3,79.5 L 460.6,78.1 L 466.9,76.7 L 473.2,75.4 L 479.5,74.1 L 485.8,72.9 L 492.1,71.7 L 498.4,70.5 L 504.7,69.4 L 511.0,68.3 L 517.3,67.3 L 523.6,66.3 L 529.9,65.4 L 536.2,64.5 L 542.5,63.6 L 548.8,62.8 L 555.1,62.0 L 561.4,61.2 L 567.7,60.5 L 574.0,59.9 L 580.3,59.2 L 586.6,58.7 L 592.9,58.1 L 599.2,57.6 L 605.5,57.1 L 611.8,56.7 L 618.1,56.3 L 624.4,55.9 L 630.7,55.6 L 637.0,55.3 L 643.3,55.0 L 649.6,54.8 L 655.9,54.6 L 662.2,54.4 L 668.5,54.3 L 674.8,54.2 L 681.1,54.1 L 687.4,54.0 L 693.7,54.0 L 700.0,54.0" class="a"/>
+<text x="62" y="44" class="lab" text-anchor="end">0</text>
+<text x="62" y="260" class="lab" text-anchor="end">very negative</text>
+<text x="22" y="150.0" class="lab" text-anchor="middle"><tspan>average of log L</tspan></text>
+<text x="70" y="284" class="lab" text-anchor="start">beta = 0 (prior)</text>
+<text x="700" y="284" class="lab" text-anchor="end">beta = 1 (posterior)</text>
+<text x="430" y="150" class="lab" text-anchor="middle">grey boxes: the finite sum, eq. (49)</text>
+<text x="430" y="168" class="lab" text-anchor="middle">curve never falls (its slope is the variance of log L)</text>
+</svg>

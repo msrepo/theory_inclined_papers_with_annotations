@@ -1,0 +1,56 @@
+<svg viewBox="0 0 780 290" xmlns="http://www.w3.org/2000/svg" role="img">
+<title>Nested sampling</title>
+<desc>Left: nested elliptical likelihood contours around a peak with live points. Right: the likelihood as a decreasing function of the enclosed prior mass X, approximated by strips whose widths shrink geometrically towards X equals zero.</desc>
+<style>
+  text{font-family:ui-sans-serif,-apple-system,"Segoe UI",sans-serif;font-weight:400}
+  .lab{font-size:12px;fill:#57564f} .hd{font-size:13px;font-weight:500;fill:#1a1a19}
+  .ax{stroke:#c3c2b7;stroke-width:0.8;fill:none}
+  .a{fill:none;stroke:#2f6fb5;stroke-width:2}
+  .b{fill:none;stroke:#c2642a;stroke-width:2}
+  .k{fill:none;stroke:#1a1a19;stroke-width:1;stroke-dasharray:3 3}
+  .fa{fill:#2f6fb5;opacity:0.18;stroke:none} .fb{fill:#c2642a;opacity:0.18;stroke:none}
+  .fg{fill:#8a8880;opacity:0.16;stroke:#8a8880;stroke-width:0.6}
+  .dot{fill:#1a1a19;stroke:none}
+  @media (prefers-color-scheme: dark){
+    .lab{fill:#b6b4ab} .hd{fill:#eceae3} .ax{stroke:#4a4844}
+    .a{stroke:#7fb2e8} .b{stroke:#e0955c} .k{stroke:#eceae3}
+    .fa{fill:#7fb2e8} .fb{fill:#e0955c} .fg{fill:#b6b4ab;stroke:#b6b4ab} .dot{fill:#eceae3}
+  }
+</style>
+<text x="190" y="24" class="hd" text-anchor="middle">Shrinking the prior volume</text>
+<rect x="60" y="50" width="260" height="200" class="ax"/>
+<ellipse cx="190" cy="150" rx="119" ry="95" class="a"/>
+<ellipse cx="190" cy="150" rx="88" ry="70" class="k"/>
+<ellipse cx="190" cy="150" rx="62" ry="50" class="a"/>
+<ellipse cx="190" cy="150" rx="42" ry="34" class="k"/>
+<ellipse cx="190" cy="150" rx="28" ry="22" class="a"/>
+<ellipse cx="190" cy="150" rx="15" ry="12" class="k"/>
+<circle cx="160" cy="160" r="2.6" class="dot"/>
+<circle cx="195" cy="130" r="2.6" class="dot"/>
+<circle cx="220" cy="155" r="2.6" class="dot"/>
+<circle cx="182" cy="168" r="2.6" class="dot"/>
+<circle cx="202" cy="180" r="2.6" class="dot"/>
+<circle cx="150" cy="120" r="2.6" class="dot"/>
+<text x="190" y="272" class="lab" text-anchor="middle">live points; each step discards the lowest-likelihood one</text>
+<text x="560" y="24" class="hd" text-anchor="middle">Z = area under L(X), X = prior mass above a likelihood level</text>
+<path d="M 400,250 H 740" class="ax"/><path d="M 400,50 V 250" class="ax"/>
+<rect x="664.8" y="232.2" width="75.2" height="17.8" class="fg"/>
+<rect x="606.2" y="227.0" width="58.6" height="23.0" class="fg"/>
+<rect x="560.6" y="218.5" width="45.6" height="31.5" class="fg"/>
+<rect x="525.1" y="206.4" width="35.5" height="43.6" class="fg"/>
+<rect x="497.4" y="191.6" width="27.7" height="58.4" class="fg"/>
+<rect x="475.9" y="175.0" width="21.5" height="75.0" class="fg"/>
+<rect x="459.1" y="158.0" width="16.8" height="92.0" class="fg"/>
+<rect x="446.0" y="141.5" width="13.1" height="108.5" class="fg"/>
+<rect x="435.8" y="126.2" width="10.2" height="123.8" class="fg"/>
+<rect x="427.9" y="112.6" width="7.9" height="137.4" class="fg"/>
+<rect x="421.7" y="100.9" width="6.2" height="149.1" class="fg"/>
+<rect x="416.9" y="91.0" width="4.8" height="159.0" class="fg"/>
+<rect x="413.2" y="82.8" width="3.7" height="167.2" class="fg"/>
+<path d="M 403.4,59.1 L 406.8,67.7 L 410.2,75.9 L 413.6,83.7 L 417.0,91.1 L 420.4,98.2 L 423.8,104.9 L 427.2,111.3 L 430.6,117.4 L 434.0,123.2 L 437.4,128.7 L 440.8,133.9 L 444.2,138.9 L 447.6,143.6 L 451.0,148.1 L 454.4,152.4 L 457.8,156.5 L 461.2,160.4 L 464.6,164.1 L 468.0,167.6 L 471.4,170.9 L 474.8,174.1 L 478.2,177.1 L 481.6,180.0 L 485.0,182.7 L 488.4,185.3 L 491.8,187.8 L 495.2,190.1 L 498.6,192.4 L 502.0,194.5 L 505.4,196.5 L 508.8,198.4 L 512.2,200.3 L 515.6,202.0 L 519.0,203.7 L 522.4,205.3 L 525.8,206.8 L 529.2,208.2 L 532.6,209.5 L 536.0,210.8 L 539.4,212.1 L 542.8,213.2 L 546.2,214.3 L 549.6,215.4 L 553.0,216.4 L 556.4,217.4 L 559.8,218.3 L 563.2,219.1 L 566.6,219.9 L 570.0,220.7 L 573.4,221.5 L 576.8,222.2 L 580.2,222.9 L 583.6,223.5 L 587.0,224.1 L 590.4,224.7 L 593.8,225.2 L 597.2,225.8 L 600.6,226.3 L 604.0,226.7 L 607.4,227.2 L 610.8,227.6 L 614.2,228.0 L 617.6,228.4 L 621.0,228.8 L 624.4,229.1 L 627.8,229.5 L 631.2,229.8 L 634.6,230.1 L 638.0,230.4 L 641.4,230.7 L 644.8,230.9 L 648.2,231.2 L 651.6,231.4 L 655.0,231.6 L 658.4,231.8 L 661.8,232.0 L 665.2,232.2 L 668.6,232.4 L 672.0,232.6 L 675.4,232.8 L 678.8,232.9 L 682.2,233.1 L 685.6,233.2 L 689.0,233.3 L 692.4,233.5 L 695.8,233.6 L 699.2,233.7 L 702.6,233.8 L 706.0,233.9 L 709.4,234.0 L 712.8,234.1 L 716.2,234.2 L 719.6,234.3 L 723.0,234.4 L 726.4,234.5 L 729.8,234.5 L 733.2,234.6 L 736.6,234.7 L 740.0,234.7" class="a"/>
+<text x="400" y="270" class="lab" text-anchor="start">X = 0 (best fit)</text>
+<text x="740" y="270" class="lab" text-anchor="end">X = 1 (whole prior)</text>
+<text x="394" y="54" class="lab" text-anchor="end">high L</text>
+<text x="600" y="150" class="lab" text-anchor="middle">strips are wide on the right and bunch up on the left:</text>
+<text x="600" y="168" class="lab" text-anchor="middle">X shrinks by about the same factor every step</text>
+</svg>

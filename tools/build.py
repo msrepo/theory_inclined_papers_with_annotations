@@ -41,6 +41,7 @@ CATEGORIES: list[tuple[str, list[str]]] = [
     ("Gradient estimation", ["Theory"]),
     ("Transferability", ["Theory", "Applications"]),
     ("Generative models", ["Theory"]),
+    ("Bayesian inference", ["Review"]),
     ("Theory of deep learning", ["Theory"]),
     # "" first: untitled Misc pages must not render under the last subheading.
     ("Misc", ["", "Domain Adaptation / Generalization", "Image Quality Assessment"]),

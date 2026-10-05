@@ -1,0 +1,37 @@
+<svg viewBox="0 0 580 290" xmlns="http://www.w3.org/2000/svg" role="img">
+<title>The variational Bayes decomposition</title>
+<desc>Three bars of equal total height log Z, each split into a lower part F, the negative free energy, and an upper part, the KL divergence. The gap shrinks to zero when Q equals the posterior.</desc>
+<style>
+  text{font-family:ui-sans-serif,-apple-system,"Segoe UI",sans-serif;font-weight:400}
+  .lab{font-size:12px;fill:#57564f} .hd{font-size:13px;font-weight:500;fill:#1a1a19}
+  .ax{stroke:#c3c2b7;stroke-width:0.8;fill:none}
+  .a{fill:none;stroke:#2f6fb5;stroke-width:2}
+  .b{fill:none;stroke:#c2642a;stroke-width:2}
+  .k{fill:none;stroke:#1a1a19;stroke-width:1;stroke-dasharray:3 3}
+  .fa{fill:#2f6fb5;opacity:0.18;stroke:none} .fb{fill:#c2642a;opacity:0.18;stroke:none}
+  .fg{fill:#8a8880;opacity:0.16;stroke:#8a8880;stroke-width:0.6}
+  .dot{fill:#1a1a19;stroke:none}
+  @media (prefers-color-scheme: dark){
+    .lab{fill:#b6b4ab} .hd{fill:#eceae3} .ax{stroke:#4a4844}
+    .a{stroke:#7fb2e8} .b{stroke:#e0955c} .k{stroke:#eceae3}
+    .fa{fill:#7fb2e8} .fb{fill:#e0955c} .fg{fill:#b6b4ab;stroke:#b6b4ab} .dot{fill:#eceae3}
+  }
+</style>
+<text x="280" y="24" class="hd" text-anchor="middle">log Z = F(Q) + KL(Q || posterior): the bound is tight only when Q is the posterior</text>
+<path d="M 70,60 H 520" class="k"/>
+<text x="60" y="64" class="lab" text-anchor="end">log Z</text>
+<path d="M 70,250 H 520" class="ax"/>
+<rect x="110" y="170" width="70" height="80" class="fa"/>
+<rect x="110" y="60" width="70" height="110" class="fb"/>
+<text x="145" y="119.0" class="lab" text-anchor="middle">KL</text>
+<text x="145" y="214.0" class="lab" text-anchor="middle">F (ELBO)</text>
+<text x="145" y="270" class="lab" text-anchor="middle">Q far off</text>
+<rect x="260" y="115" width="70" height="135" class="fa"/>
+<rect x="260" y="60" width="70" height="55" class="fb"/>
+<text x="295" y="91.5" class="lab" text-anchor="middle">KL</text>
+<text x="295" y="186.5" class="lab" text-anchor="middle">F (ELBO)</text>
+<text x="295" y="270" class="lab" text-anchor="middle">Q better</text>
+<rect x="410" y="60" width="70" height="190" class="fa"/>
+<text x="445" y="159.0" class="lab" text-anchor="middle">F (ELBO)</text>
+<text x="445" y="270" class="lab" text-anchor="middle">Q = posterior</text>
+</svg>
