@@ -1,0 +1,39 @@
+<svg viewBox="0 0 900 366" xmlns="http://www.w3.org/2000/svg" role="img">
+<title>Gradient descent reaches OLS predictions but not the OLS embedding</title>
+<desc>Log10 error against gradient-descent step (first 600 steps), for one fixed outcome vector. The error of the test-set predictions relative to OLS falls steadily toward zero (blue). The relative distance of the learned embedding Omega from the inverse Gram matrix S^-1 stays near one (orange) because gradient descent from zero stops at a rank-one embedding that merely agrees with S^-1 along the single direction X'y.</desc>
+<style>
+  text{font-family:ui-sans-serif,-apple-system,"Segoe UI",sans-serif;font-weight:400}
+  .lab{font-size:11px;fill:#57564f} .hd{font-size:13px;font-weight:500;fill:#1a1a19}
+  .ax{stroke:#8a8880;stroke-width:0.9;fill:none} .gd{stroke:#e2e1da;stroke-width:0.6;fill:none}
+  .s1{stroke:#2a78d6} .s2{stroke:#eb6834} .s3{stroke:#1baf7a} .s4{stroke:#eda100}
+  .f1{fill:#2a78d6} .f2{fill:#eb6834} .f3{fill:#1baf7a}
+  .ln{stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+  .dash{stroke-width:1.3;fill:none;stroke-dasharray:5 3}
+  @media (prefers-color-scheme: dark){
+    .lab{fill:#b6b4ab} .hd{fill:#eceae3} .ax{stroke:#85837b} .gd{stroke:#33312e}
+    .s1{stroke:#3987e5} .s2{stroke:#d95926} .s3{stroke:#199e70} .s4{stroke:#c98500}
+    .f1{fill:#3987e5} .f2{fill:#d95926} .f3{fill:#199e70}
+  }
+</style>
+<text class="hd" x="20" y="26">Gradient descent on a linear attention module, one y, Omega started at zero</text>
+<path class="gd" d="M60.0 286.0H840.0"/>
+<text class="lab" x="54.0" y="290.0" text-anchor="end">-4</text>
+<path class="gd" d="M60.0 234.9H840.0"/>
+<text class="lab" x="54.0" y="238.9" text-anchor="end">-3</text>
+<path class="gd" d="M60.0 183.8H840.0"/>
+<text class="lab" x="54.0" y="187.8" text-anchor="end">-2</text>
+<path class="gd" d="M60.0 132.7H840.0"/>
+<text class="lab" x="54.0" y="136.7" text-anchor="end">-1</text>
+<path class="gd" d="M60.0 81.6H840.0"/>
+<text class="lab" x="54.0" y="85.6" text-anchor="end">0</text>
+<text class="lab" x="60.0" y="302.0" text-anchor="middle">0</text>
+<text class="lab" x="450.0" y="302.0" text-anchor="middle">300</text>
+<text class="lab" x="840.0" y="302.0" text-anchor="middle">600</text>
+<path class="ax" d="M60.0 56.0V286.0H840.0"/>
+<text class="lab" x="450.0" y="320.0" text-anchor="middle">gradient step</text>
+<text class="lab" x="20.0" y="46.0">log10 of error (full-Omega GD)</text>
+<polyline class="ln s1" points="60.0,42.7 86.0,84.9 112.0,103.5 138.0,122.2 164.0,140.9 190.0,159.6 216.0,178.3 242.0,197.0 268.0,215.7 294.0,234.4 320.0,253.1 346.0,271.8 372.0,286.0 398.0,286.0 424.0,286.0 450.0,286.0 476.0,286.0 502.0,286.0 528.0,286.0 554.0,286.0 580.0,286.0 606.0,286.0 632.0,286.0 658.0,286.0 684.0,286.0 710.0,286.0 736.0,286.0 762.0,286.0 788.0,286.0 814.0,286.0 840.0,286.0"/>
+<polyline class="ln s2" points="60.0,81.6 86.0,81.7 112.0,81.7 138.0,81.7 164.0,81.7 190.0,81.7 216.0,81.7 242.0,81.7 268.0,81.7 294.0,81.7 320.0,81.7 346.0,81.7 372.0,81.7 398.0,81.7 424.0,81.7 450.0,81.7 476.0,81.7 502.0,81.7 528.0,81.7 554.0,81.7 580.0,81.7 606.0,81.7 632.0,81.7 658.0,81.7 684.0,81.7 710.0,81.7 736.0,81.7 762.0,81.7 788.0,81.7 814.0,81.7 840.0,81.7"/>
+<path class="ln s1" d="M70 346h22"/><text class="lab" x="96" y="350">test-prediction error vs OLS</text>
+<path class="ln s2" d="M330 346h22"/><text class="lab" x="356" y="350">relative distance of Omega from S^-1</text>
+</svg>

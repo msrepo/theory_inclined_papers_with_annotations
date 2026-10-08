@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OLS as Attention Explorer</title>
+<style>
+:root{
+  --bg:#fbfaf7; --surface:#ffffff; --ink:#1c1d21; --muted:#5b5f68; --faint:#8a8880; --line:#e2dfd8; --soft:#f2f0ea;
+  --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a; --s4:#eda100; --radius:12px;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#131417; --surface:#1b1d21; --ink:#ebebed; --muted:#a3a6ae; --faint:#85837b; --line:#2e3138; --soft:#23262b;
+    --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#131417; --surface:#1b1d21; --ink:#ebebed; --muted:#a3a6ae; --faint:#85837b; --line:#2e3138; --soft:#23262b;
+  --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500;
+  color-scheme: dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,sans-serif}
+main{max-width:980px;margin:0 auto;padding:36px 16px 80px}
+h1{font-size:1.9rem;line-height:1.2;margin:0 0 .4rem}
+h2{font-size:1.3rem;margin:2.4rem 0 .5rem;padding-top:.5rem;border-top:1px solid var(--line)}
+.lede{color:var(--muted);margin-bottom:1.2rem}
+.widget{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:14px;margin:1rem 0}
+.controls{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center;margin:.2rem 0 .7rem;font-size:.9rem}
+.controls label{display:flex;align-items:center;gap:6px;color:var(--muted)}
+input[type=range]{accent-color:var(--s1);width:170px}
+input:focus-visible{outline:2px solid var(--s1);outline-offset:2px}
+.readout{font-size:.9rem;color:var(--muted);margin-top:.5rem;font-variant-numeric:tabular-nums}
+.readout b{color:var(--ink)}
+.callout{border-left:3px solid var(--s1);background:var(--soft);padding:10px 14px;border-radius:0 8px 8px 0;margin:1rem 0;font-size:.95rem}
+svg{width:100%;height:auto;display:block}
+svg text{font-family:inherit;font-size:11px;fill:var(--muted)}
+.ax{stroke:var(--faint);stroke-width:.9;fill:none}
+.gd{stroke:var(--line);stroke-width:.7;fill:none}
+.ln{fill:none;stroke-width:2;stroke-linejoin:round}
+code{background:var(--soft);padding:1px 5px;border-radius:5px;font-size:.9em}
+.leg{display:flex;flex-wrap:wrap;gap:4px 18px;font-size:.85rem;color:var(--muted);margin-top:.4rem}
+.leg i{display:inline-block;width:18px;height:3px;vertical-align:middle;margin-right:6px;border-radius:2px}
+</style>
+</head>
+<body>
+<main>
+<h1>OLS as an attention mechanism</h1>
+<p class="lede">Goulet Coulombe (2026). Every OLS prediction is a weighted average of the training outcomes, <code>ŷⱼ = Σᵢ ωⱼᵢ yᵢ</code> with <code>ωⱼᵢ = xⱼᵀ(XᵀX)⁻¹xᵢ</code>. The two panels let you see those weights, the "attention pattern" of a regression, and what shrinkage and dimension reduction do to it. Training inputs are 300 points uniform on [−1, 1] and the features are powers 1, x, x², …</p>
+
+<h2>1. Who does the test point attend to?</h2>
+<div class="widget">
+  <div class="controls">
+    <label>polynomial degree <input id="deg" type="range" min="1" max="9" step="1" value="5"><b id="degV">5</b></label>
+    <label>test point xⱼ <input id="xj" type="range" min="-1.3" max="1.3" step="0.01" value="0.2"><b id="xjV">0.20</b></label>
+    <label>Gaussian bandwidth <input id="bw" type="range" min="0.05" max="0.5" step="0.01" value="0.15"><b id="bwV">0.15</b></label>
+  </div>
+  <svg id="p1" viewBox="0 0 900 300" role="img" aria-label="OLS weights over training inputs for the chosen test point, compared with a Gaussian kernel"></svg>
+  <div class="leg"><span><i style="background:var(--s1)"></i>OLS weight ωⱼᵢ (signed)</span><span><i style="background:var(--faint)"></i>Gaussian-kernel weight (softmax-like, ≥ 0)</span></div>
+  <div class="readout" id="r1"></div>
+</div>
+<div class="callout">Move the test point past ±1: the weights grow and swing in sign across the whole interval. That is extrapolation, and Σᵢ ωⱼᵢ² = xⱼᵀ(XᵀX)⁻¹xⱼ is exactly the factor multiplying the noise variance of the prediction. Raise the degree and the lobes multiply, because a more flexible regression is a more wiggly smoother. The weights always sum to 1 because the intercept is a regressor, but negative entries mean they are not a convex combination.</div>
+
+<h2>2. Ridge and PCR change the embedding, not the module</h2>
+<div class="widget">
+  <div class="controls">
+    <label>ridge λ <input id="lam" type="range" min="-6" max="1" step="0.1" value="-6"><b id="lamV">≈ 0</b></label>
+    <label>PCR keeps L directions <input id="L" type="range" min="1" max="6" step="1" value="6"><b id="LV">6</b></label>
+  </div>
+  <svg id="p2" viewBox="0 0 900 300" role="img" aria-label="Weights for test point 0.2 under OLS, ridge and PCR embeddings"></svg>
+  <div class="leg"><span><i style="background:var(--s1)"></i>OLS, D = 1/λᵢ</span><span><i style="background:var(--s2)"></i>ridge, D = 1/(λᵢ + λ)</span><span><i style="background:var(--s3)"></i>PCR, D = 1/λᵢ for i ≤ L, 0 otherwise</span></div>
+  <div class="readout" id="r2"></div>
+</div>
+<div class="callout">All three curves come from <code>Ω = U D Uᵀ</code> with the same eigenvectors U of XᵀX (degree-5 polynomial, 6 features). Only the diagonal D changes (paper Eq. 23). Ridge damps the small-eigenvalue directions, the wiggly ones. PCR deletes them. Both pull the weights toward a smoother, less signed pattern.</div>
+</main>
+<script>
+"use strict";
+const N = 300;
+const xs = Array.from({length: N}, (_, i) => -1 + 2 * (i + 0.5) / N);
+const cs = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const feat = (x, P) => Array.from({length: P}, (_, k) => Math.pow(x, k));
+
+function inv(A) {                      // Gauss-Jordan
+  const n = A.length, M = A.map((r, i) => [...r, ...Array.from({length: n}, (_, j) => +(i === j))]);
+  for (let c = 0; c < n; c++) {
+    let p = c; for (let r = c + 1; r < n; r++) if (Math.abs(M[r][c]) > Math.abs(M[p][c])) p = r;
+    [M[c], M[p]] = [M[p], M[c]];
+    const d = M[c][c]; for (let j = 0; j < 2 * n; j++) M[c][j] /= d;
+    for (let r = 0; r < n; r++) if (r !== c) { const f = M[r][c]; for (let j = 0; j < 2 * n; j++) M[r][j] -= f * M[c][j]; }
+  }
+  return M.map(r => r.slice(n));
+}
+const gram = (X, P) => Array.from({length: P}, (_, a) => Array.from({length: P}, (_, b) => X.reduce((s, r) => s + r[a] * r[b], 0)));
+const mv = (A, v) => A.map(r => r.reduce((s, a, i) => s + a * v[i], 0));
+
+/* Jacobi eigendecomposition of a symmetric matrix */
+function eig(S) {
+  const n = S.length; let A = S.map(r => r.slice()), V = Array.from({length: n}, (_, i) => Array.from({length: n}, (_, j) => +(i === j)));
+  for (let sweep = 0; sweep < 60; sweep++) {
+    let off = 0; for (let i = 0; i < n; i++) for (let j = i + 1; j < n; j++) off += A[i][j] ** 2;
+    if (off < 1e-24) break;
+    for (let p = 0; p < n; p++) for (let q = p + 1; q < n; q++) {
+      if (Math.abs(A[p][q]) < 1e-300) continue;
+      const th = (A[q][q] - A[p][p]) / (2 * A[p][q]), t = Math.sign(th || 1) / (Math.abs(th) + Math.sqrt(th * th + 1));
+      const c = 1 / Math.sqrt(t * t + 1), s = t * c;
+      for (let k = 0; k < n; k++) { const a = A[k][p], b = A[k][q]; A[k][p] = c * a - s * b; A[k][q] = s * a + c * b; }
+      for (let k = 0; k < n; k++) { const a = A[p][k], b = A[q][k]; A[p][k] = c * a - s * b; A[q][k] = s * a + c * b; }
+      for (let k = 0; k < n; k++) { const a = V[k][p], b = V[k][q]; V[k][p] = c * a - s * b; V[k][q] = s * a + c * b; }
+    }
+  }
+  const idx = [...Array(n).keys()].sort((a, b) => A[b][b] - A[a][a]);
+  return {lam: idx.map(i => A[i][i]), U: Array.from({length: n}, (_, r) => idx.map(i => V[r][i]))};
+}
+
+function frame(svg, yl, ticks, fmt) {
+  const W = 900, H = 300, x0 = 56, x1 = 880, y0 = 14, y1 = 262;
+  const X = v => x0 + (v + 1) / 2 * (x1 - x0), Y = v => y1 - (v - yl[0]) / (yl[1] - yl[0]) * (y1 - y0);
+  let s = "";
+  for (const t of ticks) s += `<path class="gd" d="M${x0} ${Y(t)}H${x1}"/><text x="${x0 - 6}" y="${Y(t) + 4}" text-anchor="end">${fmt(t)}</text>`;
+  for (const t of [-1, -0.5, 0, 0.5, 1]) s += `<text x="${X(t)}" y="${y1 + 16}" text-anchor="middle">${t}</text>`;
+  s += `<path class="ax" d="M${x0} ${y0}V${y1}H${x1}"/><text x="${(x0 + x1) / 2}" y="${y1 + 34}" text-anchor="middle">training input xᵢ</text>`;
+  return {X, Y, s, x0, x1, y0, y1};
+}
+function poly(f, ys, color, dash) {
+  const pts = xs.map((x, i) => `${f.X(x).toFixed(1)},${f.Y(Math.max(Math.min(ys[i], 1e9), -1e9)).toFixed(1)}`).join(" ");
+  return `<polyline class="ln" style="stroke:${color};${dash ? "stroke-dasharray:5 3;stroke-width:1.5" : ""}" points="${pts}"/>`;
+}
+const $ = id => document.getElementById(id);
+
+/* panel 1 */
+function draw1() {
+  const P = +$("deg").value + 1, xj = +$("xj").value, bw = +$("bw").value;
+  $("degV").textContent = P - 1; $("xjV").textContent = xj.toFixed(2); $("bwV").textContent = bw.toFixed(2);
+  const X = xs.map(x => feat(x, P)), Sinv = inv(gram(X, P));
+  const t = feat(xj, P), q = mv(Sinv, t);
+  const w = X.map(r => r.reduce((s, a, i) => s + a * q[i], 0));
+  const g = xs.map(x => Math.exp(-0.5 * ((x - xj) / bw) ** 2)), gs = g.reduce((a, b) => a + b, 0);
+  const gw = g.map(v => v / gs);
+  const m = Math.max(0.01, ...w.map(Math.abs), ...gw);
+  const top = Math.ceil(m * 1.1 * 100) / 100, bot = -Math.ceil(Math.min(0, ...w) * -1.1 * 100) / 100 || -0.01;
+  const yl = [Math.min(bot, -0.005), top];
+  const step = (yl[1] - yl[0]) / 4, ticks = [0, 1, 2, 3, 4].map(k => yl[0] + k * step);
+  const f = frame($("p1"), yl, ticks, v => v.toFixed(3));
+  $("p1").innerHTML = f.s + `<path class="ax" d="M${f.x0} ${f.Y(0)}H${f.x1}"/>` + poly(f, gw, cs("--faint"), true) + poly(f, w, cs("--s1"))
+    + `<path d="M${f.X(Math.max(-1, Math.min(1, xj)))} ${f.y0}V${f.y1}" class="gd" style="stroke-dasharray:3 3"/>`;
+  const sw = w.reduce((a, b) => a + b, 0), sq = w.reduce((a, b) => a + b * b, 0), neg = w.filter(v => v < 0).length / N;
+  const lev = t.reduce((s, a, i) => s + a * q[i], 0);
+  $("r1").innerHTML = `Σ ω = <b>${sw.toFixed(4)}</b> · negative share <b>${(100 * neg).toFixed(0)}%</b> · Σ ω² = <b>${sq.toFixed(4)}</b> = xⱼᵀ(XᵀX)⁻¹xⱼ = <b>${lev.toFixed(4)}</b> · Gaussian kernel: Σ = 1, Σ ω² = ${gw.reduce((a, b) => a + b * b, 0).toFixed(4)}`;
+}
+
+/* panel 2 */
+const P2 = 6, X2 = xs.map(x => feat(x, P2)), S2 = gram(X2, P2), E2 = eig(S2);
+function draw2() {
+  const lam = Math.pow(10, +$("lam").value), L = +$("L").value;
+  $("lamV").textContent = +$("lam").value <= -5.9 ? "≈ 0" : lam.toFixed(3); $("LV").textContent = L;
+  const t = feat(0.2, P2);
+  const wOf = D => { // omega_i = x_j' U D U' x_i
+    const a = E2.U[0].map((_, k) => t.reduce((s, tv, r) => s + tv * E2.U[r][k], 0) * D[k]);
+    return X2.map(row => a.reduce((s, ak, k) => s + ak * row.reduce((u, rv, r) => u + rv * E2.U[r][k], 0), 0));
+  };
+  const Dols = E2.lam.map(l => 1 / l), Drdg = E2.lam.map(l => 1 / (l + lam)), Dpcr = E2.lam.map((l, k) => k < L ? 1 / l : 0);
+  const wo = wOf(Dols), wr = wOf(Drdg), wp = wOf(Dpcr);
+  const m = Math.max(...wo.map(Math.abs), ...wr.map(Math.abs), ...wp.map(Math.abs)) * 1.1;
+  const yl = [-m, m], ticks = [-m, -m / 2, 0, m / 2, m];
+  const f = frame($("p2"), yl, ticks, v => v.toFixed(3));
+  $("p2").innerHTML = f.s + `<path class="ax" d="M${f.x0} ${f.Y(0)}H${f.x1}"/>` + poly(f, wo, cs("--s1")) + poly(f, wr, cs("--s2")) + poly(f, wp, cs("--s3"));
+  const s = w => w.reduce((a, b) => a + b * b, 0);
+  $("r2").innerHTML = `test point x = 0.2 · eigenvalues of XᵀX: <b>${E2.lam.map(v => v.toExponential(1)).join(", ")}</b><br>Σ ω² (prediction-variance factor): OLS <b>${s(wo).toFixed(4)}</b> · ridge <b>${s(wr).toFixed(4)}</b> · PCR <b>${s(wp).toFixed(4)}</b>`;
+}
+["deg", "xj", "bw"].forEach(i => $(i).addEventListener("input", draw1));
+["lam", "L"].forEach(i => $(i).addEventListener("input", draw2));
+draw1(); draw2();
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => { draw1(); draw2(); });
+</script>
+</body>
+</html>

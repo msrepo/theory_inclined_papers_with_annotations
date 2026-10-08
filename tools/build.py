@@ -38,6 +38,7 @@ CATEGORIES: list[tuple[str, list[str]]] = [
     ("Foundations", ["Linear algebra", "Probability", "Optimization", "Information geometry"]),
     ("NTK & function space", ["Theory", "Applications"]),
     ("Contrastive learning", ["Theory", "Applications"]),
+    ("Attention Mechanism", ["Theory"]),
     ("Gradient estimation", ["Theory"]),
     ("Transferability", ["Theory", "Applications"]),
     ("Generative models", ["Theory"]),
