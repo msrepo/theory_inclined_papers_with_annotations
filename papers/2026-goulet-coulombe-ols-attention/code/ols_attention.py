@@ -401,12 +401,93 @@ def fig_gd(d, rows):
     (d / "gd-embedding.svg").write_text("\n".join(s))
 
 
+
+def fig_eig(d):
+    """What S^-1 = U Lambda^-1 U' does: rotate to the eigen-axes, then divide each axis by its spread."""
+    r = np.random.default_rng(3)
+    th = np.deg2rad(32.0)
+    U = np.array([[np.cos(th), -np.sin(th)], [np.sin(th), np.cos(th)]])    # columns u1, u2
+    sd = np.array([1.9, 0.6])                                              # sqrt(lambda_k / N)
+    Z = r.standard_normal((70, 2))
+    Z[0] = (1.3, 0.0); Z[1] = (0.0, 1.3)                                    # pair marked i and j below
+    Xp = (Z * sd) @ U.T                                                    # training cloud, original axes
+    k = 24.0
+    cx = [150, 450, 750]; cy = 170
+    def pt(P, c):
+        return c + k * P[0], cy - k * P[1]
+    s = ['<svg viewBox="0 0 900 392" xmlns="http://www.w3.org/2000/svg" role="img">',
+         "<title>What the eigendecomposition of the inverse Gram matrix does to the data</title>",
+         "<desc>Three panels of the same two-dimensional training cloud. Left: the cloud is an elongated tilted ellipse in the original (x1, x2) axes; its long axis u1 has spread sqrt(lambda_1) and its short axis u2 has spread sqrt(lambda_2). Middle: after rotating coordinates with U transpose the ellipse lies along the horizontal axis and each coordinate is the data's position along an eigen-direction. Right: after dividing each coordinate by its spread, Lambda to the minus one half, the cloud is a round disc and an ordinary dot product measures similarity. Two marked points, a training point and a test point, are carried through all three panels.</desc>",
+         CSS,
+         '<defs><marker id="ah" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L8 4L0 8z" class="mk"/></marker></defs>',
+         '<style>.mk{fill:#57564f}.dot{fill:#8a8880;opacity:.55}.ell{fill:none;stroke-width:1.2}.big{font-size:12.5px;fill:#1a1a19;font-weight:500}'
+         '@media (prefers-color-scheme: dark){.mk{fill:#b6b4ab}.dot{fill:#85837b}.big{fill:#eceae3}}</style>']
+    def cloud(P, c):
+        out = []
+        for a in P:
+            x, y = pt(a, c); out.append(f'<circle class="dot" cx="{x:.1f}" cy="{y:.1f}" r="2.6"/>')
+        return out
+    def ellipse(c, A, rad, cls="s3"):
+        t = np.linspace(0, 2 * np.pi, 90)
+        E = np.c_[rad[0] * np.cos(t), rad[1] * np.sin(t)] @ A.T
+        pts = " ".join(f"{pt(e, c)[0]:.1f},{pt(e, c)[1]:.1f}" for e in E)
+        return f'<polyline class="ell {cls}" points="{pts}"/>'
+    def arrow(c, v, cls, lab, dx=6, dy=-6):
+        x, y = pt(v, c)
+        return (f'<path class="ln {cls}" style="stroke-width:2.2" d="M{c:.1f} {cy}L{x:.1f} {y:.1f}" marker-end="url(#ah)"/>'
+                f'<text class="big" x="{x + dx:.1f}" y="{y + dy:.1f}">{lab}</text>')
+    def axes(c, lab1, lab2):
+        return (f'<path class="gd" d="M{c-130} {cy}H{c+130}M{c} {cy-110}V{cy+100}"/>'
+                f'<text class="lab" x="{c+130}" y="{cy+14}" text-anchor="end">{lab1}</text>'
+                f'<text class="lab" x="{c+6}" y="{cy-100}">{lab2}</text>')
+    # panel a: original coordinates
+    s.append('<text class="hd" x="20" y="24">1  Training cloud in the original coordinates</text>')
+    s.append(axes(cx[0], "x1", "x2"))
+    s += cloud(Xp, cx[0])
+    s.append(ellipse(cx[0], U, 2 * sd))
+    s.append(arrow(cx[0], U[:, 0] * 2 * sd[0], "s1", "u1"))
+    s.append(arrow(cx[0], U[:, 1] * 2 * sd[1], "s2", "u2", dx=-22, dy=-4))
+    # panel b: rotate
+    Xr = Xp @ U
+    s.append('<text class="hd" x="320" y="24">2  Rotate:  coordinates = position along u1, u2</text>')
+    s.append(axes(cx[1], "u1 coordinate", "u2 coordinate"))
+    s += cloud(Xr, cx[1])
+    s.append(ellipse(cx[1], np.eye(2), 2 * sd))
+    s.append(arrow(cx[1], np.array([2 * sd[0], 0]), "s1", "spread √λ₁"))
+    s.append(arrow(cx[1], np.array([0, 2 * sd[1]]), "s2", "spread √λ₂", dx=10, dy=-14))
+    # panel c: whiten
+    Xw = Xr / sd
+    s.append('<text class="hd" x="620" y="24">3  Divide each axis by its spread: round</text>')
+    s.append(axes(cx[2], "u1 / √λ₁", "u2 / √λ₂"))
+    s += cloud(Xw, cx[2])
+    s.append(ellipse(cx[2], np.eye(2), (2.0, 2.0)))
+    # marked pair in all three panels
+    for P, c in ((Xp, cx[0]), (Xr, cx[1]), (Xw, cx[2])):
+        for idx, cls, lab in ((0, "f1", "xᵢ"), (1, "f2", "xⱼ")):
+            x, y = pt(P[idx], c)
+            s.append(f'<circle class="{cls}" cx="{x:.1f}" cy="{y:.1f}" r="5.2" style="stroke:var(--none,#fff);stroke-width:1"/>'
+                     f'<text class="big" x="{x + (8 if idx == 0 else -22):.1f}" y="{y - 7 if idx == 0 else y + 14:.1f}">{lab}</text>')
+    # bottom explanation, in three columns
+    notes = [
+        ["Eigenvectors U = [u1 u2] of XᵀX are the", "tilted axes the cloud is stretched along;", "λ₁, λ₂ say how stretched (λ ∝ spread²)."],
+        ["Uᵀ only re-expresses each point in those", "axes. Nothing is stretched yet; xᵢ·xⱼ is", "unchanged by a rotation."],
+        ["Λ^(-1/2) shrinks the long axis and grows the", "short one until both have the same spread.", "Now the plain dot product is a fair similarity."],
+    ]
+    for c, ls in zip(cx, notes):
+        for n, line in enumerate(ls):
+            s.append(f'<text class="lab" x="{c-135}" y="{300+n*14}">{line}</text>')
+    s.append('<text class="hd" x="20" y="366">xⱼᵀ (XᵀX)⁻¹ xᵢ  =  xⱼᵀ U Λ⁻¹ Uᵀ xᵢ  =  (Λ^(-1/2) Uᵀ xⱼ) · (Λ^(-1/2) Uᵀ xᵢ)  =  dot product in panel 3</text>')
+    s.append("</svg>")
+    (d / "eigen-whitening.svg").write_text("\n".join(s))
+
+
 def write_figures(rows):
     d = Path(__file__).resolve().parent.parent / "figures"
     d.mkdir(exist_ok=True)
     fig_weights(d)
     fig_gd(d, rows)
-    print("\nfigures: wrote ols-weights.svg, gd-embedding.svg in", d)
+    fig_eig(d)
+    print("\nfigures: wrote ols-weights.svg, gd-embedding.svg, eigen-whitening.svg in", d)
 
 
 def main():

@@ -101,6 +101,17 @@ direction is the same whether the column appears once or twice, because $S^{-1}$
 direction exactly as much as the raw inner product inflated it. The paper's analogy is the variance of a sum
 of correlated variables: only for uncorrelated pieces does the total equal the sum of the parts.
 
+<img src="figures/eigen-whitening.svg" alt="Three panels of one two-dimensional training cloud. Panel 1: a tilted elongated ellipse with its long axis u1 and short axis u2 drawn from the origin; a training point x_i lies along u1 and a test point x_j along u2. Panel 2: after rotating to the eigen-axes the ellipse lies along the horizontal axis, with spreads sqrt(lambda_1) horizontally and sqrt(lambda_2) vertically. Panel 3: after dividing each axis by its spread the cloud is a round disc. A line below states x_j' S^-1 x_i = (Lambda^-1/2 U' x_j) . (Lambda^-1/2 U' x_i), the plain dot product of panel 3.">
+
+Read the picture left to right. $S=X^\top X$ describes the *shape* of the training cloud: its eigenvectors $u_1,u_2$
+are the directions it is stretched along, and $\lambda_1,\lambda_2$ say how much (a direction with large
+$\lambda$ is one along which the training points spread out widely). $S^{-1}=U\Lambda^{-1}U^\top$ is then read in
+two steps, from the right: $U^\top$ rewrites every point in the cloud's own axes (a rotation, so no dot product
+changes), and $\Lambda^{-1/2}$ divides each axis by its spread. The result is a round cloud, in which
+an ordinary dot product no longer favours the long axis. Equivalently, $x_j^\top S^{-1}x_i$ is the dot
+product the two points have *after* this reshaping. A difference of the same size counts for more along the short axis
+than along the long one, because the training data say that direction rarely varies.
+
 **The embedding is only defined up to rotation.** Any orthogonal $Q$ gives $F_{\text{test}}Q\,(F_{\text{train}}Q)^\top
 =F_{\text{test}}F_{\text{train}}^\top$. The eigen-split $U\Lambda^{-1/2}$ is one choice among all square roots $M$ of $S^{-1}$
 ($MM^\top=S^{-1}$), a point the paper notes. Only the product $S^{-1}$ is determined, which is why the
