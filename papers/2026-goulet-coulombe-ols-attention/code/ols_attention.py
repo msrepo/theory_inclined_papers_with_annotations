@@ -481,13 +481,74 @@ def fig_eig(d):
     (d / "eigen-whitening.svg").write_text("\n".join(s))
 
 
+def fig_spread(d):
+    """u'Su = sum_i (x_i . u)^2 : project the points on a direction, square the coordinates, add."""
+    pts = np.array([[1.0, 2.0], [2.0, 1.0], [3.0, 3.0]])                   # the worked example in the notes
+    S = pts.T @ pts
+    k = 36.0
+    cols = [150, 450, 750]
+    ox_off, oy = -60, 200
+    dirs = [(-45, "u₂  (least spread)"), (0, "u = (1, 0)  (a feature axis)"), (45, "u₁  (most spread)")]
+    s = ['<svg viewBox="0 0 900 580" xmlns="http://www.w3.org/2000/svg" role="img">',
+         "<title>The quantity u'Su is the total squared spread of the points along u</title>",
+         "<desc>Top row: the same three training points (1,2), (2,1), (3,3) are projected onto three directions. Each point drops a dashed perpendicular onto the line; the foot is the projection, whose signed length along the line is x_i dot u. For u2 = (1,-1)/sqrt2 the three coordinates are -0.71, 0.71 and 0, squared and added they give 1. For u = (1,0) they are 1, 2, 3, giving 14. For u1 = (1,1)/sqrt2 they are 2.12, 2.12, 4.24, giving 27. Bottom: u'Su plotted against the angle of u equals 14 + 13 sin(2 theta); it is smallest, 1, at u2, and largest, 27, at u1, and the three directions above are marked on it.</desc>",
+         CSS,
+         '<style>.foot{fill:#57564f}.proj{stroke-width:1.2;stroke-dasharray:3 3;fill:none}.big{font-size:12.5px;fill:#1a1a19;font-weight:500}'
+         '@media (prefers-color-scheme: dark){.foot{fill:#b6b4ab}.big{fill:#eceae3}}</style>']
+    def P(c, v):
+        return c + ox_off + k * v[0], oy - k * v[1]
+    for c, (deg, lab) in zip(cols, dirs):
+        u = np.array([np.cos(np.deg2rad(deg)), np.sin(np.deg2rad(deg))])
+        a = P(c, -1.2 * u); b = P(c, (3.0 if deg < 0 else 4.7) * u)
+        s.append(f'<text class="hd" x="{c - 130}" y="22">{lab}</text>')
+        s.append(f'<path class="gd" d="M{c + ox_off - 20} {oy}H{c + 130}M{c + ox_off} {oy + 20}V{oy - 160}"/>')
+        s.append(f'<path class="ax" style="stroke-width:1.6" d="M{a[0]:.1f} {a[1]:.1f}L{b[0]:.1f} {b[1]:.1f}"/>')
+        tip = P(c, 1.0 * u)
+        s.append(f'<path class="ln s1" style="stroke-width:2.6" d="M{P(c,[0,0])[0]:.1f} {oy}L{tip[0]:.1f} {tip[1]:.1f}"/>')
+        s.append(f'<text class="big" x="{tip[0] + 6:.1f}" y="{tip[1] - 6:.1f}" style="fill:var(--none,#2a78d6)">u</text>')
+        total = 0.0
+        for i, x in enumerate(pts):
+            t = float(x @ u); total += t * t
+            f = t * u
+            xp, yp = P(c, x); fx, fy = P(c, f)
+            s.append(f'<path class="proj s2" d="M{xp:.1f} {yp:.1f}L{fx:.1f} {fy:.1f}"/>')
+            s.append(f'<circle class="f2" cx="{xp:.1f}" cy="{yp:.1f}" r="5"/>')
+            s.append(f'<text class="lab" x="{xp + 7:.1f}" y="{yp - 5:.1f}">x{"₁₂₃"[i]}</text>')
+            s.append(f'<circle class="foot" cx="{fx:.1f}" cy="{fy:.1f}" r="3.6"/>')
+        coords = ", ".join(f"{float(x @ u):.2f}" for x in pts)
+        s.append(f'<text class="lab" x="{c - 130}" y="{oy + 52}">coordinates xᵢ·u:  {coords}</text>')
+        s.append(f'<text class="big" x="{c - 130}" y="{oy + 74}">Σ (xᵢ·u)²  =  uᵀSu  =  {total:.0f}</text>')
+        assert abs(total - u @ S @ u) < 1e-9
+    # bottom: u'Su against the angle of u
+    x0, x1, y0, y1 = 80, 840, 380, 520
+    X = lambda th: x0 + (th + 90) / 180 * (x1 - x0)
+    Y = lambda v: y1 - v / 30.0 * (y1 - y0)
+    s.append('<text class="hd" x="20" y="324">uᵀSu for every direction u = (cos θ, sin θ):  a table of "spread in each direction"</text>')
+    for v in (0, 10, 20, 30):
+        s.append(f'<path class="gd" d="M{x0} {Y(v):.1f}H{x1}"/><text class="lab" x="{x0 - 6}" y="{Y(v) + 4:.1f}" text-anchor="end">{v}</text>')
+    for th in (-90, -45, 0, 45, 90):
+        s.append(f'<text class="lab" x="{X(th):.1f}" y="{y1 + 16}" text-anchor="middle">{th}°</text>')
+    s.append(f'<path class="ax" d="M{x0} {y0}V{y1}H{x1}"/><text class="lab" x="{(x0 + x1) / 2}" y="{y1 + 34}" text-anchor="middle">angle θ of the direction u</text>')
+    th = np.linspace(-90, 90, 181)
+    val = np.array([np.array([np.cos(np.deg2rad(a)), np.sin(np.deg2rad(a))]) @ S @ np.array([np.cos(np.deg2rad(a)), np.sin(np.deg2rad(a))]) for a in th])
+    s.append('<polyline class="ln s1" points="' + " ".join(f"{X(a):.1f},{Y(v):.1f}" for a, v in zip(th, val)) + '"/>')
+    for a, nm in ((-45, "λ₂ = 1 at u₂"), (0, "14"), (45, "λ₁ = 27 at u₁")):
+        v = 14 + 13 * np.sin(np.deg2rad(2 * a))
+        anchor = "end" if a == 45 else "start"
+        s.append(f'<circle class="f2" cx="{X(a):.1f}" cy="{Y(v):.1f}" r="5.5"/><text class="big" x="{X(a) + (-9 if a == 45 else 9):.1f}" y="{Y(v) - 8:.1f}" text-anchor="{anchor}">{nm}</text>')
+    s.append('<text class="lab" x="20" y="346">S = XᵀX = [[14, 13], [13, 14]]:  the bottom curve is 14 + 13 sin 2θ.  Its peak and trough are the eigenvalues, at the eigenvectors.</text>')
+    s.append("</svg>")
+    (d / "spread-along-directions.svg").write_text("\n".join(s))
+
+
 def write_figures(rows):
     d = Path(__file__).resolve().parent.parent / "figures"
     d.mkdir(exist_ok=True)
     fig_weights(d)
     fig_gd(d, rows)
     fig_eig(d)
-    print("\nfigures: wrote ols-weights.svg, gd-embedding.svg, eigen-whitening.svg in", d)
+    fig_spread(d)
+    print("\nfigures: wrote ols-weights.svg, gd-embedding.svg, eigen-whitening.svg, spread-along-directions.svg in", d)
 
 
 def main():

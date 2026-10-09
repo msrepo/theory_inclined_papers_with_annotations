@@ -112,6 +112,19 @@ an ordinary dot product no longer favours the long axis. Equivalently, $x_j^\top
 product the two points have *after* this reshaping. A difference of the same size counts for more along the short axis
 than along the long one, because the training data say that direction rarely varies.
 
+**Why the eigenvectors of $S=X^\top X$ are the "spread" directions.** Pick any unit direction $u$. Dropping each training point
+perpendicularly onto the line through $u$ gives one signed coordinate per point, $x_i\cdot u$. Square those
+coordinates and add them:
+
+$$\sum_i (x_i\cdot u)^2=\sum_i u^\top x_ix_i^\top u=u^\top\Big(\sum_i x_ix_i^\top\Big)u=u^\top X^\top X\,u=u^\top S u .$$
+
+So $u^\top Su$ is the total squared spread of the data along $u$, and the matrix $S$ is a table that returns that
+spread for every direction. The directions where the table is largest and smallest are the eigenvectors,
+and the values there are the eigenvalues. (In the figure the points are not centred, which is the paper's situation with an intercept.
+Textbook PCA subtracts the column means first.)
+
+<img src="figures/spread-along-directions.svg" alt="Top row: three training points projected onto three directions. For u2, the direction of least spread, the perpendicular feet lie close together and the squared coordinates sum to 1. For the feature axis u = (1,0) they sum to 14. For u1, the direction of most spread, the feet are far apart and the sum is 27. Bottom: the curve u'Su against the angle of u, which is 14 + 13 sin 2 theta; its trough, 1, is at u2 and its peak, 27, is at u1, with the three directions above marked on it.">
+
 **The embedding is only defined up to rotation.** Any orthogonal $Q$ gives $F_{\text{test}}Q\,(F_{\text{train}}Q)^\top
 =F_{\text{test}}F_{\text{train}}^\top$. The eigen-split $U\Lambda^{-1/2}$ is one choice among all square roots $M$ of $S^{-1}$
 ($MM^\top=S^{-1}$), a point the paper notes. Only the product $S^{-1}$ is determined, which is why the
