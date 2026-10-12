@@ -1,0 +1,69 @@
+<svg viewBox="0 0 890 356" xmlns="http://www.w3.org/2000/svg" role="img">
+<title>LogME worked example</title>
+<desc>Two panels in the plane of two examples. The ellipses are the Gaussian evidence of the target y given a feature. With the aligned feature, y lies on the long axis inside the 1 sigma ring and LogME is -1.36; with the orthogonal feature, y lies on the short axis outside it and LogME is -1.69.</desc>
+<style>
+  text{font-family:ui-sans-serif,-apple-system,"Segoe UI",sans-serif;font-weight:400}
+  .hd{font-size:14.5px;font-weight:500;fill:#1a1a19} .v{font-size:13px;fill:#1a1a19}
+  .b{font-weight:500} .sm{font-size:12px;fill:#57564f} .tiny{font-size:11px;fill:#57564f}
+  .it{font-style:italic} .sb{font-size:72%}
+  .bgcard{fill:#fbfaf6}
+  .box{fill:#f1efe7;stroke:#8a8880;stroke-width:1.3}
+  .slow{fill:#f7e7d8;stroke:#c8702f;stroke-width:1.5} .fast{fill:#dfeaf6;stroke:#2f6fb5;stroke-width:1.5}
+  .need{fill:#dfeaf6;stroke:#2f6fb5;stroke-width:1.8} .free{fill:#f7e7d8;stroke:#c8702f;stroke-width:1.8}
+  .e{stroke:#1a1a19;stroke-width:1.5;fill:none} .ah{fill:#1a1a19}
+  .ax{stroke:#8a8880;stroke-width:0.9;fill:none} .gd{stroke:#e2e1da;stroke-width:0.7;fill:none}
+  .frame{fill:none;stroke:#c9c7bf;stroke-width:1}
+  .sb1{stroke:#2f6fb5;stroke-width:2.2;fill:none} .sb2{stroke:#c8702f;stroke-width:2.2;fill:none}
+  .db1{stroke:#2f6fb5;stroke-width:2.2;fill:none;stroke-dasharray:6 4}
+  .db2{stroke:#c8702f;stroke-width:2.2;fill:none;stroke-dasharray:6 4}
+  .p1{fill:#2f6fb5;stroke:#fbfaf6;stroke-width:1.2} .p2{fill:#c8702f;stroke:#fbfaf6;stroke-width:1.2}
+  .band{fill:#c8702f;opacity:.10} .ref{stroke:#8a8880;stroke-width:1.1;stroke-dasharray:3 3;fill:none}
+  .refd{stroke:#1a1a19;stroke-width:1.3;stroke-dasharray:6 4;fill:none}
+  .blue{fill:#2f6fb5} .orange{fill:#c8702f}
+  .cen{stroke:#1a1a19;stroke-width:1.6}
+  .off{fill:none;stroke:#b3b1a8;stroke-width:1.3;stroke-dasharray:5 4}
+  @media (prefers-color-scheme: dark){
+    .hd,.v{fill:#eceae3} .sm,.tiny{fill:#b6b4ab} .bgcard{fill:#161615}
+    .box{fill:#25241f;stroke:#85837b}
+    .slow{fill:#3a2a1c;stroke:#e09a5f} .fast{fill:#1d2f45;stroke:#7fb2e8}
+    .need{fill:#1d2f45;stroke:#7fb2e8} .free{fill:#3a2a1c;stroke:#e09a5f}
+    .e{stroke:#eceae3} .ah{fill:#eceae3}
+    .ax{stroke:#85837b} .gd{stroke:#33312e} .frame{stroke:#4a4844}
+    .sb1,.db1{stroke:#7fb2e8} .sb2,.db2{stroke:#e09a5f}
+    .p1{fill:#7fb2e8;stroke:#161615} .p2{fill:#e09a5f;stroke:#161615}
+    .band{fill:#e09a5f;opacity:.14} .ref{stroke:#85837b} .refd{stroke:#eceae3}
+    .blue{fill:#7fb2e8} .orange{fill:#e09a5f} .off{stroke:#5d5b55} .cen{stroke:#eceae3}
+  }
+</style>
+<defs><marker id="ah" viewBox="0 0 10 8" refX="10" refY="4" markerWidth="10" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto"><path d="M0,0 L10,4 L0,8 Z" class="ah"/></marker></defs>
+<rect width="890" height="356" rx="6" class="bgcard"/>
+<text x="14" y="24" class="hd" text-anchor="start">LogME worked example: where the target y falls under the evidence N(0, C), C = FFᵀ + I</text>
+<text x="225" y="50" class="v b" text-anchor="middle">Good feature F = (1, −1)</text>
+<rect x="20" y="62" width="410" height="176" rx="6" class="frame"/>
+<path d="M 35,150 H 415" class="ax"/><path d="M 225,68 V 232" class="ax"/>
+<text x="417" y="164" class="tiny" text-anchor="end"><tspan class="it">y</tspan><tspan class="it sb" dy="4">1</tspan></text>
+<text x="233" y="80" class="tiny" text-anchor="start"><tspan class="it">y</tspan><tspan class="it sb" dy="4">2</tspan></text>
+<ellipse cx="225" cy="150" rx="45.0" ry="26.0" transform="rotate(45 225 150)" class="refd"/>
+<ellipse cx="225" cy="150" rx="90.1" ry="52.0" transform="rotate(45 225 150)" class="refd"/>
+<path d="M 154.3,79.3 L 295.7,220.7" class="ref"/>
+<text x="301.71067811865476" y="232.71067811865476" class="sm" text-anchor="start">F</text>
+<circle cx="251" cy="176" r="6" class="p2 cen"/>
+<text x="261" y="198" class="v b" text-anchor="start">y = (1, −1)</text>
+<text x="225" y="262" class="sm" text-anchor="middle"><tspan class="it">y</tspan><tspan>ᵀ</tspan><tspan class="it">C</tspan><tspan>⁻¹</tspan><tspan>y = 2/3     ·     log p(y) = −2.72</tspan></text>
+<text x="225" y="288" class="hd" text-anchor="middle">LogME (α = β = 1) = −1.36</text>
+<text x="665" y="50" class="v b" text-anchor="middle">Bad feature F = (1, 1)</text>
+<rect x="460" y="62" width="410" height="176" rx="6" class="frame"/>
+<path d="M 475,150 H 855" class="ax"/><path d="M 665,68 V 232" class="ax"/>
+<text x="857" y="164" class="tiny" text-anchor="end"><tspan class="it">y</tspan><tspan class="it sb" dy="4">1</tspan></text>
+<text x="673" y="80" class="tiny" text-anchor="start"><tspan class="it">y</tspan><tspan class="it sb" dy="4">2</tspan></text>
+<ellipse cx="665" cy="150" rx="45.0" ry="26.0" transform="rotate(-45 665 150)" class="refd"/>
+<ellipse cx="665" cy="150" rx="90.1" ry="52.0" transform="rotate(-45 665 150)" class="refd"/>
+<path d="M 594.3,220.7 L 735.7,79.3" class="ref"/>
+<text x="741.7106781186548" y="75.28932188134526" class="sm" text-anchor="start">F</text>
+<circle cx="691" cy="176" r="6" class="p2 cen"/>
+<text x="701" y="198" class="v b" text-anchor="start">y = (1, −1)</text>
+<text x="665" y="262" class="sm" text-anchor="middle"><tspan class="it">y</tspan><tspan>ᵀ</tspan><tspan class="it">C</tspan><tspan>⁻¹</tspan><tspan>y = 2     ·     log p(y) = −3.39</tspan></text>
+<text x="665" y="288" class="hd" text-anchor="middle">LogME (α = β = 1) = −1.69</text>
+<text x="14" y="322" class="sm" text-anchor="start">Dashed rings: 1 and 2 standard deviations of the evidence N(0, C); thin line: the feature direction F, the long axis of the</text>
+<text x="14" y="340" class="sm" text-anchor="start">ring (variance 3; the short axis has variance 1). y sits inside the 1σ ring when F is aligned with it, and outside it otherwise.</text>
+</svg>

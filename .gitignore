@@ -3,6 +3,8 @@
 papers/**/*.pdf
 papers/**/*.djvu
 papers/**/supplement/
+# ...nor are figures cropped out of those PDFs for a slide deck
+presentation/*/figures/chaves-fig3.png
 
 # Rendered output
 build/

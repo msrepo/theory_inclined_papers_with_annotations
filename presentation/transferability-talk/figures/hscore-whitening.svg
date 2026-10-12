@@ -1,0 +1,331 @@
+<svg viewBox="0 0 890 478" xmlns="http://www.w3.org/2000/svg" role="img">
+<title>What the inverse covariance does in the H-score</title>
+<desc>Two columns, each with the same centroid gap of 2 between two classes. Left: the gap lies along a quiet direction; right: along a noisy one. Top: raw features with the total-spread ellipse. Bottom: after dividing by the total spread, the ellipse is a unit circle and the gap is 1.79 versus 0.63, giving H of 0.80 versus 0.10.</desc>
+<style>
+  text{font-family:ui-sans-serif,-apple-system,"Segoe UI",sans-serif;font-weight:400}
+  .hd{font-size:14.5px;font-weight:500;fill:#1a1a19} .v{font-size:13px;fill:#1a1a19}
+  .b{font-weight:500} .sm{font-size:12px;fill:#57564f} .tiny{font-size:11px;fill:#57564f}
+  .it{font-style:italic} .sb{font-size:72%}
+  .bgcard{fill:#fbfaf6}
+  .box{fill:#f1efe7;stroke:#8a8880;stroke-width:1.3}
+  .slow{fill:#f7e7d8;stroke:#c8702f;stroke-width:1.5} .fast{fill:#dfeaf6;stroke:#2f6fb5;stroke-width:1.5}
+  .need{fill:#dfeaf6;stroke:#2f6fb5;stroke-width:1.8} .free{fill:#f7e7d8;stroke:#c8702f;stroke-width:1.8}
+  .e{stroke:#1a1a19;stroke-width:1.5;fill:none} .ah{fill:#1a1a19}
+  .ax{stroke:#8a8880;stroke-width:0.9;fill:none} .gd{stroke:#e2e1da;stroke-width:0.7;fill:none}
+  .frame{fill:none;stroke:#c9c7bf;stroke-width:1}
+  .sb1{stroke:#2f6fb5;stroke-width:2.2;fill:none} .sb2{stroke:#c8702f;stroke-width:2.2;fill:none}
+  .db1{stroke:#2f6fb5;stroke-width:2.2;fill:none;stroke-dasharray:6 4}
+  .db2{stroke:#c8702f;stroke-width:2.2;fill:none;stroke-dasharray:6 4}
+  .p1{fill:#2f6fb5;stroke:#fbfaf6;stroke-width:1.2} .p2{fill:#c8702f;stroke:#fbfaf6;stroke-width:1.2}
+  .band{fill:#c8702f;opacity:.10} .ref{stroke:#8a8880;stroke-width:1.1;stroke-dasharray:3 3;fill:none}
+  .refd{stroke:#1a1a19;stroke-width:1.3;stroke-dasharray:6 4;fill:none}
+  .blue{fill:#2f6fb5} .orange{fill:#c8702f}
+  .cen{stroke:#1a1a19;stroke-width:1.6}
+  .off{fill:none;stroke:#b3b1a8;stroke-width:1.3;stroke-dasharray:5 4}
+  @media (prefers-color-scheme: dark){
+    .hd,.v{fill:#eceae3} .sm,.tiny{fill:#b6b4ab} .bgcard{fill:#161615}
+    .box{fill:#25241f;stroke:#85837b}
+    .slow{fill:#3a2a1c;stroke:#e09a5f} .fast{fill:#1d2f45;stroke:#7fb2e8}
+    .need{fill:#1d2f45;stroke:#7fb2e8} .free{fill:#3a2a1c;stroke:#e09a5f}
+    .e{stroke:#eceae3} .ah{fill:#eceae3}
+    .ax{stroke:#85837b} .gd{stroke:#33312e} .frame{stroke:#4a4844}
+    .sb1,.db1{stroke:#7fb2e8} .sb2,.db2{stroke:#e09a5f}
+    .p1{fill:#7fb2e8;stroke:#161615} .p2{fill:#e09a5f;stroke:#161615}
+    .band{fill:#e09a5f;opacity:.14} .ref{stroke:#85837b} .refd{stroke:#eceae3}
+    .blue{fill:#7fb2e8} .orange{fill:#e09a5f} .off{stroke:#5d5b55} .cen{stroke:#eceae3}
+  }
+</style>
+<defs><marker id="ah" viewBox="0 0 10 8" refX="10" refY="4" markerWidth="10" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto"><path d="M0,0 L10,4 L0,8 Z" class="ah"/></marker></defs>
+<rect width="890" height="478" rx="6" class="bgcard"/>
+<text x="14" y="24" class="hd" text-anchor="start">H-score: what cov(f(X))⁻¹ does: measure the class gap in units of the total spread along it</text>
+<text x="225" y="46" class="v b" text-anchor="middle">Classes differ along a quiet direction</text>
+<rect x="20" y="58" width="410" height="140" rx="6" class="frame"/>
+<text x="28" y="191" class="tiny" text-anchor="start">raw features f(x)</text>
+<rect x="20" y="227" width="410" height="170" rx="6" class="frame"/>
+<text x="28" y="390" class="tiny" text-anchor="start">divided by the total spread</text>
+<circle cx="208.1" cy="144.4" r="2.6" class="p1"/>
+<circle cx="215.3" cy="337.3" r="2.6" class="p1"/>
+<circle cx="210.1" cy="153.5" r="2.6" class="p1"/>
+<circle cx="216.4" cy="351.3" r="2.6" class="p1"/>
+<circle cx="163.6" cy="152.3" r="2.6" class="p1"/>
+<circle cx="189.7" cy="349.6" r="2.6" class="p1"/>
+<circle cx="298.4" cy="145.3" r="2.6" class="p1"/>
+<circle cx="267.3" cy="338.8" r="2.6" class="p1"/>
+<circle cx="293.4" cy="147.3" r="2.6" class="p1"/>
+<circle cx="264.4" cy="341.8" r="2.6" class="p1"/>
+<circle cx="251.1" cy="148.0" r="2.6" class="p1"/>
+<circle cx="240.0" cy="342.8" r="2.6" class="p1"/>
+<circle cx="115.0" cy="140.6" r="2.6" class="p1"/>
+<circle cx="161.7" cy="331.5" r="2.6" class="p1"/>
+<circle cx="258.4" cy="144.5" r="2.6" class="p1"/>
+<circle cx="244.2" cy="337.5" r="2.6" class="p1"/>
+<circle cx="113.4" cy="169.2" r="2.6" class="p1"/>
+<circle cx="160.7" cy="375.6" r="2.6" class="p1"/>
+<circle cx="166.3" cy="155.2" r="2.6" class="p1"/>
+<circle cx="191.2" cy="353.9" r="2.6" class="p1"/>
+<circle cx="245.2" cy="150.5" r="2.6" class="p1"/>
+<circle cx="236.6" cy="346.8" r="2.6" class="p1"/>
+<circle cx="259.4" cy="157.1" r="2.6" class="p1"/>
+<circle cx="244.8" cy="356.9" r="2.6" class="p1"/>
+<circle cx="245.4" cy="145.7" r="2.6" class="p1"/>
+<circle cx="236.7" cy="339.3" r="2.6" class="p1"/>
+<circle cx="181.4" cy="131.1" r="2.6" class="p1"/>
+<circle cx="199.9" cy="316.8" r="2.6" class="p1"/>
+<circle cx="261.7" cy="136.8" r="2.6" class="p1"/>
+<circle cx="246.2" cy="325.6" r="2.6" class="p1"/>
+<circle cx="184.1" cy="158.1" r="2.6" class="p1"/>
+<circle cx="201.4" cy="358.6" r="2.6" class="p1"/>
+<circle cx="202.3" cy="151.2" r="2.6" class="p1"/>
+<circle cx="211.9" cy="347.8" r="2.6" class="p1"/>
+<circle cx="266.7" cy="147.3" r="2.6" class="p1"/>
+<circle cx="249.0" cy="341.8" r="2.6" class="p1"/>
+<circle cx="195.5" cy="160.5" r="2.6" class="p1"/>
+<circle cx="208.0" cy="362.3" r="2.6" class="p1"/>
+<circle cx="190.6" cy="136.6" r="2.6" class="p1"/>
+<circle cx="205.2" cy="325.2" r="2.6" class="p1"/>
+<circle cx="171.7" cy="147.3" r="2.6" class="p1"/>
+<circle cx="194.3" cy="341.8" r="2.6" class="p1"/>
+<circle cx="253.2" cy="166.4" r="2.6" class="p1"/>
+<circle cx="241.2" cy="371.3" r="2.6" class="p1"/>
+<circle cx="228.2" cy="135.6" r="2.6" class="p1"/>
+<circle cx="226.8" cy="323.8" r="2.6" class="p1"/>
+<circle cx="92.1" cy="153.5" r="2.6" class="p1"/>
+<circle cx="148.5" cy="351.5" r="2.6" class="p1"/>
+<circle cx="218.0" cy="159.0" r="2.6" class="p1"/>
+<circle cx="221.0" cy="359.9" r="2.6" class="p1"/>
+<circle cx="257.8" cy="150.7" r="2.6" class="p1"/>
+<circle cx="243.9" cy="347.0" r="2.6" class="p1"/>
+<circle cx="128.3" cy="140.9" r="2.6" class="p1"/>
+<circle cx="169.3" cy="331.9" r="2.6" class="p1"/>
+<circle cx="269.2" cy="139.6" r="2.6" class="p1"/>
+<circle cx="250.4" cy="329.9" r="2.6" class="p1"/>
+<circle cx="320.1" cy="146.0" r="2.6" class="p1"/>
+<circle cx="279.7" cy="339.8" r="2.6" class="p1"/>
+<circle cx="232.9" cy="164.3" r="2.6" class="p1"/>
+<circle cx="229.5" cy="368.1" r="2.6" class="p1"/>
+<circle cx="265.6" cy="156.7" r="2.6" class="p1"/>
+<circle cx="248.4" cy="356.4" r="2.6" class="p1"/>
+<circle cx="195.1" cy="163.9" r="2.6" class="p1"/>
+<circle cx="207.8" cy="367.5" r="2.6" class="p1"/>
+<circle cx="161.1" cy="111.8" r="2.6" class="p2"/>
+<circle cx="188.2" cy="287.0" r="2.6" class="p2"/>
+<circle cx="310.1" cy="128.3" r="2.6" class="p2"/>
+<circle cx="274.0" cy="312.5" r="2.6" class="p2"/>
+<circle cx="128.8" cy="103.4" r="2.6" class="p2"/>
+<circle cx="169.6" cy="273.9" r="2.6" class="p2"/>
+<circle cx="320.3" cy="99.6" r="2.6" class="p2"/>
+<circle cx="279.8" cy="268.2" r="2.6" class="p2"/>
+<circle cx="99.6" cy="133.7" r="2.6" class="p2"/>
+<circle cx="152.8" cy="320.8" r="2.6" class="p2"/>
+<circle cx="248.6" cy="114.1" r="2.6" class="p2"/>
+<circle cx="238.6" cy="290.5" r="2.6" class="p2"/>
+<circle cx="151.1" cy="95.2" r="2.6" class="p2"/>
+<circle cx="182.4" cy="261.4" r="2.6" class="p2"/>
+<circle cx="297.7" cy="104.3" r="2.6" class="p2"/>
+<circle cx="266.9" cy="275.3" r="2.6" class="p2"/>
+<circle cx="241.2" cy="101.2" r="2.6" class="p2"/>
+<circle cx="234.3" cy="270.6" r="2.6" class="p2"/>
+<circle cx="330.2" cy="99.2" r="2.6" class="p2"/>
+<circle cx="285.6" cy="267.5" r="2.6" class="p2"/>
+<circle cx="259.2" cy="100.0" r="2.6" class="p2"/>
+<circle cx="244.7" cy="268.7" r="2.6" class="p2"/>
+<circle cx="121.5" cy="91.9" r="2.6" class="p2"/>
+<circle cx="165.4" cy="256.2" r="2.6" class="p2"/>
+<circle cx="288.0" cy="100.2" r="2.6" class="p2"/>
+<circle cx="261.3" cy="269.0" r="2.6" class="p2"/>
+<circle cx="94.7" cy="113.0" r="2.6" class="p2"/>
+<circle cx="150.0" cy="288.8" r="2.6" class="p2"/>
+<circle cx="280.6" cy="125.9" r="2.6" class="p2"/>
+<circle cx="257.0" cy="308.8" r="2.6" class="p2"/>
+<circle cx="212.9" cy="94.8" r="2.6" class="p2"/>
+<circle cx="218.0" cy="260.7" r="2.6" class="p2"/>
+<circle cx="138.5" cy="88.3" r="2.6" class="p2"/>
+<circle cx="175.2" cy="250.6" r="2.6" class="p2"/>
+<circle cx="261.4" cy="107.7" r="2.6" class="p2"/>
+<circle cx="246.0" cy="280.6" r="2.6" class="p2"/>
+<circle cx="246.4" cy="98.9" r="2.6" class="p2"/>
+<circle cx="237.3" cy="267.0" r="2.6" class="p2"/>
+<circle cx="232.9" cy="93.4" r="2.6" class="p2"/>
+<circle cx="229.6" cy="258.5" r="2.6" class="p2"/>
+<circle cx="181.3" cy="110.6" r="2.6" class="p2"/>
+<circle cx="199.9" cy="285.1" r="2.6" class="p2"/>
+<circle cx="293.8" cy="105.7" r="2.6" class="p2"/>
+<circle cx="264.6" cy="277.6" r="2.6" class="p2"/>
+<circle cx="166.9" cy="95.6" r="2.6" class="p2"/>
+<circle cx="191.5" cy="261.9" r="2.6" class="p2"/>
+<circle cx="321.7" cy="110.9" r="2.6" class="p2"/>
+<circle cx="280.7" cy="285.6" r="2.6" class="p2"/>
+<circle cx="133.9" cy="107.5" r="2.6" class="p2"/>
+<circle cx="172.6" cy="280.3" r="2.6" class="p2"/>
+<circle cx="215.2" cy="109.3" r="2.6" class="p2"/>
+<circle cx="219.3" cy="283.1" r="2.6" class="p2"/>
+<circle cx="317.7" cy="117.3" r="2.6" class="p2"/>
+<circle cx="278.4" cy="295.5" r="2.6" class="p2"/>
+<circle cx="308.2" cy="120.0" r="2.6" class="p2"/>
+<circle cx="272.9" cy="299.6" r="2.6" class="p2"/>
+<circle cx="173.1" cy="99.1" r="2.6" class="p2"/>
+<circle cx="195.1" cy="267.3" r="2.6" class="p2"/>
+<circle cx="299.5" cy="96.6" r="2.6" class="p2"/>
+<circle cx="267.9" cy="263.4" r="2.6" class="p2"/>
+<circle cx="247.8" cy="104.4" r="2.6" class="p2"/>
+<circle cx="238.1" cy="275.6" r="2.6" class="p2"/>
+<circle cx="235.1" cy="99.7" r="2.6" class="p2"/>
+<circle cx="230.8" cy="268.2" r="2.6" class="p2"/>
+<ellipse cx="225" cy="128" rx="66.0" ry="24.6" class="refd"/>
+<circle cx="225" cy="312" r="38" class="refd"/>
+<circle cx="225.0" cy="150.0" r="5.5" class="p1 cen"/>
+<circle cx="225.0" cy="346.0" r="5.5" class="p1 cen"/>
+<circle cx="225.0" cy="106.0" r="5.5" class="p2 cen"/>
+<circle cx="225.0" cy="278.0" r="5.5" class="p2 cen"/>
+<text x="422" y="74" class="sm" text-anchor="end">gap = 2</text>
+<text x="422" y="243" class="sm" text-anchor="end">gap = 1.79 spreads</text>
+<path d="M 225,202 V 223" class="e" marker-end="url(#ah)"/>
+<text x="235" y="212.0" class="sm" text-anchor="start">× Σ^(−1/2)</text>
+<text x="225" y="420" class="hd" text-anchor="middle">H = (gap / 2)² = 0.80</text>
+<text x="665" y="46" class="v b" text-anchor="middle">Classes differ along a noisy direction</text>
+<rect x="460" y="58" width="410" height="140" rx="6" class="frame"/>
+<text x="468" y="191" class="tiny" text-anchor="start">raw features f(x)</text>
+<rect x="460" y="227" width="410" height="170" rx="6" class="frame"/>
+<text x="468" y="390" class="tiny" text-anchor="start">divided by the total spread</text>
+<circle cx="631.4" cy="124.9" r="2.6" class="p1"/>
+<circle cx="646.6" cy="301.5" r="2.6" class="p1"/>
+<circle cx="680.8" cy="128.0" r="2.6" class="p1"/>
+<circle cx="673.6" cy="312.0" r="2.6" class="p1"/>
+<circle cx="693.4" cy="121.8" r="2.6" class="p1"/>
+<circle cx="680.5" cy="290.5" r="2.6" class="p1"/>
+<circle cx="775.7" cy="124.4" r="2.6" class="p1"/>
+<circle cx="725.5" cy="299.7" r="2.6" class="p1"/>
+<circle cx="614.8" cy="132.1" r="2.6" class="p1"/>
+<circle cx="637.6" cy="326.2" r="2.6" class="p1"/>
+<circle cx="642.1" cy="117.8" r="2.6" class="p1"/>
+<circle cx="652.5" cy="276.9" r="2.6" class="p1"/>
+<circle cx="620.8" cy="123.8" r="2.6" class="p1"/>
+<circle cx="640.9" cy="297.3" r="2.6" class="p1"/>
+<circle cx="764.3" cy="156.2" r="2.6" class="p1"/>
+<circle cx="719.2" cy="392.0" r="2.6" class="p1"/>
+<circle cx="568.8" cy="125.3" r="2.6" class="p1"/>
+<circle cx="612.5" cy="302.7" r="2.6" class="p1"/>
+<circle cx="669.3" cy="125.4" r="2.6" class="p1"/>
+<circle cx="667.3" cy="302.9" r="2.6" class="p1"/>
+<circle cx="614.5" cy="120.8" r="2.6" class="p1"/>
+<circle cx="637.4" cy="287.1" r="2.6" class="p1"/>
+<circle cx="661.6" cy="133.7" r="2.6" class="p1"/>
+<circle cx="663.2" cy="331.8" r="2.6" class="p1"/>
+<circle cx="803.4" cy="124.1" r="2.6" class="p1"/>
+<circle cx="740.6" cy="298.5" r="2.6" class="p1"/>
+<circle cx="606.4" cy="129.1" r="2.6" class="p1"/>
+<circle cx="633.0" cy="315.8" r="2.6" class="p1"/>
+<circle cx="628.1" cy="128.7" r="2.6" class="p1"/>
+<circle cx="644.9" cy="314.4" r="2.6" class="p1"/>
+<circle cx="471.4" cy="133.4" r="2.6" class="p1"/>
+<circle cx="559.3" cy="330.5" r="2.6" class="p1"/>
+<circle cx="709.6" cy="140.9" r="2.6" class="p1"/>
+<circle cx="689.3" cy="356.4" r="2.6" class="p1"/>
+<circle cx="638.6" cy="117.5" r="2.6" class="p1"/>
+<circle cx="650.6" cy="275.8" r="2.6" class="p1"/>
+<circle cx="699.5" cy="111.6" r="2.6" class="p1"/>
+<circle cx="683.8" cy="255.3" r="2.6" class="p1"/>
+<circle cx="530.7" cy="131.9" r="2.6" class="p1"/>
+<circle cx="591.6" cy="325.4" r="2.6" class="p1"/>
+<circle cx="620.5" cy="121.1" r="2.6" class="p1"/>
+<circle cx="640.7" cy="288.3" r="2.6" class="p1"/>
+<circle cx="715.1" cy="157.5" r="2.6" class="p1"/>
+<circle cx="692.3" cy="392.0" r="2.6" class="p1"/>
+<circle cx="714.9" cy="143.9" r="2.6" class="p1"/>
+<circle cx="692.2" cy="367.0" r="2.6" class="p1"/>
+<circle cx="688.1" cy="144.4" r="2.6" class="p1"/>
+<circle cx="677.6" cy="368.7" r="2.6" class="p1"/>
+<circle cx="654.6" cy="114.9" r="2.6" class="p1"/>
+<circle cx="659.3" cy="266.6" r="2.6" class="p1"/>
+<circle cx="633.1" cy="125.9" r="2.6" class="p1"/>
+<circle cx="647.6" cy="304.7" r="2.6" class="p1"/>
+<circle cx="695.6" cy="126.4" r="2.6" class="p1"/>
+<circle cx="681.7" cy="306.6" r="2.6" class="p1"/>
+<circle cx="637.2" cy="111.1" r="2.6" class="p1"/>
+<circle cx="649.8" cy="253.7" r="2.6" class="p1"/>
+<circle cx="712.2" cy="131.2" r="2.6" class="p1"/>
+<circle cx="690.8" cy="323.2" r="2.6" class="p1"/>
+<circle cx="824.2" cy="140.6" r="2.6" class="p1"/>
+<circle cx="752.0" cy="355.6" r="2.6" class="p1"/>
+<circle cx="703.4" cy="130.9" r="2.6" class="p1"/>
+<circle cx="686.0" cy="322.1" r="2.6" class="p1"/>
+<circle cx="651.7" cy="120.2" r="2.6" class="p1"/>
+<circle cx="657.8" cy="285.2" r="2.6" class="p1"/>
+<circle cx="701.7" cy="121.0" r="2.6" class="p2"/>
+<circle cx="685.0" cy="287.7" r="2.6" class="p2"/>
+<circle cx="586.2" cy="144.6" r="2.6" class="p2"/>
+<circle cx="622.0" cy="369.4" r="2.6" class="p2"/>
+<circle cx="727.6" cy="138.6" r="2.6" class="p2"/>
+<circle cx="699.2" cy="348.6" r="2.6" class="p2"/>
+<circle cx="619.2" cy="144.2" r="2.6" class="p2"/>
+<circle cx="640.0" cy="367.9" r="2.6" class="p2"/>
+<circle cx="770.6" cy="119.8" r="2.6" class="p2"/>
+<circle cx="722.7" cy="283.6" r="2.6" class="p2"/>
+<circle cx="784.2" cy="138.3" r="2.6" class="p2"/>
+<circle cx="730.1" cy="347.6" r="2.6" class="p2"/>
+<circle cx="687.1" cy="140.5" r="2.6" class="p2"/>
+<circle cx="677.1" cy="355.3" r="2.6" class="p2"/>
+<circle cx="737.6" cy="110.5" r="2.6" class="p2"/>
+<circle cx="704.6" cy="251.6" r="2.6" class="p2"/>
+<circle cx="628.2" cy="110.8" r="2.6" class="p2"/>
+<circle cx="644.9" cy="252.7" r="2.6" class="p2"/>
+<circle cx="752.2" cy="130.0" r="2.6" class="p2"/>
+<circle cx="712.6" cy="318.8" r="2.6" class="p2"/>
+<circle cx="556.8" cy="112.5" r="2.6" class="p2"/>
+<circle cx="605.9" cy="258.5" r="2.6" class="p2"/>
+<circle cx="680.6" cy="134.6" r="2.6" class="p2"/>
+<circle cx="673.5" cy="334.9" r="2.6" class="p2"/>
+<circle cx="713.4" cy="123.5" r="2.6" class="p2"/>
+<circle cx="691.4" cy="296.4" r="2.6" class="p2"/>
+<circle cx="785.9" cy="139.2" r="2.6" class="p2"/>
+<circle cx="731.0" cy="350.8" r="2.6" class="p2"/>
+<circle cx="762.0" cy="111.6" r="2.6" class="p2"/>
+<circle cx="718.0" cy="255.5" r="2.6" class="p2"/>
+<circle cx="782.8" cy="130.0" r="2.6" class="p2"/>
+<circle cx="729.4" cy="318.9" r="2.6" class="p2"/>
+<circle cx="637.9" cy="116.8" r="2.6" class="p2"/>
+<circle cx="650.2" cy="273.3" r="2.6" class="p2"/>
+<circle cx="694.6" cy="126.6" r="2.6" class="p2"/>
+<circle cx="681.2" cy="307.3" r="2.6" class="p2"/>
+<circle cx="781.0" cy="130.9" r="2.6" class="p2"/>
+<circle cx="728.4" cy="322.0" r="2.6" class="p2"/>
+<circle cx="535.4" cy="132.3" r="2.6" class="p2"/>
+<circle cx="594.2" cy="326.7" r="2.6" class="p2"/>
+<circle cx="564.6" cy="119.0" r="2.6" class="p2"/>
+<circle cx="610.2" cy="280.9" r="2.6" class="p2"/>
+<circle cx="707.9" cy="134.7" r="2.6" class="p2"/>
+<circle cx="688.4" cy="335.2" r="2.6" class="p2"/>
+<circle cx="686.4" cy="118.8" r="2.6" class="p2"/>
+<circle cx="676.7" cy="280.4" r="2.6" class="p2"/>
+<circle cx="692.2" cy="113.4" r="2.6" class="p2"/>
+<circle cx="679.9" cy="261.6" r="2.6" class="p2"/>
+<circle cx="683.0" cy="116.6" r="2.6" class="p2"/>
+<circle cx="674.8" cy="272.5" r="2.6" class="p2"/>
+<circle cx="785.4" cy="110.3" r="2.6" class="p2"/>
+<circle cx="730.8" cy="250.8" r="2.6" class="p2"/>
+<circle cx="642.7" cy="118.3" r="2.6" class="p2"/>
+<circle cx="652.8" cy="278.6" r="2.6" class="p2"/>
+<circle cx="563.2" cy="139.9" r="2.6" class="p2"/>
+<circle cx="609.4" cy="353.2" r="2.6" class="p2"/>
+<circle cx="557.5" cy="116.2" r="2.6" class="p2"/>
+<circle cx="606.3" cy="271.4" r="2.6" class="p2"/>
+<circle cx="605.7" cy="128.1" r="2.6" class="p2"/>
+<circle cx="632.6" cy="312.5" r="2.6" class="p2"/>
+<circle cx="674.3" cy="128.3" r="2.6" class="p2"/>
+<circle cx="670.1" cy="313.1" r="2.6" class="p2"/>
+<circle cx="648.0" cy="125.4" r="2.6" class="p2"/>
+<circle cx="655.7" cy="303.1" r="2.6" class="p2"/>
+<ellipse cx="665" cy="128" rx="69.6" ry="11.0" class="refd"/>
+<circle cx="665" cy="312" r="38" class="refd"/>
+<circle cx="643.0" cy="128.0" r="5.5" class="p1 cen"/>
+<circle cx="653.0" cy="312.0" r="5.5" class="p1 cen"/>
+<circle cx="687.0" cy="128.0" r="5.5" class="p2 cen"/>
+<circle cx="677.0" cy="312.0" r="5.5" class="p2 cen"/>
+<text x="862" y="74" class="sm" text-anchor="end">gap = 2</text>
+<text x="862" y="243" class="sm" text-anchor="end">gap = 0.63 spreads</text>
+<path d="M 665,202 V 223" class="e" marker-end="url(#ah)"/>
+<text x="675" y="212.0" class="sm" text-anchor="start">× Σ^(−1/2)</text>
+<text x="665" y="420" class="hd" text-anchor="middle">H = (gap / 2)² = 0.10</text>
+<text x="14" y="444" class="sm" text-anchor="start">Dashed: one standard deviation of the total spread (class means included). After dividing by it that spread is 1 in every direction,</text>
+<text x="14" y="462" class="sm" text-anchor="start">so the class gap is read directly as a fraction of the spread along it.</text>
+</svg>

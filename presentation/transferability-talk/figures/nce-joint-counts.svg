@@ -1,0 +1,132 @@
+<svg viewBox="0 0 890 340" xmlns="http://www.w3.org/2000/svg" role="img">
+<title>Joint count tables for NCE</title>
+<desc>Three 3 by 3 tables of counts of source label Z against target label Y over 18 examples. Left: Z determines Y, one filled cell per row, H(Y|Z) is 0. Middle: partly informative, H(Y|Z) is 0.92 bits. Right: Z is useless, all cells equal, H(Y|Z) equals H(Y), 1.58 bits.</desc>
+<style>
+  text{font-family:ui-sans-serif,-apple-system,"Segoe UI",sans-serif;font-weight:400}
+  .hd{font-size:14.5px;font-weight:500;fill:#1a1a19} .v{font-size:13px;fill:#1a1a19}
+  .b{font-weight:500} .sm{font-size:12px;fill:#57564f} .tiny{font-size:11px;fill:#57564f}
+  .it{font-style:italic} .sb{font-size:72%}
+  .bgcard{fill:#fbfaf6}
+  .box{fill:#f1efe7;stroke:#8a8880;stroke-width:1.3}
+  .slow{fill:#f7e7d8;stroke:#c8702f;stroke-width:1.5} .fast{fill:#dfeaf6;stroke:#2f6fb5;stroke-width:1.5}
+  .need{fill:#dfeaf6;stroke:#2f6fb5;stroke-width:1.8} .free{fill:#f7e7d8;stroke:#c8702f;stroke-width:1.8}
+  .e{stroke:#1a1a19;stroke-width:1.5;fill:none} .ah{fill:#1a1a19}
+  .ax{stroke:#8a8880;stroke-width:0.9;fill:none} .gd{stroke:#e2e1da;stroke-width:0.7;fill:none}
+  .frame{fill:none;stroke:#c9c7bf;stroke-width:1}
+  .sb1{stroke:#2f6fb5;stroke-width:2.2;fill:none} .sb2{stroke:#c8702f;stroke-width:2.2;fill:none}
+  .db1{stroke:#2f6fb5;stroke-width:2.2;fill:none;stroke-dasharray:6 4}
+  .db2{stroke:#c8702f;stroke-width:2.2;fill:none;stroke-dasharray:6 4}
+  .p1{fill:#2f6fb5;stroke:#fbfaf6;stroke-width:1.2} .p2{fill:#c8702f;stroke:#fbfaf6;stroke-width:1.2}
+  .band{fill:#c8702f;opacity:.10} .ref{stroke:#8a8880;stroke-width:1.1;stroke-dasharray:3 3;fill:none}
+  .refd{stroke:#1a1a19;stroke-width:1.3;stroke-dasharray:6 4;fill:none}
+  .blue{fill:#2f6fb5} .orange{fill:#c8702f}
+  .cen{stroke:#1a1a19;stroke-width:1.6}
+  .off{fill:none;stroke:#b3b1a8;stroke-width:1.3;stroke-dasharray:5 4}
+  @media (prefers-color-scheme: dark){
+    .hd,.v{fill:#eceae3} .sm,.tiny{fill:#b6b4ab} .bgcard{fill:#161615}
+    .box{fill:#25241f;stroke:#85837b}
+    .slow{fill:#3a2a1c;stroke:#e09a5f} .fast{fill:#1d2f45;stroke:#7fb2e8}
+    .need{fill:#1d2f45;stroke:#7fb2e8} .free{fill:#3a2a1c;stroke:#e09a5f}
+    .e{stroke:#eceae3} .ah{fill:#eceae3}
+    .ax{stroke:#85837b} .gd{stroke:#33312e} .frame{stroke:#4a4844}
+    .sb1,.db1{stroke:#7fb2e8} .sb2,.db2{stroke:#e09a5f}
+    .p1{fill:#7fb2e8;stroke:#161615} .p2{fill:#e09a5f;stroke:#161615}
+    .band{fill:#e09a5f;opacity:.14} .ref{stroke:#85837b} .refd{stroke:#eceae3}
+    .blue{fill:#7fb2e8} .orange{fill:#e09a5f} .off{stroke:#5d5b55} .cen{stroke:#eceae3}
+  }
+</style>
+<defs><marker id="ah" viewBox="0 0 10 8" refX="10" refY="4" markerWidth="10" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto"><path d="M0,0 L10,4 L0,8 Z" class="ah"/></marker></defs>
+<rect width="890" height="340" rx="6" class="bgcard"/>
+<text x="14" y="24" class="hd" text-anchor="start">NCE counts the joint of two label lists: how much of Y is left once Z is known</text>
+<text x="157.0" y="56" class="v b" text-anchor="middle">Z determines Y</text>
+<text x="157.0" y="74" class="tiny" text-anchor="middle">each row hits one column</text>
+<text x="107.0" y="86" class="sm" text-anchor="middle"><tspan class="it">y</tspan><tspan class="it sb" dy="4">1</tspan></text>
+<text x="72" y="121.5" class="sm" text-anchor="end"><tspan class="it">z</tspan><tspan class="it sb" dy="4">1</tspan></text>
+<text x="157.0" y="86" class="sm" text-anchor="middle"><tspan class="it">y</tspan><tspan class="it sb" dy="4">2</tspan></text>
+<text x="72" y="171.5" class="sm" text-anchor="end"><tspan class="it">z</tspan><tspan class="it sb" dy="4">2</tspan></text>
+<text x="207.0" y="86" class="sm" text-anchor="middle"><tspan class="it">y</tspan><tspan class="it sb" dy="4">3</tspan></text>
+<text x="72" y="221.5" class="sm" text-anchor="end"><tspan class="it">z</tspan><tspan class="it sb" dy="4">3</tspan></text>
+<rect x="82" y="92" width="50" height="50" class="frame"/>
+<rect x="83" y="93" width="48" height="48" class="blue" fill-opacity="1.00"/>
+<text x="107.0" y="122.0" class="v b" text-anchor="middle">6</text>
+<rect x="132" y="92" width="50" height="50" class="frame"/>
+<rect x="182" y="92" width="50" height="50" class="frame"/>
+<rect x="82" y="142" width="50" height="50" class="frame"/>
+<rect x="132" y="142" width="50" height="50" class="frame"/>
+<rect x="133" y="143" width="48" height="48" class="blue" fill-opacity="1.00"/>
+<text x="157.0" y="172.0" class="v b" text-anchor="middle">6</text>
+<rect x="182" y="142" width="50" height="50" class="frame"/>
+<rect x="82" y="192" width="50" height="50" class="frame"/>
+<rect x="132" y="192" width="50" height="50" class="frame"/>
+<rect x="182" y="192" width="50" height="50" class="frame"/>
+<rect x="183" y="193" width="48" height="48" class="blue" fill-opacity="1.00"/>
+<text x="207.0" y="222.0" class="v b" text-anchor="middle">6</text>
+<text x="157.0" y="274" class="hd" text-anchor="middle"><tspan>H(Y | Z) = </tspan><tspan>0 bits</tspan></text>
+<text x="447.0" y="56" class="v b" text-anchor="middle">Z partly informative</text>
+<text x="447.0" y="74" class="tiny" text-anchor="middle">rows are concentrated</text>
+<text x="397.0" y="86" class="sm" text-anchor="middle"><tspan class="it">y</tspan><tspan class="it sb" dy="4">1</tspan></text>
+<text x="362" y="121.5" class="sm" text-anchor="end"><tspan class="it">z</tspan><tspan class="it sb" dy="4">1</tspan></text>
+<text x="447.0" y="86" class="sm" text-anchor="middle"><tspan class="it">y</tspan><tspan class="it sb" dy="4">2</tspan></text>
+<text x="362" y="171.5" class="sm" text-anchor="end"><tspan class="it">z</tspan><tspan class="it sb" dy="4">2</tspan></text>
+<text x="497.0" y="86" class="sm" text-anchor="middle"><tspan class="it">y</tspan><tspan class="it sb" dy="4">3</tspan></text>
+<text x="362" y="221.5" class="sm" text-anchor="end"><tspan class="it">z</tspan><tspan class="it sb" dy="4">3</tspan></text>
+<rect x="372" y="92" width="50" height="50" class="frame"/>
+<rect x="373" y="93" width="48" height="48" class="blue" fill-opacity="0.71"/>
+<text x="397.0" y="122.0" class="v b" text-anchor="middle">4</text>
+<rect x="422" y="92" width="50" height="50" class="frame"/>
+<rect x="423" y="93" width="48" height="48" class="blue" fill-opacity="0.41"/>
+<text x="447.0" y="122.0" class="v b" text-anchor="middle">2</text>
+<rect x="472" y="92" width="50" height="50" class="frame"/>
+<rect x="372" y="142" width="50" height="50" class="frame"/>
+<rect x="422" y="142" width="50" height="50" class="frame"/>
+<rect x="423" y="143" width="48" height="48" class="blue" fill-opacity="0.71"/>
+<text x="447.0" y="172.0" class="v b" text-anchor="middle">4</text>
+<rect x="472" y="142" width="50" height="50" class="frame"/>
+<rect x="473" y="143" width="48" height="48" class="blue" fill-opacity="0.41"/>
+<text x="497.0" y="172.0" class="v b" text-anchor="middle">2</text>
+<rect x="372" y="192" width="50" height="50" class="frame"/>
+<rect x="373" y="193" width="48" height="48" class="blue" fill-opacity="0.41"/>
+<text x="397.0" y="222.0" class="v b" text-anchor="middle">2</text>
+<rect x="422" y="192" width="50" height="50" class="frame"/>
+<rect x="472" y="192" width="50" height="50" class="frame"/>
+<rect x="473" y="193" width="48" height="48" class="blue" fill-opacity="0.71"/>
+<text x="497.0" y="222.0" class="v b" text-anchor="middle">4</text>
+<text x="447.0" y="274" class="hd" text-anchor="middle"><tspan>H(Y | Z) = </tspan><tspan>0.92 bits</tspan></text>
+<text x="737.0" y="56" class="v b" text-anchor="middle">Z useless</text>
+<text x="737.0" y="74" class="tiny" text-anchor="middle">every row looks like the Y marginal</text>
+<text x="687.0" y="86" class="sm" text-anchor="middle"><tspan class="it">y</tspan><tspan class="it sb" dy="4">1</tspan></text>
+<text x="652" y="121.5" class="sm" text-anchor="end"><tspan class="it">z</tspan><tspan class="it sb" dy="4">1</tspan></text>
+<text x="737.0" y="86" class="sm" text-anchor="middle"><tspan class="it">y</tspan><tspan class="it sb" dy="4">2</tspan></text>
+<text x="652" y="171.5" class="sm" text-anchor="end"><tspan class="it">z</tspan><tspan class="it sb" dy="4">2</tspan></text>
+<text x="787.0" y="86" class="sm" text-anchor="middle"><tspan class="it">y</tspan><tspan class="it sb" dy="4">3</tspan></text>
+<text x="652" y="221.5" class="sm" text-anchor="end"><tspan class="it">z</tspan><tspan class="it sb" dy="4">3</tspan></text>
+<rect x="662" y="92" width="50" height="50" class="frame"/>
+<rect x="663" y="93" width="48" height="48" class="blue" fill-opacity="0.41"/>
+<text x="687.0" y="122.0" class="v b" text-anchor="middle">2</text>
+<rect x="712" y="92" width="50" height="50" class="frame"/>
+<rect x="713" y="93" width="48" height="48" class="blue" fill-opacity="0.41"/>
+<text x="737.0" y="122.0" class="v b" text-anchor="middle">2</text>
+<rect x="762" y="92" width="50" height="50" class="frame"/>
+<rect x="763" y="93" width="48" height="48" class="blue" fill-opacity="0.41"/>
+<text x="787.0" y="122.0" class="v b" text-anchor="middle">2</text>
+<rect x="662" y="142" width="50" height="50" class="frame"/>
+<rect x="663" y="143" width="48" height="48" class="blue" fill-opacity="0.41"/>
+<text x="687.0" y="172.0" class="v b" text-anchor="middle">2</text>
+<rect x="712" y="142" width="50" height="50" class="frame"/>
+<rect x="713" y="143" width="48" height="48" class="blue" fill-opacity="0.41"/>
+<text x="737.0" y="172.0" class="v b" text-anchor="middle">2</text>
+<rect x="762" y="142" width="50" height="50" class="frame"/>
+<rect x="763" y="143" width="48" height="48" class="blue" fill-opacity="0.41"/>
+<text x="787.0" y="172.0" class="v b" text-anchor="middle">2</text>
+<rect x="662" y="192" width="50" height="50" class="frame"/>
+<rect x="663" y="193" width="48" height="48" class="blue" fill-opacity="0.41"/>
+<text x="687.0" y="222.0" class="v b" text-anchor="middle">2</text>
+<rect x="712" y="192" width="50" height="50" class="frame"/>
+<rect x="713" y="193" width="48" height="48" class="blue" fill-opacity="0.41"/>
+<text x="737.0" y="222.0" class="v b" text-anchor="middle">2</text>
+<rect x="762" y="192" width="50" height="50" class="frame"/>
+<rect x="763" y="193" width="48" height="48" class="blue" fill-opacity="0.41"/>
+<text x="787.0" y="222.0" class="v b" text-anchor="middle">2</text>
+<text x="737.0" y="274" class="hd" text-anchor="middle"><tspan>H(Y | Z) = </tspan><tspan>1.58 bits</tspan></text>
+<text x="14" y="322" class="sm" text-anchor="start">The same 18 examples in every panel; a cell counts the examples with source label z and target label y. No model, no features.</text>
+</svg>
