@@ -40,6 +40,8 @@ section footer { font-size: 0.55em; }
 
 ### Which pre-trained model should I fine-tune, and can I tell without fine-tuning them all?
 
+**Mahesh Shakya**, NAAMII
+
 The problem · six scores from NCE to PAS · two benchmarks
 
 Built from the annotated notes in `theory_inclined_papers_with_annotations`.
