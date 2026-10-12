@@ -205,7 +205,7 @@ PAS uses the **source** classes as a ruler and asks how decisively each unlabell
 <!-- _class: lead -->
 <!-- _paginate: false -->
 
-# 3 · Gaps
+# Gaps
 
 ### Do these scores survive medical imaging?
 
@@ -236,6 +236,15 @@ PAS uses the **source** classes as a ruler and asks how decisively each unlabell
 Also: $\mathcal N$LEEP and SFDA produce NaNs.
 
 > Notes: [Claßen 2026 — TE robustness](https://msrepo.github.io/theory_inclined_papers_with_annotations/2026-classen-te-robustness/)
+
+---
+
+<!-- _class: lead -->
+<!-- _paginate: false -->
+
+# Explorations
+
+### Mode connectivity as a transferability score
 
 ---
 
