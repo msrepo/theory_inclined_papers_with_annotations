@@ -209,7 +209,7 @@ Preview it with the Marp extension for VS Code, or export it with `npx @marp-tea
 
 | Deck | Covers |
 |---|---|
-| *Transferability estimation: the problem, the scores, the gaps, the open problems* — [source](presentation/transferability-talk/slides.md) · [code](presentation/transferability-talk/code/) | the transferability literature as one talk: the problem in symbols with its labelled and unlabelled variants, then one slide each for NCE → LEEP → H-score → LogME → SFDA → PAS, the two medical-imaging benchmarks (Chaves 2023, Claßen 2026) and what they leave open, and seven open problems |
+| *Transferability estimation: the problem, the scores, the gaps* — [source](presentation/transferability-talk/slides.md) · [code](presentation/transferability-talk/code/) | the transferability literature as one talk: the problem in symbols with its labelled and unlabelled variants, then one slide each for NCE → LEEP → H-score → LogME → SFDA → PAS, and the two medical-imaging benchmarks (Chaves 2023, Claßen 2026) |
 
 ## Papers
 

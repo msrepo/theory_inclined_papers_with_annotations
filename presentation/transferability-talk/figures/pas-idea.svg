@@ -1,0 +1,104 @@
+<svg viewBox="0 0 890 380" xmlns="http://www.w3.org/2000/svg" role="img">
+<title>PAS: the core idea</title>
+<desc>Two panels with three source class centroids on a unit circle. In the first, target points sit right next to one centroid each, so the nearest centroid is much closer than the second nearest and PAS is high. In the second, target points fall between centroids, the two nearest distances are similar, and PAS is low.</desc>
+<style>
+  text{font-family:ui-sans-serif,-apple-system,"Segoe UI",sans-serif;font-weight:400}
+  .hd{font-size:14.5px;font-weight:500;fill:#1a1a19} .v{font-size:13px;fill:#1a1a19}
+  .b{font-weight:500} .sm{font-size:12px;fill:#57564f} .tiny{font-size:11px;fill:#57564f}
+  .it{font-style:italic} .sb{font-size:72%}
+  .bgcard{fill:#fbfaf6}
+  .box{fill:#f1efe7;stroke:#8a8880;stroke-width:1.3}
+  .slow{fill:#f7e7d8;stroke:#c8702f;stroke-width:1.5} .fast{fill:#dfeaf6;stroke:#2f6fb5;stroke-width:1.5}
+  .need{fill:#dfeaf6;stroke:#2f6fb5;stroke-width:1.8} .free{fill:#f7e7d8;stroke:#c8702f;stroke-width:1.8}
+  .e{stroke:#1a1a19;stroke-width:1.5;fill:none} .ah{fill:#1a1a19}
+  .ax{stroke:#8a8880;stroke-width:0.9;fill:none} .gd{stroke:#e2e1da;stroke-width:0.7;fill:none}
+  .frame{fill:none;stroke:#c9c7bf;stroke-width:1}
+  .sb1{stroke:#2f6fb5;stroke-width:2.2;fill:none} .sb2{stroke:#c8702f;stroke-width:2.2;fill:none}
+  .db1{stroke:#2f6fb5;stroke-width:2.2;fill:none;stroke-dasharray:6 4}
+  .db2{stroke:#c8702f;stroke-width:2.2;fill:none;stroke-dasharray:6 4}
+  .p1{fill:#2f6fb5;stroke:#fbfaf6;stroke-width:1.2} .p2{fill:#c8702f;stroke:#fbfaf6;stroke-width:1.2}
+  .band{fill:#c8702f;opacity:.10} .ref{stroke:#8a8880;stroke-width:1.1;stroke-dasharray:3 3;fill:none}
+  .refd{stroke:#1a1a19;stroke-width:1.3;stroke-dasharray:6 4;fill:none}
+  .blue{fill:#2f6fb5} .orange{fill:#c8702f}
+  .cen{stroke:#1a1a19;stroke-width:1.6}
+  .off{fill:none;stroke:#b3b1a8;stroke-width:1.3;stroke-dasharray:5 4}
+  @media (prefers-color-scheme: dark){
+    .hd,.v{fill:#eceae3} .sm,.tiny{fill:#b6b4ab} .bgcard{fill:#161615}
+    .box{fill:#25241f;stroke:#85837b}
+    .slow{fill:#3a2a1c;stroke:#e09a5f} .fast{fill:#1d2f45;stroke:#7fb2e8}
+    .need{fill:#1d2f45;stroke:#7fb2e8} .free{fill:#3a2a1c;stroke:#e09a5f}
+    .e{stroke:#eceae3} .ah{fill:#eceae3}
+    .ax{stroke:#85837b} .gd{stroke:#33312e} .frame{stroke:#4a4844}
+    .sb1,.db1{stroke:#7fb2e8} .sb2,.db2{stroke:#e09a5f}
+    .p1{fill:#7fb2e8;stroke:#161615} .p2{fill:#e09a5f;stroke:#161615}
+    .band{fill:#e09a5f;opacity:.14} .ref{stroke:#85837b} .refd{stroke:#eceae3}
+    .blue{fill:#7fb2e8} .orange{fill:#e09a5f} .off{stroke:#5d5b55} .cen{stroke:#eceae3}
+  }
+</style>
+<defs><marker id="ah" viewBox="0 0 10 8" refX="10" refY="4" markerWidth="10" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto"><path d="M0,0 L10,4 L0,8 Z" class="ah"/></marker></defs>
+<rect width="890" height="380" rx="6" class="bgcard"/>
+<text x="14" y="24" class="hd" text-anchor="start">PAS in a nutshell: how decisively does each target point pick one source class centroid?</text>
+<text x="224" y="50" class="v b" text-anchor="middle">Embedding A: target points land right next to one source centroid</text>
+<rect x="14" y="60" width="420" height="232" rx="6" class="frame"/>
+<circle cx="224" cy="178" r="78" class="gd"/>
+<path d="M 207.8,101.7 L 224.0,100.0" class="e"/>
+<path d="M 207.8,101.7 L 156.5,217.0" class="refd"/>
+<circle cx="240.2" cy="101.7" r="3.8" class="p1" fill-opacity="0.75"/>
+<circle cx="230.8" cy="100.3" r="3.8" class="p1" fill-opacity="0.75"/>
+<circle cx="218.6" cy="100.2" r="3.8" class="p1" fill-opacity="0.75"/>
+<circle cx="209.1" cy="101.4" r="3.8" class="p1" fill-opacity="0.75"/>
+<circle cx="149.8" cy="202.1" r="3.8" class="p2" fill-opacity="0.75"/>
+<circle cx="153.3" cy="211.0" r="3.8" class="p2" fill-opacity="0.75"/>
+<circle cx="159.3" cy="221.6" r="3.8" class="p2" fill-opacity="0.75"/>
+<circle cx="165.1" cy="229.2" r="3.8" class="p2" fill-opacity="0.75"/>
+<circle cx="282.0" cy="230.2" r="3.8" class="ah" fill-opacity="0.75"/>
+<circle cx="287.9" cy="222.7" r="3.8" class="ah" fill-opacity="0.75"/>
+<circle cx="294.1" cy="212.2" r="3.8" class="ah" fill-opacity="0.75"/>
+<circle cx="297.8" cy="203.4" r="3.8" class="ah" fill-opacity="0.75"/>
+<path d="M 224,178 L 224.0,100.0" class="ref"/>
+<circle cx="224.0" cy="100.0" r="7" class="p1 cen"/>
+<text x="224.0" y="82.0" class="sm" text-anchor="middle"><tspan class="it">μ</tspan><tspan class="it sb" dy="4">1</tspan></text>
+<path d="M 224,178 L 156.5,217.0" class="ref"/>
+<circle cx="156.5" cy="217.0" r="7" class="p2 cen"/>
+<text x="137.39745962155615" y="232.0" class="sm" text-anchor="middle"><tspan class="it">μ</tspan><tspan class="it sb" dy="4">2</tspan></text>
+<path d="M 224,178 L 291.5,217.0" class="ref"/>
+<circle cx="291.5" cy="217.0" r="7" class="ah cen"/>
+<text x="310.60254037844385" y="232.00000000000006" class="sm" text-anchor="middle"><tspan class="it">μ</tspan><tspan class="it sb" dy="4">3</tspan></text>
+<circle cx="207.8" cy="101.7" r="6.5" fill="none" class="e"/>
+<text x="224" y="276" class="sm" text-anchor="middle">circled point: d₁ = 0.02, d₂ = 1.31, margin (d₂ − d₁)/d₂ = 0.98</text>
+<text x="224" y="312" class="hd" text-anchor="middle">PAS = average margin = 0.99</text>
+<text x="666" y="50" class="v b" text-anchor="middle">Embedding B: target points fall between the source centroids</text>
+<rect x="456" y="60" width="420" height="232" rx="6" class="frame"/>
+<circle cx="666" cy="178" r="78" class="gd"/>
+<path d="M 597.1,141.4 L 598.5,217.0" class="e"/>
+<path d="M 597.1,141.4 L 666.0,100.0" class="refd"/>
+<circle cx="609.9" cy="123.8" r="3.8" class="p1" fill-opacity="0.75"/>
+<circle cx="602.9" cy="132.2" r="3.8" class="p1" fill-opacity="0.75"/>
+<circle cx="595.3" cy="145.0" r="3.8" class="p2" fill-opacity="0.75"/>
+<circle cx="591.4" cy="155.2" r="3.8" class="p2" fill-opacity="0.75"/>
+<circle cx="647.1" cy="253.7" r="3.8" class="p2" fill-opacity="0.75"/>
+<circle cx="657.8" cy="255.6" r="3.8" class="p2" fill-opacity="0.75"/>
+<circle cx="672.8" cy="255.7" r="3.8" class="ah" fill-opacity="0.75"/>
+<circle cx="683.5" cy="254.0" r="3.8" class="ah" fill-opacity="0.75"/>
+<circle cx="741.0" cy="156.5" r="3.8" class="ah" fill-opacity="0.75"/>
+<circle cx="737.3" cy="146.3" r="3.8" class="ah" fill-opacity="0.75"/>
+<circle cx="729.9" cy="133.3" r="3.8" class="p1" fill-opacity="0.75"/>
+<circle cx="723.0" cy="124.8" r="3.8" class="p1" fill-opacity="0.75"/>
+<circle cx="636.8" cy="105.7" r="3.8" class="p1" fill-opacity="0.75"/>
+<circle cx="588.4" cy="186.2" r="3.8" class="p2" fill-opacity="0.75"/>
+<circle cx="742.8" cy="191.5" r="3.8" class="ah" fill-opacity="0.75"/>
+<path d="M 666,178 L 666.0,100.0" class="ref"/>
+<circle cx="666.0" cy="100.0" r="7" class="p1 cen"/>
+<text x="666.0" y="82.0" class="sm" text-anchor="middle"><tspan class="it">μ</tspan><tspan class="it sb" dy="4">1</tspan></text>
+<path d="M 666,178 L 598.5,217.0" class="ref"/>
+<circle cx="598.5" cy="217.0" r="7" class="p2 cen"/>
+<text x="579.3974596215561" y="232.0" class="sm" text-anchor="middle"><tspan class="it">μ</tspan><tspan class="it sb" dy="4">2</tspan></text>
+<path d="M 666,178 L 733.5,217.0" class="ref"/>
+<circle cx="733.5" cy="217.0" r="7" class="ah cen"/>
+<text x="752.6025403784438" y="232.00000000000006" class="sm" text-anchor="middle"><tspan class="it">μ</tspan><tspan class="it sb" dy="4">3</tspan></text>
+<circle cx="597.1" cy="141.4" r="6.5" fill="none" class="e"/>
+<text x="666" y="276" class="sm" text-anchor="middle">circled point: d₁ = 0.47, d₂ = 0.53, margin (d₂ − d₁)/d₂ = 0.11</text>
+<text x="666" y="312" class="hd" text-anchor="middle">PAS = average margin = 0.53</text>
+<text x="14" y="346" class="sm" text-anchor="start">Unit-length embeddings, so every point sits on the circle and distance is cosine distance 1 − cos θ. Dots take the colour of their nearest centroid,</text>
+<text x="14" y="364" class="sm" text-anchor="start">which is computed, not given: no target labels are used. Solid line: nearest centroid (d₁); dashed: second nearest (d₂).</text>
+</svg>

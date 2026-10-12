@@ -1,0 +1,87 @@
+<svg viewBox="0 0 890 314" xmlns="http://www.w3.org/2000/svg" role="img">
+<title>LEEP as a fixed linear layer</title>
+<desc>Flow from a target input through the frozen source model to a source softmax, through a fixed counted matrix P-hat of y given z, to a target prediction, and finally the log probability of the true label, averaged over examples to give the LEEP score.</desc>
+<style>
+  text{font-family:ui-sans-serif,-apple-system,"Segoe UI",sans-serif;font-weight:400}
+  .hd{font-size:14.5px;font-weight:500;fill:#1a1a19} .v{font-size:13px;fill:#1a1a19}
+  .b{font-weight:500} .sm{font-size:12px;fill:#57564f} .tiny{font-size:11px;fill:#57564f}
+  .it{font-style:italic} .sb{font-size:72%}
+  .bgcard{fill:#fbfaf6}
+  .box{fill:#f1efe7;stroke:#8a8880;stroke-width:1.3}
+  .slow{fill:#f7e7d8;stroke:#c8702f;stroke-width:1.5} .fast{fill:#dfeaf6;stroke:#2f6fb5;stroke-width:1.5}
+  .need{fill:#dfeaf6;stroke:#2f6fb5;stroke-width:1.8} .free{fill:#f7e7d8;stroke:#c8702f;stroke-width:1.8}
+  .e{stroke:#1a1a19;stroke-width:1.5;fill:none} .ah{fill:#1a1a19}
+  .ax{stroke:#8a8880;stroke-width:0.9;fill:none} .gd{stroke:#e2e1da;stroke-width:0.7;fill:none}
+  .frame{fill:none;stroke:#c9c7bf;stroke-width:1}
+  .sb1{stroke:#2f6fb5;stroke-width:2.2;fill:none} .sb2{stroke:#c8702f;stroke-width:2.2;fill:none}
+  .db1{stroke:#2f6fb5;stroke-width:2.2;fill:none;stroke-dasharray:6 4}
+  .db2{stroke:#c8702f;stroke-width:2.2;fill:none;stroke-dasharray:6 4}
+  .p1{fill:#2f6fb5;stroke:#fbfaf6;stroke-width:1.2} .p2{fill:#c8702f;stroke:#fbfaf6;stroke-width:1.2}
+  .band{fill:#c8702f;opacity:.10} .ref{stroke:#8a8880;stroke-width:1.1;stroke-dasharray:3 3;fill:none}
+  .refd{stroke:#1a1a19;stroke-width:1.3;stroke-dasharray:6 4;fill:none}
+  .blue{fill:#2f6fb5} .orange{fill:#c8702f}
+  .cen{stroke:#1a1a19;stroke-width:1.6}
+  .off{fill:none;stroke:#b3b1a8;stroke-width:1.3;stroke-dasharray:5 4}
+  @media (prefers-color-scheme: dark){
+    .hd,.v{fill:#eceae3} .sm,.tiny{fill:#b6b4ab} .bgcard{fill:#161615}
+    .box{fill:#25241f;stroke:#85837b}
+    .slow{fill:#3a2a1c;stroke:#e09a5f} .fast{fill:#1d2f45;stroke:#7fb2e8}
+    .need{fill:#1d2f45;stroke:#7fb2e8} .free{fill:#3a2a1c;stroke:#e09a5f}
+    .e{stroke:#eceae3} .ah{fill:#eceae3}
+    .ax{stroke:#85837b} .gd{stroke:#33312e} .frame{stroke:#4a4844}
+    .sb1,.db1{stroke:#7fb2e8} .sb2,.db2{stroke:#e09a5f}
+    .p1{fill:#7fb2e8;stroke:#161615} .p2{fill:#e09a5f;stroke:#161615}
+    .band{fill:#e09a5f;opacity:.14} .ref{stroke:#85837b} .refd{stroke:#eceae3}
+    .blue{fill:#7fb2e8} .orange{fill:#e09a5f} .off{stroke:#5d5b55} .cen{stroke:#eceae3}
+  }
+</style>
+<defs><marker id="ah" viewBox="0 0 10 8" refX="10" refY="4" markerWidth="10" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto"><path d="M0,0 L10,4 L0,8 Z" class="ah"/></marker></defs>
+<rect width="890" height="314" rx="6" class="bgcard"/>
+<text x="14" y="24" class="hd" text-anchor="start">LEEP's predictor: nothing is trained, the softmax goes through one counted matrix</text>
+<rect x="17" y="66" width="118" height="78" rx="8" class="box"/>
+<text x="76.0" y="101.0" class="v b" text-anchor="middle">Target input</text>
+<text x="76.0" y="118.0" class="sm" text-anchor="middle"><tspan class="it">x</tspan><tspan class="it sb" dy="4">i</tspan></text>
+<rect x="162" y="66" width="118" height="78" rx="8" class="box"/>
+<text x="221.0" y="101.0" class="v b" text-anchor="middle">Source model</text>
+<text x="221.0" y="118.0" class="sm" text-anchor="middle">frozen</text>
+<rect x="307" y="66" width="118" height="78" rx="8" class="need"/>
+<text x="366.0" y="101.0" class="v b" text-anchor="middle">Source softmax</text>
+<text x="366.0" y="118.0" class="sm" text-anchor="middle"><tspan class="it">θ</tspan><tspan>(x</tspan><tspan class="it sb" dy="4">i</tspan><tspan dy="-4">)</tspan></text>
+<rect x="452" y="66" width="118" height="78" rx="8" class="free"/>
+<text x="511.0" y="92.5" class="v b" text-anchor="middle">Fixed matrix</text>
+<text x="511.0" y="109.5" class="sm" text-anchor="middle"><tspan>P̂(y | z)</tspan></text>
+<text x="511.0" y="126.5" class="sm" text-anchor="middle">counted once</text>
+<rect x="597" y="66" width="118" height="78" rx="8" class="need"/>
+<text x="656.0" y="101.0" class="v b" text-anchor="middle">Target prediction</text>
+<text x="656.0" y="118.0" class="sm" text-anchor="middle"><tspan>p(y | x</tspan><tspan class="it sb" dy="4">i</tspan><tspan dy="-4">)</tspan></text>
+<rect x="742" y="66" width="118" height="78" rx="8" class="box"/>
+<text x="801.0" y="101.0" class="v b" text-anchor="middle">Score term</text>
+<text x="801.0" y="118.0" class="sm" text-anchor="middle"><tspan>log p(y</tspan><tspan class="it sb" dy="4">i</tspan><tspan dy="-4"> | x</tspan><tspan class="it sb" dy="4">i</tspan><tspan dy="-4">)</tspan></text>
+<path d="M 138,105.0 H 157" class="e" marker-end="url(#ah)"/>
+<path d="M 283,105.0 H 302" class="e" marker-end="url(#ah)"/>
+<path d="M 428,105.0 H 447" class="e" marker-end="url(#ah)"/>
+<path d="M 573,105.0 H 592" class="e" marker-end="url(#ah)"/>
+<path d="M 718,105.0 H 737" class="e" marker-end="url(#ah)"/>
+<rect x="337" y="186.0" width="18" height="28.0" class="blue" fill-opacity="0.75"/>
+<rect x="361" y="206.0" width="18" height="8.0" class="blue" fill-opacity="0.75"/>
+<rect x="385" y="210.0" width="18" height="4.0" class="blue" fill-opacity="0.75"/>
+<path d="M 334,214 H 406" class="ax"/>
+<text x="346.0" y="227" class="tiny" text-anchor="middle">z1</text>
+<text x="370.0" y="227" class="tiny" text-anchor="middle">z2</text>
+<text x="394.0" y="227" class="tiny" text-anchor="middle">z3</text>
+<rect x="627" y="187.6" width="18" height="26.4" class="blue" fill-opacity="0.75"/>
+<rect x="651" y="207.3" width="18" height="6.7" class="blue" fill-opacity="0.75"/>
+<rect x="675" y="207.1" width="18" height="6.9" class="blue" fill-opacity="0.75"/>
+<path d="M 624,214 H 696" class="ax"/>
+<text x="636.0" y="227" class="tiny" text-anchor="middle">y1</text>
+<text x="660.0" y="227" class="tiny" text-anchor="middle">y2</text>
+<text x="684.0" y="227" class="tiny" text-anchor="middle">y3</text>
+<text x="366.0" y="248" class="tiny" text-anchor="middle">e.g. (0.7, 0.2, 0.1)</text>
+<text x="656.0" y="248" class="tiny" text-anchor="middle">(0.66, 0.17, 0.17)</text>
+<path d="M 366.0,148 V 162" class="ref"/>
+<path d="M 656.0,148 V 162" class="ref"/>
+<text x="801.0" y="208" class="sm" text-anchor="middle"><tspan>true y</tspan><tspan class="it sb" dy="4">i</tspan><tspan dy="-4"> = 1:</tspan></text>
+<text x="801.0" y="228" class="v b" text-anchor="middle">log 0.66 = -0.42</text>
+<text x="801.0" y="248" class="tiny" text-anchor="middle">LEEP = average over i</text>
+<text x="14" y="296" class="sm" text-anchor="start">Expected Empirical Predictor: p(y | x) = Σ_z P̂(y | z) θ(x)_z. The only fitted object is the table P̂, and it is counted, not trained.</text>
+</svg>

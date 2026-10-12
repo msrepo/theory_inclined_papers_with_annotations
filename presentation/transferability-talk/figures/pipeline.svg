@@ -20,6 +20,8 @@
   .band{fill:#c8702f;opacity:.10} .ref{stroke:#8a8880;stroke-width:1.1;stroke-dasharray:3 3;fill:none}
   .refd{stroke:#1a1a19;stroke-width:1.3;stroke-dasharray:6 4;fill:none}
   .blue{fill:#2f6fb5} .orange{fill:#c8702f}
+  .cen{stroke:#1a1a19;stroke-width:1.6}
+  .off{fill:none;stroke:#b3b1a8;stroke-width:1.3;stroke-dasharray:5 4}
   @media (prefers-color-scheme: dark){
     .hd,.v{fill:#eceae3} .sm,.tiny{fill:#b6b4ab} .bgcard{fill:#161615}
     .box{fill:#25241f;stroke:#85837b}
@@ -30,7 +32,7 @@
     .sb1,.db1{stroke:#7fb2e8} .sb2,.db2{stroke:#e09a5f}
     .p1{fill:#7fb2e8;stroke:#161615} .p2{fill:#e09a5f;stroke:#161615}
     .band{fill:#e09a5f;opacity:.14} .ref{stroke:#85837b} .refd{stroke:#eceae3}
-    .blue{fill:#7fb2e8} .orange{fill:#e09a5f}
+    .blue{fill:#7fb2e8} .orange{fill:#e09a5f} .off{stroke:#5d5b55} .cen{stroke:#eceae3}
   }
 </style>
 <defs><marker id="ah" viewBox="0 0 10 8" refX="10" refY="4" markerWidth="10" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto"><path d="M0,0 L10,4 L0,8 Z" class="ah"/></marker></defs>
