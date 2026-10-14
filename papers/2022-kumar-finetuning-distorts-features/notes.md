@@ -21,7 +21,7 @@ short_title: "Kumar 2022 — fine-tuning distorts features"
   gradient flow. Drag the tilt of the pretrained feature and the initial head, scrub time.
 - **[Code](code/feature_distortion.py)**: numpy only. `python3 code/feature_distortion.py` prints every
   number quoted below; `--figures` regenerates the three SVGs.
-- **[Principal angles between subspaces](../../foundations/principal-angles-subspaces/index.html)**: the
+- **[Principal angles between subspaces](../principal-angles-subspaces/index.html)**: the
   one piece of linear algebra the main theorem is written in.
 
 Kumar, Raghunathan, Jones, Ma and Liang, *Fine-Tuning can Distort Pretrained Features and Underperform
