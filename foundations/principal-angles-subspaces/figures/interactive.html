@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Principal angles explorer</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/contrib/auto-render.min.js"></script>
+<style>
+:root{
+  --bg:#fbfaf7; --surface:#ffffff; --ink:#1c1d21; --muted:#5b5f68; --faint:#8a8880; --line:#e2dfd8; --soft:#f2f0ea;
+  --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a; --neg:#e34948; --radius:12px; color-scheme: light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#131417; --surface:#1b1d21; --ink:#ebebed; --muted:#a3a6ae; --faint:#85837b; --line:#2e3138; --soft:#23262b;
+    --s1:#3987e5; --s2:#d95926; --s3:#199e70; --neg:#e66767; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#131417; --surface:#1b1d21; --ink:#ebebed; --muted:#a3a6ae; --faint:#85837b; --line:#2e3138; --soft:#23262b;
+  --s1:#3987e5; --s2:#d95926; --s3:#199e70; --neg:#e66767; color-scheme: dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,sans-serif}
+main{max-width:1000px;margin:0 auto;padding:36px 16px 80px}
+a{color:var(--s1)}
+h1{font-size:1.9rem;line-height:1.2;margin:0 0 .4rem}
+h2{font-size:1.3rem;margin:2.4rem 0 .5rem;padding-top:.5rem;border-top:1px solid var(--line)}
+.lede{color:var(--muted)}
+.widget{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:14px;margin:1rem 0}
+.controls{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;margin:.2rem 0 .7rem;font-size:.9rem}
+.controls label{display:flex;align-items:center;gap:6px;color:var(--muted)}
+.rowbox{border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin:.4rem 0;display:flex;flex-wrap:wrap;gap:6px 16px;align-items:center;font-size:.9rem}
+.rowbox .tag{font-weight:600;min-width:1.5rem}
+.rowbox.u .tag{color:var(--s1)} .rowbox.v .tag{color:var(--s2)}
+button,select{font:inherit;font-size:.88rem;color:var(--ink);background:var(--soft);border:1px solid var(--line);border-radius:8px;padding:5px 11px;cursor:pointer}
+button:focus-visible,input:focus-visible,select:focus-visible,canvas:focus-visible{outline:2px solid var(--s1);outline-offset:2px}
+input[type=range]{accent-color:var(--s1);width:150px}
+.grid2{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:16px;align-items:start}
+@media (max-width:820px){.grid2{grid-template-columns:1fr}}
+canvas{display:block;width:100%;height:auto;border-radius:8px;touch-action:none;cursor:grab}
+.cap{font-size:.82rem;color:var(--muted)}
+.callout{border-left:3px solid var(--s1);background:var(--soft);padding:10px 14px;border-radius:0 8px 8px 0;margin:1rem 0}
+table.t{border-collapse:collapse;font-variant-numeric:tabular-nums;font-size:.88rem;width:100%;margin:.3rem 0}
+table.t th,table.t td{border:1px solid var(--line);padding:4px 8px;text-align:right}
+table.t th{color:var(--muted);font-weight:500;text-align:center}
+table.t td.l{text-align:left}
+.mat{font-family:ui-monospace,Menlo,monospace;font-size:.85rem;color:var(--ink);background:var(--soft);border-radius:8px;padding:6px 10px;display:inline-block;margin:.2rem 0}
+.bad{color:var(--neg);font-weight:600} .good{color:var(--s3);font-weight:600}
+.key{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:.8rem;color:var(--muted);margin:.4rem 0}
+.sw{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;vertical-align:-1px}
+</style>
+</head>
+<body>
+<main>
+<h1>Principal angles between subspaces</h1>
+<p class="lede">Companion to the foundations page <a href="../index.html">Principal angles between subspaces</a>. Everything here lives in $\mathbb R^3$ so the subspaces can be drawn: lines (dimension 1) and planes (dimension 2). Drag the 3-D view to turn it.</p>
+
+<div class="callout">Two <i>lines</i> meet at one angle. A line and a plane meet at one angle (the line against its own shadow in the plane). Two <i>planes</i> have two angles, and in $\mathbb R^3$ the first is always $0^\circ$, because two planes through the origin share a line. The number of angles is $\min(p,q)$, the smaller dimension.</div>
+
+<h2>1. Build two subspaces and read their angles</h2>
+<div class="widget">
+  <div class="controls">
+    <span>Presets:</span>
+    <button data-p="pp">two planes</button>
+    <button data-p="lp">line &amp; plane</button>
+    <button data-p="ll">two lines</button>
+    <button data-p="near">nearly equal planes</button>
+    <button data-p="perp">perpendicular planes</button>
+    <button data-p="cont">line inside plane</button>
+  </div>
+  <div class="grid2">
+    <div>
+      <canvas id="view" width="640" height="520" tabindex="0" role="img" aria-label="Interactive 3-D view of two subspaces and their principal vectors"></canvas>
+      <div class="key">
+        <span><span class="sw" style="background:var(--s1)"></span>U (blue)</span>
+        <span><span class="sw" style="background:var(--s2)"></span>V (orange)</span>
+        <span><span class="sw" style="background:var(--s3)"></span>principal vectors: an arc joins $u_k$ to $v_k$</span>
+      </div>
+      <div class="cap">Drag to rotate. A plane is drawn as a unit square in its own basis; a line as a segment. Each principal pair $(u_k,v_k)$ is the closest pair of unit directions left after the earlier pairs are removed, and the green arc is the angle $\theta_k$ between them.</div>
+    </div>
+    <div>
+      <div class="rowbox u"><span class="tag">U</span>
+        <select id="uk"><option value="1">line</option><option value="2" selected>plane</option></select>
+        <label>azimuth <input id="ua" type="range" min="0" max="360" step="1" value="20"> <b id="uav"></b></label>
+        <label>elevation <input id="ue" type="range" min="-90" max="90" step="1" value="90"> <b id="uev"></b></label>
+      </div>
+      <div class="rowbox v"><span class="tag">V</span>
+        <select id="vk"><option value="1">line</option><option value="2" selected>plane</option></select>
+        <label>azimuth <input id="va" type="range" min="0" max="360" step="1" value="20"> <b id="vav"></b></label>
+        <label>elevation <input id="ve" type="range" min="-90" max="90" step="1" value="60"> <b id="vev"></b></label>
+      </div>
+      <div class="cap" style="margin-top:-2px">For a plane, azimuth and elevation set its <i>normal</i> direction; for a line, its direction.</div>
+      <div id="angtab"></div>
+      <div id="dist"></div>
+    </div>
+  </div>
+</div>
+
+<h2>2. The SVD recipe: the angles are in $Q_U^\top Q_V$, whatever basis you pick</h2>
+<p>The notes' boxed formula says the singular values of $Q_U^\top Q_V$ are $\cos\theta_i$, where the columns of $Q_U,Q_V$ are <i>any</i> orthonormal bases of the two subspaces. Spin the basis inside each subspace and watch the matrix change while its singular values stay put.</p>
+<div class="widget">
+  <div class="controls">
+    <label>spin basis of U <input id="su" type="range" min="0" max="360" step="1" value="0"> <b id="suv">0&deg;</b></label>
+    <label>spin basis of V <input id="sv" type="range" min="0" max="360" step="1" value="0"> <b id="svv">0&deg;</b></label>
+  </div>
+  <div id="matrix"></div>
+  <div class="cap">The spin only re-chooses the two basis vectors inside a plane (a line has a single unit vector, so it only flips). The drawing above does not move; the matrix entries do; the singular values $\sigma_i=\cos\theta_i$ do not.</div>
+</div>
+
+<h2>3. The accuracy trap: cosines forget small angles</h2>
+<p>Take two lines in the plane at a tiny angle $\theta$: $u=(1,0)$, $v=(\cos\theta,\sin\theta)$. Recover $\theta$ two ways in ordinary double-precision arithmetic: from the cosine, $\arccos(u^\top v)$, and from the sine, $\arcsin\lVert (I-P_U)v\rVert$.</p>
+<div class="widget">
+  <div class="controls">
+    <label>$\log_{10}\theta$ <input id="ls" type="range" min="-9" max="-1" step="0.1" value="-8"> <b id="lsv"></b></label>
+  </div>
+  <div id="acc"></div>
+  <div class="cap">At $\theta=10^{-8}$ the cosine is $1-5\times10^{-17}$, which rounds to $1$: the angle has left the number before $\arccos$ ever sees it. The sine is $10^{-8}$ itself, stored with full relative precision. That is why Björck&ndash;Golub compute sines for small angles and cosines for large ones. (Here the sine is formed directly from two numbers, so it is exact; the notes' table sends it through an SVD and still sees about $10^{-9}$ relative error at $10^{-8}$, against $160\%$ for the cosine.)</div>
+</div>
+</main>
+
+<script>
+(function(){
+  var $=function(id){return document.getElementById(id);};
+  var D2R=Math.PI/180, R2D=180/Math.PI;
+  // ---------- tiny vector helpers
+  function dot(a,b){return a[0]*b[0]+a[1]*b[1]+a[2]*b[2];}
+  function cross(a,b){return [a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]];}
+  function nrm(a){return Math.sqrt(dot(a,a));}
+  function unit(a){var n=nrm(a);return [a[0]/n,a[1]/n,a[2]/n];}
+  function add(a,b,s){s=s===undefined?1:s;return [a[0]+s*b[0],a[1]+s*b[1],a[2]+s*b[2]];}
+  function scl(a,s){return [a[0]*s,a[1]*s,a[2]*s];}
+  function dirOf(az,el){var a=az*D2R,e=el*D2R;return [Math.cos(e)*Math.cos(a),Math.cos(e)*Math.sin(a),Math.sin(e)];}
+
+  // an orthonormal basis (list of 3-vectors) for the chosen subspace; spin turns it inside the subspace
+  function basis(kind,az,el,spin){
+    var d=dirOf(az,el);
+    if(kind===1){ return [scl(d, Math.cos(spin*D2R)>=0?1:-1)]; }
+    var ref=Math.abs(d[2])>0.95?[1,0,0]:[0,0,1];
+    var e1=unit(cross(d,ref)), e2=cross(d,e1);
+    var c=Math.cos(spin*D2R), s=Math.sin(spin*D2R);
+    return [add(scl(e1,c),e2,s), add(scl(e1,-s),e2,c)];
+  }
+  // M = Qu^T Qv as p x q array
+  function matM(U,V){return U.map(function(u){return V.map(function(v){return dot(u,v);});});}
+  // symmetric 2x2 eigen: returns [[l1,vec1],[l2,vec2]] with l1>=l2
+  function eig2(a,b,c){
+    var m=(a+c)/2, r=Math.sqrt(((a-c)/2)*((a-c)/2)+b*b), l1=m+r, l2=m-r, v1;
+    if(r<1e-14) v1=[1,0]; else if(Math.abs(b)<1e-14) v1=(a>=c)?[1,0]:[0,1]; else{var t=[l1-c,b],n=Math.hypot(t[0],t[1]);v1=[t[0]/n,t[1]/n];}
+    return [[l1,v1],[l2,[-v1[1],v1[0]]]];
+  }
+  // singular values and singular vectors of the small matrix M (p x q, p,q in {1,2})
+  function svd(M){
+    var p=M.length,q=M[0].length,k=Math.min(p,q),xs=[],ys=[],sig=[];
+    if(k===1 && p===1 && q===1){ var s=Math.abs(M[0][0]); return {sig:[s],xs:[[1]],ys:[[M[0][0]>=0?1:-1]]}; }
+    if(p<=q){ // eigen of M M^T (p x p) gives the left vectors
+      var A=[[0,0],[0,0]]; for(var i=0;i<p;i++)for(var j=0;j<p;j++){var t=0;for(var l=0;l<q;l++)t+=M[i][l]*M[j][l];A[i][j]=t;}
+      var ev = p===1 ? [[A[0][0],[1]]] : eig2(A[0][0],A[0][1],A[1][1]);
+      ev.forEach(function(e,idx){
+        var x=e[1], sg=Math.sqrt(Math.max(e[0],0)); sig.push(sg); xs.push(x);
+        var y=[];for(var l=0;l<q;l++){var t=0;for(var i=0;i<p;i++)t+=M[i][l]*x[i];y.push(t);}
+        if(sg>1e-9){ys.push(y.map(function(z){return z/sg;}));}
+        else{ ys.push(q===2 && ys.length ? [-ys[0][1],ys[0][0]] : (q===2?[1,0]:[1])); }
+      });
+    } else { // eigen of M^T M (q x q) gives the right vectors
+      var B=[[0,0],[0,0]]; for(var i2=0;i2<q;i2++)for(var j2=0;j2<q;j2++){var t2=0;for(var l2=0;l2<p;l2++)t2+=M[l2][i2]*M[l2][j2];B[i2][j2]=t2;}
+      var ev2 = q===1 ? [[B[0][0],[1]]] : eig2(B[0][0],B[0][1],B[1][1]);
+      ev2.forEach(function(e){
+        var y=e[1], sg=Math.sqrt(Math.max(e[0],0)); sig.push(sg); ys.push(y);
+        var x=[];for(var i=0;i<p;i++){var t=0;for(var l=0;l<q;l++)t+=M[i][l]*y[l];x.push(t);}
+        if(sg>1e-9){xs.push(x.map(function(z){return z/sg;}));}
+        else{ xs.push(p===2 && xs.length ? [-xs[0][1],xs[0][0]] : (p===2?[1,0]:[1])); }
+      });
+    }
+    return {sig:sig,xs:xs,ys:ys};
+  }
+  function lin(Q,c){var r=[0,0,0];for(var i=0;i<Q.length;i++)r=add(r,Q[i],c[i]);return r;}
+
+  // ---------- state, UI
+  var view={yaw:35*D2R,pitch:-18*D2R};
+  function state(){
+    var g=function(id){return +$(id).value;};
+    var uk=+$('uk').value, vk=+$('vk').value;
+    $('uav').textContent=g('ua')+'°';$('uev').textContent=g('ue')+'°';$('vav').textContent=g('va')+'°';$('vev').textContent=g('ve')+'°';
+    $('suv').textContent=g('su')+'°';$('svv').textContent=g('sv')+'°';
+    return {uk:uk,vk:vk,U0:basis(uk,g('ua'),g('ue'),0),V0:basis(vk,g('va'),g('ve'),0),
+            U:basis(uk,g('ua'),g('ue'),g('su')),V:basis(vk,g('va'),g('ve'),g('sv'))};
+  }
+  function css(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim();}
+  function proj(p){
+    var c=Math.cos(view.yaw),s=Math.sin(view.yaw),x1=p[0]*c-p[1]*s,y1=p[0]*s+p[1]*c,z1=p[2];
+    var cp=Math.cos(view.pitch),sp=Math.sin(view.pitch);
+    return [x1, z1*cp-y1*sp, y1*cp+z1*sp];
+  }
+  function drawScene(S,res){
+    var cv=$('view'),c=cv.getContext('2d'),W=cv.width,H=cv.height,sc=200,ox=W/2,oy=H/2+10;
+    var th={s1:css('--s1'),s2:css('--s2'),s3:css('--s3'),ink:css('--ink'),muted:css('--muted'),line:css('--line')};
+    var P=function(p){var q=proj(p);return [ox+sc*q[0],oy-sc*q[1]];};
+    c.clearRect(0,0,W,H);
+    // axes (faint)
+    c.strokeStyle=th.line;c.lineWidth=1;
+    [[1,0,0,'x'],[0,1,0,'y'],[0,0,1,'z']].forEach(function(a){
+      var p0=P([-1.5*a[0],-1.5*a[1],-1.5*a[2]]),p1=P([1.5*a[0],1.5*a[1],1.5*a[2]]);
+      c.beginPath();c.moveTo(p0[0],p0[1]);c.lineTo(p1[0],p1[1]);c.stroke();
+      c.fillStyle=th.muted;c.font='12px sans-serif';c.fillText(a[3],p1[0]+4,p1[1]-4);
+    });
+    function drawSub(B,col){
+      c.fillStyle=col;c.strokeStyle=col;
+      if(B.length===2){
+        var pts=[[-1,-1],[1,-1],[1,1],[-1,1]].map(function(t){return P(add(scl(B[0],t[0]),B[1],t[1]));});
+        c.globalAlpha=.22;c.beginPath();pts.forEach(function(q,i){if(i)c.lineTo(q[0],q[1]);else c.moveTo(q[0],q[1]);});c.closePath();c.fill();
+        c.globalAlpha=.9;c.lineWidth=1.5;c.stroke();c.globalAlpha=1;
+      } else {
+        var a=P(scl(B[0],-1.3)),b=P(scl(B[0],1.3));c.lineWidth=3.5;c.beginPath();c.moveTo(a[0],a[1]);c.lineTo(b[0],b[1]);c.stroke();
+      }
+    }
+    drawSub(S.U0,th.s1);drawSub(S.V0,th.s2);
+    // principal vectors and arcs
+    var r=res.sv;
+    r.sig.forEach(function(sg,k){
+      var u=lin(S.U0,r.xs[k]),v=lin(S.V0,r.ys[k]);
+      var ang=Math.acos(Math.min(1,sg));
+      var pu=P(scl(u,1.15)),pv=P(scl(v,1.15)),o=P([0,0,0]);
+      c.lineWidth=2.2;
+      c.strokeStyle=th.s1;c.beginPath();c.moveTo(o[0],o[1]);c.lineTo(pu[0],pu[1]);c.stroke();
+      c.fillStyle=th.s1;c.beginPath();c.arc(pu[0],pu[1],4,0,7);c.fill();
+      c.strokeStyle=th.s2;c.beginPath();c.moveTo(o[0],o[1]);c.lineTo(pv[0],pv[1]);c.stroke();
+      c.fillStyle=th.s2;c.beginPath();c.arc(pv[0],pv[1],4,0,7);c.fill();
+      // arc u -> v at radius 0.6
+      c.strokeStyle=th.s3;c.lineWidth=2.4;c.beginPath();
+      if(ang>1e-6){
+        var n=cross(u,v);var w=unit(cross(n,u)); // in-plane unit vector perpendicular to u, towards v
+        for(var i=0;i<=24;i++){var a=ang*i/24,q=P(add(scl(u,0.6*Math.cos(a)),w,0.6*Math.sin(a)));if(i)c.lineTo(q[0],q[1]);else c.moveTo(q[0],q[1]);}
+        c.stroke();
+        var mid=P(add(scl(u,0.78*Math.cos(ang/2)),w,0.78*Math.sin(ang/2)));
+        c.fillStyle=th.s3;c.font='bold 13px sans-serif';c.fillText('θ'+(k+1)+'='+(ang*R2D).toFixed(1)+'°',mid[0]+4,mid[1]);
+      } else {
+        c.fillStyle=th.s3;c.font='bold 13px sans-serif';var m2=P(scl(u,0.9));c.fillText('θ'+(k+1)+'=0°',m2[0]+6,m2[1]+14);
+      }
+      c.fillStyle=th.ink;c.font='12px sans-serif';c.fillText('u'+(k+1),pu[0]+6,pu[1]-4);c.fillText('v'+(k+1),pv[0]+6,pv[1]+12);
+    });
+  }
+  function table(res,S){
+    var p=S.U0.length,q=S.V0.length,sg=res.sv.sig, m=sg.length;
+    var h='<table class="t"><tr><th>k</th><th>cos&theta;<sub>k</sub>=&sigma;<sub>k</sub></th><th>&theta;<sub>k</sub></th><th>sin&theta;<sub>k</sub></th></tr>';
+    sg.forEach(function(s,k){var a=Math.acos(Math.min(1,s));h+='<tr><td>'+(k+1)+'</td><td>'+s.toFixed(4)+'</td><td>'+(a*R2D).toFixed(2)+'&deg;</td><td>'+Math.sin(a).toFixed(4)+'</td></tr>';});
+    h+='</table><div class="cap">dim U = '+p+', dim V = '+q+' &rarr; min(p,q) = '+m+' angle'+(m>1?'s':'')+
+       '. The largest angle &theta;<sub>'+m+'</sub> has cos&theta;<sub>max</sub> = &sigma;<sub>min</sub>(Q<sub>U</sub><sup>&top;</sup>Q<sub>V</sub>) = <b>'+sg[m-1].toFixed(4)+'</b>; it is zero only if some direction of the smaller subspace is perpendicular to the whole other one.</div>';
+    $('angtab').innerHTML=h;
+    var ang=sg.map(function(s){return Math.acos(Math.min(1,s));});
+    var tr=sg.reduce(function(a,s){return a+s*s;},0);
+    var d='<table class="t"><tr><th>quantity</th><th>value</th></tr>'+
+      '<tr><td class="l">tr(P<sub>U</sub>P<sub>V</sub>) = &Sigma;cos&sup2;&theta;</td><td>'+tr.toFixed(4)+'</td></tr>'+
+      '<tr><td class="l">&#8214;P<sub>U</sub>P<sub>V</sub>&#8214;<sub>2</sub> = cos&theta;<sub>1</sub></td><td>'+sg[0].toFixed(4)+'</td></tr>';
+    if(p===q){
+      var chord=Math.sqrt(2*ang.reduce(function(a,t){return a+Math.sin(t)*Math.sin(t);},0)), geo=Math.sqrt(ang.reduce(function(a,t){return a+t*t;},0));
+      d+='<tr><td class="l">&#8214;P<sub>U</sub>&minus;P<sub>V</sub>&#8214;<sub>2</sub> = sin&theta;<sub>m</sub></td><td>'+Math.sin(ang[m-1]).toFixed(4)+'</td></tr>'+
+         '<tr><td class="l">chordal distance &radic;(2&Sigma;sin&sup2;&theta;)</td><td>'+chord.toFixed(4)+'</td></tr>'+
+         '<tr><td class="l">geodesic distance &radic;(&Sigma;&theta;&sup2;)</td><td>'+geo.toFixed(4)+'</td></tr>';
+    } else d+='<tr><td class="l" colspan="2">projector-difference distances need p = q; here p &ne; q, so only the two rows above apply</td></tr>';
+    $('dist').innerHTML=d+'</table>';
+  }
+  function matrix(S,res){
+    var M=matM(S.U,S.V);
+    var f=function(x){return (x<0?'':'&nbsp;')+x.toFixed(3);};
+    var h='<div>Q<sub>U</sub><sup>&top;</sup>Q<sub>V</sub> = <div class="mat">'+M.map(function(r){return r.map(f).join('&nbsp;&nbsp;');}).join('<br>')+'</div></div>';
+    var sv=svd(M).sig;
+    h+='<div>singular values: <b>'+sv.map(function(s){return s.toFixed(4);}).join(', ')+'</b> &nbsp;&nbsp; cosines from the unspun bases: <b>'+res.sv.sig.map(function(s){return s.toFixed(4);}).join(', ')+'</b> &nbsp;&nbsp;'+
+       (Math.max.apply(null,sv.map(function(s,i){return Math.abs(s-res.sv.sig[i]);}))<1e-9?'<span class="good">equal</span>':'<span class="bad">differ</span>')+'</div>';
+    $('matrix').innerHTML=h;
+  }
+  function accuracy(){
+    var s=+$('ls').value; $('lsv').textContent=s.toFixed(1);
+    function run(th){
+      var c=Math.cos(th),sn=Math.sin(th),d=1*c+0*sn; // u=(1,0), v=(c,sn)
+      var rx=c-d*1, ry=sn-d*0, sine=Math.hypot(rx,ry);
+      return {cosv:d,viaCos:Math.acos(d),viaSin:Math.asin(sine)};
+    }
+    var rows=[-2,-4,-6,-8].concat([s]);
+    var h='<table class="t"><tr><th>true &theta;</th><th>cos&theta; (stored)</th><th>arccos route</th><th>rel. error</th><th>arcsin route</th><th>rel. error</th></tr>';
+    rows.forEach(function(e,i){
+      var th=Math.pow(10,e),r=run(th),ec=Math.abs(r.viaCos-th)/th,es=Math.abs(r.viaSin-th)/th;
+      var cls=function(x){return x>1e-3?'bad':'';};
+      h+='<tr'+(i===4?' style="background:var(--soft)"':'')+'><td>'+(i===4?'<b>slider:</b> ':'')+th.toExponential(1)+'</td><td>'+r.cosv.toPrecision(17)+'</td><td>'+r.viaCos.toExponential(3)+'</td><td class="'+cls(ec)+'">'+ec.toExponential(1)+'</td><td>'+r.viaSin.toExponential(3)+'</td><td>'+es.toExponential(1)+'</td></tr>';
+    });
+    $('acc').innerHTML=h+'</table>';
+  }
+  function refresh(){var S=state();var M=matM(S.U0,S.V0);var res={sv:svd(M)};drawScene(S,res);table(res,S);matrix(S,res);}
+  ['uk','vk','ua','ue','va','ve','su','sv'].forEach(function(id){$(id).addEventListener('input',refresh);});
+  $('ls').addEventListener('input',accuracy);
+  var PRE={pp:{uk:2,ua:20,ue:90,vk:2,va:20,ve:60},lp:{uk:1,ua:30,ue:50,vk:2,va:0,ve:90},ll:{uk:1,ua:0,ue:0,vk:1,va:40,ve:20},
+           near:{uk:2,ua:0,ue:90,vk:2,va:0,ve:84},perp:{uk:2,ua:0,ue:90,vk:2,va:0,ve:0},cont:{uk:1,ua:45,ue:0,vk:2,va:0,ve:90}};
+  Array.prototype.forEach.call(document.querySelectorAll('[data-p]'),function(b){b.addEventListener('click',function(){
+    var p=PRE[b.getAttribute('data-p')];Object.keys(p).forEach(function(k){$(k).value=p[k];});$('su').value=0;$('sv').value=0;refresh();});});
+  // drag to orbit
+  var cv=$('view'),drag=null;
+  cv.addEventListener('pointerdown',function(e){drag={x:e.clientX,y:e.clientY};cv.setPointerCapture(e.pointerId);cv.style.cursor='grabbing';});
+  cv.addEventListener('pointermove',function(e){if(!drag)return;view.yaw+=(e.clientX-drag.x)*0.01;view.pitch=Math.max(-1.5,Math.min(1.5,view.pitch+(e.clientY-drag.y)*0.01));drag={x:e.clientX,y:e.clientY};refresh();});
+  cv.addEventListener('pointerup',function(){drag=null;cv.style.cursor='grab';});
+  if(window.matchMedia)window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change',refresh);
+  refresh();accuracy();
+  window.addEventListener("load",function(){try{renderMathInElement(document.body,{delimiters:[{left:"$$",right:"$$",display:true},{left:"$",right:"$",display:false}]});}catch(e){}});
+})();
+</script>
+</body>
+</html>

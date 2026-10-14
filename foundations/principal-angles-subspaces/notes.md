@@ -11,6 +11,9 @@ status: living
 
 ## Links
 
+- **[Interactive version](figures/interactive.html)** — build two lines or planes in $\mathbb{R}^3$ and read
+  off their principal angles and principal vectors, spin the bases to see that $Q_U^\top Q_V$ changes
+  while its singular values do not, and watch `arccos` lose a small angle that `arcsin` keeps.
 - **[Runnable code](https://github.com/msrepo/theory_inclined_papers_with_annotations/blob/main/foundations/principal-angles-subspaces/code/angles.py)** —
   the SVD characterisation, the projector identities, the two degenerate cases, the
   arccos accuracy trap, and the CCA equivalence. `make verify` runs it.
