@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Feature distortion explorer</title>
+<style>
+:root{
+  --bg:#fbfaf7; --surface:#ffffff; --ink:#1c1d21; --muted:#5b5f68; --line:#e2dfd8; --soft:#f2f0ea;
+  --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a; --neg:#e34948; --radius:12px; color-scheme: light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#131417; --surface:#1b1d21; --ink:#ebebed; --muted:#a3a6ae; --line:#2e3138; --soft:#23262b;
+    --s1:#3987e5; --s2:#d95926; --s3:#199e70; --neg:#e66767; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#131417; --surface:#1b1d21; --ink:#ebebed; --muted:#a3a6ae; --line:#2e3138; --soft:#23262b;
+  --s1:#3987e5; --s2:#d95926; --s3:#199e70; --neg:#e66767; color-scheme: dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,sans-serif}
+main{max-width:980px;margin:0 auto;padding:36px 16px 80px}
+a{color:var(--s1)}
+h1{font-size:1.9rem;line-height:1.2;margin:0 0 .4rem}
+h2{font-size:1.3rem;margin:2.2rem 0 .5rem;padding-top:.5rem;border-top:1px solid var(--line)}
+.lede{color:var(--muted)}
+.widget{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:14px;margin:1rem 0}
+.controls{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center;margin:.2rem 0 .7rem;font-size:.9rem}
+.controls label{display:flex;align-items:center;gap:6px;color:var(--muted)}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg button{border:0;border-radius:0;border-right:1px solid var(--line)}
+.seg button:last-child{border-right:0}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--surface)}
+button{font:inherit;font-size:.88rem;color:var(--ink);background:var(--soft);border:1px solid var(--line);border-radius:8px;padding:5px 11px;cursor:pointer}
+button:focus-visible,input:focus-visible{outline:2px solid var(--s1);outline-offset:2px}
+input[type=range]{accent-color:var(--s1);width:170px}
+.readout{font-size:.9rem;color:var(--muted);margin-top:.5rem;font-variant-numeric:tabular-nums}
+.readout b{color:var(--ink)}
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;align-items:start}
+@media (max-width:760px){.grid2{grid-template-columns:1fr}}
+canvas{display:block;width:100%;height:auto;border-radius:8px}
+.cap{font-size:.82rem;color:var(--muted)}
+.callout{border-left:3px solid var(--s1);background:var(--soft);padding:10px 14px;border-radius:0 8px 8px 0;margin:1rem 0}
+</style>
+</head>
+<body>
+<main>
+<h1>Feature distortion, in two dimensions</h1>
+<p class="lede">Companion to the notes on Kumar, Raghunathan, Jones, Ma &amp; Liang, <i>Fine-Tuning can Distort Pretrained Features and Underperform Out-of-Distribution</i> (ICLR 2022). <a href="../index.html">Back to the notes</a>.</p>
+
+<p>The model is <code>f(x) = v · (B·x)</code> with a single feature <code>B = (bx, by)</code> and a scalar head <code>v</code>. The truth is <code>w* = 2·(cos 45°, sin 45°)</code>. The only training example is <code>x = (1, 0)</code>, on the horizontal axis, so training can only see <code>w</code>'s horizontal coordinate. A test point on the vertical axis is the "out-of-distribution" direction: its error is the gap between the predictor's vertical coordinate and the truth's, <code>|w*<sub>y</sub> − v·by|</code>.</p>
+
+<div class="callout">Fine-tuning runs gradient flow on both <code>v</code> and <code>B</code>. The gradient with respect to <code>B</code> is <code>(2 v r, 0)</code>, where <code>r</code> is the training residual. It has <b>no vertical component</b>, so <code>by</code> never changes, while <code>bx</code> and <code>v</code> do. That is the whole distortion.</div>
+
+<h2>1. Drag the pretrained feature and the head</h2>
+<div class="widget">
+  <div class="controls">
+    <label>angle of pretrained <b>B0</b> <input id="a0" type="range" min="30" max="75" step="1" value="50"> <b id="a0v">50°</b></label>
+    <label>initial head <b>v0</b> <input id="v0" type="range" min="-1" max="4" step="0.05" value="0.5"> <b id="v0v">0.50</b></label>
+    <label>time <input id="tt" type="range" min="0" max="1" step="0.002" value="1"> <b id="ttv">end</b></label>
+  </div>
+  <div class="grid2">
+    <div><canvas id="plane" width="520" height="440" role="img" aria-label="the plane with the true predictor, the linear-probing predictor and the fine-tuned predictor"></canvas>
+      <div class="cap">Green: truth <code>w*</code>. Blue: linear probing (rescales B0). Orange: fine-tuning at the chosen time (dashed: its path). Dashed black: B0. Red bar: the vertical-axis (OOD) error.</div></div>
+    <div><canvas id="curve" width="520" height="440" role="img" aria-label="vertical-axis error against training time"></canvas>
+      <div class="cap">OOD error over time (log scale) for fine-tuning from the head <code>v0</code>, LP-FT from the linear-probe head, and linear probing. The vertical line marks the time slider.</div></div>
+  </div>
+  <div class="readout" id="read"></div>
+</div>
+
+<h2>2. What to look for</h2>
+<ul>
+  <li>Set <b>v0</b> equal to 2, the true head size. The fine-tuning error nearly vanishes: when the head is already right it does not have to drag the feature to fit the training point (Theorem 3.3's lower bound scales with the alignment error <code>|v0² − v*²|</code>).</li>
+  <li>Move <b>B0</b> far from 45°. Linear probing now overshoots, because it only matches the horizontal coordinate, and fine-tuning can win. The theorem is about good features (small ε); the toy shows the other side too.</li>
+  <li>Put <b>B0</b> near 46° and <b>v0</b> far from 2: fine-tuning is far worse than linear probing, which is the paper's regime.</li>
+  <li>Scrub <b>time</b>: <code>by</code> (the vertical coordinate of the feature) never moves, only <code>bx</code> does.</li>
+</ul>
+</main>
+<script>
+(function(){
+  var YS = 2*Math.cos(Math.PI/4), WSY = 2*Math.sin(Math.PI/4);   // training label, true vertical coordinate
+  var $ = function(id){return document.getElementById(id);};
+  var DT = 0.01, T = 60, N = Math.round(T/DT);
+
+  function flow(v, bx, by, trainB){            // gradient flow on L = (bx v - YS)^2, RK4
+    var P = [[0,v,bx]];
+    function f(v,bx){var r = bx*v - YS; return [-2*bx*r, trainB ? -2*v*r : 0];}
+    for (var s=1; s<=N; s++){
+      var k1=f(v,bx), k2=f(v+DT/2*k1[0],bx+DT/2*k1[1]), k3=f(v+DT/2*k2[0],bx+DT/2*k2[1]), k4=f(v+DT*k3[0],bx+DT*k3[1]);
+      v += DT/6*(k1[0]+2*k2[0]+2*k3[0]+k4[0]); bx += DT/6*(k1[1]+2*k2[1]+2*k3[1]+k4[1]);
+      if (s % 5 === 0) P.push([s*DT, v, bx]);
+    }
+    return P;
+  }
+  function theme(){
+    var s = getComputedStyle(document.documentElement);
+    return {ink:s.getPropertyValue('--ink').trim(), muted:s.getPropertyValue('--muted').trim(), line:s.getPropertyValue('--line').trim(),
+            s1:s.getPropertyValue('--s1').trim(), s2:s.getPropertyValue('--s2').trim(), s3:s.getPropertyValue('--s3').trim(), neg:s.getPropertyValue('--neg').trim()};
+  }
+  function arrow(c, x0,y0,x1,y1,col,w,dash){
+    c.strokeStyle=col; c.fillStyle=col; c.lineWidth=w; c.setLineDash(dash||[]);
+    c.beginPath(); c.moveTo(x0,y0); c.lineTo(x1,y1); c.stroke(); c.setLineDash([]);
+    c.beginPath(); c.arc(x1,y1,4,0,6.3); c.fill();
+  }
+  function draw(){
+    var a0 = +$('a0').value, v0 = +$('v0').value, tf = +$('tt').value;
+    $('a0v').textContent = a0+'°'; $('v0v').textContent = v0.toFixed(2);
+    var a = a0*Math.PI/180, bx0 = Math.cos(a), by = Math.sin(a);
+    var vlp = YS/bx0;                                              // linear probe: matches the training point exactly
+    var ft = flow(v0, bx0, by, true), lpft = flow(vlp, bx0, by, true), lp = flow(v0, bx0, by, false);
+    var idx = Math.min(ft.length-1, Math.round(tf*(ft.length-1)));
+    $('ttv').textContent = (idx===ft.length-1 ? 'end' : ft[idx][0].toFixed(1));
+    var th = theme();
+    var err = function(p){return Math.abs(WSY - p[1]*by);};
+
+    // plane
+    var c = $('plane').getContext('2d'), W=520,H=440, s=105, ox=60, oy=H-70;
+    c.clearRect(0,0,W,H);
+    c.strokeStyle=th.line; c.lineWidth=1; c.beginPath(); c.moveTo(20,oy); c.lineTo(W-10,oy); c.moveTo(ox,oy+20); c.lineTo(ox,10); c.stroke();
+    c.strokeStyle=th.s3; c.globalAlpha=.45; c.lineWidth=6; c.beginPath(); c.moveTo(ox,oy); c.lineTo(ox+3.2*s,oy); c.stroke(); c.globalAlpha=1;
+    c.fillStyle=th.muted; c.font='12px sans-serif'; c.fillText('training data (x-axis)', ox+1.6*s, oy+18);
+    c.fillText('OOD direction (y-axis)', ox+8, 22);
+    var P = function(x,y){return [ox+s*x, oy-s*y];};
+    var q = P(YS,WSY); arrow(c, ox,oy,q[0],q[1],th.s3,2.5); c.fillStyle=th.s3; c.fillText('w*', q[0]+8,q[1]-4);
+    var wl = P(YS, vlp*by); arrow(c, ox,oy,wl[0],wl[1],th.s1,2.5); c.fillStyle=th.s1; c.fillText('w_lp', wl[0]+8,wl[1]-4);
+    // fine-tuning path of the predictor and the current point
+    c.strokeStyle=th.s2; c.globalAlpha=.5; c.setLineDash([4,4]); c.lineWidth=1.6; c.beginPath();
+    ft.forEach(function(p,i){var z=P(p[1]*p[2], p[1]*by); if(i===0)c.moveTo(z[0],z[1]); else c.lineTo(z[0],z[1]);}); c.stroke(); c.setLineDash([]); c.globalAlpha=1;
+    var cur = ft[idx], wf = P(cur[1]*cur[2], cur[1]*by);
+    arrow(c, ox,oy,wf[0],wf[1],th.s2,2.5); c.fillStyle=th.s2; c.fillText('w_ft', wf[0]+8, wf[1]+14);
+    // feature directions
+    var b0 = P(1.6*bx0, 1.6*by); arrow(c, ox,oy,b0[0],b0[1],th.ink,1.3,[5,3]); c.fillStyle=th.muted; c.fillText('B0', b0[0]+6,b0[1]-2);
+    var nb = Math.hypot(cur[2],by), bf = P(1.6*cur[2]/nb, 1.6*by/nb); arrow(c, ox,oy,bf[0],bf[1],th.s2,1.3,[5,3]); c.fillStyle=th.muted; c.fillText('B_ft', bf[0]+6,bf[1]+12);
+    // error bars at the right
+    c.strokeStyle=th.neg; c.lineWidth=2.5; c.beginPath(); c.moveTo(ox+3.1*s,q[1]); c.lineTo(ox+3.1*s, oy-s*cur[1]*by); c.stroke();
+    c.fillStyle=th.neg; c.fillText('FT error '+err(cur).toFixed(2), ox+3.1*s-92, (q[1]+oy-s*cur[1]*by)/2+4);
+
+    // curve
+    var d = $('curve').getContext('2d'); d.clearRect(0,0,W,H);
+    var L=56,R=14,Tp=18,Bt=44, ymin=-6, ymax=1, tmax=T;
+    var X = function(t){return L+(W-L-R)*Math.min(t,tmax)/tmax;};
+    var Y = function(e){return Tp+(H-Tp-Bt)*(ymax-Math.log10(Math.max(e,1e-6)))/(ymax-ymin);};
+    d.strokeStyle=th.line; d.fillStyle=th.muted; d.font='12px sans-serif'; d.lineWidth=1;
+    for (var e=-6;e<=1;e++){d.beginPath(); d.moveTo(L,Y(Math.pow(10,e))); d.lineTo(W-R,Y(Math.pow(10,e))); d.stroke(); d.fillText('1e'+e, 8, Y(Math.pow(10,e))+4);}
+    for (var tv=0; tv<=60; tv+=15){d.fillText(tv, X(tv)-6, H-Bt+18);}
+    d.fillText('time t', W/2-18, H-8);
+    function line(P2, col, sq){d.strokeStyle=col; d.lineWidth=2.2; d.beginPath(); P2.forEach(function(p,i){var z=[X(p[0]),Y(sq?Math.pow(WSY-p[1]*by,2):0)]; if(i===0)d.moveTo(z[0],z[1]); else d.lineTo(z[0],z[1]);}); d.stroke();}
+    line(ft, th.s2, true); line(lpft, th.s3, true); line(lp, th.s1, true);
+    d.strokeStyle=th.ink; d.setLineDash([3,3]); d.lineWidth=1; d.beginPath(); d.moveTo(X(ft[idx][0]),Tp); d.lineTo(X(ft[idx][0]),H-Bt); d.stroke(); d.setLineDash([]);
+    [['fine-tuning from v0',th.s2],['LP-FT',th.s3],['linear probing',th.s1]].forEach(function(z,i){d.fillStyle=z[1]; d.fillRect(W-170,Tp+8+i*18,16,3); d.fillStyle=th.muted; d.fillText(z[0],W-148,Tp+13+i*18);});
+
+    var e2 = function(p){return Math.pow(WSY-p[1]*by,2);};
+    $('read').innerHTML = 'at the end: <b>OOD error (squared)</b> &mdash; fine-tuning <b>'+e2(ft[ft.length-1]).toFixed(3)+'</b>, linear probing <b>'+e2(lp[lp.length-1]).toFixed(3)+'</b>, LP-FT <b>'+e2(lpft[lpft.length-1]).toFixed(3)+'</b>'
+      +' &nbsp;|&nbsp; feature: <b>bx</b> '+bx0.toFixed(3)+' &rarr; '+cur[2].toFixed(3)+', <b>by</b> '+by.toFixed(3)+' (unchanged) &nbsp;|&nbsp; <b>v</b> '+v0.toFixed(2)+' &rarr; '+cur[1].toFixed(3)
+      +' &nbsp;|&nbsp; alignment error |v0&sup2;&minus;v*&sup2;| = <b>'+Math.abs(v0*v0-4).toFixed(2)+'</b>';
+  }
+  ['a0','v0','tt'].forEach(function(id){$(id).addEventListener('input',draw);});
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change',draw);
+  draw();
+})();
+</script>
+</body>
+</html>
