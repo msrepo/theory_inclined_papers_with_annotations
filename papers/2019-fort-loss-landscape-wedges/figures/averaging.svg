@@ -1,0 +1,39 @@
+<svg viewBox="0 0 780 300" xmlns="http://www.w3.org/2000/svg" role="img">
+<title>Loss of the weight average against the number of shared short directions</title>
+<desc>The average of two points has zero loss when they share all ten short directions and rises steadily as they share fewer, reaching about 0.32 when they share none.</desc>
+<style>
+  text{font-family:ui-sans-serif,-apple-system,"Segoe UI",sans-serif;font-weight:400}
+  .lab{font-size:12px;fill:#57564f} .hd{font-size:13px;font-weight:500;fill:#1a1a19}
+  .ax{stroke:#c3c2b7;stroke-width:0.6;fill:none}
+  .gd{stroke:#e2e1da;stroke-width:0.5;fill:none;stroke-dasharray:4 4}
+  .a{fill:none;stroke:#2f6fb5;stroke-width:2} .b{fill:none;stroke:#c2642a;stroke-width:2}
+  .g{fill:none;stroke:#2a8a5c;stroke-width:2} .k{fill:none;stroke:#1a1a19;stroke-width:1.2;stroke-dasharray:5 3}
+  .ia{fill:#2f6fb5} .ib{fill:#c2642a} .ig{fill:#2a8a5c}
+  @media (prefers-color-scheme: dark){
+    .lab{fill:#b6b4ab} .hd{fill:#eceae3} .ax{stroke:#4a4844} .gd{stroke:#33312e}
+    .a{stroke:#7fb2e8} .b{stroke:#e0955c} .g{stroke:#5fcf96} .k{stroke:#eceae3}
+    .ia{fill:#7fb2e8} .ib{fill:#e0955c} .ig{fill:#5fcf96}
+  }
+</style>
+<text class="hd" x="70" y="24">Loss at the midpoint of two optima vs shared short directions (median of 20)</text>
+<line x1="70" y1="250.0" x2="760" y2="250.0" class="gd"/><text class="lab" x="62" y="254.0" text-anchor="end">0.0</text>
+<line x1="70" y1="203.3" x2="760" y2="203.3" class="gd"/><text class="lab" x="62" y="207.3" text-anchor="end">0.1</text>
+<line x1="70" y1="156.7" x2="760" y2="156.7" class="gd"/><text class="lab" x="62" y="160.7" text-anchor="end">0.2</text>
+<line x1="70" y1="110.0" x2="760" y2="110.0" class="gd"/><text class="lab" x="62" y="114.0" text-anchor="end">0.3</text>
+<line x1="70" y1="63.3" x2="760" y2="63.3" class="gd"/><text class="lab" x="62" y="67.3" text-anchor="end">0.4</text>
+<line x1="70" y1="250" x2="760" y2="250" class="ax"/>
+<text class="lab" x="70.0" y="268" text-anchor="middle">10</text>
+<text class="lab" x="208.0" y="268" text-anchor="middle">8</text>
+<text class="lab" x="346.0" y="268" text-anchor="middle">6</text>
+<text class="lab" x="484.0" y="268" text-anchor="middle">4</text>
+<text class="lab" x="622.0" y="268" text-anchor="middle">2</text>
+<text class="lab" x="760.0" y="268" text-anchor="middle">0</text>
+<text class="lab" x="415.0" y="292" text-anchor="middle">zero coordinates shared by the two optima (10 = same wedge)</text>
+<polyline class="b" points="70.0,250.0 208.0,236.4 346.0,206.8 484.0,166.2 622.0,130.8 760.0,100.6"/>
+<circle cx="70.0" cy="250.0" r="3.5" class="ib"/>
+<circle cx="208.0" cy="236.4" r="3.5" class="ib"/>
+<circle cx="346.0" cy="206.8" r="3.5" class="ib"/>
+<circle cx="484.0" cy="166.2" r="3.5" class="ib"/>
+<circle cx="622.0" cy="130.8" r="3.5" class="ib"/>
+<circle cx="760.0" cy="100.6" r="3.5" class="ib"/>
+</svg>
