@@ -45,7 +45,7 @@ CATEGORIES: list[tuple[str, list[str]]] = [
     ("Bayesian inference", ["Review"]),
     ("Theory of deep learning", ["Theory"]),
     # "" first: untitled Misc pages must not render under the last subheading.
-    ("Misc", ["", "Domain Adaptation / Generalization", "Image Quality Assessment"]),
+    ("Misc", ["", "Domain Adaptation / Generalization", "Image Quality Assessment", "Uncertainty Quantification"]),
 ]
 UNSORTED = "Unsorted"
 BUILD = ROOT / "build"

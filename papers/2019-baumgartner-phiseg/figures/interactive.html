@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PHiSeg toy: coarse to fine sampling</title>
+<style>
+:root{--bg:#fff;--card:#f4f3ee;--t:#1f1e1d;--t2:#5f5e5a;--b:#b4b2a9}
+@media(prefers-color-scheme:dark){:root{--bg:#1f1e1d;--card:#2c2c2a;--t:#f1efe8;--t2:#b4b2a9;--b:#5f5e5a}}
+body{margin:0;padding:16px;background:var(--bg);color:var(--t);font:15px/1.6 system-ui,sans-serif;max-width:720px}
+p.note{color:var(--t2);font-size:13px}
+#grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin:0 0 1rem}
+.pn{background:var(--card);border-radius:12px;padding:8px}.pn svg{width:100%;display:block}
+.cap{font-size:12px;color:var(--t2);text-align:center;margin:2px 0 0}
+.row{display:flex;align-items:center;gap:10px;margin:0 0 8px;font-size:13px;color:var(--t2)}
+.row span.l{width:170px}.row span.v{width:32px;text-align:right;color:var(--t)}
+button{padding:6px 12px;border:.5px solid var(--b);border-radius:8px;background:none;color:var(--t);cursor:pointer}
+</style></head><body>
+<p class="note">A toy, not the real network: each panel adds one level's random wiggle to a fixed circle. Levels here are drawn independently; in PHiSeg each finer level is drawn given the coarser one and the image.</p>
+<div id="grid"></div>
+<div class="row"><span class="l">z3 randomness (coarse)</span><input type="range" id="s3" min="0" max="10" value="6" style="flex:1"><span class="v" id="o3"></span></div>
+<div class="row"><span class="l">z2 randomness (middle)</span><input type="range" id="s2" min="0" max="10" value="4" style="flex:1"><span class="v" id="o2"></span></div>
+<div class="row"><span class="l">z1 randomness (fine)</span><input type="range" id="s1" min="0" max="10" value="3" style="flex:1"><span class="v" id="o1"></span></div>
+<button onclick="draw1()">Draw new sample</button>
+<script>
+const K=[4,8,16],R=44,A=[1,0.55,0.28],C=["#7F77DD","#1D9E75","#D85A30"];
+function gauss(){let u=0,v=0;while(!u)u=Math.random();v=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(6.2832*v)}
+function zs(){return K.map(k=>Array.from({length:k},gauss))}
+function interp(z,t){const k=z.length,p=t/6.2832*k,i=Math.floor(p),f=p-i,w=(1-Math.cos(Math.PI*f))/2;return z[((i%k)+k)%k]*(1-w)+z[(((i+1)%k)+k)%k]*w}
+function contour(zz,ss,upto){let d="";for(let j=0;j<=120;j++){const t=j/120*6.2832;let r=R;for(let l=0;l<=upto;l++)r+=ss[l]*A[l]*10*interp(zz[l],t);d+=(j?"L":"M")+(80+r*Math.cos(t)).toFixed(1)+" "+(80+r*Math.sin(t)).toFixed(1)}return d+"Z"}
+const titles=["z3 only (coarse)","+ z2 residual","+ z1 residual","20 samples"],grid=document.getElementById("grid");
+titles.forEach((t,i)=>grid.insertAdjacentHTML("beforeend",`<div><div class="pn"><svg viewBox="0 0 160 160" id="p${i}"></svg></div><p class="cap">${t}</p></div>`));
+let cur=zs();
+function render(){const ss=[+s3.value/10,+s2.value/10,+s1.value/10];o3.textContent=ss[0].toFixed(1);o2.textContent=ss[1].toFixed(1);o1.textContent=ss[2].toFixed(1);
+const zz=[cur[2],cur[1],cur[0]];
+for(let i=0;i<3;i++)document.getElementById("p"+i).innerHTML=`<circle cx="80" cy="80" r="${R}" fill="none" stroke="var(--b)" stroke-dasharray="3 3" stroke-width="0.5"/><path d="${contour(zz,ss,i)}" fill="${C[i]}" fill-opacity="0.25" stroke="${C[i]}" stroke-width="1.5"/>`;
+let m="";for(let n=0;n<20;n++){const z=zs();m+=`<path d="${contour([z[2],z[1],z[0]],ss,2)}" fill="none" stroke="#D85A30" stroke-opacity="0.35" stroke-width="1"/>`}
+document.getElementById("p3").innerHTML=m}
+function draw1(){cur=zs();render()}
+["s1","s2","s3"].forEach(id=>document.getElementById(id).oninput=render);render();
+</script></body></html>
