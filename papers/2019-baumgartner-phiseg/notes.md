@@ -16,7 +16,7 @@ status: read
 
 - **[arXiv:1906.04045](https://arxiv.org/abs/1906.04045)**: the paper (MICCAI 2019).
 - **Code**: [baumgach/PHiSeg-code](https://github.com/baumgach/PHiSeg-code).
-- **Builds on**: Kohl et al., *A Probabilistic U-Net for Segmentation of Ambiguous Images*, NeurIPS 2018.
+- **Builds on**: [Kohl et al. 2018, the Probabilistic U-Net](../2018-kohl-probabilistic-unet/index.html).
 - **Used by**: [Wundram et al. 2024](../2024-wundram-glaucoma-probabilistic-pipeline/index.html), which
   uses PHiSeg as one of four segmenters in a glaucoma pipeline.
 - **[Interactive companion](figures/interactive.html)**: a toy cup outline built from a coarse random
