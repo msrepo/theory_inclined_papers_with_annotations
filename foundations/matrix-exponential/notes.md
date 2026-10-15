@@ -18,7 +18,7 @@ short_title: "Matrix exponential"
   **[Gram matrix](../gram-matrix/index.html)**, **[Four fundamental subspaces](../four-fundamental-subspaces/index.html)**,
   **[Hilbert spaces](../hilbert-space/index.html)**.
 - Where it shows up in the paper notes: the stationary velocity field $\exp(V)$ in
-  [Lipschitz ResNet registration](../../papers/2022-joshi-lipschitz-resnet-registration/notes.md).
+  [Lipschitz ResNet registration](../2022-joshi-lipschitz-resnet-registration/index.html).
 
 ## In one paragraph
 

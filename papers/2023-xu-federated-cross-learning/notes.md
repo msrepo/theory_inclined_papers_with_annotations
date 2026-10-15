@@ -16,7 +16,7 @@ status: read
 - **[PMLR 227:1441–1452](https://proceedings.mlr.press/v227/xu24a.html)**: the paper (MIDL 2023, full paper track).
 - **Code**: [DIAL-RPI/FedCross](https://github.com/DIAL-RPI/FedCross).
 - **Baselines**: FedAvg (McMahan et al. 2017), FedProx (Li et al. 2020), FedBN (Li et al. 2021).
-- **Related in this repo**: [IID representation learning](../2022-wu-iid-representation/notes.md), which asks what it would take
+- **Related in this repo**: [IID representation learning](../2022-wu-iid-representation/index.html), which asks what it would take
   to make domains' distributions identical.
 
 Xu et al., *Federated Cross Learning for Medical Image Segmentation*, MIDL 2023 (proceedings volume dated 2024).
