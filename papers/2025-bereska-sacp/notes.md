@@ -19,7 +19,7 @@ status: read
 - **Conformal prediction primer**: Angelopoulos & Bates, *A gentle introduction to conformal prediction* (2023).
 - **Class-conditional CP**: Shi, Ong & Leckie 2013; Sadinle, Lei & Wasserman 2019 (least ambiguous set-valued classifiers).
 - **Data**: PANORAMA challenge CTs (pancreatic cancer) and the Medical Segmentation Decathlon pancreas set.
-- **Related in this repo**: [PHiSeg](../2019-baumgartner-phiseg/index.html) and [Probabilistic U-Net](../2018-kohl-probabilistic-unet/notes.md) for a different way of getting uncertainty in segmentation.
+- **Related in this repo**: [PHiSeg](../2019-baumgartner-phiseg/index.html) and [Probabilistic U-Net](../2018-kohl-probabilistic-unet/index.html) for a different way of getting uncertainty in segmentation.
 
 Bereska, Karimi and Samavi, *SACP*, MIDL 2025 (proceedings volume dated 2026).
 
