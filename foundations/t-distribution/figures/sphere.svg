@@ -1,0 +1,35 @@
+<svg viewBox="0 0 780 340" xmlns="http://www.w3.org/2000/svg" role="img">
+<title>A sphere cut into rings of constant angle</title>
+<desc>A sphere with a vertical reference axis, a random point and the angle theta between its radius and the axis. The points at the same angle form a horizontal ring, a sphere one dimension lower with radius sine theta.</desc>
+<style>
+  text{font-family:ui-sans-serif,-apple-system,"Segoe UI",sans-serif;font-weight:400}
+  .lab{font-size:12px;fill:#57564f} .hd{font-size:13px;font-weight:500;fill:#1a1a19}
+  .ax{stroke:#c3c2b7;stroke-width:0.6;fill:none}
+  .gd{stroke:#e2e1da;stroke-width:0.5;fill:none;stroke-dasharray:4 4}
+  .a{fill:none;stroke:#2f6fb5;stroke-width:2} .b{fill:none;stroke:#c2642a;stroke-width:2}
+  .g{fill:none;stroke:#2a8a5c;stroke-width:2} .n{fill:none;stroke:#8a8880;stroke-width:2;stroke-dasharray:6 4}
+  .fa{fill:#2f6fb5} .fb{fill:#c2642a} .fg{fill:#2a8a5c} .fn{fill:#8a8880}
+  .sph{fill:none;stroke:#8a8880;stroke-width:1.5} .rg{fill:none;stroke:#c2642a;stroke-width:2}
+  .vec{stroke:#2f6fb5;stroke-width:2;fill:none} .ref{stroke:#57564f;stroke-width:1.2;fill:none;stroke-dasharray:5 4}
+  @media (prefers-color-scheme: dark){
+    .lab{fill:#b6b4ab} .hd{fill:#eceae3} .ax{stroke:#4a4844} .gd{stroke:#33312e}
+    .a{stroke:#7fb2e8} .b{stroke:#e0955c} .g{stroke:#5fcf96} .n{stroke:#8a8880}
+    .fa{fill:#7fb2e8} .fb{fill:#e0955c} .fg{fill:#5fcf96} .fn{fill:#8a8880}
+    .sph{stroke:#8a8880} .rg{stroke:#e0955c} .vec{stroke:#7fb2e8} .ref{stroke:#b6b4ab}
+  }
+</style>
+<text class="hd" x="30" y="26">A uniform point on a sphere and its angle θ to a reference axis</text>
+<circle class="sph" cx="260" cy="170" r="120"/>
+<ellipse class="sph" cx="260" cy="170" rx="120" ry="24" style="stroke-dasharray:4 4"/>
+<line class="ref" x1="260" y1="306" x2="260" y2="32"/>
+<text class="lab" x="268" y="44">reference axis</text>
+<ellipse class="rg" cx="260" cy="101.17082763787448" rx="98.3" ry="19.7"/>
+<line class="vec" x1="260" y1="170" x2="338.6" y2="113.0"/>
+<circle class="fa" cx="338.6" cy="113.0" r="4.5"/>
+<path d="M 260 126 A 44 44 0 0 1 296.0 144.8" class="vec" style="stroke-width:1.2"/>
+<text class="lab" x="274" y="120">θ</text>
+<text class="lab" x="396" y="77.5">all points with the same θ</text>
+<text class="lab" x="396" y="93.5">form a ring: a sphere one</text>
+<text class="lab" x="396" y="109.5">dimension lower, radius sin θ</text>
+<text class="lab" x="396" y="129.5">ring size ∝ sin<tspan dy="-5" font-size="10">ν−1</tspan><tspan dy="5">θ</tspan></text>
+</svg>

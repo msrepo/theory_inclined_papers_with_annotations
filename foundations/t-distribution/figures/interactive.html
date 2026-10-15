@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>t-distribution explorer</title>
+<style>
+:root{
+  --bg:#fbfaf7; --surface:#ffffff; --ink:#1c1d21; --muted:#5b5f68; --line:#e2dfd8;
+  --s1:#2a78d6; --s2:#eb6834; --s3:#898781; --radius:12px; color-scheme: light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#131417; --surface:#1b1d21; --ink:#ebebed; --muted:#a3a6ae; --line:#2e3138;
+    --s1:#3987e5; --s2:#d95926; color-scheme: dark;
+  }
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,sans-serif}
+main{max-width:760px;margin:0 auto;padding:32px 16px 64px}
+h1{font-size:1.7rem;line-height:1.2;margin:0 0 .4rem}
+h2{font-size:1.15rem;margin:2rem 0 .3rem}
+.lede{color:var(--muted);margin:0 0 1rem}
+.widget{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:14px}
+.controls{display:flex;align-items:center;gap:10px;margin-bottom:8px;font-size:.92rem;flex-wrap:wrap}
+.controls label{color:var(--muted)}
+.controls input[type=range]{flex:1;min-width:140px}
+.controls output{font-variant-numeric:tabular-nums;min-width:3em}
+.chart{position:relative;width:100%;height:230px}
+.key{display:flex;flex-wrap:wrap;gap:14px;font-size:.8rem;color:var(--muted);margin-bottom:6px}
+.key i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:4px}
+.stats{display:flex;gap:10px;margin-top:8px;font-size:.9rem;color:var(--muted)}
+.stats b{display:block;font-size:1.4rem;font-weight:500;color:var(--ink);font-variant-numeric:tabular-nums}
+.stats div{flex:1;background:var(--bg);border-radius:8px;padding:8px 10px}
+button{font:inherit;background:transparent;color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:2px 10px;cursor:pointer}
+p.cap{color:var(--muted);font-size:.9rem;margin:.2rem 0 .6rem}
+</style>
+</head>
+<body>
+<main>
+<h1>t-distribution explorer</h1>
+<p class="lede">Four small experiments that go with the foundations page: how the tails depend on ν, why a noisy ruler fattens them, how they fall out of sphere geometry, and what they do to a loss.</p>
+
+<h2>1. t against the normal</h2>
+<p class="cap">Drag ν. The tail probability is the area beyond ±2.</p>
+<div class="widget">
+ <div class="controls"><label for="nu1">ν</label><input type="range" id="nu1" min="1" max="30" value="3"><output id="nu1o">3</output></div>
+ <div class="key"><span><i style="background:var(--s1)"></i>t(ν)</span><span><i style="background:var(--s3)"></i>normal</span></div>
+ <div class="chart"><canvas id="c1" role="img" aria-label="t density against the normal density">t and normal densities.</canvas></div>
+ <div class="stats"><div>P(|T| &gt; 2)<b id="pt">-</b></div><div>P(|Z| &gt; 2)<b>4.55%</b></div></div>
+</div>
+
+<h2>2. Why a noisy ruler fattens the tails</h2>
+<p class="cap">20,000 experiments with n samples. Z divides by the true σ, T divides by the S estimated from the same n samples.</p>
+<div class="widget">
+ <div class="controls"><label for="n2">n</label><input type="range" id="n2" min="2" max="30" value="3"><output id="n2o">3</output><button id="re2">Resimulate</button></div>
+ <div class="key"><span><i style="background:var(--s2)"></i>T (σ estimated)</span><span><i style="background:var(--s1)"></i>Z (σ known)</span></div>
+ <div class="chart"><canvas id="c2" role="img" aria-label="histograms of Z and T">Histograms of Z and T.</canvas></div>
+ <div class="stats"><div>share of T beyond ±2<b id="st">-</b></div><div>share of Z beyond ±2<b id="sz">-</b></div></div>
+</div>
+
+<h2>3. The same curve from a sphere</h2>
+<p class="cap">Random points on the sphere S<sup>ν</sup> in ν+1 dimensions. T = √ν cot θ, with θ the angle to a fixed axis.</p>
+<div class="widget">
+ <div class="controls"><label for="nu3">ν</label><input type="range" id="nu3" min="1" max="30" value="2"><output id="nu3o">2</output><button id="re3">Resample</button></div>
+ <div class="key"><span><i style="background:var(--s2)"></i>simulated</span><span><i style="background:var(--s1)"></i>theory</span><span><i style="background:var(--s3)"></i>normal</span></div>
+ <div class="chart"><canvas id="c3a" role="img" aria-label="histogram of the angle theta">Angle histogram.</canvas></div>
+ <div class="chart" style="margin-top:12px"><canvas id="c3b" role="img" aria-label="histogram of root nu cot theta against t density">T histogram.</canvas></div>
+</div>
+
+<h2>4. T-Loss: loss, gradient, weight</h2>
+<p class="cap">Per-pixel version. Drag ν on a log scale: ν → ∞ is MSE.</p>
+<div class="widget">
+ <div class="controls"><label for="lv">log₁₀ ν</label><input type="range" id="lv" min="-3" max="3" value="0" step="0.05"><output id="vo">1.00</output></div>
+ <div class="key"><span><i style="background:var(--s1)"></i>T-Loss</span><span><i style="background:var(--s2)"></i>MSE</span><span><i style="background:var(--s3)"></i>MAE</span></div>
+ <div class="chart"><canvas id="c4a" role="img" aria-label="loss against error">Loss curves.</canvas></div>
+ <p class="cap" style="margin-top:10px">Gradient: how hard a pixel pulls on the weights.</p>
+ <div class="chart"><canvas id="c4b" role="img" aria-label="gradient against error">Gradient curves.</canvas></div>
+</div>
+</main>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+function lg(x){const c=[76.18009172947146,-86.50532032941677,24.01409824083091,-1.231739572450155,0.1208650973866179e-2,-0.5395239384953e-5];let y=x,t=x+5.5;t-=(x+0.5)*Math.log(t);let s=1.000000000190015;for(const v of c){y+=1;s+=v/y;}return -t+Math.log(2.5066282746310005*s/x);}
+const tpdf=(x,v)=>Math.exp(lg((v+1)/2)-lg(v/2))/Math.sqrt(v*Math.PI)*Math.pow(1+x*x/v,-(v+1)/2);
+const npdf=x=>Math.exp(-x*x/2)/Math.sqrt(2*Math.PI);
+const Bf=v=>Math.exp(lg(0.5)+lg(v/2)-lg((v+1)/2));
+function tail(v,a){let s=0,x=a;while(x<a+4000){const st=0.01*(1+(x-a)/50);s+=tpdf(x+st/2,v)*st;x+=st;}return 2*s;}
+function gauss(){let u=0;while(!u)u=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*Math.random());}
+const dark=document.documentElement.dataset.theme?document.documentElement.dataset.theme==='dark':matchMedia('(prefers-color-scheme: dark)').matches;
+const grid=dark?'#2c2c2a':'#e1e0d9',tick='#898781',C1=dark?'#3987e5':'#2a78d6',C2=dark?'#d95926':'#eb6834',C3='#898781';
+const base=(extra)=>Object.assign({responsive:true,maintainAspectRatio:false,animation:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:tick,maxTicksLimit:7},grid:{display:false}},y:{min:0,ticks:{color:tick},grid:{color:grid}}}},extra||{});
+const line=(c,d,f)=>({type:'line',data:[],borderColor:c,backgroundColor:c+'22',fill:!!f,borderWidth:2,pointRadius:0,borderDash:d||[]});
+const bar=c=>({type:'bar',data:[],backgroundColor:c+'aa',barPercentage:1,categoryPercentage:1});
+const xs=[];for(let x=-6;x<=6.001;x+=0.1)xs.push(+x.toFixed(1));
+
+const c1=new Chart(document.getElementById('c1'),{data:{labels:xs,datasets:[line(C3,[5,4]),line(C1,null,1)]},options:base()});
+c1.data.datasets[0].data=xs.map(npdf);
+function u1(){const v=+document.getElementById('nu1').value;document.getElementById('nu1o').textContent=v;c1.data.datasets[1].data=xs.map(x=>tpdf(x,v));c1.update();document.getElementById('pt').textContent=(tail(v,2)*100).toFixed(1)+'%';}
+document.getElementById('nu1').oninput=u1;u1();
+
+const nb=24,cl2=[];for(let b=0;b<nb;b++)cl2.push((-6+(b+0.5)*0.5).toFixed(1));
+const c2=new Chart(document.getElementById('c2'),{data:{labels:cl2,datasets:[bar(C2),bar(C1)]},options:base()});
+function u2(){const n=+document.getElementById('n2').value;document.getElementById('n2o').textContent=n;const N=20000,hT=new Array(nb).fill(0),hZ=new Array(nb).fill(0);let oT=0,oZ=0;
+for(let i=0;i<N;i++){const a=[];let s=0;for(let j=0;j<n;j++){const g=gauss();a.push(g);s+=g;}const m=s/n;let q=0;for(const g of a)q+=(g-m)*(g-m);const S=Math.sqrt(q/(n-1)),T=m/(S/Math.sqrt(n)),Z=m*Math.sqrt(n);
+if(Math.abs(T)>2)oT++;if(Math.abs(Z)>2)oZ++;let bt=Math.floor((T+6)/0.5),bz=Math.floor((Z+6)/0.5);if(bt>=0&&bt<nb)hT[bt]++;if(bz>=0&&bz<nb)hZ[bz]++;}
+c2.data.datasets[0].data=hT.map(c=>c/N/0.5);c2.data.datasets[1].data=hZ.map(c=>c/N/0.5);c2.update();
+document.getElementById('st').textContent=(oT/N*100).toFixed(1)+'%';document.getElementById('sz').textContent=(oZ/N*100).toFixed(1)+'%';}
+document.getElementById('n2').oninput=u2;document.getElementById('re2').onclick=u2;u2();
+
+const NB1=36,NB2=48,l3=[];for(let b=0;b<NB1;b++)l3.push(((b+0.5)*180/NB1).toFixed(0));
+const c3a=new Chart(document.getElementById('c3a'),{data:{labels:l3,datasets:[bar(C2),line(C1)]},options:base({scales:{x:{ticks:{color:tick,maxTicksLimit:7,callback:function(v){return this.getLabelForValue(v)+'°';}},grid:{display:false}},y:{min:0,ticks:{color:tick},grid:{color:grid}}}})});
+const c3b=new Chart(document.getElementById('c3b'),{data:{labels:[],datasets:[bar(C2),line(C1),line(C3,[5,4])]},options:base()});
+function u3(){const v=+document.getElementById('nu3').value;document.getElementById('nu3o').textContent=v;const N=20000,h1=new Array(NB1).fill(0),h2=new Array(NB2).fill(0),w1=Math.PI/NB1,w2=12/NB2;
+for(let i=0;i<N;i++){let q=0;const z1=gauss();for(let j=0;j<v;j++){const g=gauss();q+=g*g;}const u=z1/Math.sqrt(z1*z1+q),th=Math.acos(u),t=Math.sqrt(v)*u/Math.sqrt(1-u*u);
+h1[Math.min(NB1-1,Math.floor(th/w1))]++;const b=Math.floor((t+6)/w2);if(b>=0&&b<NB2)h2[b]++;}
+c3a.data.datasets[0].data=h1.map(c=>c/N/w1);c3a.data.datasets[1].data=l3.map((_,b)=>Math.pow(Math.sin((b+0.5)*w1),v-1)/Bf(v));c3a.update();
+const l=[],p=[],n=[];for(let b=0;b<NB2;b++){const c=-6+(b+0.5)*w2;l.push(c.toFixed(1));p.push(tpdf(c,v));n.push(npdf(c));}
+c3b.data.labels=l;c3b.data.datasets[0].data=h2.map(c=>c/N/w2);c3b.data.datasets[1].data=p;c3b.data.datasets[2].data=n;c3b.update();}
+document.getElementById('nu3').oninput=u3;document.getElementById('re3').onclick=u3;u3();
+
+const dx=[];for(let i=0;i<=100;i++)dx.push(i/100);
+const c4a=new Chart(document.getElementById('c4a'),{data:{labels:dx,datasets:[line(C1),line(C2),line(C3,[5,4])]},options:base({scales:{x:{ticks:{color:tick,maxTicksLimit:6},grid:{display:false}},y:{min:0,max:1.1,ticks:{color:tick},grid:{color:grid}}}})});
+const c4b=new Chart(document.getElementById('c4b'),{data:{labels:dx,datasets:[line(C1),line(C2),line(C3,[5,4])]},options:base({scales:{x:{ticks:{color:tick,maxTicksLimit:6},grid:{display:false}},y:{min:0,max:2.2,ticks:{color:tick},grid:{color:grid}}}})});
+function u4(){const v=Math.pow(10,+document.getElementById('lv').value);document.getElementById('vo').textContent=Math.log10(v).toFixed(2);
+const L=d=>(v+1)/2*Math.log(1+d*d/v),L1=L(1),G=d=>(v+1)*d/(v+d*d);
+c4a.data.datasets[0].data=dx.map(d=>L(d)/L1);c4a.data.datasets[1].data=dx.map(d=>d*d);c4a.data.datasets[2].data=dx.map(d=>d);c4a.update();
+c4b.data.datasets[0].data=dx.map(G);c4b.data.datasets[1].data=dx.map(d=>2*d);c4b.data.datasets[2].data=dx.map(()=>1);c4b.update();}
+document.getElementById('lv').oninput=u4;u4();
+</script>
+</body>
+</html>
