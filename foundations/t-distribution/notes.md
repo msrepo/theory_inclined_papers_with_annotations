@@ -18,6 +18,8 @@ short_title: "t-distribution"
 - **Video**: the geometric construction below follows
   [the YouTube video at `rawxsBUnUY8`](https://www.youtube.com/watch?v=rawxsBUnUY8) (the transcript was taken from its
   auto-generated captions).
+- **[Liu et al. 2025, BayeSMM](https://papers.miccai.org/miccai-2025/paper/0645_paper.pdf)**: the t as an intensity model for
+  joint registration and segmentation of multi-modality cardiac MR; the second paper worked through below.
 - **[Gaussianity in practice](../gaussianity-in-practice/index.html)** and **[ELBO](../elbo/index.html)**: where a
   Gaussian error model is the default that this page loosens.
 
@@ -234,10 +236,35 @@ the other robust losses degrade late in training as they memorize wrong masks wh
 - **Student-t mixture models for segmentation.** Before deep learning, intensity classes in an image were modelled as a mixture of t-distributions
   (instead of Gaussians) fitted by EM, because Gaussians are dragged around by outlier intensities. Examples: Sfikas, Nikou and Galatsanos (ICIP 2007),
   and versions with spatial Markov random field priors (Xiong et al. 2018).
-- **BayeSMM (MICCAI 2025).** A Bayesian Student-t mixture model for misaligned multi-modality images, fitted by variational inference, that
-  guides a network doing registration and segmentation together. I have only read the abstract.
 - **A polyp-segmentation extension of T-Loss.** Reported to make $\nu$ per-image (predicted by a small network) with per-pixel precision weights.
   Not yet checked; it appears to be a workshop-level paper.
+
+### BayeSMM (Liu et al., MICCAI 2025): the t as a model of pixel intensities
+
+[Paper](https://papers.miccai.org/miccai-2025/paper/0645_paper.pdf); code reported at `github.com/HenryLau7/BayeSMM`
+(not checked). Here the t is not a loss on labels. It is the model of **what intensities a tissue class produces**.
+
+*The problem.* Cardiac MR is scanned in several modalities (LGE, bSSFP, T2) that are not aligned, and the goal is to segment and
+align them together. Disease puts a few extreme pixels inside a tissue class (scar is bright in LGE, oedema is bright in T2),
+which stretches a Gaussian model of that class's intensities and hurts both tasks.
+
+*The model.* Every pixel $x$ in a shared space has a hidden tissue class $z_x$ (one of $K$), with class proportions $\pi$. Given the
+class, the modalities are independent, and each modality's intensity is Student-t with a class-specific mean $\mu$ and inverse-variance $\lambda$,
+written as the scale mixture of this page:
+
+$$
+I_{x,i}\mid z_{x,k}=1,\ u\sim N\!\Big(\mu_{i,k},\ \frac{1}{u_{x,i,k}\,\lambda_{i,k}}\Big),\qquad u_{x,i,k}\sim\mathrm{Gamma}\big(\tfrac\nu2,\ \text{rate }\tfrac\nu2\big).
+$$
+
+So $u_{x,i,k}$ is the precision multiplier $\tau$ of one pixel in one modality. Its posterior value is that pixel's weight: close to 1 for a
+normal member of the class, small for a far-out pixel, which then sits under a wide, tolerant Gaussian and barely moves $\mu$ and $\lambda$.
+This is the same reweighting as in the T-Loss, applied to the intensity model rather than a loss. Here $\nu$ is a hand-chosen hyperparameter, not learned.
+The interactive page's last demo shows this weight on one class with a few bright pixels. How the paper estimates $u$ (a variational
+scheme with a network) is left to a separate section on variational inference.
+
+*Reported evidence (the paper's).* On MS-CMR (45 patients, three modalities, three-fold cross-validation) the model is used inside a joint registration and segmentation network. For the t itself, the relevant test is a synthetic one in which a share of
+pixels is replaced by extreme intensities: BayeSMM degrades less than BayeSMM(w/o), the same model with $u$ fixed to 1 (a Gaussian). Its $\hat u$ maps are shown
+to light up on scar and oedema.
 
 ## Questions and doubts
 
@@ -248,6 +275,14 @@ the other robust losses degrade late in training as they memorize wrong masks wh
   noise is simulated (erosion, dilation, affine), and the link between $\nu$ and the fraction of bad labels is empirical.
 - **Why not scale as well?** A t has a scale parameter that the loss fixes to 1 ($\Sigma=I$). Letting the scale be learned (per image) would give the
   network a second way to explain large errors, so how $\nu$ and the scale interact is unclear.
+- **BayeSMM: how large is the benefit of the t?** In the synthetic-outlier table the BayeSMM versus BayeSMM(w/o) gaps are small compared with
+  the spread across folds (for example about 0.1 to 0.7 Dice points against standard deviations of 0.3 to 1.4), so the ablation alone does not
+  clearly separate them. The 80% and clean-data rows are similar.
+- **BayeSMM: which way does $u$ point?** By the paper's Eq. (3) the variance is $1/(u\lambda)$, so an outlier pixel should have a *small* $u$.
+  Figure 3 describes the abnormal regions as lighter areas with *high* $u$, after "adjusting the brightness". That looks inverted relative to the
+  equations; it could be a different quantity plotted (such as $1/u$) or a different parametrization of the $D_U$ output. The code would settle it.
+- **BayeSMM: why is $\nu$ fixed?** It is hand-chosen, with its posterior "implicitly updated", and no sensitivity to it is shown. Compare T-Loss, where
+  it is the learned quantity.
 - **Is the independence in the mixture view realistic?** The mixture view gives each observation its own $\tau$, but label errors are spatially correlated
   (a whole border shifts). A multivariate t with one shared $\tau$ per image, as in the $D$-dimensional form, is closer to that, which may be the reason
   the paper's image-level formula is the natural one.
@@ -258,4 +293,6 @@ the other robust losses degrade late in training as they memorize wrong masks wh
 - Three derivations give the same density: Gosset's ratio, a gamma-averaged normal, and the angle of a random point on a sphere of dimension $\nu$.
 - Heavy tails make a loss robust because the gradient of $\log(1+\delta^2/\nu)$ falls for large errors: far-out points are down-weighted by the
   model's own estimate of their precision.
+- The same $u$ (the per-observation precision) appears in both papers: in T-Loss as the weight on a pixel's label error, in BayeSMM as the weight on
+  a pixel's intensity within its tissue class. One mechanism, two places to put it.
 - Making $\nu$ trainable lets the data choose the tolerance; the normalizing constants are what make that a proper likelihood fit.

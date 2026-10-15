@@ -77,6 +77,16 @@ p.cap{color:var(--muted);font-size:.9rem;margin:.2rem 0 .6rem}
  <p class="cap" style="margin-top:10px">Gradient: how hard a pixel pulls on the weights.</p>
  <div class="chart"><canvas id="c4b" role="img" aria-label="gradient against error">Gradient curves.</canvas></div>
 </div>
+<h2>5. The weight u in an intensity model (the BayeSMM idea)</h2>
+<p class="cap">One tissue class plus a few bright pixels (think scar). Gaussian fit against a t fit whose per-pixel weights u are learned (a small EM, not the paper's full variational scheme).</p>
+<div class="widget">
+ <div class="controls"><label for="f5">outliers</label><input type="range" id="f5" min="0" max="30" value="10"><output id="f5o">10%</output><label for="nu5">ν</label><input type="range" id="nu5" min="1" max="30" value="3"><output id="nu5o">3</output><button id="re5">Resample</button></div>
+ <div class="key"><span><i style="background:var(--s3)"></i>pixels</span><span><i style="background:var(--s2)"></i>Gaussian fit</span><span><i style="background:var(--s1)"></i>t fit</span></div>
+ <div class="chart"><canvas id="c5a" role="img" aria-label="intensity histogram with Gaussian and t fits">Fits.</canvas></div>
+ <p class="cap" style="margin-top:10px">Weight u of each pixel against its intensity.</p>
+ <div class="chart" style="height:170px"><canvas id="c5b" role="img" aria-label="pixel weight against intensity">Weights.</canvas></div>
+ <div class="stats"><div>Gaussian mean / std (true 100 / 10)<b id="g5">-</b></div><div>t mean / scale<b id="t5">-</b></div></div>
+</div>
 </main>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script>
@@ -126,6 +136,23 @@ const L=d=>(v+1)/2*Math.log(1+d*d/v),L1=L(1),G=d=>(v+1)*d/(v+d*d);
 c4a.data.datasets[0].data=dx.map(d=>L(d)/L1);c4a.data.datasets[1].data=dx.map(d=>d*d);c4a.data.datasets[2].data=dx.map(d=>d);c4a.update();
 c4b.data.datasets[0].data=dx.map(G);c4b.data.datasets[1].data=dx.map(d=>2*d);c4b.data.datasets[2].data=dx.map(()=>1);c4b.update();}
 document.getElementById('lv').oninput=u4;u4();
+
+const bn=[];for(let x=40;x<=260;x+=5)bn.push(x);
+const c5a=new Chart(document.getElementById('c5a'),{data:{labels:bn.map(b=>b+2.5),datasets:[bar(C3),line(C2),line(C1)]},options:base({scales:{x:{ticks:{color:tick,maxTicksLimit:8,callback:function(v){return Math.round(+this.getLabelForValue(v));}},grid:{display:false}},y:{min:0,ticks:{color:tick},grid:{color:grid}}}})});
+const c5b=new Chart(document.getElementById('c5b'),{type:'scatter',data:{datasets:[{data:[],backgroundColor:C1+'99',pointRadius:2.5}]},options:{responsive:true,maintainAspectRatio:false,animation:false,plugins:{legend:{display:false}},scales:{x:{min:40,max:260,ticks:{color:tick},grid:{display:false}},y:{min:0,max:1.3,ticks:{color:tick},grid:{color:grid}}}}});
+function u5(){const f=+document.getElementById('f5').value/100,v=+document.getElementById('nu5').value;
+document.getElementById('f5o').textContent=Math.round(f*100)+'%';document.getElementById('nu5o').textContent=v;
+const N=500,x=[];for(let i=0;i<N;i++)x.push(Math.random()<f?190+25*gauss():100+10*gauss());
+const m=x.reduce((a,b)=>a+b)/N,sd=Math.sqrt(x.reduce((a,b)=>a+(b-m)*(b-m),0)/N);
+let mu=m,s2=sd*sd,u=x.map(()=>1);
+for(let it=0;it<60;it++){u=x.map(xi=>(v+1)/(v+(xi-mu)*(xi-mu)/s2));const su=u.reduce((a,b)=>a+b);mu=x.reduce((a,xi,i)=>a+u[i]*xi,0)/su;s2=x.reduce((a,xi,i)=>a+u[i]*(xi-mu)*(xi-mu),0)/N;}
+const sc=Math.sqrt(s2),h=new Array(bn.length).fill(0);for(const xi of x){const b=Math.floor((xi-40)/5);if(b>=0&&b<h.length)h[b]++;}
+const np=(t,a,b)=>Math.exp(-(t-a)*(t-a)/(2*b*b))/(b*Math.sqrt(2*Math.PI));
+const tp=(t,a,b)=>Math.exp(lg((v+1)/2)-lg(v/2))/(b*Math.sqrt(v*Math.PI))*Math.pow(1+(t-a)*(t-a)/(b*b*v),-(v+1)/2);
+c5a.data.datasets[0].data=h.map(c=>c/N/5);c5a.data.datasets[1].data=bn.map(b=>np(b+2.5,m,sd));c5a.data.datasets[2].data=bn.map(b=>tp(b+2.5,mu,sc));c5a.update();
+c5b.data.datasets[0].data=x.map((xi,i)=>({x:xi,y:u[i]}));c5b.update();
+document.getElementById('g5').textContent=m.toFixed(0)+' / '+sd.toFixed(0);document.getElementById('t5').textContent=mu.toFixed(0)+' / '+sc.toFixed(1);}
+['f5','nu5'].forEach(i=>document.getElementById(i).oninput=u5);document.getElementById('re5').onclick=u5;u5();
 </script>
 </body>
 </html>
