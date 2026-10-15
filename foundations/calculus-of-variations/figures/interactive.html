@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Calculus of variations</title>
+<style>
+:root{
+ --page:#ffffff;--text-primary:#1a1a18;--text-secondary:#5f5e5a;--surface-1:#f4f3ee;
+ --border:rgba(0,0,0,.12);--border-strong:rgba(0,0,0,.28);--radius:8px;
+ --font-sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root{
+ --page:#1c1c1a;--text-primary:#ecebe6;--text-secondary:#a9a8a0;--surface-1:#2a2a27;
+ --border:rgba(255,255,255,.14);--border-strong:rgba(255,255,255,.3);}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--text-primary);font-family:var(--font-sans);font-size:16px;line-height:1.7}
+main{max-width:760px;margin:0 auto;padding:32px 16px 80px}
+h1{font-size:28px;font-weight:500;margin:0 0 6px}
+h2{font-size:21px;font-weight:500;margin:2.2rem 0 .4rem;border-top:.5px solid var(--border);padding-top:1.2rem}
+p{margin:.6rem 0}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px 20px;margin:0 0 1rem}
+.grid label{font-size:13px;color:var(--text-secondary);display:block}
+.grid b{color:var(--text-primary);font-weight:500}
+.grid input,.grid select{width:100%}
+.leg{display:flex;gap:16px;font-size:13px;color:var(--text-secondary);margin:0 0 6px;flex-wrap:wrap}
+.leg i{display:inline-block;width:12px;height:3px;vertical-align:middle;margin-right:6px}
+canvas{width:100%;display:block}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin:1rem 0}
+.card{background:var(--surface-1);border-radius:var(--radius);padding:1rem}
+.card span{display:block;font-size:13px;color:var(--text-secondary)}
+.card b{font-size:24px;font-weight:500}
+.cap{font-size:14px;color:var(--text-secondary)}
+</style>
+</head>
+<body>
+<main>
+<h1>Calculus of variations: the Gaussian has the most entropy</h1>
+<p class="cap">Every density here has the same mean and the same spread as the Gaussian. Entropy is the number the Gaussian wins.</p>
+
+<h2>Gaussian against another density with the same mean and spread</h2>
+<div class="grid">
+<div><label>Mean μ: <b id="muo">0.0</b></label><input type="range" id="mu" min="-3" max="3" step="0.1" value="0"></div>
+<div><label>Std dev σ: <b id="sgo">1.0</b></label><input type="range" id="sg" min="0.5" max="2" step="0.1" value="1"></div>
+<div><label>Alternative density</label><select id="alt"><option value="uni">Uniform</option><option value="lap" selected>Laplace</option><option value="log">Logistic</option><option value="bi">Two bumps</option></select></div>
+<div><label>Mix toward alternative, t: <b id="to">0.50</b></label><input type="range" id="t" min="0" max="1" step="0.01" value="0.5"></div>
+</div>
+<div class="leg">
+<span><i style="background:#7F77DD"></i>Gaussian</span>
+<span><i style="background:#D85A30"></i>Alternative (same μ, σ)</span>
+<span><i style="background:#1D9E75"></i>Mixture (1−t)·Gaussian + t·alternative</span>
+</div>
+<canvas id="c1" style="height:230px"></canvas>
+<div class="cards">
+<div class="card"><span>H[Gaussian]</span><b id="hg"></b></div>
+<div class="card"><span>H[alternative]</span><b id="ha"></b></div>
+<div class="card"><span>H[mixture]</span><b id="hm"></b></div>
+<div class="card"><span>Gap to maximum</span><b id="hd"></b></div>
+</div>
+
+<h2>Entropy along the path from the Gaussian to the alternative</h2>
+<p class="cap">The mixture keeps the same mean and variance at every t, so every point on the path obeys the constraints. The entropy peaks at t = 0.</p>
+<canvas id="c2" style="height:170px"></canvas>
+</main>
+<script>
+const S=id=>document.getElementById(id);
+const SQ=Math.sqrt;
+function dens(kind,mu,s){
+ if(kind==='g')return x=>Math.exp(-(x-mu)**2/(2*s*s))/(s*SQ(2*Math.PI));
+ if(kind==='uni'){const w=s*SQ(12)/2;return x=>Math.abs(x-mu)<=w?1/(2*w):0;}
+ if(kind==='lap'){const b=s/SQ(2);return x=>Math.exp(-Math.abs(x-mu)/b)/(2*b);}
+ if(kind==='log'){const k=s*SQ(3)/Math.PI;return x=>{const e=Math.exp(-(x-mu)/k);return e/(k*(1+e)**2);};}
+ const a=0.8*s,q=0.6*s,n=x=>Math.exp(-x*x/(2*q*q))/(q*SQ(2*Math.PI));
+ return x=>0.5*n(x-mu+a)+0.5*n(x-mu-a);
+}
+function ent(f,mu,s){const N=3000,lo=mu-9*s,h=18*s/N;let H=0;
+ for(let i=0;i<=N;i++){const p=f(lo+i*h);if(p>1e-300)H-=p*Math.log(p)*h;}return H;}
+function setup(c){const r=devicePixelRatio||1,w=c.clientWidth,h=c.clientHeight;c.width=w*r;c.height=h*r;const g=c.getContext('2d');g.setTransform(r,0,0,r,0,0);return[g,w,h];}
+function col(v){return getComputedStyle(document.documentElement).getPropertyValue(v).trim()||'#888';}
+function line(g,pts,color,wd){g.beginPath();pts.forEach((p,i)=>i?g.lineTo(p[0],p[1]):g.moveTo(p[0],p[1]));g.strokeStyle=color;g.lineWidth=wd;g.stroke();}
+function draw(){
+ const mu=+S('mu').value,s=+S('sg').value,kind=S('alt').value,t=+S('t').value;
+ S('muo').textContent=mu.toFixed(1);S('sgo').textContent=s.toFixed(1);S('to').textContent=t.toFixed(2);
+ const G=dens('g',mu,s),A=dens(kind,mu,s);
+ const M=tt=>x=>(1-tt)*G(x)+tt*A(x);
+ const hG=ent(G,mu,s),hA=ent(A,mu,s),hM=ent(M(t),mu,s);
+ S('hg').textContent=hG.toFixed(3);S('ha').textContent=hA.toFixed(3);S('hm').textContent=hM.toFixed(3);S('hd').textContent=(hG-hM).toFixed(3);
+ const tc=col('--text-secondary'),bc=col('--border-strong');
+ let[g,w,h]=setup(S('c1'));
+ const x0=-8,x1=8,px=x=>30+(x-x0)/(x1-x0)*(w-40),ymax=0.85,py=y=>h-24-Math.min(y,ymax)/ymax*(h-40);
+ g.strokeStyle=bc;g.lineWidth=1;g.beginPath();g.moveTo(30,h-24);g.lineTo(w-10,h-24);g.stroke();
+ g.fillStyle=tc;g.font='11px sans-serif';g.textAlign='center';
+ for(let x=-8;x<=8;x+=2){g.fillText(x,px(x),h-8);}
+ g.setLineDash([4,4]);g.strokeStyle=tc;g.beginPath();g.moveTo(px(mu),10);g.lineTo(px(mu),h-24);g.stroke();g.setLineDash([]);
+ const curve=f=>{const a=[];for(let i=0;i<=400;i++){const x=x0+(x1-x0)*i/400;a.push([px(x),py(f(x))]);}return a;};
+ line(g,curve(A),'#D85A30',2);line(g,curve(G),'#7F77DD',2.5);line(g,curve(M(t)),'#1D9E75',2.5);
+ let[g2,w2,h2]=setup(S('c2'));
+ const ts=[],hs=[];for(let i=0;i<=40;i++){const tt=i/40;ts.push(tt);hs.push(ent(M(tt),mu,s));}
+ const hmin=Math.min(...hs)-0.05,hmax=hG+0.05;
+ const qx=v=>40+v*(w2-55),qy=v=>h2-24-(v-hmin)/(hmax-hmin)*(h2-36);
+ g2.strokeStyle=bc;g2.beginPath();g2.moveTo(40,h2-24);g2.lineTo(w2-15,h2-24);g2.moveTo(40,10);g2.lineTo(40,h2-24);g2.stroke();
+ g2.setLineDash([4,4]);g2.strokeStyle=tc;g2.beginPath();g2.moveTo(40,qy(hG));g2.lineTo(w2-15,qy(hG));g2.stroke();g2.setLineDash([]);
+ g2.fillStyle=tc;g2.font='11px sans-serif';g2.textAlign='center';
+ [0,0.5,1].forEach(v=>g2.fillText(v.toFixed(1),qx(v),h2-8));
+ g2.textAlign='left';g2.fillText('max',46,qy(hG)-5);
+ line(g2,ts.map((v,i)=>[qx(v),qy(hs[i])]),'#1D9E75',2.5);
+ g2.fillStyle='#1D9E75';g2.beginPath();g2.arc(qx(t),qy(hM),5,0,7);g2.fill();
+}
+['mu','sg','alt','t'].forEach(id=>S(id).addEventListener('input',draw));
+addEventListener('resize',draw);
+draw();
+</script>
+</body>
+</html>
