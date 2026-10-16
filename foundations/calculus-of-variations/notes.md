@@ -12,7 +12,7 @@ short_title: "Calculus of variations"
 ## Links
 
 - **[Interactive version](figures/interactive.html)**: compare a Gaussian with a uniform, Laplace, logistic or two-bump density
-  that has the same mean and spread, and slide along the path between them to watch the entropy fall away from the Gaussian.
+  that has the same mean and spread, and slide along the path between them to watch the entropy fall away from the Gaussian; and a sphere where you push a great-circle arc sideways and watch it lengthen.
 - **[Lagrange multiplier](../lagrange-multiplier/index.html)**: the same constrained-maximum idea for a point instead of a
   function. Its maximum-entropy section is the discrete version of the Gaussian derivation below.
 - **[Fisher information](../fisher-information/index.html)**: where the exponential family at the end of this page lives.
@@ -104,6 +104,41 @@ no second-variation check is needed.
 The [interactive page](figures/interactive.html) draws the Gaussian next to a uniform, Laplace, logistic or two-bump density with the same
 mean and spread. Mix the two with the slider $t$: the mixture $(1-t)\,\text{Gaussian}+t\,\text{alternative}$ still has that mean and
 variance for every $t$, so every point on the path obeys the constraints, and the entropy curve along the path peaks at $t=0$, the Gaussian.
+
+## Worked example: the shortest path on a sphere is a great circle
+
+Take a sphere of radius $R$ with polar angle $\theta$ (from the north pole) and longitude $\varphi$. A tiny step on the surface has
+length $ds^2=R^2(d\theta^2+\sin^2\theta\,d\varphi^2)$. Describe a path as $\varphi(\theta)$; its length is the functional
+$$J[\varphi]=R\int\sqrt{1+\sin^2\theta\;\varphi'^2}\,d\theta,\qquad F=\sqrt{1+\sin^2\theta\,\varphi'^2}.$$
+
+**Euler–Lagrange.** $F$ contains $\varphi'$ but not $\varphi$ itself, so $\partial F/\partial\varphi=0$ and the equation says
+$\dfrac{d}{d\theta}\dfrac{\partial F}{\partial\varphi'}=0$. Therefore
+$$\frac{\sin^2\theta\,\varphi'}{\sqrt{1+\sin^2\theta\,\varphi'^2}}=c\quad(\text{a constant}).$$
+This constant exists because turning the sphere about its polar axis changes no lengths. A symmetry of the problem gives a conserved quantity (Noether's theorem in its simplest form).
+
+**Solve.** Square it and solve for $\varphi'$:
+$$\varphi'=\frac{c}{\sin\theta\,\sqrt{\sin^2\theta-c^2}}\;\Longrightarrow\;\cot\theta=A\cos(\varphi-\varphi_0),\qquad A=\frac{c}{\sqrt{1-c^2}}$$
+(substitute $u=\cot\theta$ to integrate).
+
+**Why that is a great circle.** With $x=R\sin\theta\cos\varphi,\;y=R\sin\theta\sin\varphi,\;z=R\cos\theta$ we have $\cot\theta=z/\sqrt{x^2+y^2}$, and the
+answer becomes
+$$z=A\,(x\cos\varphi_0+y\sin\varphi_0),$$
+the equation of a plane through the centre. A plane through the centre cuts the sphere in a **great circle**.
+
+**A shortcut by symmetry.** Rotate the sphere so both points lie on the equator. Then the equator is a path that obeys the equation (the case $c=1$). Any two points can be rotated onto a common great circle, so the answer is always a great-circle arc.
+
+Details:
+
+- Two points split their great circle into a short arc and a long arc. Both are stationary, but only the short one is the minimum.
+- If the points are antipodal, every great circle through them has the same length $\pi R$, so the shortest path is not unique.
+- The shortest paths on any curved surface are called **geodesics**, and the Euler–Lagrange equation for length is the **geodesic equation**.
+  The same calculation with a different length rule gives the geodesics on the Gaussians in the
+  [Fisher information](../fisher-information/index.html) notes.
+
+### See it
+
+The second plot on the [interactive page](figures/interactive.html) puts two points on a sphere. Push the great-circle arc sideways by $\varepsilon$ and the path gets longer
+on either side, with the extra length growing as the bump grows. That is the nudge argument above, drawn on a globe.
 
 ## The pattern behind it: the exponential family
 

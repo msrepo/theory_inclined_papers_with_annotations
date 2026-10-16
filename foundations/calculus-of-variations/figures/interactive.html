@@ -61,12 +61,34 @@ canvas{width:100%;display:block}
 <h2>Entropy along the path from the Gaussian to the alternative</h2>
 <p class="cap">The mixture keeps the same mean and variance at every t, so every point on the path obeys the constraints. The entropy peaks at t = 0.</p>
 <canvas id="c2" style="height:170px"></canvas>
+
+<h2>The shortest path on a sphere</h2>
+<p class="cap">Two points on a sphere. The bold orange arc is the great-circle arc. Push it sideways with the slider: every bump makes the path longer, which is the nudge-and-look-at-the-slope argument.</p>
+<div class="grid">
+<div><label>Point A latitude: <b id="la_o">20</b>°</label><input type="range" id="la" min="-80" max="80" step="1" value="20"></div>
+<div><label>Point A longitude: <b id="oa_o">-60</b>°</label><input type="range" id="oa" min="-180" max="180" step="1" value="-60"></div>
+<div><label>Point B latitude: <b id="lb_o">35</b>°</label><input type="range" id="lb" min="-80" max="80" step="1" value="35"></div>
+<div><label>Point B longitude: <b id="ob_o">70</b>°</label><input type="range" id="ob" min="-180" max="180" step="1" value="70"></div>
+<div><label>Sideways bump ε: <b id="bu_o">0.00</b></label><input type="range" id="bu" min="-0.8" max="0.8" step="0.01" value="0"></div>
+<div><label>View: turn the sphere <b id="vw_o">0</b>°</label><input type="range" id="vw" min="-180" max="180" step="1" value="0"></div>
+</div>
+<div class="leg">
+<span><i style="background:#D85A30"></i>Great-circle arc (short way)</span>
+<span><i style="background:#7F77DD"></i>Nudged path</span>
+<span><i style="background:#888780"></i>The rest of the great circle</span>
+</div>
+<canvas id="c3" style="height:380px"></canvas>
+<div class="cards">
+<div class="card"><span>Great-circle arc (in radii R)</span><b id="s_arc"></b></div>
+<div class="card"><span>Nudged path (in radii R)</span><b id="s_bent"></b></div>
+<div class="card"><span>Extra length</span><b id="s_gap"></b></div>
+</div>
 </main>
 <script>
 const S=id=>document.getElementById(id);
 const SQ=Math.sqrt;
 function dens(kind,mu,s){
- if(kind==='g')return x=>Math.exp(-(x-mu)**2/(2*s*s))/(s*SQ(2*Math.PI));
+ if(kind==='g')return x=>Math.exp(-((x-mu)*(x-mu))/(2*s*s))/(s*SQ(2*Math.PI));
  if(kind==='uni'){const w=s*SQ(12)/2;return x=>Math.abs(x-mu)<=w?1/(2*w):0;}
  if(kind==='lap'){const b=s/SQ(2);return x=>Math.exp(-Math.abs(x-mu)/b)/(2*b);}
  if(kind==='log'){const k=s*SQ(3)/Math.PI;return x=>{const e=Math.exp(-(x-mu)/k);return e/(k*(1+e)**2);};}
@@ -109,6 +131,54 @@ function draw(){
 ['mu','sg','alt','t'].forEach(id=>S(id).addEventListener('input',draw));
 addEventListener('resize',draw);
 draw();
+
+(function(){
+const g3=id=>document.getElementById(id),D=Math.PI/180;
+const dot=(a,b)=>a[0]*b[0]+a[1]*b[1]+a[2]*b[2];
+const nrm=a=>{const l=Math.hypot(a[0],a[1],a[2]);return[a[0]/l,a[1]/l,a[2]/l];};
+const crs=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]];
+const vec=(la,lo)=>[Math.cos(la*D)*Math.cos(lo*D),Math.cos(la*D)*Math.sin(lo*D),Math.sin(la*D)];
+function draw(){
+ const A=vec(+g3('la').value,+g3('oa').value),B=vec(+g3('lb').value,+g3('ob').value);
+ const eps=+g3('bu').value,view=+g3('vw').value;
+ ['la','oa','lb','ob','vw'].forEach(k=>g3(k+'_o').textContent=g3(k).value);
+ g3('bu_o').textContent=eps.toFixed(2);
+ const cA=Math.max(-1,Math.min(1,dot(A,B))),Om=Math.acos(cA);
+ let u=[B[0]-cA*A[0],B[1]-cA*A[1],B[2]-cA*A[2]];
+ const ul=Math.hypot(u[0],u[1],u[2]);
+ if(ul<1e-9){u=nrm(crs(A,[0,0,1]));if(!isFinite(u[0]))u=[1,0,0];}else u=nrm(u);
+ const n=crs(A,u);
+ const pt=(phi,bump)=>{const c=Math.cos(phi),s=Math.sin(phi);let p=[A[0]*c+u[0]*s,A[1]*c+u[1]*s,A[2]*c+u[2]*s];
+  if(bump){p=nrm([p[0]+bump*n[0],p[1]+bump*n[1],p[2]+bump*n[2]]);}return p;};
+ const N=240,bent=[];
+ for(let i=0;i<=N;i++){const s=i/N;bent.push(pt(s*Om,eps*Math.sin(Math.PI*s)));}
+ let Lb=0;for(let i=1;i<=N;i++){Lb+=Math.acos(Math.max(-1,Math.min(1,dot(bent[i-1],bent[i]))));}
+ g3('s_arc').textContent=Om.toFixed(3);g3('s_bent').textContent=Lb.toFixed(3);g3('s_gap').textContent=Math.max(0,Lb-Om).toFixed(3);
+ const yaw=(-90-(view+(+g3('oa').value+ +g3('ob').value)/2))*D,tilt=20*D;
+ const rot=p=>{const c=Math.cos(yaw),s=Math.sin(yaw);let x=p[0]*c-p[1]*s,y=p[0]*s+p[1]*c,z=p[2];
+  const ct=Math.cos(tilt),st=Math.sin(tilt);return[x,y*ct-z*st,y*st+z*ct];};
+ const cv=g3('c3'),r=devicePixelRatio||1,w=cv.clientWidth,h=cv.clientHeight;cv.width=w*r;cv.height=h*r;
+ const g=cv.getContext('2d');g.setTransform(r,0,0,r,0,0);
+ const cs=getComputedStyle(document.documentElement),tc=cs.getPropertyValue('--text-secondary').trim(),bs=cs.getPropertyValue('--border-strong').trim(),bd=cs.getPropertyValue('--border').trim();
+ const R=Math.min(w,h)/2-16,cx=w/2,cy=h/2;
+ const sc=p=>{const q=rot(p);return[cx+R*q[0],cy-R*q[2],q[1]];};
+ g.fillStyle=cs.getPropertyValue('--surface-1').trim();g.beginPath();g.arc(cx,cy,R,0,7);g.fill();
+ g.strokeStyle=bs;g.lineWidth=1;g.beginPath();g.arc(cx,cy,R,0,7);g.stroke();
+ const poly=(pts,col,wd,back)=>{for(let i=1;i<pts.length;i++){const a=sc(pts[i-1]),b=sc(pts[i]),vis=(a[2]+b[2])/2<0;
+   if(!vis&&!back)continue;g.globalAlpha=vis?1:0.18;g.strokeStyle=col;g.lineWidth=wd;g.beginPath();g.moveTo(a[0],a[1]);g.lineTo(b[0],b[1]);g.stroke();}g.globalAlpha=1;};
+ for(let la=-60;la<=60;la+=30){const a=[];for(let lo=0;lo<=360;lo+=4)a.push(vec(la,lo));poly(a,bd,1,false);}
+ for(let lo=0;lo<360;lo+=30){const a=[];for(let la=-90;la<=90;la+=4)a.push(vec(la,lo));poly(a,bd,1,false);}
+ const full=[];for(let i=0;i<=360;i++)full.push(pt(i*D,0));
+ poly(full,'#888780',1.5,true);
+ const arc=[];for(let i=0;i<=N;i++)arc.push(pt(i/N*Om,0));
+ poly(arc,'#D85A30',3.5,true);
+ if(eps!==0)poly(bent,'#7F77DD',2.5,true);
+ [[A,'A'],[B,'B']].forEach(([p,l])=>{const q=sc(p);g.globalAlpha=q[2]<0?1:0.3;g.fillStyle='#D85A30';g.beginPath();g.arc(q[0],q[1],5,0,7);g.fill();
+  g.fillStyle=tc;g.font='13px sans-serif';g.fillText(l,q[0]+8,q[1]-8);g.globalAlpha=1;});
+}
+['la','oa','lb','ob','bu','vw'].forEach(k=>g3(k).addEventListener('input',draw));
+addEventListener('resize',draw);draw();
+})();
 </script>
 </body>
 </html>
