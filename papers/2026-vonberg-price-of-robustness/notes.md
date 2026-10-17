@@ -10,6 +10,7 @@ url: "https://openreview.net/forum?id=YnpiyoklHP"
 pdf_url: "https://arxiv.org/pdf/2603.02806"
 tags: [law-of-robustness, overparameterization, margin, class-stability, rademacher-complexity, isoperimetry, generalization, lipschitz]
 status: read
+summary: "a law of robustness for classifiers: swap the Lipschitz constant for the mean distance to the decision boundary, and memorisers need $p\gtrsim nd$ parameters for margins above the free $\sqrt{c/d}$; the ramp surrogate carries every proof, but Corollary 15 drops a covering term and loses its dependence on $p$, and the experiments never cross $p = nd$ on CIFAR-10"
 ---
 
 ## Links

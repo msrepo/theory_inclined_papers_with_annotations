@@ -5,7 +5,9 @@ venue: "Foundations"
 tags: [classification, dimensionality-reduction, scatter-matrices, generalised-eigenproblem, background]
 status: living
 category: "Foundations"
+subcategory: "Linear algebra"
 short_title: "LDA / Fisher discriminant"
+summary: "between/within-class scatter matrices, Fisher's criterion as a generalised eigenproblem $S_w^{-1}S_b$, the $g-1$ rank cap, and the PCA+LDA fix for small-sample singular $S_w$"
 ---
 
 ## Links

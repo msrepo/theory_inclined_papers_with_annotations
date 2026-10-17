@@ -10,6 +10,7 @@ url: "https://arxiv.org/abs/2002.12462"
 pdf_url: "https://arxiv.org/pdf/2002.12462"
 tags: [transfer-learning, transferability, log-likelihood, conditional-entropy, source-model-selection, calibration]
 status: read
+summary: "scoring a source model by the likelihood of one hand-built classifier, not the best one"
 ---
 
 ## Links

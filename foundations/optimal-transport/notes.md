@@ -7,6 +7,7 @@ status: living
 category: "Foundations"
 subcategory: "Probability"
 short_title: "Optimal transport"
+summary: "Monge maps vs. Kantorovich couplings, pushforward in plain words, $W_p$ and why it beats KL/JS without overlap (WGAN), Sinkhorn, duality, 1-D and Gaussian (FID) closed forms, minibatch OT for flow matching, and a symbol-by-symbol reading of the discrete OT definition used in data selection"
 ---
 
 ## Links

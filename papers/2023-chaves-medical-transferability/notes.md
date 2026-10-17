@@ -10,6 +10,7 @@ url: "https://arxiv.org/abs/2308.07444"
 pdf_url: "https://arxiv.org/pdf/2308.07444"
 tags: [transferability, medical-imaging, benchmark, out-of-distribution, statistical-power, source-model-selection]
 status: read
+summary: "seven transferability scores on medical targets, in and out of distribution"
 ---
 
 ## Links

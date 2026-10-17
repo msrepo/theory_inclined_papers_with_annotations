@@ -10,6 +10,7 @@ url: "https://arxiv.org/abs/1908.08142"
 pdf_url: "https://arxiv.org/pdf/1908.08142"
 tags: [transfer-learning, transferability, conditional-entropy, task-hardness, information-theory, source-model-selection]
 status: read
+summary: "bounding transfer with the conditional entropy of two label sequences, no model needed; the proof's one-term drop costs $\ln(1+\text{other terms}/\text{kept term})$ per image, so the bound is tight for a one-to-one source and loose by $\ln g$ for a fine source with a coarse target; Figure 1 as drawn ties four panels at $\log 2$ (the text's $4\log 2$ needs sixteen labels); in the paper's own Tables 3 and 4, Figure 3's $r=0.78$ recomputes to $0.63$, the target's label entropy alone ties it on Pearson $r$ ($0.62$) though not on rank ($0.66$ against $0.83$), the four CelebA panels in Figure 2 are exactly the top four of forty, and the counted $H(Y\mid Z)$ is biased low by about $0.028$ nats at $17.9$ images per identity, as large as the smallest reported values"
 ---
 
 ## Links

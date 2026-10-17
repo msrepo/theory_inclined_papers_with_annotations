@@ -8,6 +8,7 @@ category: "Foundations"
 subcategory: "Probability"
 short_title: "Probabilistic PCA"
 pdf_url: "https://www.microsoft.com/en-us/research/wp-content/uploads/2016/02/tr-98-18.pdf"
+summary: "a short hidden Gaussian vector carried along a few directions plus equal noise; the data as a Gaussian with covariance $WW^\top+\sigma^2I$ and the rotation freedom of $W$; the maximum-likelihood solution (PCA subspace, directions shortened to $\sqrt{\lambda_j-\sigma^2}$, noise equal to the average of the discarded eigenvalues); the Gaussian posterior over a point's hidden coordinate as a shrunken PCA projection that tends to PCA as the noise goes to zero; EM without forming the covariance, missing data, factor analysis and the linear VAE; three explorers (build and fit a cloud, drag a point and see its posterior, cut a spectrum to see the noise floor)"
 ---
 
 ## Links

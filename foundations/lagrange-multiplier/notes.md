@@ -7,6 +7,7 @@ status: living
 category: "Foundations"
 subcategory: "Optimization"
 short_title: "Lagrange multiplier"
+summary: "the best point on a trail as a tangent contour, $\nabla F=\lambda\nabla G$ and the Lagrangian, a fence by a river where $\lambda$ is the price of one more metre, shadow prices and the bead on a wire, maximum entropy giving Boltzmann and the exponential family, $\theta$ and $\eta$ as two addresses linked by the Fisher information, and the limits (candidates, endpoints, singular points, KKT); story after a YouTube video, credited on the page"
 ---
 
 ## Links

@@ -1,6 +1,7 @@
 ---
 title: "Computing Large Deformation Metric Mappings via Geodesic Flows of Diffeomorphisms"
-category: "Misc"
+category: "Medical image analysis"
+subcategory: "Registration"
 short_title: "Beg 2005 — LDDMM"
 authors: "Mirza Faisal Beg, Michael I. Miller, Alain Trouvé, Laurent Younes"
 venue: "IJCV 61(2):139–157"
@@ -9,6 +10,7 @@ url: "https://doi.org/10.1023/B:VISI.0000043755.93987.AA"
 pdf_url: ""
 tags: [image-registration, diffeomorphism, lddmm, geodesic, euler-lagrange, rkhs, sobolev-gradient, computational-anatomy]
 status: read
+summary: "a warp as the end of a flow of a smooth velocity field, chosen to minimise path energy plus mismatch; the Euler–Lagrange equation step by step, the Sobolev (Hilbert) gradient against the $L^2$ gradient, constant-speed re-timing, and the image metric; the experiments use a milder smoothing operator than the diffeomorphism guarantee asks for, and the shorter paths than Christensen's method cost 10 to 80 times the run time"
 ---
 
 ## Links

@@ -10,6 +10,9 @@ ROOT = Path(__file__).resolve().parent.parent
 
 TEMPLATE = """---
 title: "TODO title"
+category: "TODO category (see CATEGORIES in tools/build.py)"
+subcategory: "Theory"
+short_title: "TODO Surname YEAR — topic"
 authors: "TODO, first author et al."
 venue: "TODO venue"
 year: {year}
@@ -17,6 +20,7 @@ url: ""
 pdf_url: ""
 tags: [todo]
 status: reading
+summary: "TODO one line: what it does and what checking it turned up"
 ---
 
 ## Links

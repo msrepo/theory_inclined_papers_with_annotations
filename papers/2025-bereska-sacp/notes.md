@@ -1,7 +1,7 @@
 ---
 title: "SACP: Spatially-Adaptive Conformal Prediction in Uncertainty Quantification of Medical Image Segmentation"
-category: "Misc"
-subcategory: "Uncertainty Quantification"
+category: "Medical image analysis"
+subcategory: "Uncertainty & annotator noise"
 short_title: "Bereska 2025 — SACP"
 authors: "Jacqueline Isabel Bereska, Hamed Karimi, Reza Samavi"
 venue: "MIDL (PMLR 301)"
@@ -10,6 +10,8 @@ url: "https://proceedings.mlr.press/v301/bereska26a.html"
 pdf_url: "https://raw.githubusercontent.com/mlresearch/v301/main/assets/bereska26a/bereska26a.pdf"
 tags: [conformal-prediction, uncertainty, segmentation, coverage-guarantee, class-conditional, pancreatic-cancer, exchangeability]
 status: read
+summary: "scaling the tumour's non-conformity score by a distance-to-vessel weight so prediction sets grow near vessels; sets can only get larger, so validity is inherited, while local coverage is observed rather than guaranteed"
+ext_links: [code|https://github.com/tailabTMU/SACP]
 ---
 
 ## Links

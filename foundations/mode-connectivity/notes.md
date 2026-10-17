@@ -7,6 +7,7 @@ authors: "Background notes"
 venue: "Foundations"
 tags: [mode-connectivity, loss-landscape, linear-mode-connectivity, permutation-symmetry, barrier, weight-averaging, background]
 status: living
+summary: "barrier height as non-convexity along a line; linear connectivity vs a curved path vs linear-up-to-symmetry; the $H!\cdot2^H$ copies of one network and why a straight line between two copies averages unrelated units; a small experiment (straight line 1.81, aligned line 0.0003, one-bend path 0.025; five pairs; width sweep) with a loss heat map through the bend point; a literature map marked read / searched / memory"
 ---
 
 ## Links

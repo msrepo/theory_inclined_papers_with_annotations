@@ -10,6 +10,7 @@ status: read
 category: "Contrastive learning"
 subcategory: "Theory"
 short_title: "Zhang 2026 — difficult examples"
+summary: "why deleting boundary examples improves contrastive learning"
 ---
 
 ## Links

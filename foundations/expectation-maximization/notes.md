@@ -7,6 +7,7 @@ status: living
 category: "Foundations"
 subcategory: "Probability"
 short_title: "EM algorithm"
+summary: "the chicken-and-egg of latent labels, responsibilities by Bayes' rule (a softmax, and a sigmoid for two blobs), weighted M-step refits with a worked six-point example, why the likelihood never drops (Jensen, a touching lower bound, the $\ln p = \mathcal L + \mathrm{KL}$ gap), k-means as the hard limit, and the step to the ELBO of VAEs"
 ---
 
 ## Links

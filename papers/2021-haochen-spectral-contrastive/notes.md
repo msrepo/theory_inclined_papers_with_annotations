@@ -10,6 +10,7 @@ status: read
 category: "Contrastive learning"
 subcategory: "Theory"
 short_title: "HaoChen 2021 — spectral contrastive"
+summary: "contrastive learning is spectral clustering of the augmentation graph"
 ---
 
 ## Links

@@ -10,6 +10,7 @@ status: read
 category: "Bayesian inference"
 subcategory: "Review"
 short_title: "Knuth 2015 — Bayesian evidence"
+summary: "the evidence as a prior-averaged likelihood and the Occam factor as the fraction of the prior that fits; Laplace, importance sampling, thermodynamic integration, AIS (arithmetic against geometric mean), variational Bayes ($\log Z=F+\mathrm{KL}$) and nested sampling ($\int_0^1 L(X)\,dX$) derived step by step; the signal-detection log odds ratio by completing the square; and the printed slips found along the way (eq. 23's factor 2, eq. 38's estimator, eq. 69's sign)"
 ---
 
 ## Links

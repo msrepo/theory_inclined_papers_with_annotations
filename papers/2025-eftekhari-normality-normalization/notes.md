@@ -1,6 +1,7 @@
 ---
 title: "On the Importance of Gaussianizing Representations"
-category: "Misc"
+category: "Theory of deep learning"
+subcategory: "Theory"
 short_title: "Eftekhari 2025 — Normality normalization"
 authors: "Daniel Eftekhari, Vardan Papyan (University of Toronto, Vector Institute)"
 venue: "ICML"
@@ -9,6 +10,7 @@ url: "https://arxiv.org/abs/2505.00685"
 pdf_url: "https://arxiv.org/pdf/2505.00685"
 tags: [normalization, gaussianity, power-transform, yeo-johnson, mutual-information, noise-robustness, batchnorm]
 status: read
+summary: "a normalization layer that Gaussianizes each unit with a one-step Yeo–Johnson power transform, plus scaled Gaussian noise"
 ---
 
 ## Links

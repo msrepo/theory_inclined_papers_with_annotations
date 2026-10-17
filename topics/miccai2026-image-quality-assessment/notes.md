@@ -4,9 +4,10 @@ authors: "Topic notes"
 venue: "MICCAI 2026"
 tags: [image-quality-assessment, weak-supervision, label-noise, few-shot, positive-unlabelled, miccai]
 status: reading
-category: "Misc"
-subcategory: "Image Quality Assessment"
+category: "Medical image analysis"
+subcategory: "Image quality assessment"
 short_title: "MICCAI 2026 — IQA papers"
+summary: "the core mathematical construct of each of 11 MICCAI 2026 papers tagged image quality assessment (cross-sectional self-consistency for label noise, prototype-guided flow matching, few-shot prototypical networks with FiLM and gradient reversal, a failure-driven MLLM data engine, loss-GMM pseudo-label filtering, generalised Lehmer pooling, Dice under class imbalance, set encoders for missing metadata, non-negative PU learning, masked autoencoders with LoRA, CORN and concept MIL), with a what-is-graded table, a construct map, one interactive widget per paper, and a *What to watch* per paper"
 ---
 
 ## Why this page exists

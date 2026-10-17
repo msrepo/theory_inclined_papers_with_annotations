@@ -7,6 +7,7 @@ status: living
 category: "Foundations"
 subcategory: "Linear algebra"
 short_title: "HSIC"
+summary: "why uncorrelated is not independent (parabola, circle, funnel); squared covariance and $\lVert C\rVert_F^2$ as agreement of two centred Gram matrices; more features catch more dependence, and the Gaussian kernel as every polynomial degree at once; the estimator $\frac{1}{n^2}\operatorname{tr}(KHLH)$ symbol by symbol with a five-point example that honestly fails; the population form and HSIC as MMD between the joint and the product of marginals; bandwidth limits (too wide is linear, too narrow is blind, a checkerboard the median heuristic misses); the permutation test and the $1/n$ bias; CKA and its eigenvalue weighting; COCO, HGR and the H-score as relatives"
 ---
 
 ## Links

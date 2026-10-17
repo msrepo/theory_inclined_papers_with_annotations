@@ -1,7 +1,7 @@
 ---
 title: "Leveraging Probabilistic Segmentation Models for Improved Glaucoma Diagnosis: A Clinical Pipeline Approach"
-category: "Misc"
-subcategory: "Uncertainty Quantification"
+category: "Medical image analysis"
+subcategory: "Uncertainty & annotator noise"
 short_title: "Wundram 2024 — glaucoma pipeline"
 authors: "Anna M. Wundram, Paul Fischer, Stephan Wunderlich, Hanna Faber, Lisa M. Koch, Philipp Berens, Christian F. Baumgartner"
 venue: "MIDL (PMLR 250)"
@@ -10,6 +10,8 @@ url: "https://proceedings.mlr.press/v250/wundram24a.html"
 pdf_url: "https://raw.githubusercontent.com/mlresearch/v250/main/assets/wundram24a/wundram24a.pdf"
 tags: [uncertainty, uncertainty-propagation, segmentation, glaucoma, multiple-annotators, marginalisation, medical-imaging]
 status: read
+summary: "sampling plausible cup and disc masks, turning each into a rim thickness curve, and averaging the classifier's votes; the claimed gain over a deterministic U-Net is clearest only for the seed ensemble"
+ext_links: [code|https://github.com/annawundram/glaucoma-diagnosis-pipeline]
 ---
 
 ## Links

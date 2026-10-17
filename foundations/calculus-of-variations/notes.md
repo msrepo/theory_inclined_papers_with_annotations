@@ -7,6 +7,7 @@ status: living
 category: "Foundations"
 subcategory: "Optimization"
 short_title: "Calculus of variations"
+summary: "a functional as a height over a space of functions; nudge-and-look-at-the-slope giving the Euler–Lagrange equation and the functional derivative; the shortest path as a worked case; a multiplier per constraint; the Gaussian as the maximum-entropy density for a given mean and variance (with an explorer mixing it toward other densities), great circles as the shortest paths on a sphere (with a globe where pushing the arc sideways always lengthens it), and the exponential family as the general pattern"
 ---
 
 ## Links

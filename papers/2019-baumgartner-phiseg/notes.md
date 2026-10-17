@@ -1,7 +1,7 @@
 ---
 title: "PHiSeg: Capturing Uncertainty in Medical Image Segmentation"
-category: "Misc"
-subcategory: "Uncertainty Quantification"
+category: "Medical image analysis"
+subcategory: "Uncertainty & annotator noise"
 short_title: "Baumgartner 2019 — PHiSeg"
 authors: "Christian F. Baumgartner, Kerem C. Tezcan, Krishna Chaitanya, Andreas M. Hötker, Urs J. Muehlematter, Khoschy Schawkat, Anton S. Becker, Olivio Donati, Ender Konukoglu"
 venue: "MICCAI"
@@ -10,6 +10,8 @@ url: "https://arxiv.org/abs/1906.04045"
 pdf_url: "https://arxiv.org/pdf/1906.04045"
 tags: [uncertainty, segmentation, variational-autoencoder, hierarchical-latent, multiple-annotators, medical-imaging]
 status: read
+summary: "one latent variable per resolution level, each conditioned on the coarser one, so a segmenter can produce many plausible masks matching annotator disagreement"
+ext_links: [code|https://github.com/baumgach/PHiSeg-code]
 ---
 
 ## Links

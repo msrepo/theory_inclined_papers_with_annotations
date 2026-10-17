@@ -10,6 +10,7 @@ url: "https://arxiv.org/abs/1610.05683"
 pdf_url: "https://arxiv.org/pdf/1610.05683"
 tags: [variational-inference, reparameterization-gradient, rejection-sampling, gradient-estimation, gamma, dirichlet, variance-reduction]
 status: read
+summary: "differentiating through an accept/reject step by integrating out the coin"
 ---
 
 ## Links

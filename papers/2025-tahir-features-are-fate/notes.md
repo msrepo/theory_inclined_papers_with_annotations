@@ -10,6 +10,8 @@ url: "https://arxiv.org/abs/2410.08194"
 pdf_url: "https://arxiv.org/pdf/2410.08194"
 tags: [transfer-learning, deep-linear-networks, double-descent, minimum-norm, fine-tuning, feature-learning, dudley-metric, integral-probability-metrics, phase-diagram]
 status: read
+summary: "transfer in a deep linear network from a tiny initialisation: pretraining leaves one direction, so linear transfer has a floor $\sin^2\theta$ against scratch training's double-descent risk, and $\mathcal T_{lt}$ is a phase diagram (positive for few samples, negative for many, positive again in a thin band at $\gamma = 1$; eq. 11 derived in three lines, the same pair of tasks changes sign three times as $n$ grows); fine-tuning keeps the pretrained guess where the data are silent and wins iff $\theta < 60^\circ$ (eq. 15), but real gradient descent carries a scale factor $c = 1 + O(\sigma^2)$ the printed theorem omits (break-even 52° at $\sigma = 1$); Appendix A's Dudley proof fails at step (29) and "any $\delta$" is false beyond 2, Figure 4(a) is a sweep over $[0,\pi]$ and 4(b)'s $W_1$ is sampling noise (≈ 527 for identical laws)"
+ext_links: [code|https://github.com/javantahir/features_are_fate]
 ---
 
 ## Links

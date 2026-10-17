@@ -10,6 +10,7 @@ url: "https://arxiv.org/abs/2010.15110"
 pdf_url: "https://arxiv.org/pdf/2010.15110"
 tags: [ntk, function-space, loss-landscape, feature-learning, empirical, linear-connectivity]
 status: read
+summary: "how far real training departs from the NTK limit, and when"
 ---
 
 ## Links

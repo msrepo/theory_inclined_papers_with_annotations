@@ -10,6 +10,7 @@ url: "https://arxiv.org/abs/2212.10082"
 pdf_url: "https://arxiv.org/pdf/2212.10082"
 tags: [transfer-learning, transferability, information-geometry, error-exponent, hgr-correlation, feature-selection, taskonomy]
 status: read
+summary: "predicting transfer performance without training, via a projection onto the feature subspace"
 ---
 
 ## Links

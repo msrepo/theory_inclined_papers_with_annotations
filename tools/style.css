@@ -213,3 +213,42 @@ figcaption {
   color: var(--ink-soft);
 }
 figcaption b, figcaption strong { font-weight: 500; color: var(--ink); }
+
+/* ---- finding things: search box, filters, tag buttons, related notes ---- */
+.nav-filter, #q {
+  width: 100%; font: inherit; font-size: .88rem; color: var(--ink); background: var(--bg, transparent);
+  border: 1px solid var(--rule); border-radius: 8px; padding: 6px 10px; margin: .2rem 0 .6rem;
+}
+.nav-filter:focus-visible, #q:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+#q { font-size: 1rem; padding: 9px 12px; margin: 0 0 .5rem; }
+.finder { margin: 0 0 1.4rem; }
+.finder-row { display: flex; flex-wrap: wrap; gap: .4rem 1rem; align-items: center; font-family: ui-sans-serif, sans-serif;
+  font-size: .85rem; color: var(--ink-soft); }
+.finder select { font: inherit; color: var(--ink); background: transparent; border: 1px solid var(--rule); border-radius: 6px; padding: 2px 6px; }
+.count { margin-left: auto; }
+.reset { font: inherit; font-size: .85rem; color: var(--accent); background: none; border: 0; cursor: pointer; text-decoration: underline; padding: 0; }
+.chips { margin-top: .6rem; font-family: ui-sans-serif, sans-serif; font-size: .85rem; color: var(--ink-soft); }
+.chips summary { cursor: pointer; }
+.chips div { display: flex; flex-wrap: wrap; gap: .3rem; padding: .5rem 0; }
+.chip {
+  font: inherit; font-size: .78rem; color: var(--ink-soft); background: transparent; border: 1px solid var(--rule);
+  border-radius: 999px; padding: 1px 9px; cursor: pointer;
+}
+button.tag { cursor: pointer; }
+.chip small { opacity: .65; }
+.chip:hover, button.tag:hover { color: var(--accent); border-color: var(--accent); }
+.chip.on, button.tag.on { color: #fff; background: var(--accent); border-color: var(--accent); }
+.none { color: var(--ink-soft); font-style: italic; }
+[hidden] { display: none !important; }
+ul.papers .summary {
+  margin: .3rem 0 .2rem; font-size: .9rem; line-height: 1.45; color: var(--ink-soft); cursor: pointer;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+ul.papers .summary.open { display: block; }
+.kind { margin-left: .6rem; font-family: ui-sans-serif, sans-serif; font-size: .72rem; text-transform: uppercase;
+  letter-spacing: .04em; color: var(--ink-soft); border: 1px solid var(--rule); border-radius: 4px; padding: 0 5px; }
+.related { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid var(--rule); }
+.related ul { list-style: none; padding: 0; }
+.related li { padding: .45rem 0; }
+.related .meta, .related .rel-note { color: var(--ink-soft); font-size: .85rem; }
+.related .rel-note { display: block; }

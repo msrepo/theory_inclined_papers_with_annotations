@@ -1,6 +1,7 @@
 ---
 title: "Diffeomorphic Image Registration using Lipschitz Continuous Residual Networks"
-category: "Misc"
+category: "Medical image analysis"
+subcategory: "Registration"
 short_title: "Joshi 2022 — Lipschitz ResNet registration"
 authors: "Ankita Joshi, Yi Hong"
 venue: "MIDL (PMLR 172)"
@@ -9,6 +10,7 @@ url: "https://proceedings.mlr.press/v172/joshi22a.html"
 pdf_url: "https://proceedings.mlr.press/v172/joshi22a/joshi22a.pdf"
 tags: [image-registration, diffeomorphism, ode, resnet, lipschitz, spectral-normalisation, rkhs, lddmm]
 status: read
+summary: "ResNet blocks as Euler steps of a velocity-field ODE, with spectral normalisation for Lipschitz control; fewer folded voxels than VoxelMorph at slightly worse matching"
 ---
 
 ## Links

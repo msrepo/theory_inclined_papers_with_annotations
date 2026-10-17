@@ -10,6 +10,7 @@ url: "https://arxiv.org/abs/1904.03292"
 pdf_url: "https://arxiv.org/pdf/1904.03292"
 tags: [task-complexity, task-distance, kolmogorov-complexity, structure-function, information-in-weights, fisher-information, pac-bayes, transfer-learning, free-energy]
 status: read
+summary: "task complexity as a two-part code with a factorised model, $C=\min_p L_{\mathcal D}(p)+K(p)$, its structure function and $\beta$-Lagrangian, and an asymmetric distance $K(p_{12})-K(p_1)$; whenever the optima are unique the asymmetry is exactly a difference of complexities, and the paper's Figure 1 obeys this to its rounding ($R^2=0.99992$); over all $Q$ the computable Lagrangian is a free energy (the evidence at $\beta=1$), and Theorem 5.4's $O(1)$ is $\tfrac k2\log(N/\beta)-\tfrac k2$, millions of nats at network scale; Theorem 4.4 needs $\beta\ge1$, Lemma A.1 a finite input space and Example 3.5 an index oracle; and sharp phase transitions need a non-convex structure function, so a convex model cannot show them"
 ---
 
 ## Links

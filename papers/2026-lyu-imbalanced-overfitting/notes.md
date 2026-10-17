@@ -1,6 +1,6 @@
 ---
 title: "A Statistical Theory of Overfitting for Imbalanced Classification"
-category: "Theory of deep learning"
+category: "High-dimensional statistics"
 subcategory: "Theory"
 short_title: "Lyu 2026 — Imbalanced overfitting"
 authors: "Jingyang Lyu, Kangjie Zhou, Yiqiao Zhong (UW–Madison, Columbia)"
@@ -10,6 +10,8 @@ url: "https://arxiv.org/abs/2502.11323"
 pdf_url: "https://arxiv.org/pdf/2502.11323"
 tags: [imbalanced-classification, max-margin, svm, high-dimensional-asymptotics, cgmt, gordon, logit-distribution, calibration, margin-rebalancing]
 status: read
+summary: "max-margin linear probes on an imbalanced Gaussian mixture with n/d → δ: training logits are the test Gaussian truncated at the margin, because the d free directions can lift the n training logits by a mean square of (1−ρ²)/δ and truncation is the cheapest way to spend it (Gordon/CGMT); both classes get the same total lift, so each minority point is lifted (1−π)/π times further and the intercept goes negative; rebalancing moves only the intercept and τ_opt has a closed form, but it is negative in several of the paper's own settings, and the π-trend in calibration is almost entirely the prior log-odds that rebalancing discards"
+ext_links: [code|https://github.com/jlyu55/Imbalanced_Classification]
 ---
 
 ## Links

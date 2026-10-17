@@ -7,6 +7,7 @@ status: living
 category: "Foundations"
 subcategory: "Probability"
 short_title: "ELBO"
+summary: "a two-coin bag as the running example (marginal $0.25+0.45=0.70$, posterior $0.36/0.64$); why the log of a sum or integral is intractable for a large continuous latent; Jensen's inequality (log of the average vs. average of the log); the bound $\log p(x)\ge\mathrm{ELBO}(q)$; the exact gap $\log p(x)=\mathrm{ELBO}+\mathrm{KL}(q\|p(z|x))$ and why maximising the ELBO pushes $q$ to the posterior; reconstruction minus KL-to-prior as the VAE form; a Gaussian latent where blind sampling fails with dimension and guided sampling does not; an explorer where you drag $q$ and watch the gap"
 ---
 
 ## Links

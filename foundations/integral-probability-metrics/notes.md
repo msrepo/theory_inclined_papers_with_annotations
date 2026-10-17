@@ -7,6 +7,7 @@ status: read
 category: "Foundations"
 subcategory: "Probability"
 short_title: "Integral probability metrics"
+summary: "a distance as the best gap any judge in a panel can produce between two average scores; judges scored in $[0,1]$ give total variation, 1-Lipschitz judges give $W_1$, judges with height plus slope at most 1 give the Dudley (bounded-Lipschitz) metric, a kernel's unit ball gives MMD; closed forms for two point masses (TV = 1, $W_1 = D$, Dudley $= 2D/(D+2)$, saturating at 2) and for shifted Gaussians; the best ramp judge and why it is optimal for a single hump, cross-checked by an assignment solver; Dudley is not $W_1$ for close distributions unless they are narrow; why bounded panels cannot be "arbitrarily far"; IPMs against $\varphi$-divergences; what a supremum over a panel does not tell you about a downstream task"
 ---
 
 ## Links

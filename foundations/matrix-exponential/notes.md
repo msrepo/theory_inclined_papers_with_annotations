@@ -7,6 +7,7 @@ status: living
 category: "Foundations"
 subcategory: "Linear algebra"
 short_title: "Matrix exponential"
+summary: "$e^{A}=I+A+A^2/2!+\cdots$ as the linear map that carries every point along the flow $\dot x=Ax$; its properties read off the eigenvalues, why $e^{A+B}\ne e^{A}e^{B}$ unless $A$ and $B$ commute, and scaling and squaring"
 ---
 
 ## Links

@@ -10,6 +10,7 @@ status: read
 category: "Transferability"
 subcategory: "Theory"
 short_title: "Kumar 2022 — fine-tuning distorts features"
+summary: "the gradient on the feature extractor lives in the span of the training inputs (so features move only there) and $vv^\top-BB^\top$ is conserved, so a random head drags the features and fine-tuning stalls out-of-distribution while linear probing falls like $\epsilon^2$; the proof of Theorem 3.3 step by step, the two invariants checked by gradient flow (also for the logistic loss), the head-alignment dependence, the toy of Figure 2 run for real (FT wins once the tilt is large), LP-FT, and the slips found in the appendix"
 ---
 
 ## Links

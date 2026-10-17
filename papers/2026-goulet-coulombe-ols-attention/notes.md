@@ -10,6 +10,7 @@ status: read
 category: "Attention Mechanism"
 subcategory: "Theory"
 short_title: "Goulet Coulombe 2026 — OLS as attention"
+summary: "an OLS prediction is a signed weighted sum of training outcomes, ŷⱼ = Σᵢ xⱼᵀ(XᵀX)⁻¹xᵢ yᵢ, i.e. attention with the softmax removed, test rows as queries, training rows as keys, outcomes as values and W_Q W_Kᵀ = (XᵀX)⁻¹; ridge, PCR and OLS differ only in the diagonal of one embedding; (XᵀX)⁻¹ is the unique minimiser only if it must serve every outcome vector, and gradient descent on one y reaches the same predictions with a rank-one Ω; the weights sum to 1 but are signed and grow without bound off the data; Regression Block (polynomial features + ridge in place of attention) edges the FT-Transformer by 0.001–0.029 R², credited to the polynomial expansion; Attention Regression trails the random forest on 7 of 8 tables"
 ---
 
 ## Links

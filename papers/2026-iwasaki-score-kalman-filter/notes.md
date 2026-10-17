@@ -1,6 +1,7 @@
 ---
 title: "The Score Kalman Filter"
-category: "Misc"
+category: "Bayesian inference"
+subcategory: "Theory"
 short_title: "Iwasaki 2026 — Score Kalman filter"
 authors: "Kaito Iwasaki, Anthony Bloch, Taeyoung Lee, Maani Ghaffari (University of Michigan, George Washington University)"
 venue: "arXiv preprint (eess.SY)"
@@ -9,6 +10,7 @@ url: "https://arxiv.org/abs/2605.16644"
 pdf_url: "https://arxiv.org/pdf/2605.16644"
 tags: [bayesian-filtering, kalman-filter, score-matching, stein-identity, moment-closure, exponential-family, maximum-entropy]
 status: read
+summary: "moment filtering without the partition function: score matching fits an exp-polynomial belief in one linear solve, Stein's identity closes the moment hierarchy; but the benchmark truth is noise-free, which rewards ignoring the data, and the update as written leaves the mean at the prior"
 ---
 
 ## Links

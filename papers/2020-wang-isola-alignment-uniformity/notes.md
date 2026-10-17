@@ -10,6 +10,7 @@ status: read
 category: "Contrastive learning"
 subcategory: "Theory"
 short_title: "Wang & Isola 2020 — alignment / uniformity"
+summary: "the decomposition of InfoNCE into alignment plus a potential-theory energy"
 ---
 
 ## Links

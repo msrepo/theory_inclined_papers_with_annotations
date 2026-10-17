@@ -5,7 +5,9 @@ venue: "Foundations"
 tags: [concentration, spectral-graph-theory, information-theory, cheeger, background]
 status: living
 category: "Foundations"
+subcategory: "Probability"
 short_title: "Inequalities & concentration"
+summary: "Cheeger and higher-order Cheeger, Markov/Chebyshev/Hoeffding, McDiarmid, Rademacher, KL chain rule, Donsker–Varadhan, HGR, Weyl, Davis–Kahan, Wigner, spherical CLT"
 ---
 
 Background for the annotations in this repo. Every paper here is ultimately a chain of

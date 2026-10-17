@@ -6,6 +6,7 @@ tags: [t-distribution, student-t, degrees-of-freedom, scale-mixture, heavy-tails
 status: living
 category: "Foundations"
 subcategory: "Probability"
+summary: "the bell curve whose width is itself uncertain: three routes to the same density, degrees of freedom, heavy tails as a scale mixture of Gaussians, and why the standardised mean with an estimated $\sigma$ follows it"
 short_title: "t-distribution"
 ---
 

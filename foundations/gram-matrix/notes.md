@@ -7,6 +7,7 @@ status: living
 category: "Foundations"
 subcategory: "Linear algebra"
 short_title: "Gram matrix"
+summary: "$G=XX^\top$ as lengths, angles and distances; rotation invariance and rebuilding points from $G$ (MDS); why it is always PSD and its rank; the dual view $XX^\top$ vs. $X^\top X$ and centring $HGH$; kernel Gram matrices and RBF bandwidth; the NTK as a Gram matrix of gradients; the InfoNCE logit matrix; where each appears in the paper notes; and why forming it squares the condition number"
 ---
 
 ## Links

@@ -7,6 +7,7 @@ status: living
 category: "Foundations"
 subcategory: "Information geometry"
 short_title: "Fisher information"
+summary: "the score and its variance on a coin (why a fair coin is least informative), Cramér–Rao and efficiency (the median's 2/π), the Fisher matrix as an inverted uncertainty ellipse and blind directions, the local KL expansion, reparameterisation and the Fisher–Rao distance, the Gaussians as a hyperbolic half-plane (geodesics widen, slide, narrow; contrasted with optimal transport), natural gradient and Fisher scoring, Hessian against Fisher against empirical Fisher, the Fisher and the NTK sharing eigenvalues, and how it is estimated in practice"
 ---
 
 ## Links

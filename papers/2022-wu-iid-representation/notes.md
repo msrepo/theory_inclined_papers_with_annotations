@@ -1,6 +1,8 @@
 ---
 title: "Towards IID representation learning and its application on biomedical data"
-category: "Misc"
+category: "Theory of deep learning"
+subcategory: "Theory"
+summary: "treating IID as a property to learn, not assume: find $\phi$ so that $\phi(X_i)$ share one distribution, which turns several causal-inference problems into one representation-learning objective, tested on biomedical data"
 short_title: "Wu 2022 — IID representation"
 authors: "Jiqing Wu, Inti Zlobec, Maxime Lafarge, Yukun He, Viktor H. Koelzer"
 venue: "MIDL (PMLR 172)"

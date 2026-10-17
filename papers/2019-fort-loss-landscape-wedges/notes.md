@@ -10,6 +10,7 @@ status: read
 category: "Theory of deep learning"
 subcategory: "Theory"
 short_title: "Fort 2019 — wedges"
+summary: "the loss landscape as a union of high-dimensional wedges: a straight line between two optima leaves them while a tunnel through their intersections does not; the toy loss run for real (wall 0.29, tunnel 0.07, tunnel alignment cosines 0.24/0.28/+0.01), the intrinsic dimension as a dimension count (hyperplane d >= D - n), m-connectors, averaging as shared short directions (the SWA prediction), and doubts (the tunnel passes through intermediate wedges, Figure 4 not reproduced, axis-aligned wedges vs permutation symmetry)"
 ---
 
 ## Links

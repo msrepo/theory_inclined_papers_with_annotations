@@ -10,6 +10,7 @@ url: "https://arxiv.org/abs/2604.09863"
 pdf_url: "https://arxiv.org/pdf/2604.09863"
 tags: [transferability, domain-adaptation, unsupervised, silhouette, cosine-similarity, source-selection, nearest-centroid]
 status: read
+summary: "scoring a source domain with no target labels at all, via a nearest-centroid margin"
 ---
 
 ## Links

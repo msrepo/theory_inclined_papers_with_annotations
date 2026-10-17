@@ -1,6 +1,6 @@
 ---
 title: "Phase transition in PCA with missing data: Reduced signal-to-noise ratio, not sample size!"
-category: "Theory of deep learning"
+category: "High-dimensional statistics"
 subcategory: "Theory"
 short_title: "Ipsen 2019 — PCA missing data"
 authors: "Niels Bruun Ipsen, Lars Kai Hansen (Technical University of Denmark)"
@@ -10,6 +10,8 @@ url: "https://arxiv.org/abs/1905.00709"
 pdf_url: "https://arxiv.org/pdf/1905.00709"
 tags: [pca, missing-data, replica-method, phase-transition, spiked-covariance, statistical-mechanics, signal-to-noise]
 status: read
+related: [probabilistic-pca, 2026-lyu-imbalanced-overfitting]
+summary: "replica derivation of the overlap between the true and the learned principal direction, with entries missing at random: $S\to(1-m)S$ in the complete-data formula $R^2=(\alpha S^2-1)/(S+\alpha S^2)$, which is the random-matrix spiked-covariance overlap; the appendix's saddle-point step needs $1-r^2$ where $1+r^2$ is printed, the theory describes zero-filled PCA while the experiments use EM probabilistic PCA, and $N(1-m)^2$, not the tested $N(1-m)$, shares Eq. 2's threshold, so "not sample size" holds against $N(1-m)$ only"
 ---
 
 ## Links

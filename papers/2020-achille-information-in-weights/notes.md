@@ -10,6 +10,7 @@ url: "https://arxiv.org/abs/1905.12213"
 pdf_url: "https://arxiv.org/pdf/1905.12213"
 tags: [information-in-the-weights, fisher-information, pac-bayes, mutual-information, flat-minima, sgd, kramers, invariance, information-bottleneck]
 status: read
+summary: "information in the weights as the optimum of $\mathbb E_Q L+\beta\,\mathrm{KL}(Q\Vert P)$, whose minimiser is the Gibbs distribution; Shannon and Fisher are special codes. The Gaussian optimum is $\beta(H+\beta/\lambda^2)^{-1}$, twice the stated one; the activation Fisher is $\nabla_x f^\top(\beta JF^{-1}J^\top)^{-1}\nabla_x f$, not $JFJ^\top/\beta$, and Eq 10 needs $\dim z\ge\dim x$; isotropic Kramers gives no temperature-dependent preference among equal-loss minima; and in the rebuilt Figure 3 toy the batch-size drop in "Shannon information" is the entropy of which equivalent minimum the seed reached, while $I(\theta;\mathcal D)$ stays flat"
 ---
 
 ## Links

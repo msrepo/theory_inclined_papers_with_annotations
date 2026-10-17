@@ -10,6 +10,7 @@ url: "https://proceedings.mlr.press/v139/gao21a.html"
 pdf_url: "https://arxiv.org/pdf/2011.00613"
 tags: [task-distance, fisher-rao, information-geometry, optimal-transport, rademacher-complexity, generalization-gap, transfer-learning, mantel-test]
 status: read
+summary: "task distance as the Fisher–Rao length of a classifier that tracks a task moved from source to target by optimal transport; Definition 2 averages the square root of the KL over inputs ($B\le A$ by Jensen, a Finsler length, not the Riemannian length of Eqs. 4–5) and (12b) is the speed of the weights through a frozen input, not an endpoint distance (2.63 against 0 for a perfectly tracking model); in an exactly solvable logistic toy the minimiser path is exactly reversible, so Remark 3's asymmetry is dynamical and vanishes as the learning speed $\kappa\to\infty$, the SGD length creeps to its limit (6.7% short at $\kappa=3000$) and Remark 1 (uncoupled is longer) holds for $B$ and the loss variation but fails for the Riemannian $A$ at large shifts; Theorem 6's printed $\lambda$ has an extra factor $K$ (exponent $+144$ where the right one is $-1.8$), its exponent has no $N$ (McDiarmid gives $\exp\{-2NK(\epsilon-2\bar R)^2/M^2\}$), the complexity term the proof supports for Theorems 5/7 is $2\,\mathrm{TV}/K$ rather than the length, and the reported Mantel $r$ cannot be reproduced from the printed matrices (Pearson 0.93 against 0.43 in Figure 2; a 4-task test cannot return $p<1/24$)"
 ---
 
 ## Links

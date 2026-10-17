@@ -7,8 +7,10 @@ url: "https://arxiv.org/abs/2502.06970"
 pdf_url: "https://arxiv.org/pdf/2502.06970"
 tags: [few-shot, pac-bayes, generalization-bounds, certification, diffusion, weight-space, peft]
 status: read
-category: "Misc"
+category: "Theory of deep learning"
+subcategory: "Theory"
 short_title: "Rezk 2026 — certifiable few-shot"
+summary: "non-vacuous few-shot certificates from a finite hypothesis class"
 ---
 
 ## Links

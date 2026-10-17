@@ -7,6 +7,7 @@ status: living
 category: "Foundations"
 subcategory: "Linear algebra"
 short_title: "Eckart–Young / low-rank SVD"
+summary: "Frobenius and spectral matrix norms, the Eckart–Young–Mirsky theorem (truncated SVD is the provably-best rank-$k$ approximation in both norms), the 2-norm proof, and an image-compression example"
 ---
 
 ## Links

@@ -7,6 +7,7 @@ authors: "Background notes"
 venue: "Foundations"
 tags: [linear-algebra, svd, subspaces, canonical-correlation, grassmannian, numerical-stability, background]
 status: living
+summary: "the SVD characterisation, the projector and distance identities, why `arccos` destroys small angles and the sine fix, and the equivalence with canonical correlations; an interactive 3-D explorer of lines and planes with their principal vectors, the basis-independence of the SVD recipe, and the accuracy trap"
 ---
 
 ## Links

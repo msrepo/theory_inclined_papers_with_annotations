@@ -9,6 +9,7 @@ year: 2016
 url: "https://doi.org/10.1007/978-4-431-55978-8"
 tags: [information-geometry, bregman-divergence, legendre-transform, exponential-family, kl-divergence, pythagorean-theorem, projection, em-algorithm, natural-gradient, softmax]
 status: read
+summary: "one convex function $\psi$ yields a divergence, a second (Legendre-dual) coordinate system, a metric and two flat structures; softmax logits and probabilities as the running example; the Pythagorean and projection theorems and the alternating (em) minimisation, each rechecked numerically. The printed identity (1.114) has permuted indices, and Theorem 1.4 and the em paragraph pair each projection with the opposite argument slot of $D_\psi$ to what the calculus gives"
 ---
 
 ## Links

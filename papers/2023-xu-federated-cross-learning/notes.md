@@ -1,6 +1,7 @@
 ---
 title: "Federated Cross Learning for Medical Image Segmentation"
-category: "Misc"
+category: "Medical image analysis"
+subcategory: "Federated learning"
 short_title: "Xu 2023 — FedCross"
 authors: "Xuanang Xu, Hannah H. Deng, Tianyi Chen, Tianshu Kuang, Joshua C. Barber, Daeseung Kim, Jaime Gateno, James J. Xia, Pingkun Yan"
 venue: "MIDL (PMLR 227)"
@@ -9,6 +10,8 @@ url: "https://proceedings.mlr.press/v227/xu24a.html"
 pdf_url: "https://proceedings.mlr.press/v227/xu24a/xu24a.pdf"
 tags: [federated-learning, non-iid, fedavg, ensemble, uncertainty, prostate-mri, catastrophic-forgetting]
 status: read
+summary: "passing one model from hospital to hospital instead of averaging weights; the algebra only unrolls the FedAvg update, the gains are fractions of a Dice point, and the ensemble variant is compared with single models"
+ext_links: [code|https://github.com/DIAL-RPI/FedCross]
 ---
 
 ## Links

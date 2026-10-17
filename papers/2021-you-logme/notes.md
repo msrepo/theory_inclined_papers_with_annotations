@@ -10,6 +10,7 @@ url: "https://arxiv.org/abs/2102.11005"
 pdf_url: "https://arxiv.org/pdf/2102.11005"
 tags: [transferability, bayesian, marginal-likelihood, evidence, model-selection, regression, occam-factor]
 status: read
+summary: "scoring features by the marginal likelihood of the labels, not the best fit to them"
 ---
 
 ## Links

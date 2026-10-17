@@ -10,6 +10,8 @@ url: "https://arxiv.org/abs/2505.17517"
 pdf_url: "https://arxiv.org/pdf/2505.17517"
 tags: [diffusion-models, information-geometry, fisher-rao, exponential-family, geodesics, tweedie, riemannian-geometry, transition-path-sampling]
 status: read
+summary: "x_t) over spacetime (x_t, t): an exponential family whose chord (Δη)ᵀ(Δμ) is exactly twice a symmetrised KL, so geodesic energies need only the denoiser and one JVP; spacetime is the natural-parameter space (schedule-free), and for Gaussian data the hyperbolic half-plane, which makes DiffED a log of Euclidean distance that saturates; and in a transition-path toy the geodesic reweights wells rather than transporting mass, so its noise schedule, not its route, does the work"
+ext_links: [code|https://github.com/Aalto-QuML/spacetime-geometry]
 ---
 
 ## Links

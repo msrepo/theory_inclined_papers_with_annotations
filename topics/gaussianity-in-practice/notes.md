@@ -7,6 +7,7 @@ status: living
 category: "Contrastive learning"
 subcategory: "Applications"
 short_title: "Gaussianity in practice"
+summary: "the applied literature that assumes CLIP features are Gaussian, with close reads of Zhou et al. 2025 (CVPR), Venkataramanan et al. 2025 (UAI) and C. Huang et al. 2024 (IJCAI)"
 ---
 
 ## Why this page exists

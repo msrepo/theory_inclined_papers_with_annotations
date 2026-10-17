@@ -8,6 +8,7 @@
 #   make list                           list the papers in the repo
 #   make check                          verify pandoc and that notes parse
 #   make verify                         run every papers/*/code/*.py
+#   make readme                         rewrite the README tables from front matter
 #   make clean                          remove build/
 
 PYTHON ?= python3
@@ -21,11 +22,11 @@ CODE  := $(foreach r,$(ROOTS),$(wildcard $(r)/*/code/*.py))
 STAMP := .build-stamp
 
 .DEFAULT_GOAL := html
-.PHONY: html new fetch serve open list check verify clean help
+.PHONY: html new fetch serve open list check verify readme clean help
 
 html: $(STAMP)
 
-$(STAMP): $(NOTES) $(FIGS) $(TOOLS)/build.py $(TOOLS)/style.css
+$(STAMP): $(NOTES) $(FIGS) $(TOOLS)/build.py $(TOOLS)/style.css $(TOOLS)/site.js
 	@$(PYTHON) $(TOOLS)/build.py
 	@touch $@
 
@@ -58,6 +59,9 @@ verify:
 	  echo "=== $$f ==="; $(PYTHON) $$f || exit 1; echo; \
 	done
 	@echo "all code ran"
+
+readme:
+	@$(PYTHON) $(TOOLS)/gen_readme.py
 
 clean:
 	@rm -rf build $(STAMP)

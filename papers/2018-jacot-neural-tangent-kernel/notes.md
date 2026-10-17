@@ -10,6 +10,7 @@ status: read
 category: "NTK & function space"
 subcategory: "Theory"
 short_title: "Jacot 2018 — NTK"
+summary: "wide networks train as kernel regression in function space"
 ---
 
 ## Links

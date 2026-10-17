@@ -10,6 +10,7 @@ url: "https://arxiv.org/abs/1810.02440"
 pdf_url: "https://arxiv.org/pdf/1810.02440"
 tags: [sgd, langevin, path-integral, onsager-machlup, kramers, detailed-balance, flat-minima, structure-function, pac-bayes, transfer-learning, task-distance]
 status: read
+summary: "SGD as a Langevin particle and a path integral over training runs: the static × reachability split is exactly detailed balance (the path factor is symmetric), and SGD's stationary law is exactly the minimiser of the complexity Lagrangian with β = D and λ² = D/γ (the paper's β = 2λ²γ doubles the weight decay); the curvature correction is (D/2) log|H|, which decides when a sharp minimum loses or turns into a bump; eq. (16) puts end points where Kramers puts the barrier, and on the most likely downhill path the static factor is cancelled exactly; Figure 2's printed matrices still show the static distance ranking sources within a target (r ≈ 0.6); plus a first-reading Q&A (transition probability, the information-theoretic distance, reachability, eqs. 2, 3, 5 and 9 and the SDE line by line, the Fisher in place of the Hessian, a solvable structure function, feature-only transferability scores, dataset against architecture)"
 ---
 
 ## Links

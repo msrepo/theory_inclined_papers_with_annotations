@@ -1,7 +1,7 @@
 ---
 title: "A Probabilistic U-Net for Segmentation of Ambiguous Images"
-category: "Misc"
-subcategory: "Uncertainty Quantification"
+category: "Medical image analysis"
+subcategory: "Uncertainty & annotator noise"
 short_title: "Kohl 2018 — Probabilistic U-Net"
 authors: "Simon A. A. Kohl, Bernardino Romera-Paredes, Clemens Meyer, Jeffrey De Fauw, Joseph R. Ledsam, Klaus H. Maier-Hein, S. M. Ali Eslami, Danilo Jimenez Rezende, Olaf Ronneberger"
 venue: "NeurIPS"
@@ -10,6 +10,8 @@ url: "https://arxiv.org/abs/1806.05034"
 pdf_url: "https://arxiv.org/pdf/1806.05034"
 tags: [uncertainty, segmentation, conditional-vae, u-net, multiple-annotators, generalised-energy-distance, medical-imaging]
 status: read
+summary: "a conditional VAE whose latent code, injected late into a U-Net, selects one coherent plausible mask; learns variant frequencies; judged by the generalised energy distance"
+ext_links: [code|https://github.com/SimonKohl/probabilistic_unet]
 ---
 
 ## Links

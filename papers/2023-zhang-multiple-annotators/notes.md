@@ -1,6 +1,7 @@
 ---
 title: "Learning from multiple annotators for medical image segmentation"
-category: "Misc"
+category: "Medical image analysis"
+subcategory: "Uncertainty & annotator noise"
 short_title: "Zhang 2023 — multiple annotators"
 authors: "Le Zhang, Ryutaro Tanno, Moucheng Xu, Yawen Huang, Kevin Bronik, Chen Jin, Joseph Jacob, Yefeng Zheng, Ling Shao, Olga Ciccarelli, Frederik Barkhof, Daniel C. Alexander (UCL, Microsoft Research, Tencent, Queen Square MS Centre)"
 venue: "Pattern Recognition 138"
@@ -8,6 +9,7 @@ year: 2023
 url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC10533416/"
 tags: [label-noise, multiple-annotators, segmentation, confusion-matrix, identifiability, trace-regularisation, staple, medical-imaging]
 status: read
+summary: "separating annotator error from the true segmentation with a trace penalty on per-pixel confusion matrices (no HSIC); the per-pixel theorem needs column dominance, and without it the trace is smallest at the label swap"
 ---
 
 ## Links

@@ -10,6 +10,7 @@ url: "https://iclr.cc/virtual/2026/poster/10007061"
 pdf_url: "https://arxiv.org/pdf/2505.24403"
 tags: [lipschitz, deep-sets, multisets, permutation-invariance, earth-movers-distance, hausdorff-distance, matching-distance, attention, robustness, domain-adaptation]
 status: read
+summary: "mean, sum and max are 1-, 1- and √d-Lipschitz for EMD, matching and Hausdorff respectively, and each distance's blind spot (duplication, multiplicity, zero vectors) explains five of the six failures at distance zero; the sixth, max against EMD, holds only for unbounded set sizes (constant in [M, √d·M] under a cap), attention fails EMD only on unbounded inputs, the NN_max bound needs the hidden width, and Proposition 3.6 is an equality"
 ---
 
 ## Links

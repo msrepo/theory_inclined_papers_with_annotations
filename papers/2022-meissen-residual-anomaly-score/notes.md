@@ -1,6 +1,7 @@
 ---
 title: "On the Pitfalls of Using the Residual Error as Anomaly Score"
-category: "Misc"
+category: "Medical image analysis"
+subcategory: "Anomaly detection"
 short_title: "Meissen 2022 — residual anomaly score"
 authors: "Felix Meissen, Benedikt Wiestler, Georgios Kaissis, Daniel Rueckert"
 venue: "MIDL (PMLR 172)"
@@ -9,6 +10,8 @@ url: "https://proceedings.mlr.press/v172/meissen22a.html"
 pdf_url: "https://proceedings.mlr.press/v172/meissen22a/meissen22a.pdf"
 tags: [anomaly-detection, autoencoder, reconstruction-error, brain-mri, average-precision, unsupervised-segmentation]
 status: read
+summary: "a lesion is found only if its residual beats the reconstruction error at healthy pixels, so the score is blind to lesions near common tissue intensity; a sharper autoencoder also reconstructs the lesion; the one inequality it rests on is loose and the evidence is simulated discs"
+ext_links: [code|https://github.com/FeliMe/residual-score-pitfalls]
 ---
 
 ## Links

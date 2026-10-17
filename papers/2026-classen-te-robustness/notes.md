@@ -10,6 +10,7 @@ url: "https://arxiv.org/abs/2608.09999"
 pdf_url: "https://arxiv.org/pdf/2608.09999"
 tags: [transferability, medical-imaging, benchmark, robustness, rank-correlation, medmnist, reproducibility]
 status: read
+summary: "whether transferability rankings survive a change of random seed; mostly they do not"
 ---
 
 ## Links

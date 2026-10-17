@@ -9,6 +9,8 @@ year: 2026
 url: "https://github.com/applewpj/NTK-Selector"
 tags: [ntk, function-space, data-selection, domain-adaptation, llm, lora, low-resource, empirical]
 status: read
+summary: "mining general-domain data by NTK alignment with a tiny domain set"
+ext_links: [repository|https://github.com/applewpj/NTK-Selector]
 ---
 
 ## Links

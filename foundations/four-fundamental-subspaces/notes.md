@@ -7,6 +7,7 @@ status: living
 category: "Foundations"
 subcategory: "Linear algebra"
 short_title: "Four Fundamental Subspaces"
+summary: "what a matrix can reach (column space) and cannot see (null space), their perpendicular partners, least squares as a right angle with residuals in $N(A^\top)$, the hat matrix and $n-p$ residual degrees of freedom, centring as a residual, the pseudo-inverse and why gradient descent from zero finds the minimum-norm solution, the SVD bases, PCA residual subspaces for OOD, and where each one does work in H-score, LogME, LDA/SFDA, the NTK, spectral contrastive learning and the MICCAI notes"
 ---
 
 ## Links

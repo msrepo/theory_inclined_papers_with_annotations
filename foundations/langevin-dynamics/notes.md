@@ -7,6 +7,7 @@ status: living
 category: "Foundations"
 subcategory: "Probability"
 short_title: "Langevin dynamics"
+summary: "why a kick in time dt has size √dt (Brownian motion spreads like √t), Euler–Maruyama as gradient descent plus noise, the Ornstein–Uhlenbeck bowl and equipartition (kD/2 of excess loss), the Gibbs law e^(−U/D) from a zero probability current, depth against width (the free energy U + (D/2) log det H), the Fokker–Planck equation and its two time scales, Kramers' law (the barrier sets the exponent, not the destination), detailed balance and two ways to break it (a rotating drift; Hessian-shaped noise gives a round cloud), the path weight (downhill free, uphill e^(−ΔU/D)), ULA's 1/(1 − η/2) bias against MALA, SGLD's extra temperature, SGD's D ≈ ησ²/2B, and annealed Langevin fixing mode weights in score-based sampling"
 ---
 
 ## Links

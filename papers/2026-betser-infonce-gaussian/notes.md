@@ -10,6 +10,8 @@ status: read
 category: "Contrastive learning"
 subcategory: "Theory"
 short_title: "Betser 2026 — InfoNCE induces Gaussian"
+summary: "why contrastive representations come out approximately Gaussian"
+ext_links: [project page|https://rbetser.github.io/InfoNCE-induces-Gaussian-distribution/]
 ---
 
 ## Links

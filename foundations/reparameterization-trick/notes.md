@@ -6,6 +6,7 @@ tags: [reparameterization, score-function, reinforce, gradient-estimation, vae, 
 status: living
 category: "Gradient estimation"
 subcategory: "Theory"
+summary: "two ways to differentiate an expectation over a distribution with parameters: move the randomness into a parameter-free noise variable (reparameterization), or weight by the score function (REINFORCE), and when each applies"
 short_title: "Reparameterization vs REINFORCE"
 ---
 

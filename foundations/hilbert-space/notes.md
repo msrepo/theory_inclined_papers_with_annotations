@@ -7,6 +7,7 @@ status: living
 category: "Foundations"
 subcategory: "Linear algebra"
 short_title: "Hilbert Spaces"
+summary: "a vector space plus an inner product plus no holes; functions as vectors, with sin x and sin 2x perpendicular and Fourier series; unit balls of different lengths and why only the circle has angles; projection, the perpendicular foot and Pythagoras, and the closest point under three lengths; completeness shown by a sequence closing in on a hole and by the square wave; and where Hilbert spaces appear (least squares, kernels, RKHS, Hilbert–Schmidt, the Fisher metric)"
 ---
 
 ## Links

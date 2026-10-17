@@ -4,9 +4,10 @@ authors: "Topic notes"
 venue: "MICCAI 2026"
 tags: [domain-adaptation, domain-generalisation, test-time-adaptation, ood-detection, source-free, miccai]
 status: reading
-category: "Misc"
-subcategory: "Domain Adaptation / Generalization"
+category: "Medical image analysis"
+subcategory: "Domain adaptation / generalization"
 short_title: "MICCAI 2026 — DA/DG papers"
+summary: "the core mathematical construct of each of 26 MICCAI 2026 DA/DG/TTA/OOD papers (Mahalanobis residuals, deep EM, OT and Schrödinger bridges, flow-matching TTA, InfoMax, variational logit energies, GRPO), with a construct map, one toy-computed figure per paper, and a *What to watch* per paper"
 ---
 
 ## Why this page exists

@@ -10,6 +10,7 @@ url: "https://arxiv.org/abs/2207.03036"
 pdf_url: "https://arxiv.org/pdf/2207.03036"
 tags: [transferability, fisher-discriminant, lda, model-selection, ensembles, hard-examples, regularisation]
 status: read
+summary: "imitating fine-tuning by making the target task deliberately harder"
 ---
 
 ## Links
