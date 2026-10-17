@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Linear VAE and Posterior Collapse</title>
+<style>
+:root{
+  --bg:#fbfaf7; --surface:#ffffff; --ink:#1c1d21; --muted:#5b5f68; --line:#e2dfd8; --soft:#f2f0ea;
+  --c0:#2f6fb5; --c1:#c2571a; --c2:#0f7a5a; --c3:#7c3aed; --radius:12px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#131417; --surface:#1b1d21; --ink:#ebebed; --muted:#a3a6ae; --line:#2e3138; --soft:#23262b;
+    --c0:#7fb2e8; --c1:#f0a070; --c2:#4cc79a; --c3:#b48cff;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#131417; --surface:#1b1d21; --ink:#ebebed; --muted:#a3a6ae; --line:#2e3138; --soft:#23262b;
+  --c0:#7fb2e8; --c1:#f0a070; --c2:#4cc79a; --c3:#b48cff;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,sans-serif;}
+main{max-width:860px;margin:0 auto;padding:40px 16px 80px}
+h1{font-size:2.1rem;line-height:1.2;margin:0 0 .4rem;letter-spacing:-.01em}
+h2{font-size:1.4rem;margin:3rem 0 .6rem;padding-top:.5rem;border-top:1px solid var(--line)}
+p{margin:.6rem 0}
+a{color:var(--c0)}
+.lede{color:var(--muted);font-size:1.08rem;margin-bottom:1.4rem}
+nav.toc{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:12px 18px;font-size:.93rem}
+nav.toc ol{margin:.3rem 0;padding-left:1.2rem}
+nav.toc a{color:var(--ink);text-decoration:none;border-bottom:1px dotted var(--muted)}
+.widget{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:14px;margin:1rem 0 1.2rem}
+.controls{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;margin:.2rem 0 .6rem;font-size:.9rem}
+.controls label{display:flex;align-items:center;gap:6px;color:var(--muted)}
+button,select{font:inherit;font-size:.88rem;color:var(--ink);background:var(--soft);border:1px solid var(--line);border-radius:8px;padding:5px 11px;cursor:pointer}
+button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+input[type=range]{accent-color:var(--c0);width:130px}
+.readout{font-size:.9rem;color:var(--muted);margin-top:.5rem;font-variant-numeric:tabular-nums}
+.readout b{color:var(--ink)}
+.callout{border-left:3px solid var(--c2);background:var(--soft);padding:10px 14px;border-radius:0 8px 8px 0;margin:1rem 0;font-size:.95rem}
+canvas{display:block;width:100%;touch-action:none}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:.82rem;color:var(--muted);margin-top:.3rem}
+.legend span::before{content:"";display:inline-block;width:14px;height:3px;margin-right:6px;vertical-align:3px;background:var(--c)}
+@media (max-width:600px){ h1{font-size:1.7rem} input[type=range]{width:100px} }
+</style>
+</head>
+<body>
+<main>
+
+<h1>Linear VAE and Posterior Collapse, Interactively</h1>
+<p class="lede"><a href="../index.html">← text notes</a> · Lucas, Tucker, Grosse and Norouzi (NeurIPS 2019). Three widgets: why a fixed noise level can trap a latent unit at zero, how many units that traps, and why a diagonal posterior forces the decoder's columns to be perpendicular.</p>
+
+<nav class="toc"><b>Contents</b>
+<ol>
+  <li><a href="#s1">One column: a valley or a hill at zero</a></li>
+  <li><a href="#s2">Fixed noise against learned noise</a></li>
+  <li><a href="#s3">Rotating the decoder: same likelihood, different ELBO</a></li>
+</ol></nav>
+
+<h2 id="s1">1. One column: a valley or a hill at zero</h2>
+<p>Take a single latent unit whose decoder column points along one principal direction of the data, and ask how much the log-likelihood improves as the column's length <i>s</i> grows from zero. Here λ is the data's variance along that direction and σ² is the observation noise, held fixed. The curve is the gain per data point, measured against the collapsed column (s = 0).</p>
+<p>Because the model's variance along the direction is σ² + s², the unit can only describe variance above the noise floor.</p>
+
+<div class="widget">
+  <div class="controls">
+    <label>data variance λ <input id="aLam" type="range" min="2" max="50" value="20"></label>
+    <label>noise σ² <input id="aSig" type="range" min="2" max="50" value="8"></label>
+  </div>
+  <canvas id="aCanvas" height="320"></canvas>
+  <div class="legend">
+    <span style="--c:var(--c0)">gain in log-likelihood versus s = 0</span>
+    <span style="--c:var(--c1)">best column length</span>
+  </div>
+  <div class="readout" id="aRead"></div>
+</div>
+<div class="callout">Things to try. With σ² below λ the curve dips at s = 0 and rises to two peaks (higher is better, so these are the likelihood's maxima): a zero column is not a resting place, because growing it helps. Raise σ² past λ and the two peaks merge into a single peak at zero: now the collapsed column is a local maximum, and no small push away from zero improves the likelihood. The switch happens exactly where the two sliders are equal. Nothing about the KL term, the encoder or the decoder's power has entered yet.</div>
+
+<h2 id="s2">2. Fixed noise against learned noise</h2>
+<p>Now several directions at once. Each bar is a principal-component variance λ<sub>i</sub> of the data. The model has <b>q</b> latent columns to spend on the top q directions. The horizontal line is σ². A column whose bar lies <i>above</i> the line can be used (filled, blue). One whose bar lies <i>below</i> it is stuck at zero (hollow): it is collapsed. The lower panel shows how much information each live unit carries, ½ ln(λ<sub>i</sub>/σ²), which is the KL cost the unit pays.</p>
+
+<div class="widget">
+  <div class="controls">
+    <label>Spectrum
+      <select id="bSpec">
+        <option value="gap">Clear gap after 3</option>
+        <option value="decay">Gradual decay</option>
+      </select></label>
+    <label>latent columns q <input id="bQ" type="range" min="1" max="7" value="5"></label>
+  </div>
+  <div class="controls">
+    <button id="bFixed" class="on">σ² fixed</button>
+    <button id="bLearn">σ² learned</button>
+    <label>σ² (fixed) <input id="bSig" type="range" min="2" max="60" value="30"></label>
+  </div>
+  <canvas id="bCanvas" height="400"></canvas>
+  <div class="legend">
+    <span style="--c:var(--c0)">live unit</span>
+    <span style="--c:var(--muted)">collapsed unit or unused direction</span>
+    <span style="--c:var(--c1)">noise level σ²</span>
+  </div>
+  <div class="readout" id="bRead"></div>
+</div>
+<div class="callout">Things to try. With σ² fixed high, only the few bars above the line survive and the rest of the q units collapse, however many you provide. Lower σ² and collapsed units come alive one by one, from the largest bar downward. Now switch to <b>σ² learned</b>: the line drops to the average of the directions you did not give a column to, which is never above the q-th bar, so every one of the q units is alive. That is the paper's reason a learned noise level turns the collapsed points into saddles. Notice in the lower panel that a unit's information is half the log of its signal-to-noise ratio, so it vanishes exactly as the bar reaches the line.</div>
+
+<h2 id="s3">3. Rotating the decoder: same likelihood, different ELBO</h2>
+<p>With two latent units, the decoder is W = L Rᵀ: lengths L = diag(l<sub>1</sub>, l<sub>2</sub>) and a rotation R of the latent coordinates. The data distribution (left panel, its ellipse) does not depend on the rotation, so the likelihood is the same for every angle θ. The arrows are the two columns of W.</p>
+<p>The middle panel is the latent space: the dark ellipse is the true posterior, and the coloured ellipse is what a variational posterior with <i>diagonal</i> covariance can offer. The right panel plots the gap KL(q ‖ posterior) against θ. The ELBO is the likelihood minus this gap.</p>
+
+<div class="widget">
+  <div class="controls">
+    <label>column length l₁ <input id="cL1" type="range" min="3" max="30" value="22"></label>
+    <label>column length l₂ <input id="cL2" type="range" min="3" max="30" value="10"></label>
+    <label>noise σ <input id="cSig" type="range" min="3" max="20" value="8"></label>
+  </div>
+  <div class="controls">
+    <label>rotation θ <input id="cTh" type="range" min="0" max="180" value="35" style="width:260px"></label>
+  </div>
+  <canvas id="cCanvas" height="300"></canvas>
+  <div class="legend">
+    <span style="--c:var(--c0)">columns of W</span>
+    <span style="--c:var(--ink)">true posterior (1σ)</span>
+    <span style="--c:var(--c1)">diagonal variational posterior (1σ)</span>
+  </div>
+  <div class="readout" id="cRead"></div>
+</div>
+<div class="callout">Things to try. At θ = 0 (and 90°, 180°) the columns are perpendicular, the two ellipses coincide, and the gap is zero: the ELBO equals the likelihood. Between those angles the true posterior tilts while the variational one cannot, and the gap is positive. The ELBO therefore prefers perpendicular columns, and a small rotation toward them always raises it. Make l₁ equal l₂ and the true posterior is round at every angle: the gap is zero everywhere and the angle is no longer pinned down, which is the tie caveat in the notes.</div>
+
+<p class="readout" style="margin-top:2.5rem">Everything here is computed in the browser from the formulas in the notes; none of it is data from the paper.</p>
+</main>
+
+<script>
+"use strict";
+const $ = id => document.getElementById(id);
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+function setup(cv){
+  const dpr=window.devicePixelRatio||1, w=cv.clientWidth;
+  if(!cv.dataset.h) cv.dataset.h=cv.getAttribute("height");
+  const h=+cv.dataset.h; cv.style.height=h+"px";
+  cv.width=w*dpr; cv.height=h*dpr; const g=cv.getContext("2d"); g.setTransform(dpr,0,0,dpr,0,0);
+  return {g,w,h};
+}
+function dot(g,x,y,r,col){ g.beginPath(); g.arc(x,y,r,0,2*Math.PI); g.fillStyle=col; g.fill(); }
+function label(g,t,x,y,col,al){ g.fillStyle=col||css("--muted"); g.font="12px -apple-system,sans-serif"; g.textAlign=al||"center"; g.fillText(t,x,y); }
+
+// ================= widget A =================
+function drawA(){
+  const {g,w,h}=setup($("aCanvas")); g.clearRect(0,0,w,h);
+  const lam=+$("aLam").value/10, sg=+$("aSig").value/10;
+  const f=s=>{ const t=sg+s*s; return 0.5*((Math.log(sg)+lam/sg)-(Math.log(t)+lam/t)); };
+  const A=3, pl=44, pr=14, pt=14, pb=34, W=w-pl-pr, H=h-pt-pb;
+  const best=Math.sqrt(Math.max(lam-sg,0));
+  let lo=0, hi=0; for(let i=0;i<=300;i++){ const v=f(-A+2*A*i/300); lo=Math.min(lo,v); hi=Math.max(hi,v); }
+  hi=Math.max(hi,0.05); lo=Math.min(lo,-0.05);
+  const pad=(hi-lo)*0.12; lo-=pad; hi+=pad;
+  const X=s=>pl+W*(s+A)/(2*A), Y=v=>pt+H*(1-(v-lo)/(hi-lo));
+  g.strokeStyle=css("--line"); g.lineWidth=1; g.beginPath(); g.moveTo(pl,Y(0)); g.lineTo(w-pr,Y(0)); g.moveTo(X(0),pt); g.lineTo(X(0),h-pb); g.stroke();
+  label(g,"0",pl-8,Y(0)+4,null,"right"); label(g,"column length s",pl+W/2,h-6);
+  for(let s=-3;s<=3;s++) label(g,String(s),X(s),h-pb+16);
+  g.strokeStyle=css("--c0"); g.lineWidth=2.5; g.beginPath();
+  for(let i=0;i<=300;i++){ const s=-A+2*A*i/300, x=X(s), y=Y(f(s)); i?g.lineTo(x,y):g.moveTo(x,y); } g.stroke();
+  dot(g,X(0),Y(0),6,css("--ink"));
+  if(best>0){ for(const s of [-best,best]) dot(g,X(s),Y(f(s)),6,css("--c1")); }
+  const txt = lam>sg
+    ? `λ = ${lam.toFixed(1)} is above σ² = ${sg.toFixed(1)}: <b>s = 0 is not a maximum</b>; the best length is √(λ − σ²) = <b>${best.toFixed(2)}</b>, and using it gains ${f(best).toFixed(2)} per point.`
+    : `λ = ${lam.toFixed(1)} is not above σ² = ${sg.toFixed(1)}: <b>s = 0 is a local maximum</b>. No column length improves the fit, so a zero column stays zero.`;
+  $("aRead").innerHTML=txt;
+}
+["aLam","aSig"].forEach(i=>$(i).addEventListener("input",drawA));
+
+// ================= widget B =================
+const SPECS={ gap:[5.0,3.6,2.4,0.55,0.45,0.35,0.28,0.2], decay:[5.0,3.4,2.4,1.7,1.2,0.8,0.5,0.3] };
+let learn=false;
+function drawB(){
+  const {g,w,h}=setup($("bCanvas")); g.clearRect(0,0,w,h);
+  const lam=SPECS[$("bSpec").value], d=lam.length, q=+$("bQ").value;
+  let s2;
+  if(learn){ s2=0; for(let i=q;i<d;i++) s2+=lam[i]; s2/=(d-q); $("bSig").disabled=true; }
+  else { s2=+$("bSig").value/10; $("bSig").disabled=false; }
+  const pl=44, pr=10, W=w-pl-pr, top=5.6, topH=210, kH=h-topH-70;
+  const Y=v=>12+topH*(1-v/top), bw=W/d*0.62;
+  g.strokeStyle=css("--line"); g.lineWidth=1;
+  for(let v=0;v<=top;v+=1){ g.beginPath(); g.moveTo(pl,Y(v)); g.lineTo(w-pr,Y(v)); g.stroke(); label(g,v.toFixed(0),pl-6,Y(v)+4,null,"right"); }
+  let alive=0, totalKL=0; const kl=[];
+  for(let i=0;i<d;i++){
+    const x=pl+W/d*(i+0.5)-bw/2, used=i<q, live=used&&lam[i]>s2;
+    if(live){ alive++; kl.push(0.5*Math.log(lam[i]/s2)); totalKL+=kl[i]; } else kl.push(0);
+    if(live){ g.fillStyle=css("--c0"); g.fillRect(x,Y(lam[i]),bw,Y(0)-Y(lam[i])); }
+    else if(used){ g.strokeStyle=css("--c0"); g.lineWidth=2; g.setLineDash([4,3]); g.strokeRect(x,Y(lam[i]),bw,Y(0)-Y(lam[i])); g.setLineDash([]); }
+    else { g.fillStyle=css("--muted"); g.globalAlpha=.5; g.fillRect(x,Y(lam[i]),bw,Y(0)-Y(lam[i])); g.globalAlpha=1; }
+    label(g,"λ"+(i+1),x+bw/2,Y(0)+16);
+  }
+  g.strokeStyle=css("--c1"); g.lineWidth=2.2; g.setLineDash([6,4]); g.beginPath(); g.moveTo(pl,Y(s2)); g.lineTo(w-pr,Y(s2)); g.stroke(); g.setLineDash([]);
+  label(g,"σ²",w-26,Y(s2)-6,css("--c1"));
+  // information panel
+  const y0=12+topH+48, kmax=Math.max(1.4,...kl);
+  label(g,"information carried per unit, ½ ln(λ/σ²)",pl,y0-8,null,"left");
+  for(let i=0;i<d;i++){
+    const x=pl+W/d*(i+0.5)-bw/2, hh=kH*kl[i]/kmax;
+    g.fillStyle=css("--c0"); g.fillRect(x,y0+kH-hh,bw,hh);
+  }
+  g.strokeStyle=css("--line"); g.beginPath(); g.moveTo(pl,y0+kH); g.lineTo(w-pr,y0+kH); g.stroke();
+  $("bRead").innerHTML=`<b>${alive}</b> of <b>${q}</b> units alive · noise σ² = <b>${s2.toFixed(2)}</b>${learn?" (learned: average of the directions without a column)":" (fixed)"} · total information carried <b>${totalKL.toFixed(2)}</b>`;
+}
+$("bSpec").addEventListener("change",drawB); $("bQ").addEventListener("input",drawB); $("bSig").addEventListener("input",drawB);
+$("bFixed").onclick=()=>{ learn=false; $("bFixed").classList.add("on"); $("bLearn").classList.remove("on"); drawB(); };
+$("bLearn").onclick=()=>{ learn=true; $("bLearn").classList.add("on"); $("bFixed").classList.remove("on"); drawB(); };
+
+// ================= widget C =================
+function ell(g,cx,cy,Sxx,Sxy,Syy,k,col,lw,dash){      // covariance ellipse via its eigen-decomposition
+  const tr=(Sxx+Syy)/2, df=Math.sqrt(((Sxx-Syy)/2)**2+Sxy*Sxy), l1=tr+df, l2=Math.max(tr-df,1e-9);
+  const th=0.5*Math.atan2(2*Sxy,Sxx-Syy);
+  g.save(); g.translate(cx,cy); g.rotate(-th); g.beginPath(); g.ellipse(0,0,k*Math.sqrt(l1),k*Math.sqrt(l2),0,0,2*Math.PI);
+  g.strokeStyle=col; g.lineWidth=lw; g.setLineDash(dash||[]); g.stroke(); g.restore(); g.setLineDash([]);
+}
+function klGap(l1,l2,s2,th){
+  const c=Math.cos(th), s=Math.sin(th);
+  // M = R (L^2+s2 I) R^T
+  const a=l1*l1+s2, b=l2*l2+s2;
+  const m11=a*c*c+b*s*s, m22=a*s*s+b*c*c, m12=(a-b)*c*s;
+  return 0.5*(Math.log(m11*m22)-Math.log(m11*m22-m12*m12));
+}
+function drawC(){
+  const {g,w,h}=setup($("cCanvas")); g.clearRect(0,0,w,h);
+  const l1=+$("cL1").value/10, l2=+$("cL2").value/10, sg=+$("cSig").value/10, s2=sg*sg, th=+$("cTh").value*Math.PI/180;
+  const pw=w/3, cy=h/2+4, sc=Math.min(pw/2/ (Math.max(l1,l2)+sg+0.4), 80);
+  const c=Math.cos(th), s=Math.sin(th);
+  // panel 1: data space
+  const cx1=pw/2;
+  g.strokeStyle=css("--line"); g.lineWidth=1; g.beginPath(); g.moveTo(8,cy); g.lineTo(pw-8,cy); g.moveTo(cx1,18); g.lineTo(cx1,h-8); g.stroke();
+  label(g,"data space",cx1,14);
+  ell(g,cx1,cy,(l1*l1+s2)*sc*sc,0,(l2*l2+s2)*sc*sc,1,css("--ink"),2);
+  ell(g,cx1,cy,(l1*l1+s2)*sc*sc,0,(l2*l2+s2)*sc*sc,2,css("--muted"),1);
+  const w1=[l1*c,-l2*s], w2=[l1*s,l2*c];
+  for(const v of [w1,w2]){ g.strokeStyle=css("--c0"); g.lineWidth=3; g.beginPath(); g.moveTo(cx1,cy); g.lineTo(cx1+v[0]*sc,cy-v[1]*sc); g.stroke(); dot(g,cx1+v[0]*sc,cy-v[1]*sc,5,css("--c0")); }
+  // panel 2: latent space
+  const cx2=pw*1.5, a=l1*l1+s2, b=l2*l2+s2;
+  const m11=a*c*c+b*s*s, m22=a*s*s+b*c*c, m12=(a-b)*c*s, det=m11*m22-m12*m12;
+  const S1=[s2*m22/det, -s2*m12/det, s2*m11/det];       // sigma^2 M^{-1}
+  const D=[s2/m11, 0, s2/m22];                            // diagonal variational covariance
+  const ls=Math.min(pw/2.6, 1)*120/ Math.max(Math.sqrt(Math.max(D[0],D[2],S1[0],S1[2])),0.2) *0.55;
+  g.strokeStyle=css("--line"); g.beginPath(); g.moveTo(pw+8,cy); g.lineTo(2*pw-8,cy); g.moveTo(cx2,18); g.lineTo(cx2,h-8); g.stroke();
+  label(g,"latent space (given x)",cx2,14);
+  ell(g,cx2,cy,S1[0]*ls*ls/1,S1[1]*ls*ls,S1[2]*ls*ls,1,css("--ink"),2.4);
+  ell(g,cx2,cy,D[0]*ls*ls,0,D[2]*ls*ls,1,css("--c1"),2.4,[6,4]);
+  // panel 3: gap vs theta
+  const px=2*pw+34, pwid=pw-48, py0=34, ph=h-70;
+  let mx=0.02; for(let i=0;i<=180;i++) mx=Math.max(mx,klGap(l1,l2,s2,i*Math.PI/180));
+  mx*=1.15;
+  label(g,"gap KL(q ‖ posterior) vs θ",2*pw+pw/2,14);
+  g.strokeStyle=css("--line"); g.beginPath(); g.moveTo(px,py0+ph); g.lineTo(px+pwid,py0+ph); g.moveTo(px,py0); g.lineTo(px,py0+ph); g.stroke();
+  g.strokeStyle=css("--c1"); g.lineWidth=2.4; g.beginPath();
+  for(let i=0;i<=180;i++){ const x=px+pwid*i/180, y=py0+ph*(1-klGap(l1,l2,s2,i*Math.PI/180)/mx); i?g.lineTo(x,y):g.moveTo(x,y); } g.stroke();
+  const cur=klGap(l1,l2,s2,th), xc=px+pwid*(th*180/Math.PI)/180, yc=py0+ph*(1-cur/mx);
+  dot(g,xc,yc,6,css("--ink"));
+  for(const t of [0,90,180]) label(g,t+"°",px+pwid*t/180,py0+ph+16);
+  $("cRead").innerHTML=`gap at this θ: <b>${cur.toFixed(3)}</b> · the likelihood is the same for every θ, so the ELBO moves by exactly minus this gap · columns ${Math.abs(w1[0]*w2[0]+w1[1]*w2[1])<1e-3?"are <b>perpendicular</b>":"are not perpendicular"}`;
+}
+["cL1","cL2","cSig","cTh"].forEach(i=>$(i).addEventListener("input",drawC));
+
+function all(){ drawA(); drawB(); drawC(); }
+window.addEventListener("resize",all);
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change",all);
+all();
+</script>
+</body>
+</html>
