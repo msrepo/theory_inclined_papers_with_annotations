@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Probabilistic PCA, Interactively</title>
+<style>
+:root{
+  --bg:#fbfaf7; --surface:#ffffff; --ink:#1c1d21; --muted:#5b5f68; --line:#e2dfd8; --soft:#f2f0ea;
+  --c0:#2f6fb5; --c1:#c2571a; --c2:#0f7a5a; --c3:#7c3aed; --radius:12px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#131417; --surface:#1b1d21; --ink:#ebebed; --muted:#a3a6ae; --line:#2e3138; --soft:#23262b;
+    --c0:#7fb2e8; --c1:#f0a070; --c2:#4cc79a; --c3:#b48cff;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#131417; --surface:#1b1d21; --ink:#ebebed; --muted:#a3a6ae; --line:#2e3138; --soft:#23262b;
+  --c0:#7fb2e8; --c1:#f0a070; --c2:#4cc79a; --c3:#b48cff;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,sans-serif;}
+main{max-width:860px;margin:0 auto;padding:40px 16px 80px}
+h1{font-size:2.1rem;line-height:1.2;margin:0 0 .4rem;letter-spacing:-.01em}
+h2{font-size:1.4rem;margin:3rem 0 .6rem;padding-top:.5rem;border-top:1px solid var(--line)}
+p{margin:.6rem 0}
+a{color:var(--c0)}
+.lede{color:var(--muted);font-size:1.08rem;margin-bottom:1.4rem}
+nav.toc{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:12px 18px;font-size:.93rem}
+nav.toc ol{margin:.3rem 0;padding-left:1.2rem}
+nav.toc a{color:var(--ink);text-decoration:none;border-bottom:1px dotted var(--muted)}
+.widget{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:14px;margin:1rem 0 1.2rem}
+.controls{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;margin:.2rem 0 .6rem;font-size:.9rem}
+.controls label{display:flex;align-items:center;gap:6px;color:var(--muted)}
+button,select{font:inherit;font-size:.88rem;color:var(--ink);background:var(--soft);border:1px solid var(--line);border-radius:8px;padding:5px 11px;cursor:pointer}
+button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+input[type=range]{accent-color:var(--c0);width:130px}
+.readout{font-size:.9rem;color:var(--muted);margin-top:.5rem;font-variant-numeric:tabular-nums}
+.readout b{color:var(--ink)}
+.callout{border-left:3px solid var(--c2);background:var(--soft);padding:10px 14px;border-radius:0 8px 8px 0;margin:1rem 0;font-size:.95rem}
+canvas{display:block;width:100%;touch-action:none}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:.82rem;color:var(--muted);margin-top:.3rem}
+.legend span::before{content:"";display:inline-block;width:14px;height:3px;margin-right:6px;vertical-align:3px;background:var(--c)}
+@media (max-width:600px){ h1{font-size:1.7rem} input[type=range]{width:100px} }
+</style>
+</head>
+<body>
+<main>
+
+<h1>Probabilistic PCA, Interactively</h1>
+<p class="lede"><a href="../index.html">← text notes</a> · Foundations › Probability. Three widgets: grow a data cloud from a hidden coordinate, locate a point's hidden coordinate from where it landed, and see where the noise level comes from.</p>
+
+<nav class="toc"><b>Contents</b>
+<ol>
+  <li><a href="#s1">The generative story: a line, blurred</a></li>
+  <li><a href="#s2">From a point back to its hidden coordinate</a></li>
+  <li><a href="#s3">The noise is the variance PCA throws away</a></li>
+</ol></nav>
+
+<h2 id="s1">1. The generative story: a line, blurred</h2>
+<p>Every point is made in two steps. First draw a hidden number <i>z</i> from a bell curve. Then walk that far along the arrow <b>w</b> (the <i>z</i>-th multiple of it), and finally add a little noise that is equally strong in every direction. The data you see is a stretched cloud around the line. Drag the sliders to rotate the arrow, lengthen it, or turn up the noise.</p>
+<p>The solid ellipses are the model's own picture of the data, the Gaussian with covariance <b>ww<sup>⊤</sup> + σ²I</b>. Press <b>Fit from the points</b> and the dashed ellipse is what maximum likelihood recovers from the dots alone: the long axis is the top principal direction, the noise is the short axis' variance, and the arrow length is what is left of the long axis after the noise is taken off.</p>
+
+<div class="widget">
+  <div class="controls">
+    <label>angle of w <input id="aAng" type="range" min="-90" max="90" value="30"></label>
+    <label>length of w <input id="aLen" type="range" min="0" max="40" value="22"></label>
+    <label>noise σ <input id="aSig" type="range" min="1" max="30" value="8"></label>
+  </div>
+  <div class="controls">
+    <button id="aFit">Fit from the points</button>
+    <button id="aLine" class="on">Show hidden line</button>
+    <button id="aNew">↻ New sample</button>
+  </div>
+  <canvas id="aCanvas" height="400"></canvas>
+  <div class="legend">
+    <span style="--c:var(--c0)">true model (1σ, 2σ)</span>
+    <span style="--c:var(--c1)">fitted by maximum likelihood</span>
+  </div>
+  <div class="readout" id="aRead"></div>
+</div>
+<div class="callout">Things to try. Set σ to its minimum and the dots collapse onto the line: that is plain PCA's picture, where every point is exactly on the subspace. Raise σ until the cloud is nearly round and the fit's angle starts to wobble; with this much noise the direction is hard to read. Shrink the length of w to zero and the cloud becomes round, with nothing to find. Press <b>New sample</b> a few times: the fit moves a little each time because it only sees 150 dots.</div>
+
+<h2 id="s2">2. From a point back to its hidden coordinate</h2>
+<p>Here the model is fixed (a line at 30°). Drag the black dot anywhere. PCA says: drop a perpendicular onto the line, and that foot is the point's coordinate (orange). Probabilistic PCA gives a whole <i>bell curve</i> for the hidden coordinate instead of a single value; its centre is the blue dot and the blue bar is its two-standard-deviation spread. The coordinate axis along the line is marked in units of <i>z</i>.</p>
+
+<div class="widget">
+  <div class="controls">
+    <label>noise σ <input id="bSig" type="range" min="1" max="40" value="14"></label>
+    <label>length of w <input id="bLen" type="range" min="8" max="40" value="24"></label>
+  </div>
+  <canvas id="bCanvas" height="380"></canvas>
+  <div class="legend">
+    <span style="--c:var(--c1)">PCA foot (σ → 0)</span>
+    <span style="--c:var(--c0)">PPCA posterior mean and ±2 spread</span>
+  </div>
+  <div class="readout" id="bRead"></div>
+</div>
+<div class="callout">Things to try. Drag the dot far from the line: the PCA foot follows it all the way out, but the blue mean sits closer to the middle. It is pulled toward 0 because the prior says most points have a small <i>z</i>, and the pull grows with the noise. Set σ to its minimum and the blue and orange dots coincide, with the bar nearly gone. Make w short with large σ, and the blue dot barely moves from the centre however far you drag: with this much noise and so little signal, the position says almost nothing about <i>z</i>.</div>
+
+<h2 id="s3">3. The noise is the variance PCA throws away</h2>
+<p>Each bar is one eigenvalue of the sample covariance: how much the data spreads along that principal direction. Choose how many directions <i>q</i> to keep. The model's noise variance σ² is the <b>average of the bars you discard</b> (dashed line), and each kept direction contributes its bar minus that floor. Change the preset to see when there is a natural place to cut.</p>
+
+<div class="widget">
+  <div class="controls">
+    <label>Spectrum
+      <select id="cSpec">
+        <option value="gap">Clear gap after 2</option>
+        <option value="decay">Gradual decay</option>
+        <option value="flat">All equal (pure noise)</option>
+      </select></label>
+    <label>keep q <input id="cQ" type="range" min="0" max="7" value="2"></label>
+  </div>
+  <canvas id="cCanvas" height="320"></canvas>
+  <div class="legend">
+    <span style="--c:var(--c0)">signal kept: λᵢ − σ²</span>
+    <span style="--c:var(--c1)">noise floor σ²</span>
+    <span style="--c:var(--muted)">discarded directions</span>
+  </div>
+  <div class="readout" id="cRead"></div>
+</div>
+<div class="callout">Things to try. With the clear gap, q = 2 puts the dashed line right at the level of the small bars, so the floor describes them well. Push q to 1 and the floor jumps up, because the second large bar is now being counted as noise. Push q to 7 and only one bar is discarded, so the floor is just the last eigenvalue. On the gradual-decay preset no q gives a floor that matches the discarded bars: there is no clean split between signal and noise, which is a statement about the data and not about the method.</div>
+
+<p class="readout" style="margin-top:2.5rem">Samples are generated in the browser from a fixed seed. Nothing here comes from the paper's data.</p>
+</main>
+
+<script>
+"use strict";
+const $ = id => document.getElementById(id);
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+
+// ---------- seeded randomness ----------
+function rng(seed){ return function(){ seed|=0; seed=seed+0x6D2B79F5|0; let t=Math.imul(seed^seed>>>15,1|seed);
+  t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+function gauss(r){ let u=0,v=0; while(!u)u=r(); v=r(); return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v); }
+
+// ---------- canvas helpers ----------
+function setup(cv){
+  const dpr=window.devicePixelRatio||1, w=cv.clientWidth;
+  if(!cv.dataset.h) cv.dataset.h=cv.getAttribute("height");
+  const h=+cv.dataset.h; cv.style.height=h+"px";
+  cv.width=w*dpr; cv.height=h*dpr; const g=cv.getContext("2d"); g.setTransform(dpr,0,0,dpr,0,0);
+  return {g,w,h};
+}
+// world: x in [-S,S], y in [-S*h/w, S*h/w], units of "tenths" so sliders are integers
+const S=60;
+function mapper(w,h){ const k=w/(2*S); return {k, X:x=>w/2+x*k, Y:y=>h/2-y*k, ix:px=>(px-w/2)/k, iy:py=>(h/2-py)/k}; }
+function axes(g,w,h,m){
+  g.strokeStyle=css("--line"); g.lineWidth=1; g.beginPath();
+  g.moveTo(0,m.Y(0)); g.lineTo(w,m.Y(0)); g.moveTo(m.X(0),0); g.lineTo(m.X(0),h); g.stroke();
+}
+function ellipse(g,m,cx,cy,a,b,th,col,lw,dash){
+  g.save(); g.translate(m.X(cx),m.Y(cy)); g.rotate(-th); g.beginPath();
+  g.ellipse(0,0,Math.max(a*m.k,0.5),Math.max(b*m.k,0.5),0,0,2*Math.PI);
+  g.strokeStyle=col; g.lineWidth=lw; g.setLineDash(dash||[]); g.stroke(); g.restore();
+}
+function dot(g,x,y,r,col){ g.beginPath(); g.arc(x,y,r,0,2*Math.PI); g.fillStyle=col; g.fill(); }
+
+// ================= widget A =================
+const N=150; let aR=rng(7), aZ=[], aE=[], showLine=true, showFit=false;
+function aSample(seed){ aR=rng(seed); aZ=[]; aE=[];
+  for(let i=0;i<N;i++){ aZ.push(gauss(aR)); aE.push([gauss(aR),gauss(aR)]); } }
+aSample(7);
+function drawA(){
+  const {g,w,h}=setup($("aCanvas")), m=mapper(w,h); g.clearRect(0,0,w,h); axes(g,w,h,m);
+  const th=+$("aAng").value*Math.PI/180, L=+$("aLen").value, sg=+$("aSig").value/ 1;
+  const ux=Math.cos(th), uy=Math.sin(th), sig=sg;
+  if(showLine){ g.strokeStyle=css("--muted"); g.setLineDash([4,4]); g.beginPath();
+    g.moveTo(m.X(-S*2*ux),m.Y(-S*2*uy)); g.lineTo(m.X(S*2*ux),m.Y(S*2*uy)); g.stroke(); g.setLineDash([]); }
+  const pts=[]; let mx=0,my=0;
+  for(let i=0;i<N;i++){ const x=L*aZ[i]*ux+sig*aE[i][0], y=L*aZ[i]*uy+sig*aE[i][1]; pts.push([x,y]); mx+=x; my+=y; }
+  mx/=N; my/=N;
+  for(const p of pts) dot(g,m.X(p[0]),m.Y(p[1]),3,css("--muted"));
+  // true model ellipses: eigenvalues L^2+sig^2 along w, sig^2 across
+  const a=Math.sqrt(L*L+sig*sig), b=sig;
+  for(const k of [1,2]) ellipse(g,m,0,0,k*a,k*b,th,css("--c0"),k==1?2.2:1.2);
+  // arrow for w
+  g.strokeStyle=css("--c0"); g.fillStyle=css("--c0"); g.lineWidth=3; g.beginPath();
+  g.moveTo(m.X(0),m.Y(0)); g.lineTo(m.X(L*ux),m.Y(L*uy)); g.stroke();
+  dot(g,m.X(L*ux),m.Y(L*uy),5,css("--c0"));
+  let txt=`true: <b>‖w‖</b> = ${(L/10).toFixed(2)}, <b>σ</b> = ${(sig/10).toFixed(2)}`;
+  if(showFit){
+    let sxx=0,syy=0,sxy=0; for(const p of pts){ const dx=p[0]-mx, dy=p[1]-my; sxx+=dx*dx; syy+=dy*dy; sxy+=dx*dy; }
+    sxx/=N; syy/=N; sxy/=N;
+    const tr=(sxx+syy)/2, df=Math.sqrt(((sxx-syy)/2)**2+sxy*sxy), l1=tr+df, l2=tr-df;
+    const ft=0.5*Math.atan2(2*sxy,sxx-syy);
+    ellipse(g,m,mx,my,Math.sqrt(l1),Math.sqrt(l2),ft,css("--c1"),2.2,[7,4]);
+    ellipse(g,m,mx,my,2*Math.sqrt(l1),2*Math.sqrt(l2),ft,css("--c1"),1.2,[7,4]);
+    let ang=ft*180/Math.PI; // direction defined up to a half turn
+    let tru=th*180/Math.PI; let d=((ang-tru+90)%180+180)%180-90;
+    txt+=`<br>fitted: <b>‖w‖</b> = ${(Math.sqrt(Math.max(l1-l2,0))/10).toFixed(2)}, <b>σ</b> = ${(Math.sqrt(l2)/10).toFixed(2)}, direction off by <b>${Math.abs(d).toFixed(1)}°</b>`;
+  }
+  $("aRead").innerHTML=txt;
+}
+["aAng","aLen","aSig"].forEach(i=>$(i).addEventListener("input",drawA));
+$("aFit").onclick=()=>{ showFit=!showFit; $("aFit").classList.toggle("on",showFit); drawA(); };
+$("aLine").onclick=()=>{ showLine=!showLine; $("aLine").classList.toggle("on",showLine); drawA(); };
+let aSeed=7; $("aNew").onclick=()=>{ aSeed+=13; aSample(aSeed); drawA(); };
+
+// ================= widget B =================
+let bx=-14, by=20, drag=false;
+function drawB(){
+  const {g,w,h}=setup($("bCanvas")), m=mapper(w,h); g.clearRect(0,0,w,h); axes(g,w,h,m);
+  const th=30*Math.PI/180, ux=Math.cos(th), uy=Math.sin(th);
+  const L=+$("bLen").value, sig=+$("bSig").value;      // w = L*u, so ‖w‖ = L
+  // the line, with ticks every unit of z
+  g.strokeStyle=css("--muted"); g.lineWidth=1.5; g.beginPath();
+  g.moveTo(m.X(-S*2*ux),m.Y(-S*2*uy)); g.lineTo(m.X(S*2*ux),m.Y(S*2*uy)); g.stroke();
+  g.fillStyle=css("--muted"); g.font="12px -apple-system,sans-serif"; g.textAlign="center";
+  for(let z=-3;z<=3;z++){ const px=L*z*ux, py=L*z*uy; if(Math.abs(px)>S||Math.abs(py)>S*h/w) continue;
+    dot(g,m.X(px),m.Y(py),3,css("--muted"));
+    g.fillText("z="+z,m.X(px)+14*Math.sin(th),m.Y(py)+14*Math.cos(th)+4); }
+  // posterior
+  const proj=(bx*ux+by*uy);                 // distance of x along the line
+  const zPCA=proj/L;                         // hidden coordinate under PCA
+  const M=L*L+sig*sig, zMean=L*proj/M;       // posterior mean of z
+  const zSd=sig/Math.sqrt(M);                // posterior std of z
+  const px0=L*zPCA*ux, py0=L*zPCA*uy, px1=L*zMean*ux, py1=L*zMean*uy;
+  // x to foot
+  g.strokeStyle=css("--c1"); g.setLineDash([4,4]); g.lineWidth=1.5; g.beginPath();
+  g.moveTo(m.X(bx),m.Y(by)); g.lineTo(m.X(px0),m.Y(py0)); g.stroke(); g.setLineDash([]);
+  // spread bar
+  const lo=zMean-2*zSd, hi=zMean+2*zSd;
+  g.strokeStyle=css("--c0"); g.lineWidth=7; g.lineCap="round"; g.globalAlpha=.45; g.beginPath();
+  g.moveTo(m.X(L*lo*ux),m.Y(L*lo*uy)); g.lineTo(m.X(L*hi*ux),m.Y(L*hi*uy)); g.stroke(); g.globalAlpha=1; g.lineCap="butt";
+  dot(g,m.X(px0),m.Y(py0),6,css("--c1"));
+  dot(g,m.X(px1),m.Y(py1),6,css("--c0"));
+  dot(g,m.X(bx),m.Y(by),8,css("--ink"));
+  $("bRead").innerHTML=`PCA coordinate <b>z = ${zPCA.toFixed(2)}</b> · PPCA posterior <b>z ~ N(${zMean.toFixed(2)}, ${zSd.toFixed(2)}²)</b> · shrinkage factor <b>${(L*L/M).toFixed(2)}</b> (1 means no pull toward 0)`;
+}
+(function(){
+  const cv=$("bCanvas");
+  function pos(e){ const r=cv.getBoundingClientRect(), w=r.width, h=r.height, m=mapper(w,h);
+    const t=e.touches?e.touches[0]:e; return [m.ix(t.clientX-r.left), m.iy(t.clientY-r.top)]; }
+  function mv(e){ if(!drag) return; const [x,y]=pos(e); const Yl=S*cv.clientHeight/cv.clientWidth-2; bx=Math.max(-S+2,Math.min(S-2,x)); by=Math.max(-Yl,Math.min(Yl,y)); drawB(); e.preventDefault(); }
+  cv.addEventListener("pointerdown",e=>{ drag=true; cv.setPointerCapture(e.pointerId); mv(e); });
+  cv.addEventListener("pointermove",mv);
+  cv.addEventListener("pointerup",()=>drag=false);
+})();
+["bSig","bLen"].forEach(i=>$(i).addEventListener("input",drawB));
+
+// ================= widget C =================
+const SPECS={
+  gap:  [5.0,3.4,0.55,0.5,0.42,0.36,0.3,0.25],
+  decay:[5.0,3.2,2.1,1.4,0.9,0.6,0.4,0.25],
+  flat: [1,1,1,1,1,1,1,1]
+};
+function drawC(){
+  const {g,w,h}=setup($("cCanvas")); g.clearRect(0,0,w,h);
+  const lam=SPECS[$("cSpec").value], q=+$("cQ").value, d=lam.length;
+  let s2=0; for(let i=q;i<d;i++) s2+=lam[i]; s2/=(d-q);
+  const top=Math.max(...lam)*1.12, padL=44, padB=30, W=w-padL-10, H=h-padB-10;
+  const Y=v=>10+H*(1-v/top), bw=W/d*0.62;
+  g.strokeStyle=css("--line"); g.lineWidth=1; g.fillStyle=css("--muted"); g.font="12px -apple-system,sans-serif"; g.textAlign="right";
+  for(let v=0;v<=top;v+=1){ g.beginPath(); g.moveTo(padL,Y(v)); g.lineTo(w-10,Y(v)); g.stroke(); g.fillText(v.toFixed(0),padL-6,Y(v)+4); }
+  g.textAlign="center";
+  for(let i=0;i<d;i++){
+    const x=padL+W/d*(i+0.5)-bw/2;
+    if(i<q){
+      g.fillStyle=css("--c1"); g.fillRect(x,Y(s2),bw,Y(0)-Y(s2));
+      g.fillStyle=css("--c0"); g.fillRect(x,Y(lam[i]),bw,Y(s2)-Y(lam[i]));
+    } else { g.fillStyle=css("--muted"); g.globalAlpha=.55; g.fillRect(x,Y(lam[i]),bw,Y(0)-Y(lam[i])); g.globalAlpha=1; }
+    g.fillStyle=css("--muted"); g.fillText("λ"+(i+1),x+bw/2,h-10);
+  }
+  g.strokeStyle=css("--c1"); g.lineWidth=2; g.setLineDash([6,4]); g.beginPath(); g.moveTo(padL,Y(s2)); g.lineTo(w-10,Y(s2)); g.stroke(); g.setLineDash([]);
+  g.fillStyle=css("--c1"); g.textAlign="left"; g.fillText("σ²",w-34,Y(s2)-6);
+  // spread of discarded bars around the floor
+  let spread=0; for(let i=q;i<d;i++) spread=Math.max(spread,Math.abs(lam[i]-s2));
+  $("cRead").innerHTML=`keeping <b>q = ${q}</b> of ${d} directions · noise floor <b>σ² = ${s2.toFixed(2)}</b> · the discarded bars stray from the floor by at most <b>${spread.toFixed(2)}</b>`;
+}
+$("cSpec").addEventListener("change",drawC); $("cQ").addEventListener("input",drawC);
+
+function all(){ drawA(); drawB(); drawC(); }
+window.addEventListener("resize",all);
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change",all);
+all();
+</script>
+</body>
+</html>
