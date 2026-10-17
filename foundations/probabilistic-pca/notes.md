@@ -174,6 +174,7 @@ the only maxima are the ones in §5 (all choices of eigenvectors other than the 
 
 - **Linear VAE.** A VAE with a linear Gaussian decoder $x=Wz+\mu+\epsilon$ and a standard-normal prior is exactly PPCA. Its exact posterior is the one in §6, so the
   ELBO's gap closes, and the optimum recovers the PCA subspace. A nonlinear decoder is "PPCA with a bent sheet".
+  See Lucas, Tucker, Grosse and Norouzi, ["Don't Blame the ELBO! A Linear VAE Perspective on Posterior Collapse"](https://arxiv.org/abs/1911.02469) (NeurIPS 2019).
 - **Anomaly and OOD scores.** The sheet is "normal", and the distance to it, plus the position on it, is the score. The posterior spread above
   tells you how much of that distance is expected from noise alone.
 - **Data with missing entries.** Whenever a table has holes, the model of §7 is the principled replacement for filling in the mean first.
