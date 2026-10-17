@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PCA Missing Data Explorer</title>
+<style>
+:root{
+  --bg:#fbfaf7; --surface:#ffffff; --ink:#1c1d21; --muted:#5b5f68; --faint:#8a8880; --line:#e2dfd8; --soft:#f2f0ea;
+  --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a; --radius:12px; color-scheme: light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#131417; --surface:#1b1d21; --ink:#ebebed; --muted:#a3a6ae; --faint:#85837b; --line:#2e3138; --soft:#23262b;
+    --s1:#3987e5; --s2:#d95926; --s3:#199e70; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#131417; --surface:#1b1d21; --ink:#ebebed; --muted:#a3a6ae; --faint:#85837b; --line:#2e3138; --soft:#23262b;
+  --s1:#3987e5; --s2:#d95926; --s3:#199e70; color-scheme: dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,sans-serif}
+main{max-width:900px;margin:0 auto;padding:36px 16px 80px}
+h1{font-size:1.8rem;line-height:1.2;margin:0 0 .4rem}
+h2{font-size:1.25rem;margin:2.2rem 0 .5rem;padding-top:.5rem;border-top:1px solid var(--line)}
+.lede{color:var(--muted)}
+.widget{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:14px;margin:1rem 0}
+.controls{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center;margin:.2rem 0 .7rem;font-size:.9rem}
+.controls label{display:flex;align-items:center;gap:6px;color:var(--muted)}
+button{font:inherit;font-size:.88rem;color:var(--ink);background:var(--soft);border:1px solid var(--line);border-radius:8px;padding:5px 12px;cursor:pointer}
+button:focus-visible,input:focus-visible{outline:2px solid var(--s1);outline-offset:2px}
+input[type=range]{accent-color:var(--s1);width:150px}
+.readout{font-size:.9rem;color:var(--muted);margin-top:.5rem;font-variant-numeric:tabular-nums}
+.readout b{color:var(--ink)}
+canvas{display:block;width:100%;height:auto;border-radius:8px}
+.key{display:flex;flex-wrap:wrap;gap:4px 16px;font-size:.84rem;color:var(--muted);margin-top:.4rem}
+.key i{display:inline-block;width:18px;height:0;border-top:3px solid;vertical-align:middle;margin-right:5px}
+.cap{font-size:.84rem;color:var(--muted)}
+</style>
+</head>
+<body>
+<main>
+<h1>PCA with missing data</h1>
+<p class="lede">Ipsen &amp; Hansen (2019). One planted direction, signal-to-noise <i>S</i>, <i>α&nbsp;=&nbsp;N/D</i> samples per dimension, each entry missing with probability <i>m</i>. The plot shows the squared overlap <i>R²</i> of the learned direction with the true one.</p>
+
+<h2>1. Three readings of "missing data"</h2>
+<p>The paper's Eq. 2 replaces <i>S</i> by (1−<i>m</i>)<i>S</i>. The older view shrinks the sample, to <i>N</i>(1−<i>m</i>) (the paper's Fig. 2c). The third curve, <i>N</i>(1−<i>m</i>)², is the sample-size version that has the <em>same threshold</em> as Eq. 2.</p>
+<div class="widget">
+  <div class="controls">
+    <label>S <input id="S" type="range" min="0.5" max="12" step="0.1" value="4"><b id="SV"></b></label>
+    <label>α <input id="A" type="range" min="0.25" max="10" step="0.05" value="2"><b id="AV"></b></label>
+    <label>x-axis
+      <select id="X"><option value="m">missing rate m</option><option value="a">α (at the m below)</option></select></label>
+    <label>m <input id="M" type="range" min="0" max="0.95" step="0.01" value="0.5"><b id="MV"></b></label>
+  </div>
+  <canvas id="c1" width="900" height="380" tabindex="0" aria-label="R squared curves for three readings of missing data"></canvas>
+  <div class="key"><span><i style="border-color:var(--s1)"></i>Eq 2: S→(1−m)S</span><span><i style="border-color:var(--s2);border-top-style:dashed"></i>N(1−m)</span><span><i style="border-color:var(--s3);border-top-style:dashed"></i>N(1−m)²</span><span><i style="border-color:var(--faint)"></i>no missing data</span></div>
+  <div class="readout" id="r1"></div>
+</div>
+
+<h2>2. Run the experiment</h2>
+<p>Draws a fresh data set in your browser (D = 150), deletes entries at random, fills the gaps with zero and finds the top principal direction by power iteration. The paper's EM probabilistic PCA lands on the same curve; see the notes.</p>
+<div class="widget">
+  <div class="controls">
+    <label>S <input id="S2" type="range" min="1" max="12" step="0.5" value="4"><b id="S2V"></b></label>
+    <label>α <input id="A2" type="range" min="0.5" max="6" step="0.25" value="2"><b id="A2V"></b></label>
+    <button id="run">Sweep m (1 run per point)</button><button id="clr">Clear</button>
+  </div>
+  <canvas id="c2" width="900" height="340" tabindex="0" aria-label="Simulated R squared against missing rate"></canvas>
+  <div class="readout" id="r2">Press the button. Each dot is one random data set, so expect scatter of a few hundredths, larger near the transition (D is small here).</div>
+</div>
+<p class="cap">Theory: R² = 0 if αS′² &lt; 1, else (αS′² − 1)/(S′ + αS′²), with S′ = (1−m)S. Critical missing rate m<sub>c</sub> = 1 − 1/(S√α).</p>
+</main>
+<script>
+const $ = id => document.getElementById(id);
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const colors = () => ({ ink: css("--ink"), muted: css("--muted"), faint: css("--faint"), line: css("--line"), s1: css("--s1"), s2: css("--s2"), s3: css("--s3") });
+const R2 = (a, S) => (a * S * S < 1 ? 0 : (a * S * S - 1) / (S + a * S * S));
+function fit(c, ratio) { const w = c.clientWidth || 900; c.width = Math.round(w * devicePixelRatio); c.height = Math.round(w * ratio * devicePixelRatio);
+  const g = c.getContext("2d"); g.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0); return { g, w, h: w * ratio }; }
+function frame(g, w, h, xs, xl, C) {
+  const ox = 52, oy = 12, W = w - ox - 14, H = h - oy - 42;
+  g.clearRect(0, 0, w, h); g.font = "11px -apple-system,Segoe UI,sans-serif"; g.lineWidth = 1; g.strokeStyle = C.line; g.fillStyle = C.muted;
+  [0, .25, .5, .75, 1].forEach(v => { const y = oy + H - v * H; g.beginPath(); g.moveTo(ox, y); g.lineTo(ox + W, y); g.stroke(); g.textAlign = "right"; g.fillText(v, ox - 6, y + 4); });
+  xs.forEach(([v, p]) => { g.textAlign = "center"; g.fillText(v, ox + p * W, oy + H + 15); });
+  g.strokeStyle = C.faint; g.strokeRect(ox, oy, W, H); g.textAlign = "center"; g.font = "12px -apple-system,Segoe UI,sans-serif";
+  g.fillText(xl, ox + W / 2, h - 6); g.save(); g.translate(13, oy + H / 2); g.rotate(-Math.PI / 2); g.fillText("R²", 0, 0); g.restore();
+  return { X: p => ox + p * W, Y: v => oy + H - v * H, W, H, ox, oy };
+}
+function line(g, P, f, col, dash, N = 300) { g.strokeStyle = col; g.lineWidth = dash ? 1.8 : 2.4; g.setLineDash(dash ? [6, 4] : []); g.beginPath();
+  for (let i = 0; i <= N; i++) { const p = i / N, v = f(p); i ? g.lineTo(P.X(p), P.Y(v)) : g.moveTo(P.X(p), P.Y(v)); } g.stroke(); g.setLineDash([]); }
+function draw1() {
+  const C = colors(), S = +$("S").value, a0 = +$("A").value, m0 = +$("M").value, mode = $("X").value;
+  $("SV").textContent = S.toFixed(1); $("AV").textContent = a0.toFixed(2); $("MV").textContent = m0.toFixed(2);
+  $("A").disabled = mode === "a"; $("M").disabled = mode === "m";
+  const { g, w, h } = fit($("c1"), 380 / 900);
+  let P, f;
+  if (mode === "m") { P = frame(g, w, h, [0, .2, .4, .6, .8, 1].map(v => [v, v]), "missing rate m", C);
+    f = [p => R2(a0, (1 - p) * S), p => R2(a0 * (1 - p), S), p => R2(a0 * (1 - p) ** 2, S), p => R2(a0, S)]; }
+  else { const amax = 10; P = frame(g, w, h, [0, 2, 4, 6, 8, 10].map(v => [v, v / amax]), "α = N / D", C);
+    f = [p => R2(p * amax, (1 - m0) * S), p => R2(p * amax * (1 - m0), S), p => R2(p * amax * (1 - m0) ** 2, S), p => R2(p * amax, S)]; }
+  line(g, P, f[3], C.faint, false); line(g, P, f[1], C.s2, true); line(g, P, f[2], C.s3, true); line(g, P, f[0], C.s1, false);
+  const mc = 1 - 1 / (S * Math.sqrt(a0));
+  $("r1").innerHTML = mode === "m"
+    ? `Eq 2 at m=${m0.toFixed(2)}: R² <b>${R2(a0, (1 - m0) * S).toFixed(3)}</b> · N(1−m): <b>${R2(a0 * (1 - m0), S).toFixed(3)}</b> · N(1−m)²: <b>${R2(a0 * (1 - m0) ** 2, S).toFixed(3)}</b> · Eq 2 and N(1−m)² switch on at m<sub>c</sub> = <b>${mc > 0 ? mc.toFixed(3) : "already off at m=0"}</b>; N(1−m) switches on at ${(1 - 1 / (S * S * a0)).toFixed(3)}`
+    : `At m=${m0.toFixed(2)}, S=${S.toFixed(1)}: Eq 2 turns on at α = <b>${(1 / (((1 - m0) * S) ** 2)).toFixed(2)}</b>, N(1−m)² at the same α, N(1−m) at α = ${(1 / (S * S * (1 - m0))).toFixed(2)}`;
+}
+["S", "A", "M", "X"].forEach(id => $(id).addEventListener("input", draw1));
+// ---------- simulation
+function randn() { let u = 0, v = 0; while (!u) u = Math.random(); v = Math.random(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v); }
+function simulate(D, N, S, m) {
+  const a0 = Float64Array.from({ length: D }, randn); let n = 0; a0.forEach(x => n += x * x); n = Math.sqrt(n); for (let i = 0; i < D; i++) a0[i] /= n;
+  const sig = 1 / Math.sqrt(S), X = new Float64Array(N * D);
+  for (let i = 0; i < N; i++) { const z = randn(); for (let d = 0; d < D; d++) X[i * D + d] = Math.random() < m ? 0 : z * a0[d] + sig * randn(); }
+  let v = Float64Array.from({ length: D }, randn), t = new Float64Array(N);
+  for (let it = 0; it < 120; it++) {
+    for (let i = 0; i < N; i++) { let s = 0; for (let d = 0; d < D; d++) s += X[i * D + d] * v[d]; t[i] = s; }
+    const u = new Float64Array(D); for (let i = 0; i < N; i++) for (let d = 0; d < D; d++) u[d] += X[i * D + d] * t[i];
+    let nn = 0; for (let d = 0; d < D; d++) nn += u[d] * u[d]; nn = Math.sqrt(nn) || 1; for (let d = 0; d < D; d++) v[d] = u[d] / nn;
+  }
+  let dot = 0; for (let d = 0; d < D; d++) dot += v[d] * a0[d]; return dot * dot;
+}
+let pts = [];
+function draw2() {
+  const C = colors(), S = +$("S2").value, a = +$("A2").value; $("S2V").textContent = S.toFixed(1); $("A2V").textContent = a.toFixed(2);
+  const { g, w, h } = fit($("c2"), 340 / 900), P = frame(g, w, h, [0, .2, .4, .6, .8, 1].map(v => [v, v]), "missing rate m", C);
+  line(g, P, p => R2(a, (1 - p) * S), C.s1, false);
+  line(g, P, p => R2(a * (1 - p), S), C.s2, true);
+  pts.filter(q => q.S === S && q.a === a).forEach(q => { g.fillStyle = C.ink; g.beginPath(); g.arc(P.X(q.m), P.Y(q.r), 3.6, 0, 6.3); g.fill(); });
+}
+$("run").addEventListener("click", async () => {
+  const S = +$("S2").value, a = +$("A2").value, D = 150, N = Math.round(a * D); $("run").disabled = true;
+  for (let k = 0; k <= 19; k++) { const m = k * 0.05; pts.push({ S, a, m, r: simulate(D, N, S, m) }); draw2(); await new Promise(r => setTimeout(r, 0)); }
+  const mine = pts.filter(q => q.S === S && q.a === a).slice(-20);
+  const err = mine.reduce((s, q) => s + Math.abs(q.r - R2(a, (1 - q.m) * S)), 0) / mine.length;
+  const err2 = mine.reduce((s, q) => s + Math.abs(q.r - R2(a * (1 - q.m), S)), 0) / mine.length;
+  $("r2").innerHTML = `Mean |simulation − Eq 2| = <b>${err.toFixed(3)}</b>; mean |simulation − N(1−m)| = <b>${err2.toFixed(3)}</b>. Solid: Eq 2. Dashed: N(1−m).`; $("run").disabled = false;
+});
+$("clr").addEventListener("click", () => { pts = []; draw2(); $("r2").textContent = "Cleared."; });
+["S2", "A2"].forEach(id => $(id).addEventListener("input", draw2));
+addEventListener("resize", () => { draw1(); draw2(); });
+draw1(); draw2();
+</script>
+</body>
+</html>
