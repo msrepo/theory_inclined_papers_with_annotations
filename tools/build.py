@@ -409,7 +409,8 @@ def render_index(entries: list[tuple[Path, dict]]) -> None:
 {sidebar_html(entries, None, depth=0)}
 <main>
 <header class="paper-head"><h1>Theory-inclined papers, with annotations</h1>
-<p class="meta">{n_paper} paper(s), {n_other} background page(s)</p></header>
+<p class="meta">{n_paper} paper(s), {n_other} background page(s)</p>
+<p>Heavy use of AI went into these notes: I used it to help me understand the papers. The annotations and derivations are mostly AI-written in response to the questions I asked while reading, so they are not in my own words, and they may contain mistakes.</p></header>
 {controls}
 <div id="results">{"".join(rows)}</div>
 <p id="none" class="none" hidden>No page matches. Try fewer words or clear the filters.</p>

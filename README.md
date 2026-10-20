@@ -6,6 +6,8 @@ Close readings of theory-heavy machine learning papers. One folder per paper, ea
 plain-language annotation in Markdown (LaTeX maths included) that can be rendered to a
 styled HTML page with `make`.
 
+Heavy use of AI went into these notes: I used it to help me understand the papers. The annotations and derivations are mostly AI-written in response to the questions I asked while reading, so they are not in my own words, and they may contain mistakes.
+
 The aim of each annotation is not a summary. It is to reconstruct the argument so that the
 steps a first reading skips over — why a definition is stated the way it is, where an
 inequality comes from, what an assumption is buying — are written down explicitly.
