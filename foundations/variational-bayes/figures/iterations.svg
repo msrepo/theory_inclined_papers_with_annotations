@@ -1,0 +1,97 @@
+<svg viewBox="0 0 680 250" xmlns="http://www.w3.org/2000/svg" role="img">
+<title>MFVB parameters settle in a few sweeps</title>
+<desc>m, s2 and b over the first eight sweeps; all settle within about five.</desc>
+<style>
+  text{font-family:ui-sans-serif,-apple-system,"Segoe UI",sans-serif;font-weight:400}
+  .lab{font-size:11px;fill:#57564f} .hd{font-size:13px;font-weight:500;fill:#1a1a19}
+  .sub{font-size:11.5px;fill:#57564f} .tiny{font-size:10px;fill:#57564f} .ink{fill:#1a1a19}
+  .ax{stroke:#c3c2b7;stroke-width:0.8;fill:none} .gd{stroke:#e2e1da;stroke-width:0.6;fill:none}
+  .b{stroke:#2f6fb5;stroke-width:2;fill:none} .bf{fill:#2f6fb5} .bb{fill:#2f6fb5;opacity:.28}
+  .o{stroke:#c2571a;stroke-width:2;fill:none} .of{fill:#c2571a} .ob{fill:#c2571a;opacity:.28}
+  .g{stroke:#0f7a5a;stroke-width:2;fill:none} .gf{fill:#0f7a5a}
+  .p{stroke:#7c3aed;stroke-width:2;fill:none} .pf{fill:#7c3aed}
+  .r{stroke:#b42318;stroke-width:1.6;fill:none} .rf{fill:#b42318}
+  .k{stroke:#1a1a19;stroke-width:1.1;fill:none;stroke-dasharray:4 3} .k0{stroke:#1a1a19;stroke-width:1.3;fill:none}
+  .dash{stroke-dasharray:5 3} .dot{stroke-dasharray:1.5 3}
+  .shade{fill:#8a8880;opacity:.16} .shader{fill:#b42318;opacity:.12}
+  .cell{stroke:#ffffff;stroke-width:1}
+  @media (prefers-color-scheme: dark){
+    .lab,.sub,.tiny{fill:#b6b4ab} .hd,.ink{fill:#eceae3} .ax{stroke:#4a4844} .gd{stroke:#33312e}
+    .b{stroke:#3d8ad8} .bf{fill:#3d8ad8} .bb{fill:#3d8ad8;opacity:.36}
+    .o{stroke:#d8733a} .of{fill:#d8733a} .ob{fill:#d8733a;opacity:.36}
+    .g{stroke:#4cc79a} .gf{fill:#4cc79a} .p{stroke:#b48cff} .pf{fill:#b48cff}
+    .r{stroke:#ff7a6b} .rf{fill:#ff7a6b}
+    .k,.k0{stroke:#eceae3} .shade{fill:#b6b4ab;opacity:.16} .shader{fill:#ff7a6b;opacity:.16}
+    .cell{stroke:#131417}
+  }
+</style>
+<line class="gd" x1="40" x2="210" y1="210.0" y2="210.0"/>
+<text class="tiny" x="35" y="213.0" text-anchor="end">9.60</text>
+<line class="gd" x1="40" x2="210" y1="125.0" y2="125.0"/>
+<text class="tiny" x="35" y="128.0" text-anchor="end">9.68</text>
+<line class="gd" x1="40" x2="210" y1="40.0" y2="40.0"/>
+<text class="tiny" x="35" y="43.0" text-anchor="end">9.75</text>
+<text class="tiny" x="64.3" y="223" text-anchor="middle">2</text>
+<text class="tiny" x="112.9" y="223" text-anchor="middle">4</text>
+<text class="tiny" x="161.4" y="223" text-anchor="middle">6</text>
+<text class="tiny" x="210.0" y="223" text-anchor="middle">8</text>
+<line class="ax" x1="40" x2="210" y1="210" y2="210"/>
+<line class="ax" x1="40" x2="40" y1="40" y2="210"/>
+<text class="lab" x="125.0" y="238" text-anchor="middle">sweep</text>
+<polyline class="b" points="40.0,107.6 64.3,128.7 88.6,130.5 112.9,130.6 137.1,130.6 161.4,130.6 185.7,130.6 210.0,130.6"/>
+<circle class="bf" cx="40.0" cy="107.6" r="3"/>
+<circle class="bf" cx="64.3" cy="128.7" r="3"/>
+<circle class="bf" cx="88.6" cy="130.5" r="3"/>
+<circle class="bf" cx="112.9" cy="130.6" r="3"/>
+<circle class="bf" cx="137.1" cy="130.6" r="3"/>
+<circle class="bf" cx="161.4" cy="130.6" r="3"/>
+<circle class="bf" cx="185.7" cy="130.6" r="3"/>
+<circle class="bf" cx="210.0" cy="130.6" r="3"/>
+<text class="hd" x="40" y="26">m (mean of q(mu))</text>
+<line class="gd" x1="260" x2="430" y1="210.0" y2="210.0"/>
+<text class="tiny" x="255" y="213.0" text-anchor="end">0.00</text>
+<line class="gd" x1="260" x2="430" y1="125.0" y2="125.0"/>
+<text class="tiny" x="255" y="128.0" text-anchor="end">0.17</text>
+<line class="gd" x1="260" x2="430" y1="40.0" y2="40.0"/>
+<text class="tiny" x="255" y="43.0" text-anchor="end">0.35</text>
+<text class="tiny" x="284.3" y="223" text-anchor="middle">2</text>
+<text class="tiny" x="332.9" y="223" text-anchor="middle">4</text>
+<text class="tiny" x="381.4" y="223" text-anchor="middle">6</text>
+<text class="tiny" x="430.0" y="223" text-anchor="middle">8</text>
+<line class="ax" x1="260" x2="430" y1="210" y2="210"/>
+<line class="ax" x1="260" x2="260" y1="40" y2="210"/>
+<text class="lab" x="345.0" y="238" text-anchor="middle">sweep</text>
+<polyline class="b" points="260.0,161.5 284.3,68.3 308.6,60.6 332.9,60.0 357.1,59.9 381.4,59.9 405.7,59.9 430.0,59.9"/>
+<circle class="bf" cx="260.0" cy="161.5" r="3"/>
+<circle class="bf" cx="284.3" cy="68.3" r="3"/>
+<circle class="bf" cx="308.6" cy="60.6" r="3"/>
+<circle class="bf" cx="332.9" cy="60.0" r="3"/>
+<circle class="bf" cx="357.1" cy="59.9" r="3"/>
+<circle class="bf" cx="381.4" cy="59.9" r="3"/>
+<circle class="bf" cx="405.7" cy="59.9" r="3"/>
+<circle class="bf" cx="430.0" cy="59.9" r="3"/>
+<text class="hd" x="260" y="26">s2 (variance of q(mu))</text>
+<line class="gd" x1="480" x2="650" y1="210.0" y2="210.0"/>
+<text class="tiny" x="475" y="213.0" text-anchor="end">17.00</text>
+<line class="gd" x1="480" x2="650" y1="125.0" y2="125.0"/>
+<text class="tiny" x="475" y="128.0" text-anchor="end">18.00</text>
+<line class="gd" x1="480" x2="650" y1="40.0" y2="40.0"/>
+<text class="tiny" x="475" y="43.0" text-anchor="end">19.00</text>
+<text class="tiny" x="504.3" y="223" text-anchor="middle">2</text>
+<text class="tiny" x="552.9" y="223" text-anchor="middle">4</text>
+<text class="tiny" x="601.4" y="223" text-anchor="middle">6</text>
+<text class="tiny" x="650.0" y="223" text-anchor="middle">8</text>
+<line class="ax" x1="480" x2="650" y1="210" y2="210"/>
+<line class="ax" x1="480" x2="480" y1="40" y2="210"/>
+<text class="lab" x="565.0" y="238" text-anchor="middle">sweep</text>
+<polyline class="b" points="480.0,163.3 504.3,81.5 528.6,74.6 552.9,74.1 577.1,74.0 601.4,74.0 625.7,74.0 650.0,74.0"/>
+<circle class="bf" cx="480.0" cy="163.3" r="3"/>
+<circle class="bf" cx="504.3" cy="81.5" r="3"/>
+<circle class="bf" cx="528.6" cy="74.6" r="3"/>
+<circle class="bf" cx="552.9" cy="74.1" r="3"/>
+<circle class="bf" cx="577.1" cy="74.0" r="3"/>
+<circle class="bf" cx="601.4" cy="74.0" r="3"/>
+<circle class="bf" cx="625.7" cy="74.0" r="3"/>
+<circle class="bf" cx="650.0" cy="74.0" r="3"/>
+<text class="hd" x="480" y="26">b (rate of q(sigma2))</text>
+</svg>
