@@ -42,6 +42,7 @@ CATEGORIES: list[tuple[str, list[str]]] = [
     ("Attention Mechanism", ["Theory"]),
     ("Gradient estimation", ["Theory"]),
     ("Transferability", ["Theory", "Applications"]),
+    ("Class imbalance", ["Overview", "Theory", "Methods"]),
     ("Generative models", ["Theory"]),
     ("Bayesian inference", ["Review", "Theory"]),
     ("Theory of deep learning", ["Theory"]),

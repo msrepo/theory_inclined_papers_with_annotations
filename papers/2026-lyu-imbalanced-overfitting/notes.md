@@ -1,6 +1,6 @@
 ---
 title: "A Statistical Theory of Overfitting for Imbalanced Classification"
-category: "High-dimensional statistics"
+category: "Class imbalance"
 subcategory: "Theory"
 short_title: "Lyu 2026 — Imbalanced overfitting"
 authors: "Jingyang Lyu, Kangjie Zhou, Yiqiao Zhong (UW–Madison, Columbia)"
