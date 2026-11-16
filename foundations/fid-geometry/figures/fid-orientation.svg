@@ -1,0 +1,46 @@
+<svg viewBox="0 0 720 270" xmlns="http://www.w3.org/2000/svg" role="img">
+<title>FID and orientation</title>
+<desc>Three panels, each with a blue real ellipse and an orange generated ellipse sharing one centre. Panel A: both ellipses lie along the same axis and overlap exactly; covariance term zero. Panel B: the orange ellipse has the same shape but is turned a quarter turn, crossing the blue one; covariance term positive, so FID sees the difference. Panel C: both ellipses turned together by the same angle, still overlapping; FID is unchanged because only the choice of axes changed. A small grey axis cross in panel C is tilted to show the whole space rotating.</desc>
+<style>
+  text{font-family:ui-sans-serif,-apple-system,"Segoe UI",sans-serif;font-weight:400}
+  .lab{font-size:12px;fill:#57564f} .hd{font-size:13px;font-weight:500;fill:#1a1a19}
+  .sm{font-size:11px;fill:#57564f}
+  .rl{fill:#2f6fb5;fill-opacity:.12;stroke:#2f6fb5;stroke-width:1.6}
+  .gn{fill:none;stroke:#c2571a;stroke-width:1.6;stroke-dasharray:6 4}
+  .ax{stroke:#c3c2b7;stroke-width:0.9;fill:none}
+  .ok{fill:#0f7a5a} .bad{fill:#c2571a}
+  .box{fill:#f4f3ee;stroke:#c3c2b7;stroke-width:0.8}
+  @media (prefers-color-scheme: dark){
+    .lab,.sm{fill:#b6b4ab} .hd{fill:#eceae3}
+    .rl{fill:#7fb2e8;stroke:#7fb2e8} .gn{stroke:#f0a070}
+    .ax{stroke:#4a4844} .ok{fill:#4cc79a} .bad{fill:#f0a070}
+    .box{fill:#23262b;stroke:#4a4844}
+  }
+</style>
+
+<rect class="box" x="8" y="10" width="228" height="250" rx="8"/>
+<text class="hd" x="20" y="32">A. Same shape, aligned</text>
+<line class="ax" x1="40" y1="135" x2="204" y2="135"/><line class="ax" x1="122" y1="60" x2="122" y2="210"/>
+<ellipse class="rl" cx="122" cy="135" rx="75" ry="28"/>
+<ellipse class="gn" cx="122" cy="135" rx="75" ry="28"/>
+<text class="ok lab" x="20" y="232">covariance term = 0</text>
+<text class="sm" x="20" y="248">clouds coincide</text>
+
+<rect class="box" x="246" y="10" width="228" height="250" rx="8"/>
+<text class="hd" x="258" y="32">B. Same shape, turned</text>
+<line class="ax" x1="278" y1="135" x2="442" y2="135"/><line class="ax" x1="360" y1="60" x2="360" y2="210"/>
+<ellipse class="rl" cx="360" cy="135" rx="75" ry="28"/>
+<ellipse class="gn" cx="360" cy="135" rx="28" ry="75"/>
+<text class="bad lab" x="258" y="232">covariance term &gt; 0</text>
+<text class="sm" x="258" y="248">relative orientation is penalised</text>
+
+<rect class="box" x="484" y="10" width="228" height="250" rx="8"/>
+<text class="hd" x="496" y="32">C. Both turned together</text>
+<g transform="rotate(-35 598 135)">
+<line class="ax" x1="516" y1="135" x2="680" y2="135"/><line class="ax" x1="598" y1="60" x2="598" y2="210"/>
+<ellipse class="rl" cx="598" cy="135" rx="75" ry="28"/>
+<ellipse class="gn" cx="598" cy="135" rx="75" ry="28"/>
+</g>
+<text class="ok lab" x="496" y="232">FID unchanged</text>
+<text class="sm" x="496" y="248">only the axes were relabelled</text>
+</svg>

@@ -1,0 +1,43 @@
+<svg viewBox="0 0 720 300" xmlns="http://www.w3.org/2000/svg" role="img">
+<title>The two terms of FID</title>
+<desc>Two panels. Left: a blue ellipse for the real features and an orange ellipse of the same shape for the generated features, with their centres apart; a dark arrow between the centres is labelled position term, the squared distance between the means. Right: the two ellipses drawn on a common centre, one tilted relative to the other and of a different size; the label says the covariance term compares size, shape and orientation once the centres are made to coincide.</desc>
+<style>
+  text{font-family:ui-sans-serif,-apple-system,"Segoe UI",sans-serif;font-weight:400}
+  .lab{font-size:12px;fill:#57564f} .hd{font-size:13px;font-weight:500;fill:#1a1a19}
+  .sm{font-size:11px;fill:#57564f}
+  .rl{fill:#2f6fb5;fill-opacity:.12;stroke:#2f6fb5;stroke-width:1.6}
+  .gn{fill:#c2571a;fill-opacity:.12;stroke:#c2571a;stroke-width:1.6}
+  .rt{fill:#2f6fb5} .gt{fill:#c2571a}
+  .arr{stroke:#1a1a19;stroke-width:1.6;fill:none} .arf{fill:#1a1a19}
+  .dot{fill:#1a1a19}
+  .box{fill:#f4f3ee;stroke:#c3c2b7;stroke-width:0.8}
+  @media (prefers-color-scheme: dark){
+    .lab,.sm{fill:#b6b4ab} .hd{fill:#eceae3}
+    .rl{fill:#7fb2e8;stroke:#7fb2e8} .rt{fill:#7fb2e8}
+    .gn{fill:#f0a070;stroke:#f0a070} .gt{fill:#f0a070}
+    .arr{stroke:#eceae3} .arf,.dot{fill:#eceae3}
+    .box{fill:#23262b;stroke:#4a4844}
+  }
+</style>
+<defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="arf"/></marker></defs>
+
+<rect class="box" x="10" y="10" width="340" height="280" rx="8"/>
+<text class="hd" x="24" y="34">1. Position term: ‖μ<tspan font-size="9" dy="3">r</tspan><tspan dy="-3"> − μ</tspan><tspan font-size="9" dy="3">g</tspan><tspan dy="-3">‖²</tspan></text>
+<ellipse class="rl" cx="110" cy="160" rx="70" ry="34" transform="rotate(-20 110 160)"/>
+<ellipse class="gn" cx="250" cy="185" rx="70" ry="34" transform="rotate(-20 250 185)"/>
+<circle class="dot" cx="110" cy="160" r="3"/><circle class="dot" cx="250" cy="185" r="3"/>
+<line class="arr" x1="114" y1="161" x2="244" y2="184" marker-end="url(#ah)"/>
+<text class="rt lab" x="60" y="110">real</text>
+<text class="gt lab" x="262" y="243">generated</text>
+<text class="sm" x="24" y="272">How far apart the two centres are.</text>
+
+<rect class="box" x="370" y="10" width="340" height="280" rx="8"/>
+<text class="hd" x="384" y="34">2. Covariance term: centres made to coincide</text>
+<ellipse class="rl" cx="540" cy="160" rx="95" ry="36" transform="rotate(-20 540 160)"/>
+<ellipse class="gn" cx="540" cy="160" rx="70" ry="48" transform="rotate(35 540 160)"/>
+<circle class="dot" cx="540" cy="160" r="3"/>
+<text class="rt lab" x="400" y="110">real</text>
+<text class="gt lab" x="600" y="235">generated</text>
+<text class="sm" x="384" y="262">Compares size, shape and orientation.</text>
+<text class="sm" x="384" y="278">Position no longer plays a part.</text>
+</svg>
