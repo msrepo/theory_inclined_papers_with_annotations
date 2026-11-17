@@ -25,7 +25,7 @@ syntheses are from **titles and abstracts only**; shares add up to more than 100
 papers make arguments in two groups.
 
 ICML has run a position track since 2024; see the
-[ICML 2024](../icml2024-position-overview/index.html) and [ICML 2025](../icml2025-position-overview/index.html) overviews for larger, more
+[ICML 2024](../icml2024-position-overview/index.html), [ICML 2025](../icml2025-position-overview/index.html) and [ICML 2026](../icml2026-position-overview/index.html) overviews for larger, more
 theory-heavy companions.
 
 Position papers are worth reading differently from method papers. The question is less "does the

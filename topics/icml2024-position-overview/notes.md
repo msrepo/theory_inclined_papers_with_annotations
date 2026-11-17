@@ -8,7 +8,7 @@ category: "Research practice & policy"
 subcategory: "Conference overviews"
 short_title: "ICML 2024 — position papers"
 summary: "a map of the 75 papers in the first ICML Position Paper Track (2024, PMLR v235) in seven groups of arguments, with an idea-level synthesis of each, the outliers, the positions with the most mathematical content, and their relevance to medical imaging"
-related: [icml2025-position-overview, neurips2025-position-overview]
+related: [icml2025-position-overview, icml2026-position-overview, neurips2025-position-overview]
 ---
 
 ## Why this page exists
@@ -22,7 +22,7 @@ titles and matched one-to-one to their decisions in the ICML 2024 schedule data.
 the "Position:" prefix. The grouping and syntheses are from **titles and abstracts only**; each
 paper is listed in one group, though the syntheses mention related papers from other groups.
 
-Companion pages: the [ICML 2025](../icml2025-position-overview/index.html) and
+Companion pages: the [ICML 2025](../icml2025-position-overview/index.html), [ICML 2026](../icml2026-position-overview/index.html) and
 [NeurIPS 2025](../neurips2025-position-overview/index.html) position tracks.
 
 ## Topic groups at a glance
