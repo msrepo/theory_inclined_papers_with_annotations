@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Betti Grid Explorer</title>
+<style>
+:root{
+  --bg:#fbfaf7; --surface:#ffffff; --ink:#1c1d21; --muted:#5b5f68; --line:#e2dfd8; --soft:#f2f0ea;
+  --acc:#2f6fb5; --radius:12px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#131417; --surface:#1b1d21; --ink:#ebebed; --muted:#a3a6ae; --line:#2e3138; --soft:#23262b; --acc:#7fb2e8;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#131417; --surface:#1b1d21; --ink:#ebebed; --muted:#a3a6ae; --line:#2e3138; --soft:#23262b; --acc:#7fb2e8;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,sans-serif}
+main{max-width:900px;margin:0 auto;padding:40px 16px 80px}
+h1{font-size:2rem;line-height:1.2;margin:0 0 .4rem}
+.lede{color:var(--muted);font-size:1.05rem;margin-bottom:1.2rem}
+a{color:var(--acc)}
+.widget{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:14px;margin:1rem 0}
+.ctl{display:flex;align-items:center;gap:10px;margin:6px 0;font-size:.9rem}
+.ctl label{color:var(--muted);min-width:140px}
+.ctl input[type=range]{flex:1;accent-color:var(--acc)}
+.ctl span{font-weight:600;min-width:40px;text-align:right;font-variant-numeric:tabular-nums}
+button{font:inherit;font-size:.88rem;color:var(--ink);background:var(--soft);border:1px solid var(--line);border-radius:8px;padding:5px 12px;cursor:pointer}
+button[aria-pressed="true"]{border-color:var(--acc)}
+.g3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:10px}
+.cap{font-size:.78rem;color:var(--muted);margin:4px 0 0;text-align:center}
+canvas{width:100%;border-radius:8px;image-rendering:pixelated}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:12px 0 4px}
+.stat{background:var(--soft);border-radius:8px;padding:8px 12px;font-size:.8rem;color:var(--muted)}
+.stat b{display:block;font-size:1.2rem;color:var(--ink);font-variant-numeric:tabular-nums}
+ol{padding-left:1.2rem} li{margin:.3rem 0}
+@media (max-width:640px){.g3,.stats{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<main>
+<h1>Betti grid explorer</h1>
+<p class="lede">The core computation of TopoCon-MP on a made-up 64 × 64 lesion, for the
+<a href="../index.html">Tastan et al. 2026 notes</a>. A pixel is switched on when its red value is at most
+<i>s</i> and its green value is at most <i>t</i>; the heatmaps record islands, holes and switched-on pixels at all
+20 × 20 threshold pairs, which is the paper's 3 × 20 × 20 "topological image".</p>
+
+<div class="widget">
+<div style="display:flex;gap:8px;align-items:center;margin-bottom:6px;flex-wrap:wrap">
+<span style="font-size:.88rem;color:var(--muted)">Lesion</span>
+<button id="b1" aria-pressed="true">Compact, uniform</button>
+<button id="b2" aria-pressed="false">Irregular, mottled</button>
+<button id="b3">New random seed</button>
+</div>
+<div class="ctl"><label for="sR">Red threshold s</label><input type="range" id="sR" min="0" max="19" step="1" value="11"><span id="vR"></span></div>
+<div class="ctl"><label for="sG">Green threshold t</label><input type="range" id="sG" min="0" max="19" step="1" value="11"><span id="vG"></span></div>
+<div class="g3">
+<div><canvas id="img" width="160" height="160" aria-label="Synthetic lesion"></canvas><p class="cap">lesion (dark = low red and green)</p></div>
+<div><canvas id="msk" width="160" height="160" aria-label="Binary mask"></canvas><p class="cap">pixels with R ≤ s and G ≤ t</p></div>
+<div><canvas id="crv" width="320" height="320" aria-label="Betti curves"></canvas><p class="cap">along red only (green fixed at t)</p></div>
+</div>
+<div class="stats">
+<div class="stat">Islands β₀<b id="o0">0</b></div>
+<div class="stat">Holes β₁<b id="o1">0</b></div>
+<div class="stat">Pixels switched on<b id="oa">0</b></div>
+</div>
+<div class="g3">
+<div><canvas id="h0" width="200" height="200" style="cursor:crosshair" aria-label="Beta zero grid"></canvas><p class="cap">β₀ over the 20 × 20 grid (click to move)</p></div>
+<div><canvas id="h1" width="200" height="200" style="cursor:crosshair" aria-label="Beta one grid"></canvas><p class="cap">β₁ over the 20 × 20 grid</p></div>
+<div><canvas id="ha" width="200" height="200" style="cursor:crosshair" aria-label="Activated pixels grid"></canvas><p class="cap">pixels on over the grid</p></div>
+</div>
+<p style="font-size:.8rem;color:var(--muted);margin:8px 0 0">Heatmaps: red threshold left → right, green threshold bottom → top; brighter means a larger count. The red square marks the current pair.</p>
+</div>
+
+<h2 style="font-size:1.3rem">Things to try</h2>
+<ol>
+<li><b>Compact lesion, slide red upwards.</b> One island appears in the dark centre and grows; at high thresholds the background floods in. β₀ stays small, holes are rare, and the heatmaps show one tidy block.</li>
+<li><b>Switch to the irregular lesion.</b> Many islands appear at middle thresholds and enclosed gaps show up as holes; the heatmaps spread out with hotspots in particular red–green combinations.</li>
+<li><b>Compare a row with the grid.</b> The curve panel is one row of the grid; the full grid keeps cross-channel information the row loses.</li>
+<li><b>Press "New random seed".</b> Exact counts move, but the overall shape of the heatmaps is fairly stable.</li>
+</ol>
+<p style="color:var(--muted);font-size:.9rem">Each grid cell is computed independently, by counting islands (8-connected foreground) and holes
+(4-connected background regions not touching the border) in that one mask. Nothing links an island at one pair to the
+same island at the next, so this is the Hilbert function of the bifiltration, not persistence. The heatmap axes are
+colour thresholds, not image positions. The lesions are synthetic and only illustrate the computation.</p>
+</main>
+<script>
+const N=64,K=20;let kind=1,seed=7,R,G,B0,B1,BA;
+const $=id=>document.getElementById(id);
+function rng(){seed=(seed*1664525+1013904223)%4294967296;return seed/4294967296}
+function make(){const r=new Float32Array(N*N),g=new Float32Array(N*N);const blobs=[];
+ if(kind===1){blobs.push([32,32,13,0.62])}else{for(let i=0;i<7;i++)blobs.push([18+rng()*28,18+rng()*28,4+rng()*7,0.35+rng()*0.4])}
+ const ph=rng()*6;
+ for(let y=0;y<N;y++)for(let x=0;x<N;x++){let d=0;for(const[cx,cy,s,a]of blobs){d+=a*Math.exp(-((x-cx)**2+(y-cy)**2)/(2*s*s))}
+  let net=0;if(kind===2){net=0.18*Math.max(0,Math.sin(x*0.9+ph)*Math.sin(y*0.9+ph*1.3))}
+  const nz=(rng()-0.5)*(kind===1?0.06:0.16);const v=Math.min(1,d+net);
+  r[y*N+x]=Math.max(0,Math.min(255,235-175*v+255*nz));
+  g[y*N+x]=Math.max(0,Math.min(255,200-150*v*(kind===2?(0.8+0.4*Math.sin(x*0.15)):1)+255*nz*0.8))}
+ R=r;G=g;}
+const thr=k=>Math.round(k*255/(K-1));
+function betti(s,t){const m=new Uint8Array(N*N);let on=0;for(let i=0;i<N*N;i++){if(R[i]<=s&&G[i]<=t){m[i]=1;on++}}
+ const lab=new Int32Array(N*N);let b0=0;const st=[];
+ for(let i=0;i<N*N;i++){if(!m[i]||lab[i])continue;b0++;lab[i]=b0;st.push(i);while(st.length){const p=st.pop(),x=p%N,y=(p/N)|0;for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){const nx=x+dx,ny=y+dy;if(nx<0||ny<0||nx>=N||ny>=N)continue;const q=ny*N+nx;if(m[q]&&!lab[q]){lab[q]=b0;st.push(q)}}}}
+ const bl=new Int32Array(N*N);let id=0,b1=0;
+ for(let i=0;i<N*N;i++){if(m[i]||bl[i])continue;id++;bl[i]=id;let border=false;st.push(i);while(st.length){const p=st.pop(),x=p%N,y=(p/N)|0;if(x===0||y===0||x===N-1||y===N-1)border=true;for(const[dx,dy]of[[1,0],[-1,0],[0,1],[0,-1]]){const nx=x+dx,ny=y+dy;if(nx<0||ny<0||nx>=N||ny>=N)continue;const q=ny*N+nx;if(!m[q]&&!bl[q]){bl[q]=id;st.push(q)}}}if(!border)b1++}
+ return{m,b0,b1,on}}
+function grid(){B0=[];B1=[];BA=[];for(let a=0;a<K;a++){B0.push([]);B1.push([]);BA.push([]);for(let b=0;b<K;b++){const r=betti(thr(a),thr(b));B0[a].push(r.b0);B1[a].push(r.b1);BA[a].push(r.on)}}}
+function heat(id,M,a,b,hue){const c=$(id),x=c.getContext('2d'),w=c.width/K;let mx=1;for(const row of M)for(const v of row)mx=Math.max(mx,v);
+ for(let i=0;i<K;i++)for(let j=0;j<K;j++){const v=M[i][j]/mx;x.fillStyle=`hsl(${hue},70%,${92-62*v}%)`;x.fillRect(i*w,(K-1-j)*w,w+0.5,w+0.5)}
+ x.strokeStyle='#E24B4A';x.lineWidth=2;x.strokeRect(a*w+1,(K-1-b)*w+1,w-2,w-2)}
+function css(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim()}
+function draw(){const a=+$('sR').value,b=+$('sG').value,s=thr(a),t=thr(b);$('vR').textContent=s;$('vG').textContent=t;
+ const r=betti(s,t);$('o0').textContent=r.b0;$('o1').textContent=r.b1;$('oa').textContent=r.on;
+ const ic=$('img').getContext('2d'),id=ic.createImageData(N,N);for(let i=0;i<N*N;i++)id.data.set([R[i],G[i],Math.min(255,G[i]*0.85),255],i*4);
+ const o=document.createElement('canvas');o.width=N;o.height=N;o.getContext('2d').putImageData(id,0,0);ic.imageSmoothingEnabled=false;ic.clearRect(0,0,160,160);ic.drawImage(o,0,0,160,160);
+ const mc=$('msk').getContext('2d'),md=mc.createImageData(N,N);for(let i=0;i<N*N;i++)md.data.set(r.m[i]?[83,74,183,255]:[211,209,199,255],i*4);
+ o.getContext('2d').putImageData(md,0,0);mc.imageSmoothingEnabled=false;mc.clearRect(0,0,160,160);mc.drawImage(o,0,0,160,160);
+ heat('h0',B0,a,b,250);heat('h1',B1,a,b,15);heat('ha',BA,a,b,170);
+ const cv=$('crv'),x=cv.getContext('2d');x.clearRect(0,0,320,320);const L=30,T=16,W=280,H=260;
+ x.strokeStyle=css('--line');x.strokeRect(L,T,W,H);
+ let mx=1;for(let k=0;k<K;k++)mx=Math.max(mx,B0[k][b],B1[k][b]);
+ const line=(arr,col)=>{x.strokeStyle=col;x.lineWidth=2.5;x.beginPath();for(let k=0;k<K;k++){const X=L+k*W/(K-1),Y=T+H-arr[k]/mx*H;k?x.lineTo(X,Y):x.moveTo(X,Y)}x.stroke()};
+ line(B0.map(c=>c[b]),'#534AB7');line(B1.map(c=>c[b]),'#D85A30');
+ x.strokeStyle='#E24B4A';x.lineWidth=1.5;x.setLineDash([4,4]);const X=L+a*W/(K-1);x.beginPath();x.moveTo(X,T);x.lineTo(X,T+H);x.stroke();x.setLineDash([]);
+ x.font='20px sans-serif';x.fillStyle='#534AB7';x.fillText('β₀',L+8,T+24);x.fillStyle='#D85A30';x.fillText('β₁',L+48,T+24);
+ x.fillStyle=css('--muted');x.fillText('red threshold →',L+70,T+H+30)}
+function setKind(k){kind=k;$('b1').setAttribute('aria-pressed',k===1);$('b2').setAttribute('aria-pressed',k===2);make();grid();draw()}
+$('b1').onclick=()=>setKind(1);$('b2').onclick=()=>setKind(2);$('b3').onclick=()=>{seed=Math.floor(Math.random()*1e6);make();grid();draw()};
+['sR','sG'].forEach(i=>$(i).oninput=draw);
+['h0','h1','ha'].forEach(i=>$(i).onclick=e=>{const c=$(i),bb=c.getBoundingClientRect();const a=Math.min(K-1,Math.floor((e.clientX-bb.left)/bb.width*K)),b=Math.min(K-1,K-1-Math.floor((e.clientY-bb.top)/bb.height*K));$('sR').value=a;$('sG').value=b;draw()});
+setKind(1);
+</script>
+</body>
+</html>
