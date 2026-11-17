@@ -1,0 +1,52 @@
+<svg viewBox="0 0 720 300" xmlns="http://www.w3.org/2000/svg" role="img">
+<title>Where a group of indistinguishable pixels settles</title>
+<desc>A group of pixels the network cannot tell apart shares one probability p, and 30 percent of them are foreground. Three number lines from 0 to 1 show where training moves that shared p. Cross-entropy: arrows from both ends meet at 0.3, the true fraction. Dice: a single arrow runs all the way to 0, regardless of the fraction. Dice with surgery: arrows meet at about 0.38, slightly above 0.3, because foreground odds are inflated by one over the IoU.</desc>
+<style>
+  text{font-family:ui-sans-serif,-apple-system,"Segoe UI",sans-serif;font-weight:400}
+  .lab{font-size:12px;fill:#57564f} .hd{font-size:13px;font-weight:500;fill:#1a1a19}
+  .sm{font-size:11px;fill:#57564f}
+  .ax{stroke:#c3c2b7;stroke-width:0.9;fill:none}
+  .fg{stroke:#c2571a;stroke-width:2;fill:none} .fgt{fill:#c2571a}
+  .bg{stroke:#2f6fb5;stroke-width:2;fill:none} .bgt{fill:#2f6fb5}
+  .eq{fill:#0f7a5a} .eqt{fill:#0f7a5a} .eqs{stroke:#0f7a5a;stroke-width:1.2;stroke-dasharray:4 3;fill:none}
+  .bad{fill:#c2571a}
+  .arr{stroke:#1a1a19;stroke-width:1.6;fill:none} .arf{fill:#1a1a19}
+  .rr{stroke:#57564f;stroke-width:1.2;stroke-dasharray:3 3}
+  .box{fill:#f4f3ee;stroke:#c3c2b7;stroke-width:0.8}
+  @media (prefers-color-scheme: dark){
+    .lab,.sm{fill:#b6b4ab} .hd{fill:#eceae3} .ax{stroke:#4a4844}
+    .fg{stroke:#f0a070} .fgt{fill:#f0a070} .bg{stroke:#7fb2e8} .bgt{fill:#7fb2e8}
+    .eq,.eqt{fill:#4cc79a} .eqs{stroke:#4cc79a} .bad{fill:#f0a070}
+    .arr{stroke:#eceae3} .arf{fill:#eceae3} .rr{stroke:#b6b4ab}
+    .box{fill:#23262b;stroke:#4a4844}
+  }
+</style>
+<defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="arf"/></marker></defs>
+<rect class="box" x="8" y="10" width="704" height="280" rx="8"/>
+<text class="hd" x="22" y="34">A group of look-alike pixels shares one probability p; 30% of them are foreground (r = 0.3)</text>
+<text class="lab" x="22" y="94">Cross-entropy</text>
+<line class="ax" x1="150" y1="90" x2="480" y2="90"/>
+<text class="sm" x="146" y="108">0</text><text class="sm" x="476" y="108">1</text>
+<line class="rr" x1="249.0" y1="76" x2="249.0" y2="98"/>
+<text class="sm" x="245.0" y="72">r</text>
+<line class="arr" x1="156" y1="84" x2="241.0" y2="84" marker-end="url(#ah)"/>
+<line class="arr" x1="474" y1="84" x2="257.0" y2="84" marker-end="url(#ah)"/>
+<circle class="eq" cx="249.0" cy="90" r="5"/>
+<text class="eqt lab" x="496" y="94">rests at the true fraction r</text>
+<text class="lab" x="22" y="164">Dice</text>
+<line class="ax" x1="150" y1="160" x2="480" y2="160"/>
+<text class="sm" x="146" y="178">0</text><text class="sm" x="476" y="178">1</text>
+<line class="rr" x1="249.0" y1="146" x2="249.0" y2="168"/>
+<line class="arr" x1="430.5" y1="154" x2="158" y2="154" marker-end="url(#ah)"/>
+<circle class="bad" cx="150" cy="160" r="5"/>
+<text class="bad lab" x="496" y="164">pushed to 0 (or 1), whatever r</text>
+<text class="lab" x="22" y="234">Dice + surgery</text>
+<line class="ax" x1="150" y1="230" x2="480" y2="230"/>
+<text class="sm" x="146" y="248">0</text><text class="sm" x="476" y="248">1</text>
+<line class="rr" x1="249.0" y1="216" x2="249.0" y2="238"/>
+<line class="arr" x1="156" y1="224" x2="267.3164556962025" y2="224" marker-end="url(#ah)"/>
+<line class="arr" x1="474" y1="224" x2="283.3164556962025" y2="224" marker-end="url(#ah)"/>
+<circle class="eq" cx="275.3" cy="230" r="5"/>
+<text class="eqt lab" x="496" y="234">rests near r (odds × 1/IoU)</text>
+<text class="sm" x="22" y="282">Drawn with IoU = 0.7; as overlap improves (IoU → 1) the surgery’s resting point moves onto r.</text>
+</svg>
