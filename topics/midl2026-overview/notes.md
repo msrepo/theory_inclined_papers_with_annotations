@@ -384,9 +384,13 @@ Papers that sit outside the main groups in topic, method or framing.
 - [OmniNet: Remote Respiratory Rate Measurement from Facial Video](https://proceedings.mlr.press/v315/lin26a.html): no medical imaging involved.
 - [GenVOG-DiT: Pose-Driven Nystagmus VOG Video Generation](https://proceedings.mlr.press/v315/rahman26a.html): generates eye-tracking video.
 - [Deep Learning Based Emboli Detection Using Ultrasound Doppler Imaging](https://proceedings.mlr.press/v315/mushunuri26a.html)
-- [Orientation Normalization of Multi-Stain Skin Tissue Cross-Sections](https://proceedings.mlr.press/v315/topolnjak26a.html)
 - [SCR²-ST: Single Cell with Spatial Transcriptomics for Active Sampling via RL](https://proceedings.mlr.press/v315/zhu26a.html)
 - [BETA: Resting-state fMRI Biotypes for tDCS Efficacy in Anxiety Among Older Adults](https://proceedings.mlr.press/v315/stolte26a.html)
+- [Beyond Machine Interpretation: Learning from Expert Over-Reads Improves ECG Diagnosis](https://proceedings.mlr.press/v315/kwak26a.html): not imaging at all; over two million ECGs, each with a machine reading and a cardiologist's correction, so the model learns from the gap between the two.
+- [Unpaired Multimodal Learning for Biological Datasets](https://proceedings.mlr.press/v315/ji26a.html): molecular biology, where measuring a sample often destroys it (RNA sequencing), so paired data cannot exist.
+- [GEMCONT: Genetics-based Multimodal Contrastive Learning](https://proceedings.mlr.press/v315/sens26a.html): genetic variation shapes the image embeddings, aimed at genetic discovery rather than diagnosis.
+- [From Surface to Viscera: 3D Estimation of Internal Anatomy from Body Surface Point Clouds](https://proceedings.mlr.press/v315/atici26a.html): organ positions predicted from a body-surface point cloud before any scan, to help position the patient.
+- [Flow Matching for 3D Craniofacial Skeletal Data Generation](https://proceedings.mlr.press/v315/melacini26a.html): synthetic skeletal shape data, motivated by privacy.
 
 ### Social or ethical findings
 
@@ -403,6 +407,9 @@ Papers that sit outside the main groups in topic, method or framing.
 - [MultiPersistence Topological Fusion with Vision Transformers for Skin Cancer Detection](https://proceedings.mlr.press/v315/tastan26a.html): multiparameter TDA.
 - [RNCA: Self-Repairing Segmentation Masks](https://proceedings.mlr.press/v315/silbernagel26a.html): neural cellular automata.
 - [Beyond scalar losses: gradient vector field surgery](https://proceedings.mlr.press/v315/lux26a.html)
+- [Chronological Contrastive Learning: Few-Shot Progression Assessment in Irreversible Diseases](https://proceedings.mlr.press/v315/watzenbock26a.html): the order of scans in time is the supervision, since in an irreversible disease a later scan cannot be less severe.
+- [CyclePhase](https://proceedings.mlr.press/v315/ben-haddou26a.html) and [Orientation Normalization of Multi-Stain Skin Tissue Cross-Sections](https://proceedings.mlr.press/v315/topolnjak26a.html): periodic targets (cardiac phase, rotation angle) treated on the circle rather than as ordinary numbers.
+- [GeoReg](https://proceedings.mlr.press/v315/herten26a.html) and [Geometry-Aware Cardiac MRI Representation Learning with Equivariant Neural Fields](https://proceedings.mlr.press/v315/wiers26a.html): constraints on the rotation group $SO(3)$ and equivariance.
 
 ### Papers that critique the field
 
@@ -410,12 +417,30 @@ Papers that sit outside the main groups in topic, method or framing.
 - [The LUMirage: An independent evaluation of zero-shot performance in the LUMIR challenge](https://proceedings.mlr.press/v315/jena26a.html)
 - [ReX-MLE: The Autonomous Agent Benchmark for Medical Imaging Challenges](https://proceedings.mlr.press/v315/kenia26a.html)
 - [Test-Time Scaling in Clinical Decision Making](https://proceedings.mlr.press/v315/byun26a.html): an LLM-era idea brought to the clinic.
+- [Validating the Benefit of Combining Imaging and Clinical Data for Ischemic Stroke Outcome Prediction](https://proceedings.mlr.press/v315/abouyoussef26a.html): on a multi-centre test set of over 600 cases, adding imaging only matches logistic regression on clinical data (AUROC 0.72), and the imaging features carry little weight.
+- [On the Stability and Robustness of Vision Transformers for Neurodegenerative Disease Classification](https://proceedings.mlr.press/v315/navet26a.html): reported gains shrink once variation across random seeds is reported.
+- [Impact of uncertainty maps on manual editing of rectal cancer segmentation in radiotherapy](https://proceedings.mlr.press/v315/maruccio26a.html): a user study in which uncertainty maps did not change how clinicians edited contours, and trust in them was low.
+- [FunnyNodules: A Customizable Medical Dataset Tailored for Evaluating Explainable AI](https://proceedings.mlr.press/v315/gallee26a.html): a synthetic dataset with a known decision rule, built to test whether explanation methods find the right reasons.
 
 ### Unusual clinical framing
 
 - [A Deep Learning-Enabled Digital Twin for Fast Online Adaptive Proton Therapy](https://proceedings.mlr.press/v315/chang26a.html)
 - [From Cross-Sectional CT to Dynamic Insights: Pseudotime-Based Modeling of Lung Nodule Progression](https://proceedings.mlr.press/v315/zhuang26a.html): borrows pseudotime from single-cell biology.
 - [Brain Tumor Growth Inversion via Differentiable Neural Surrogates](https://proceedings.mlr.press/v315/weidner26a.html): solving a PDE inverse problem through a learned surrogate.
+
+### Imaging as a stand-in for another measurement
+
+Papers that predict, from routine or cheap imaging, something normally measured in a more invasive,
+expensive or different way.
+
+- [Non-invasive estimation of haemodynamic parameters in pulmonary hypertension](https://proceedings.mlr.press/v315/cheng26a.html): echocardiography cine loops instead of right-heart catheterisation.
+- [Generating Post-Acetazolamide Cerebral Blood Flow MRI for High-Risk Stroke Patients](https://proceedings.mlr.press/v315/goyal26a.html): predicting the response to a drug challenge without giving the drug.
+- [UnEBOLT: A Unified Model for EEG-to-BOLD Translation](https://proceedings.mlr.press/v315/li26g.html): cheap, portable EEG standing in for fMRI.
+- [REVEAL: Retinal Morphometry and Clinical Risks for Incident AD and Dementia Prediction](https://proceedings.mlr.press/v315/leem26a.html): the eye as a window onto brain disease.
+- [X-Cardia: Opportunistic Cardiac Screening on Routine Chest CT](https://proceedings.mlr.press/v315/nizam26a.html): cardiac assessment from scans taken for other reasons.
+- [Machine-Learning Based Detection of Coronary Artery Calcification Using Synthetic Chest X-Rays](https://proceedings.mlr.press/v315/saeed26a.html): CT-derived labels carried over to cheap X-rays through simulated radiographs.
+
+The [health-insurance paper](https://proceedings.mlr.press/v315/chen26c.html) under *Social or ethical findings* is the cautionary twin of this group: imaging can stand in for things nobody intended, too.
 
 ## Theory picks
 
