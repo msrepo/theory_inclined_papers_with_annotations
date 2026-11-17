@@ -8,7 +8,7 @@ category: "Research practice & policy"
 subcategory: "Conference overviews"
 short_title: "NeurIPS 2025 — position papers"
 summary: "a map of the 40 papers accepted to the first NeurIPS Position Paper Track (2025) in six groups of arguments, with an idea-level synthesis of each, the outliers, and the positions with the most mathematical content to engage with"
-related: [midl2026-overview, midl2025-overview]
+related: [icml2025-position-overview, midl2026-overview, midl2025-overview]
 ---
 
 ## Why this page exists
@@ -23,6 +23,10 @@ The list here comes from the NeurIPS public schedule data: **40 accepted papers,
 Links go to each paper's OpenReview page, which has the PDF and the reviews. The grouping and
 syntheses are from **titles and abstracts only**; shares add up to more than 100% because some
 papers make arguments in two groups.
+
+ICML has run a position track since 2024; see the
+[ICML 2025 position track overview](../icml2025-position-overview/index.html) for a larger, more
+theory-heavy companion.
 
 Position papers are worth reading differently from method papers. The question is less "does the
 method work?" and more "is the argument valid, is the evidence enough for the claim, and what would
