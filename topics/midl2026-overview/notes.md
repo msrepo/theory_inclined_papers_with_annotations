@@ -58,6 +58,90 @@ Each group lists a few representative papers, not all of them.
 
 ### Foundation models and adaptation
 
+**The ideas behind this group** (a synthesis from the abstracts of about 25 papers in this group and
+the ones next to it; the individual papers have not been read in full).
+
+*The starting point is a domain gap.* General-purpose foundation models (DINOv2/v3 for image
+features, the SAM family for promptable segmentation, CLIP-style vision–language models) learn
+excellent representations from natural images and web text, but medical data differs in almost every
+way they assume: it is often 3D rather than 2D, physical rather than photographic (CT intensity values,
+PET uptake, ultrasound speckle, histology stains), and the signal often lies in subtle texture rather
+than object shape. The papers respond with two strategies, often combined: re-train the model on the
+medical domain, or keep it and adapt it cheaply.
+
+*The first strategy treats the training recipe, not the weights, as the reusable asset.* Several papers
+rerun a proven self-supervised method on large in-domain data: DINOv2 adapted to 3D CT with
+depth-aware patches and positional encodings
+([TAP-CT](https://proceedings.mlr.press/v315/veenboer26a.html)); a PET-only DINOv3 encoder combined
+with a separately pretrained CT encoder, so paired scans are not needed for pretraining
+([Dual-DINOv3](https://proceedings.mlr.press/v315/lin26b.html)); pathology models for
+immunohistochemistry and special stains ([StainNet](https://proceedings.mlr.press/v315/li26c.html));
+DINO variants pretrained on 4.7 million surgical video frames
+([DINO for surgery](https://proceedings.mlr.press/v315/jong26a.html)); 3D masked-autoencoder priors for
+low-dose lung CT ([ILD screening](https://proceedings.mlr.press/v315/mcconnell26a.html)) and
+self-supervised pretraining for prostate MRI
+([UMamba-ProSSL](https://proceedings.mlr.press/v315/abbas26a.html)); and federated pretraining across
+hospitals where privacy rules stop data from being pooled
+([Federated EndoViT](https://proceedings.mlr.press/v315/kirchner26a.html)). The consistent finding is
+that in-domain pretraining helps reliably, and the general recipe transfers better than the general
+weights. The medical-specific work goes into handling 3D input, augmentations that respect each
+modality's physics, and data governance.
+
+*The second strategy keeps a large model frozen, or nearly so, and adapts it cheaply.* The mechanisms
+vary: parameter-efficient fine-tuning such as LoRA, sometimes with a step that separates task-relevant
+features from task-irrelevant noise ([DINOv3-FD](https://proceedings.mlr.press/v315/he26a.html));
+hypernetworks that generate task-specific weights, either LoRA updates for each chest-CT task
+([HyperCT](https://proceedings.mlr.press/v315/liu26c.html)) or small 3D U-Nets from a single annotated
+volume ([task-conditioned U-Nets](https://proceedings.mlr.press/v315/hagen26a.html)); in-context and
+prototype-based learning, where a frozen encoder labels new cases by comparison with a handful of
+examples ([PIKACHU](https://proceedings.mlr.press/v315/kumar26b.html),
+[RandP](https://proceedings.mlr.press/v315/mao26a.html),
+[ICL-NoiseUNet](https://proceedings.mlr.press/v315/charisiadis26a.html)); distillation of DINOv3 into a
+ResNet-50 small enough for point-of-care ultrasound, where the student sometimes beats its teacher on
+varied ultrasound data ([POCUS distillation](https://proceedings.mlr.press/v315/nahian26a.html)); and
+using the model with no training at all, for example combining 2D features from three viewing axes into
+3D tokens for zero-shot anomaly detection
+([training-free 3D anomaly detection](https://proceedings.mlr.press/v315/le-gia26a.html)). Behind all of
+these is one question: how little needs to change to make a general representation work for a specific
+clinical task? One reality check: adapting a 3D vision–language model to a new hospital's liver-cancer
+data, LoRA-style fine-tuning came close to full fine-tuning
+([HCC adaptation](https://proceedings.mlr.press/v315/kartika26a.html)).
+
+*The 2D-to-3D mismatch is its own sub-theme.* Most strong foundation models are 2D, while much clinical
+imaging is volumetric. One group lifts 2D models to 3D: generating prompts slice by slice from a single
+click for vessels ([automatic prompts](https://proceedings.mlr.press/v315/zhang26c.html)) or cells
+([cell foundation models](https://proceedings.mlr.press/v315/archit26a.html)), and using SAM 2's
+video-style tracking through a volume; a controlled comparison asks whether SAM 3 can simply replace
+SAM 2 ([SAM 2 vs SAM 3](https://proceedings.mlr.press/v315/chakrabarty26a.html)). The other group
+pretrains natively in 3D. Within the SAM line the recurring practical problem is sensitivity to prompts,
+answered by generating prompts automatically, simulating imprecise clicks during training, and adding
+anatomical shape priors such as an ellipse for fetal heart chambers
+([Ultra-ECP](https://proceedings.mlr.press/v315/le26a.html)); frozen SAM encoders also anchor
+semi-supervised cross-teaching ([ECT-3DMedSAM](https://proceedings.mlr.press/v315/huang26a.html)).
+
+*The third thread asks what these models have actually learned.* Pathology foundation models turn out to
+encode which hospital a slide came from, so scanner and lab can act as a shortcut; one paper measures
+this with a robustness index and removes it with an adversarially trained adapter
+([hospital bias](https://proceedings.mlr.press/v315/zhang26d.html)), and
+[AdvDINO](https://proceedings.mlr.press/v315/su26a.html) builds the same idea into self-supervised
+pretraining to suppress batch effects. Another uses radiomic features as an interpretable view of what
+fine-tuning changes inside a prostate model
+([radiomic lens](https://proceedings.mlr.press/v315/wang26e.html)). This is the same goal as the
+exchangeability discussion in the [Roy et al. notes](../2026-roy-exchangeability-pooling/index.html):
+make the representation carry no information about the site, given the label,
+$Z\perp\text{site}\mid Y$.
+
+*Taken together*, the field is converging on a three-step pattern: pretrain in-domain with a general
+recipe; adapt lightly with LoRA, hypernetworks, prompts or prototypes; and audit the representation for
+shortcuts such as site, scanner or stain. Still open: evaluation is fragmented, so it is hard to say
+which pretrained model suits a new task, which is the transferability-estimation question, and none of
+these papers uses a transferability score to choose a model; where self-configuring baselines such as
+nnU-Net are included, foundation models do not always win for segmentation; and ultrasound, functional
+imaging and non-H&E pathology remain the weakest areas, which is why several papers build their own
+in-domain models.
+
+**Representative papers**
+
 - [Incentivizing DINOv3 Adaptation for Medical Vision Tasks via Feature Disentanglement](https://proceedings.mlr.press/v315/he26a.html)
 - [Domain-Constrained Distillation of DINOv3 into a Lightweight Foundation Model Toward Point-of-Care Ultrasound](https://proceedings.mlr.press/v315/nahian26a.html)
 - [TAP-CT: 3D Task-Agnostic Pretraining of CT Foundation Models](https://proceedings.mlr.press/v315/veenboer26a.html)
