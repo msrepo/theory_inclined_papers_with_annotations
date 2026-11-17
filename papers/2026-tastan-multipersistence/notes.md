@@ -139,6 +139,67 @@ What it makes visible: each grid cell is computed independently, so it is the Hi
 persistence; and the heatmap axes are colour thresholds, not positions, which is why the co-localisation
 claim does not follow. The lesions are synthetic and only illustrate the computation.
 
+## Q4. What does "a Hilbert function, not persistence" mean?
+
+It comes down to **counting features versus following them**. Thresholding an image at many levels
+gives two kinds of information: what is there at each threshold (how many islands and holes, the Betti
+numbers), and how one threshold connects to the next (which island at $t_1$ becomes which island at
+$t_2$; whether two islands merged; whether one hole filled while another opened elsewhere).
+**Persistence** uses both: it follows each feature across thresholds and records when it is born and
+when it dies, so a bar's length says how robust the feature is. The **Hilbert function** uses only the
+first: at each threshold, or each grid point with two parameters, it records the count and throws away
+the links.
+
+**An example where they disagree.** Two images thresholded at $t_1<t_2<t_3$:
+
+```
+Image A: one hole that never fills          Image B: a hole fills, a new one opens
+  t1: hole h                                   t1: hole h
+  t2: hole h (same one)                        t2: h fills in; new hole h' opens elsewhere
+  t3: hole h (same one)                        t3: hole h'
+
+  β1 = [1, 1, 1]                               β1 = [1, 1, 1]      ← identical counts
+  barcode: one long bar [t1, ∞)                barcode: two shorter bars [t1, t2) and [t2, ∞)
+```
+
+The counts are identical, so the Hilbert function cannot tell the images apart; persistence can: one
+robust hole against two separate, shorter-lived ones. The same happens with islands: two islands at
+$t_1$ merge at $t_2$ while a new speck appears elsewhere, so the count stays at 2 although one island has
+died and another has been born.
+
+**The formal version.** At each threshold $p$, homology gives a vector space $H_k(X_p)$ whose dimension
+is the number of features. Because $X_p\subseteq X_q$ whenever $p\le q$, there is also a linear map
+$H_k(X_p)\to H_k(X_q)$ saying where each feature goes. The spaces together with the maps form the
+**persistence module**, and invariants of increasing strength can be read from it:
+
+| Invariant | What it records | One parameter | Two parameters |
+|---|---|---|---|
+| Hilbert function | $\dim H_k(X_p)$ at each $p$: the counts | the Betti curve | the paper's 20 × 20 grid |
+| Rank invariant | rank of $H_k(X_p)\to H_k(X_q)$: how many features survive from $p$ to $q$ | equivalent to the barcode | more than counts, still not complete |
+| Barcode | each feature's birth and death | complete | does not exist in general |
+
+In the example, the counts are 1 everywhere for both images, but the rank from $t_1$ to $t_3$ is 1 for
+image A (the hole survives) and 0 for image B (the original hole is gone).
+
+**Why it matters in practice.**
+
+- *Noise.* Persistence separates robust structure (long bars) from noise (short bars). The Hilbert
+  function counts a one-pixel speck that exists at a single threshold exactly as much as a lesion-scale
+  structure that lasts across thresholds, which is a real weakness on noisy dermoscopy.
+- *Stability.* The stability theorem says small changes to the image give small changes to the
+  persistence diagram; that guarantee is about matching bars, and per-threshold counts do not come with
+  it in the same form.
+- *Computation.* The Hilbert function can be computed by labelling each binary mask independently,
+  which is what the released code does with `scipy.ndimage.label`. Persistence needs bookkeeping across
+  thresholds, typically union–find for islands, or a persistent-homology library.
+
+**Is calling it persistence wrong?** Not exactly: the Hilbert function is an invariant of the
+persistence module, and the paper says so in Appendix A. But it is the weakest standard summary and its
+computation involves no tracking, so "multiparameter persistence" makes the method sound more
+sophisticated than "a grid of island and hole counts over colour thresholds". A natural test of whether
+the topology adds anything is to swap in the rank invariant, or multiparameter landscapes, which do
+track features across thresholds.
+
 ## Questions and doubts
 
 - How much of the in-distribution gain survives a Swin-T baseline trained with the same recipe and loss?
