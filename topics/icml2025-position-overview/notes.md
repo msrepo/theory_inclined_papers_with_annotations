@@ -8,13 +8,13 @@ category: "Research practice & policy"
 subcategory: "Conference overviews"
 short_title: "ICML 2025 — position papers"
 summary: "a map of the 73 papers in the ICML 2025 Position Paper Track (PMLR v267) in seven groups of arguments, with an idea-level synthesis of each, the outliers, the positions with the most mathematical content, and their relevance to medical imaging"
-related: [neurips2025-position-overview, midl2025-overview]
+related: [icml2024-position-overview, neurips2025-position-overview, midl2025-overview]
 ---
 
 ## Why this page exists
 
 ICML 2025 (Vancouver, 13–19 July 2025) ran its second **Position Paper Track**; the first was at
-ICML 2024. Position papers argue for a claim about the field rather than presenting a new method.
+ICML 2024 ([overview](../icml2024-position-overview/index.html)). Position papers argue for a claim about the field rather than presenting a new method.
 Unlike NeurIPS, ICML publishes them in the main proceedings,
 [PMLR volume 267](https://proceedings.mlr.press/v267/), where every title begins "Position:".
 
