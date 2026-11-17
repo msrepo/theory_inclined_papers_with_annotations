@@ -8,15 +8,15 @@ category: "Medical image analysis"
 subcategory: "Conference overviews"
 short_title: "MIDL 2024 — overview"
 summary: "a high-level map of the 117 MIDL 2024 full papers (PMLR v250) in thirteen topic groups, with an idea-level synthesis of each, the outlier papers that fall outside them, and a shortlist of the most mathematically foundational ones to read"
-related: [midl2025-overview, midl2026-overview, 2024-wundram-glaucoma-probabilistic-pipeline]
+related: [midl2023-overview, midl2025-overview, midl2026-overview, 2024-wundram-glaucoma-probabilistic-pipeline]
 ---
 
 ## Why this page exists
 
 MIDL 2024 (Paris, 3–5 July 2024) was published as
 [PMLR volume 250](https://proceedings.mlr.press/v250/), with 117 full papers. This page is the
-companion to the [MIDL 2025](../midl2025-overview/index.html) and
-[MIDL 2026](../midl2026-overview/index.html) overviews: which topics dominate, which papers do not
+companion to the [MIDL 2023](../midl2023-overview/index.html),
+[MIDL 2025](../midl2025-overview/index.html) and [MIDL 2026](../midl2026-overview/index.html) overviews: which topics dominate, which papers do not
 fit the pattern, and which are worth a close, theory-first read.
 
 The grouping and the syntheses are from **titles and abstracts only**; the PDFs have not been
