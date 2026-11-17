@@ -50,6 +50,7 @@ CATEGORIES: list[tuple[str, list[str]]] = [
     ("Medical image analysis", ["Uncertainty & annotator noise", "Registration", "Anomaly detection",
                                 "Federated learning", "Domain adaptation / generalization",
                                 "Image quality assessment"]),
+    ("Research practice & policy", ["Conference overviews"]),
     # "" first: untitled Misc pages must not render under the last subheading.
     ("Misc", [""]),
 ]
@@ -266,7 +267,11 @@ def _grouped(entries: list[tuple[Path, dict]]) -> list[tuple[str, list[tuple[str
         return (-int(m["year"]) if str(m.get("year", "")).isdigit() else -9999,
                 str(m["title"]).lower())
 
-    order = [c for c, _ in CATEGORIES] + [UNSORTED]
+    known = dict(CATEGORIES)
+    # Categories missing from CATEGORIES are still shown (after the known ones)
+    # rather than silently dropped from the index.
+    order = [c for c, _ in CATEGORIES] + \
+        sorted(c for c in by_cat if c not in known and c != UNSORTED) + [UNSORTED]
     out = []
     for cat in order:
         if cat not in by_cat:
