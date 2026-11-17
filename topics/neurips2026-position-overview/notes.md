@@ -8,7 +8,7 @@ category: "Research practice & policy"
 subcategory: "Conference overviews"
 short_title: "NeurIPS 2026 — position papers"
 summary: "a map of the 137 papers accepted to the second NeurIPS Position Paper Track (2026) in nine groups of arguments, with an idea-level synthesis of each, the outliers, the positions with the most mathematical content, and their relevance to medical imaging"
-related: [neurips2025-position-overview, icml2026-position-overview]
+related: [neurips2025-position-overview, icml2026-position-overview, ijcnn2026-position-overview]
 ---
 
 ## Why this page exists
