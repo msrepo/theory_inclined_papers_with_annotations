@@ -8,7 +8,7 @@ category: "Research practice & policy"
 subcategory: "Conference overviews"
 short_title: "ICML 2026 — position papers"
 summary: "a map of the 212 papers in the ICML 2026 Position Paper Track (PMLR v306) in eleven groups of arguments, with an idea-level synthesis of each, the outliers, the positions with the most mathematical content, and their relevance to medical imaging"
-related: [icml2025-position-overview, icml2024-position-overview, neurips2025-position-overview]
+related: [neurips2026-position-overview, icml2025-position-overview, icml2024-position-overview, neurips2025-position-overview]
 ---
 
 ## Why this page exists
