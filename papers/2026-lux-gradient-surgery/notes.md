@@ -87,6 +87,19 @@ $$
 Read it either as cross-entropy's gradient with region-imbalance weights, or as Dice's gradient with
 the sigmoid slope replaced by the error. A confident wrong pixel now gets the *largest* push.
 
+<figure>
+<img src="figures/vector-fields.svg" alt="Three square panels of predicted probabilities for two pixels, a foreground pixel on the horizontal axis and a background pixel on the vertical axis, so the correct answer is the bottom-right corner and the confidently wrong answer the top-left corner. Arrows show each loss's update. Cross-entropy: arrows point to the correct corner and are longest at the wrong corner. Dice: each pixel's push dies near 0 and 1, leaving almost nothing at the wrong corner. Dice with surgery: error-sized arrows like cross-entropy, tilted towards the foreground direction.">
+<figcaption><b>The surgery as a picture: the update field for two pixels.</b> The horizontal axis is
+a foreground pixel's probability, the vertical axis a background pixel's, so the correct answer is the
+bottom-right corner and the confidently wrong one the top-left (dashed ring). Each arrow is the update
+on the two logits at that point. <b>A:</b> cross-entropy's arrows grow with the error and are largest
+at the wrong corner. <b>B:</b> Dice multiplies each pixel's push by $p(1-p)$, so it dies near 0 and 1:
+along the edges and at the wrong corner there is almost nothing to correct a confident mistake.
+<b>C:</b> the surgery restores error-sized arrows, but keeps Dice's region weights, which tilt them
+towards the foreground (here weighted 2:1, as at IoU = 0.5). Region weights are held fixed in this
+picture to isolate the per-pixel factor, and the smooth cut-off at 0 and 1 is left out.</figcaption>
+</figure>
+
 **Step 5: where the surgery's balance point lands** (a derivation made in these notes, not in the
 paper). Repeating Step 3, the group's total push is $n\big[p(1-r)G_{bg}-(1-p)rG_{fg}\big]$, zero at
 
@@ -224,8 +237,76 @@ recalibration, which it argues breaks under shift but never tests.
 existing models), and it tests the claim that calibrated maps can be dialled towards high recall.
 Pairing it with Experiment 6 would also cover the argument against temperature scaling.
 
+## Q5. What is done in the backward pass to execute this?
+
+**Only the backward pass of the softmax changes.** The forward pass, the loss and everything upstream
+stay as they are; one factor in the chain rule is swapped (the paper's Appendix D, `GradSurgeSoftmax`).
+
+$$
+\frac{\partial L}{\partial \theta}
+=\underbrace{\frac{\partial L}{\partial p}}_{\text{from the Dice loss: contains } G}
+\cdot\underbrace{\frac{\partial p}{\partial z}}_{\text{softmax: } p(1-p)\ \leftarrow\ \text{replaced}}
+\cdot\underbrace{\frac{\partial z}{\partial \theta}}_{\text{the network}}
+$$
+
+- **The loss factor** is untouched: Dice's region weights $G_{fg}$ and $G_{bg}$ arrive from the
+  loss's own backward pass.
+- **The softmax factor** is replaced: the custom backward uses $0.25\,\lvert y-p\rvert$ instead of
+  $p(1-p)$.
+- **The network factor** is untouched: autograd carries the modified signal through the network.
+
+**What the custom function does.**
+
+*Forward:* compute an ordinary softmax, so predictions and the loss value are unchanged; compute the
+error $\lvert p-y\rvert$, which needs the labels inside the activation function, unusually; save
+$0.25\times$ the error, optionally times the cut-off $(1-\text{err}^n)(1-(1-\text{err})^n)$, for the
+backward pass.
+
+*Backward:* receive $\partial L/\partial p$ for both channels, form the difference
+$\partial L/\partial p_{fg}-\partial L/\partial p_{bg}$, and return plus and minus the saved weight
+times that difference as the gradients for the foreground and background logits.
+
+**Why it has that shape.** With two classes the softmax depends only on the difference of the
+logits, $p_{fg}=\sigma(z_{fg}-z_{bg})$, so its true backward pass is
+
+$$
+\frac{\partial L}{\partial z_{fg}}=p(1-p)\Big(\tfrac{\partial L}{\partial p_{fg}}-\tfrac{\partial L}{\partial p_{bg}}\Big),\qquad
+\frac{\partial L}{\partial z_{bg}}=-\frac{\partial L}{\partial z_{fg}} .
+$$
+
+The custom backward is exactly this with the saved weight in place of $p(1-p)$. The 0.25 matches the
+peak of $p(1-p)$, so gradients stay in a similar range and the learning rate need not be retuned.
+
+**Using it.**
+
+```python
+probs = GradSurgeSoftmax.apply(logits, onehot_targets, 20)  # n = 20 for the cut-off
+loss = dice_loss(probs, targets)                            # any loss built on probabilities
+loss.backward()                                             # gradients now carry |y - p| instead of p(1 - p)
+```
+
+The logged loss value is still the real Dice loss, but the update is no longer its gradient;
+optimisers such as Adam only consume the vector and do not mind. At inference the plain softmax is
+used, so labels are needed only during training.
+
+**Why not a gradient hook?** Multiplying the logit gradient by $\lvert y-p\rvert/[p(1-p)]$ in a hook
+gives the same field in exact arithmetic but divides by a number near zero for confident pixels.
+Replacing the factor inside the backward pass avoids the division.
+
+**Things to watch.**
+
+- *Binary only.* The code slices channels 0 and 1. Multi-class segmentation needs the full softmax
+  Jacobian, with its off-diagonal terms, and the error-based replacement is not obvious there.
+- *The "CE + Dice − Surgery" variant.* If the cross-entropy term is also computed on the modified
+  softmax output, its factor changes from $(1/p)\cdot p(1-p)=1-p$ to $(1/p)\cdot0.25(1-p)$, which grows
+  large as $p\to0$; the cut-off would limit it. If the cross-entropy is computed from the logits
+  directly (the usual `F.cross_entropy`), it never passes through the modified function. The paper
+  does not say which.
+
 ## Questions and doubts
 
+- **How the CE term is wired in "CE + Dice − Surgery"** (see Q5): through the modified softmax or
+  from the logits directly. The two give different updates for confident errors.
 - **No temperature-scaling baseline**, although post-hoc recalibration is discussed in the related work.
 - **Model selection:** best 5 of 25 runs for 2D by validation Dice; the single best of 10 runs for 3D, so
   no error bars in the 3D table.
