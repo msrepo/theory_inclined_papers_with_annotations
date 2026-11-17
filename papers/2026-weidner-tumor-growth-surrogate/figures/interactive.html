@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tumour Growth, Hands On</title>
+<style>
+:root{
+  --bg:#fbfaf7; --surface:#ffffff; --ink:#1c1d21; --muted:#5b5f68; --line:#e2dfd8; --soft:#f2f0ea;
+  --acc:#2f6fb5; --radius:12px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#131417; --surface:#1b1d21; --ink:#ebebed; --muted:#a3a6ae; --line:#2e3138; --soft:#23262b; --acc:#7fb2e8;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#131417; --surface:#1b1d21; --ink:#ebebed; --muted:#a3a6ae; --line:#2e3138; --soft:#23262b; --acc:#7fb2e8;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,sans-serif}
+main{max-width:900px;margin:0 auto;padding:40px 16px 80px}
+h1{font-size:2rem;line-height:1.2;margin:0 0 .4rem}
+.lede{color:var(--muted);font-size:1.05rem;margin-bottom:1.2rem}
+a{color:var(--acc)}
+.widget{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:14px;margin:1rem 0}
+.row{display:flex;align-items:center;gap:10px;margin:6px 0;font-size:.9rem}
+.row label{color:var(--muted);min-width:180px}
+.row input[type=range]{flex:1;accent-color:var(--acc)}
+.row span{font-weight:600;min-width:56px;text-align:right;font-variant-numeric:tabular-nums}
+button{font:inherit;font-size:.88rem;color:var(--ink);background:var(--soft);border:1px solid var(--line);border-radius:8px;padding:5px 12px;cursor:pointer}
+.panels{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;margin-top:10px}
+canvas{width:100%;border-radius:8px}
+.leg{display:flex;flex-wrap:wrap;gap:14px;font-size:.82rem;color:var(--muted);margin:8px 0}
+.sw{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-2px;margin-right:5px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:10px}
+.stat{background:var(--soft);border-radius:8px;padding:8px 12px;font-size:.82rem;color:var(--muted)}
+.stat b{display:block;font-size:1.1rem;color:var(--ink);font-variant-numeric:tabular-nums}
+ol{padding-left:1.2rem} li{margin:.3rem 0}
+@media (max-width:640px){.panels{grid-template-columns:1fr}.row label{min-width:120px}}
+</style>
+</head>
+<body>
+<main>
+<h1>Tumour growth, hands on</h1>
+<p class="lede">A live simulation of the Fisher–Kolmogorov model on a made-up brain slice, for the
+<a href="../index.html">Weidner et al. 2026 notes</a>. Press Play, then try the experiments below.</p>
+
+<div class="widget">
+<div class="row"><label for="dS">White-matter diffusion D</label><input type="range" id="dS" min="0.02" max="0.25" step="0.01" value="0.12"><span id="dV"></span></div>
+<div class="row"><label for="rS">Proliferation rate ρ</label><input type="range" id="rS" min="0.01" max="0.12" step="0.005" value="0.04"><span id="rV"></span></div>
+<div class="row"><label for="tS">Visibility threshold</label><input type="range" id="tS" min="0.1" max="0.8" step="0.01" value="0.33"><span id="tV"></span></div>
+<div style="display:flex;gap:8px;margin:10px 0;align-items:center;flex-wrap:wrap">
+<button id="play">Play</button><button id="reset">Reset</button>
+<span style="font-size:.85rem;color:var(--muted)">Click the brain to move the seed.</span>
+</div>
+<div class="panels">
+<canvas id="map" width="384" height="384" style="cursor:crosshair" aria-label="Brain slice with tumour density"></canvas>
+<canvas id="prof" width="384" height="384" aria-label="Tumour density along the dashed line"></canvas>
+</div>
+<div class="leg">
+<span><i class="sw" style="background:#D3D1C7"></i>White matter</span>
+<span><i class="sw" style="background:#888780"></i>Grey matter (D × 0.1)</span>
+<span><i class="sw" style="background:#185FA5"></i>Fluid spaces (no spread)</span>
+<span><i class="sw" style="background:#E24B4A"></i>Tumour density</span>
+<span><i class="sw" style="background:#EF9F27"></i>Visible edge</span>
+</div>
+<div class="stats">
+<div class="stat">Time<b id="tT">0</b></div>
+<div class="stat">Visible area<b id="aV">0</b></div>
+<div class="stat">Area with any cells (c ≥ 0.01)<b id="aI">0</b></div>
+<div class="stat">Front speed 2√(Dρ)<b id="sp">0</b></div>
+<div class="stat">Tail length √(D/ρ)<b id="tl">0</b></div>
+</div>
+</div>
+
+<h2 style="font-size:1.3rem">Things to try</h2>
+<ol>
+<li><b>Play with the defaults.</b> The tumour stretches along white matter, slows at grey matter and stops at the fluid spaces.</li>
+<li><b>Compare the orange outline with the faint red.</b> The outline is roughly what a scan shows; the faint red beyond it is the invisible tail.</li>
+<li><b>Make a diffuse tumour</b>: raise D, lower ρ, Reset, Play. The tail √(D/ρ) grows and hidden spread reaches far beyond the visible edge.</li>
+<li><b>Make a compact tumour</b>: lower D, raise ρ. The front is steep and the visible edge is close to where cells stop.</li>
+<li><b>Match visible sizes</b> of a diffuse and a compact tumour and compare their "any cells" areas.</li>
+<li><b>Move the threshold.</b> The tumour is unchanged; only what counts as visible moves.</li>
+</ol>
+<p style="color:var(--muted);font-size:.9rem">A 2-D slice with made-up anatomy, in grid units, with explicit
+finite differences. Like the paper's model it leaves out mass effect, necrosis and treatment. The speed and tail
+readouts are exact for constant D in one dimension and approximate here.</p>
+</main>
+<script>
+const N=96,S=4;const map=document.getElementById('map'),mx=map.getContext('2d');const pr=document.getElementById('prof'),px=pr.getContext('2d');
+const tis=new Uint8Array(N*N);let c=new Float32Array(N*N),cn=new Float32Array(N*N);let seed=[38,40],t=0,run=false;
+function ell(x,y,cx,cy,a,b){return((x-cx)/a)**2+((y-cy)/b)**2<=1}
+for(let y=0;y<N;y++)for(let x=0;x<N;x++){let v=0;if(ell(x,y,48,48,42,45)){v=2;if(ell(x,y,48,48,36,39))v=1;if(ell(x,y,40,46,4,11)||ell(x,y,56,46,4,11))v=3;if(ell(x,y,48,72,9,5))v=2;if(ell(x,y,30,62,7,6))v=2}tis[y*N+x]=v}
+const $=id=>document.getElementById(id);
+function P(){return{D:+$('dS').value,r:+$('rS').value,th:+$('tS').value}}
+function Dof(v,D){return v===1?D:v===2?0.1*D:0}
+function reset(){c.fill(0);t=0;const[sx,sy]=seed;for(let y=-2;y<=2;y++)for(let x=-2;x<=2;x++){const i=(sy+y)*N+sx+x;if(tis[i]===1||tis[i]===2)c[i]=0.8}draw()}
+function step(){const{D,r}=P();const dt=Math.min(0.9,0.2/Math.max(D,1e-3));for(let y=1;y<N-1;y++)for(let x=1;x<N-1;x++){const i=y*N+x;const di=Dof(tis[i],D);if(tis[i]===0||tis[i]===3){cn[i]=0;continue}let f=0;for(const j of[i-1,i+1,i-N,i+N]){const dj=Dof(tis[j],D);f+=Math.sqrt(di*dj)*(c[j]-c[i])}cn[i]=c[i]+dt*(f+r*c[i]*(1-c[i]))}[c,cn]=[cn,c];t+=dt}
+function css(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim()}
+function draw(){const{D,r,th}=P();const img=mx.createImageData(N,N);const tc={0:[0,0,0,0],1:[211,209,199,255],2:[136,135,128,255],3:[24,95,165,255]};let av=0,ai=0;
+for(let i=0;i<N*N;i++){const b=tc[tis[i]];let R=b[0],G=b[1],B=b[2],A=b[3];const v=c[i];if(v>0.002&&A){const a=Math.min(1,0.25+0.75*v);R=R*(1-a)+226*a;G=G*(1-a)+75*a;B=B*(1-a)+74*a}if(v>=th)av++;if(v>=0.01)ai++;img.data.set([R,G,B,A],i*4)}
+for(let y=1;y<N-1;y++)for(let x=1;x<N-1;x++){const i=y*N+x;if(c[i]>=th&&(c[i-1]<th||c[i+1]<th||c[i-N]<th||c[i+N]<th))img.data.set([239,159,39,255],i*4)}
+const off=document.createElement('canvas');off.width=N;off.height=N;off.getContext('2d').putImageData(img,0,0);mx.clearRect(0,0,384,384);mx.imageSmoothingEnabled=false;mx.drawImage(off,0,0,384,384);
+const sy=seed[1];mx.strokeStyle=css('--muted');mx.setLineDash([4,4]);mx.beginPath();mx.moveTo(0,sy*S+2);mx.lineTo(384,sy*S+2);mx.stroke();mx.setLineDash([]);
+px.clearRect(0,0,384,384);const L=34,Rr=372,T=22,Bt=330;px.strokeStyle=css('--line');px.strokeRect(L,T,Rr-L,Bt-T);
+for(let x=0;x<N;x++){const v=tis[sy*N+x];if(v===3){px.fillStyle='rgba(24,95,165,0.18)';px.fillRect(L+x*(Rr-L)/N,T,(Rr-L)/N+1,Bt-T)}else if(v===2){px.fillStyle='rgba(136,135,128,0.16)';px.fillRect(L+x*(Rr-L)/N,T,(Rr-L)/N+1,Bt-T)}}
+const yth=Bt-th*(Bt-T);px.strokeStyle='#EF9F27';px.setLineDash([5,4]);px.beginPath();px.moveTo(L,yth);px.lineTo(Rr,yth);px.stroke();px.setLineDash([]);
+px.fillStyle='rgba(226,75,74,0.18)';px.beginPath();px.moveTo(L,Bt);for(let x=0;x<N;x++){px.lineTo(L+(x+0.5)*(Rr-L)/N,Bt-c[sy*N+x]*(Bt-T))}px.lineTo(Rr,Bt);px.closePath();px.fill();
+px.strokeStyle='#E24B4A';px.lineWidth=2;px.beginPath();for(let x=0;x<N;x++){const X=L+(x+0.5)*(Rr-L)/N,Y=Bt-c[sy*N+x]*(Bt-T);x?px.lineTo(X,Y):px.moveTo(X,Y)}px.stroke();px.lineWidth=1;
+px.fillStyle=css('--muted');px.font='12px sans-serif';px.fillText('1',L-14,T+5);px.fillText('0',L-14,Bt+4);px.fillText('density along the dashed line',L,Bt+22);px.fillStyle='#BA7517';px.fillText('visible above this line',L+6,yth-6);
+$('dV').textContent=D.toFixed(2);$('rV').textContent=r.toFixed(3);$('tV').textContent=th.toFixed(2);$('tT').textContent=Math.round(t);$('aV').textContent=av+' px';$('aI').textContent=ai+' px';$('sp').textContent=(2*Math.sqrt(D*r)).toFixed(3)+' px/t';$('tl').textContent=Math.sqrt(D/r).toFixed(2)+' px'}
+function loop(){if(run){for(let k=0;k<2;k++)step();draw()}requestAnimationFrame(loop)}
+$('play').onclick=()=>{run=!run;$('play').textContent=run?'Pause':'Play'};
+$('reset').onclick=reset;['dS','rS','tS'].forEach(id=>$(id).oninput=draw);
+map.onclick=e=>{const b=map.getBoundingClientRect();const x=Math.floor((e.clientX-b.left)/b.width*N),y=Math.floor((e.clientY-b.top)/b.height*N);const v=tis[y*N+x];if(v===1||v===2){seed=[x,y];reset()}};
+reset();loop();
+</script>
+</body>
+</html>
