@@ -8,14 +8,15 @@ category: "Medical image analysis"
 subcategory: "Conference overviews"
 short_title: "MIDL 2025 — overview"
 summary: "a high-level map of the ~108 MIDL 2025 full papers (PMLR v301) in eleven topic groups, with an idea-level synthesis of each, the outlier papers that fall outside them, and a shortlist of the most mathematically foundational ones to read"
-related: [midl2026-overview, 2025-bereska-sacp]
+related: [midl2024-overview, midl2026-overview, 2025-bereska-sacp]
 ---
 
 ## Why this page exists
 
 MIDL 2025 (Salt Lake City, 9–11 July 2025) was published as
 [PMLR volume 301](https://proceedings.mlr.press/v301/), with about 108 full papers. This page
-is the companion to the [MIDL 2026 overview](../midl2026-overview/index.html): which topics
+is the companion to the [MIDL 2024](../midl2024-overview/index.html) and
+[MIDL 2026](../midl2026-overview/index.html) overviews: which topics
 dominate, which papers do not fit the pattern, and which are worth a close, theory-first read.
 
 The grouping and the syntheses are from **titles and abstracts only**; the PDFs have not been
