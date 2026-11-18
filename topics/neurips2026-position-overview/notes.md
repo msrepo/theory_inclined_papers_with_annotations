@@ -21,7 +21,8 @@ yet, and the list may still change.
 The list comes from the NeurIPS 2026 public schedule data, filtered to papers from the track's
 OpenReview group: **137 papers, 5 orals and 11 spotlights**. Abstracts were taken from each paper's
 page on the NeurIPS virtual site, and links go to the OpenReview forum, which has the PDF and
-reviews. Some titles carry a "Position:" prefix and some do not; it is dropped below. The grouping
+reviews. Where a preprint exists, an arXiv link follows: as of 18 November 2026, **47 of the 137
+papers** have one, matched by title and checked against the author list (two were retitled on arXiv). Some titles carry a "Position:" prefix and some do not; it is dropped below. The grouping
 and syntheses are from **titles and abstracts only**; each paper is listed in one group, though the
 syntheses mention related papers from other groups. The track's call also required position papers
 to be substantially human-written.
@@ -71,21 +72,21 @@ Every paper is listed under its group.
 **Papers**
 
 - [AI Behavioral Evaluation Should Be Grounded in Psychophysics Across Marr's Levels](https://openreview.net/forum?id=oBYTzTkjHI)
-- [AI Evaluation Should Require Standardized Item-Level Data Releases](https://openreview.net/forum?id=MTjR4BxEXy)
+- [AI Evaluation Should Require Standardized Item-Level Data Releases](https://openreview.net/forum?id=MTjR4BxEXy) · [arXiv:2604.03244](https://arxiv.org/abs/2604.03244)
 - [Auditing is not Evaluating: LLM Audit Requires Dynamic, Contextual, Budget-aware and Reliable Evidence](https://openreview.net/forum?id=Oruatg6X7C)
 - [Causal Benchmarks for Multimodal AI Should Measure Categorical Difference, Not Capability Gap](https://openreview.net/forum?id=duHo1qPNcq)
-- [Causality can systematically address the monsters under the bench(marks)](https://openreview.net/forum?id=U7mzwCsCwV)
+- [Causality can systematically address the monsters under the bench(marks)](https://openreview.net/forum?id=U7mzwCsCwV) · [arXiv:2502.05085](https://arxiv.org/abs/2502.05085)
 - [Cognitive bias benchmarks should incorporate insights from ecological rationality](https://openreview.net/forum?id=0xGmHXiwbV)
 - [Deployment-Memory LLM Test-Time Training Should Require Behavioral Evidence Beyond Perplexity](https://openreview.net/forum?id=ra80Jaw38j)
-- [Don't Claim Benchmark-Oriented Optimization Improves General Coding Capability — Diverse Evaluation Is Required](https://openreview.net/forum?id=xmvm5TQJnM)
+- [Don't Claim Benchmark-Oriented Optimization Improves General Coding Capability — Diverse Evaluation Is Required](https://openreview.net/forum?id=xmvm5TQJnM) · [arXiv:2608.13566](https://arxiv.org/abs/2608.13566)
 - [Evaluating Physical Reasoning in LLM Agents Requires Construction Benchmarks](https://openreview.net/forum?id=42PVaAYxLX)
-- [Evaluation of Visual Processing Should Be Human-Centered, Not Metric-Centered](https://openreview.net/forum?id=uTpdwVSSKl)
+- [Evaluation of Visual Processing Should Be Human-Centered, Not Metric-Centered](https://openreview.net/forum?id=uTpdwVSSKl) · [arXiv:2603.00643](https://arxiv.org/abs/2603.00643)
 - [From Benchmark to Adoption: Coding Agent Evaluation Needs User-Level Harness](https://openreview.net/forum?id=rDKap2gO2x)
 - [ImageNet FID is a Pass Check, Not a Finish Line](https://openreview.net/forum?id=cRKDUddr0V)
 - [Telic Errors Make VLMs Unreliable Annotators in Sensitive Contexts](https://openreview.net/forum?id=RLRpTy0ryW)
 - [The Window for Preventive Action Before AI Saturates Most Cognitive Benchmarks is Closing](https://openreview.net/forum?id=cs7f8WAg7q)
 - [We Need to Improve Benchmarks in AI for Mathematics](https://openreview.net/forum?id=5Llaz7kMgQ)
-- [We Need to Rethink Benchmarking in Anomaly Detection](https://openreview.net/forum?id=x04YwfpsQV)
+- [We Need to Rethink Benchmarking in Anomaly Detection](https://openreview.net/forum?id=x04YwfpsQV) · [arXiv:2507.15584](https://arxiv.org/abs/2507.15584)
 - [Weight Space Learning needs to unify benchmarking! A taxonomy of evaluation practices](https://openreview.net/forum?id=r2QmG8OjJ9)
 
 ### Peer review, reproducibility and research culture
@@ -106,19 +107,19 @@ Every paper is listed under its group.
 
 **Papers**
 
-- [Allocate Marginal Reviews to Borderline Papers Using LLM Comparative Ranking](https://openreview.net/forum?id=O49HqYGb2z)
-- [Computer Science Conferences Should Require Nonrepudiable Experimental Results](https://openreview.net/forum?id=UK7onMx1HA)
-- [Epistemic Infrastructures of Science in AI Era Should Rebalance Costs of Generation and Verification](https://openreview.net/forum?id=lj2lMy4avH)
+- [Allocate Marginal Reviews to Borderline Papers Using LLM Comparative Ranking](https://openreview.net/forum?id=O49HqYGb2z) · [arXiv:2602.06078](https://arxiv.org/abs/2602.06078)
+- [Computer Science Conferences Should Require Nonrepudiable Experimental Results](https://openreview.net/forum?id=UK7onMx1HA) · [arXiv:2605.08586](https://arxiv.org/abs/2605.08586)
+- [Epistemic Infrastructures of Science in AI Era Should Rebalance Costs of Generation and Verification](https://openreview.net/forum?id=lj2lMy4avH) · [arXiv:2605.10425](https://arxiv.org/abs/2605.10425)
 - [Large language models can not and should not be banned from peer review](https://openreview.net/forum?id=etNM2edhNT) (spotlight)
 - [ML Configuration Artifacts Should Be Closed Under Review](https://openreview.net/forum?id=1l0lbV2pC2)
 - [Peer Review of Applied Machine Learning Papers Must Include Code Execution](https://openreview.net/forum?id=S58vxHCoNU)
-- [Peer review should constrain evaluative authority](https://openreview.net/forum?id=n0eZtLIdnZ)
+- [Peer review should constrain evaluative authority](https://openreview.net/forum?id=n0eZtLIdnZ) · [arXiv:2610.28646](https://arxiv.org/abs/2610.28646)
 - [Anthropomorphic Language in AI Discourse Can Be Constructive](https://openreview.net/forum?id=WW1MV8hcqQ)
-- [Let's Strengthen Verifiability if We Can't Enforce Reproducibility](https://openreview.net/forum?id=ZjRcVMBODY)
+- [Let's Strengthen Verifiability if We Can't Enforce Reproducibility](https://openreview.net/forum?id=ZjRcVMBODY) · [arXiv:2609.35854](https://arxiv.org/abs/2609.35854)
 - [Machine Learning Conferences Should Introduce an Autonomous Research Track](https://openreview.net/forum?id=CKNdkXRRKD)
 - [We Need Greater Transparency to Maintain Research Pipeline Reliability Despite GenAI](https://openreview.net/forum?id=LOuXOaoYvI)
-- [Reviewer Scores Are Not Comparable Across Research Areas in ML Peer Review](https://openreview.net/forum?id=VcG54FOUwI)
-- [Standardization of Post-Publication Code Verification is Possible with the Support of the Community](https://openreview.net/forum?id=a524oxDsQo)
+- [Reviewer Scores Are Not Comparable Across Research Areas in ML Peer Review](https://openreview.net/forum?id=VcG54FOUwI) · [arXiv:2607.27209](https://arxiv.org/abs/2607.27209)
+- [Standardization of Post-Publication Code Verification is Possible with the Support of the Community](https://openreview.net/forum?id=a524oxDsQo) · [arXiv:2601.07189](https://arxiv.org/abs/2601.07189)
 - [Stop Mechanizing Reform Heuristics as Scientific Quality Filters in AI Review](https://openreview.net/forum?id=StsCjqI2vv)
 - [Text-Based AI Tools for Research Integrity Must Be Audited on Linguistic Fairness Before Deployment](https://openreview.net/forum?id=uqhofRLsrB)
 - [Too Early for AI-Assisted Peer Review: A Systematic Account of the Limits and Opportunities of Automating Human Judgment](https://openreview.net/forum?id=tAnaMrZFJ9)
@@ -141,18 +142,18 @@ Every paper is listed under its group.
 
 **Papers**
 
-- [Causal discovery needs explicit epistemic standards](https://openreview.net/forum?id=iyUZ5kB4ar)
-- [Claims of emergence in AI should be grounded in information decomposition](https://openreview.net/forum?id=eXkSa0pAuf) (spotlight)
+- [Causal discovery needs explicit epistemic standards](https://openreview.net/forum?id=iyUZ5kB4ar) · [arXiv:2611.03166](https://arxiv.org/abs/2611.03166)
+- [Claims of emergence in AI should be grounded in information decomposition](https://openreview.net/forum?id=eXkSa0pAuf) (spotlight) · [arXiv:2610.28479](https://arxiv.org/abs/2610.28479)
 - [Generalization Measures for Deep Learning Should Be Audited for Fragility](https://openreview.net/forum?id=ZbkyZd1PpG)
-- [Graph Learning Should Move Beyond Restrictive Views of Spectral and Message-Passing GNNs](https://openreview.net/forum?id=82awBSyQDS)
+- [Graph Learning Should Move Beyond Restrictive Views of Spectral and Message-Passing GNNs](https://openreview.net/forum?id=82awBSyQDS) · [arXiv:2602.10031](https://arxiv.org/abs/2602.10031)
 - [Language Models Demand New Computer Science](https://openreview.net/forum?id=OmubRAmSd7)
 - [Large Language Model Failures from Hallucination to Homogenization Are Different Facets of Miscalibration](https://openreview.net/forum?id=iXZzj7en1J)
 - [Lottery Tickets Do Not Explain Overparameterization. How About Escape Dimensions?](https://openreview.net/forum?id=CaVlKu3gPo)
 - [Semantic Uncertainty Measures Disagreement, Not Reliability](https://openreview.net/forum?id=9U7JrtGeQh)
 - [The Aleatoric-Epistemic Dichotomy of Uncertainty is Meaningful and Indispensable for Machine Learning](https://openreview.net/forum?id=CuRV56FVBy) (oral)
-- [Understanding Generalization Requires Universal Induction](https://openreview.net/forum?id=1s5jL1RVFK)
-- [Understanding diffusion models requires rethinking (again) generalization](https://openreview.net/forum?id=0GkPaYMOa7)
-- [Wasserstein Gradient Flows and Forward-Only Diffusion Are Not Enough for Multimodal Sampling](https://openreview.net/forum?id=7sdrh3QFdg)
+- [Understanding Generalization Requires Universal Induction](https://openreview.net/forum?id=1s5jL1RVFK) · [arXiv:2609.34458](https://arxiv.org/abs/2609.34458)
+- [Understanding diffusion models requires rethinking (again) generalization](https://openreview.net/forum?id=0GkPaYMOa7) · [arXiv:2605.06077](https://arxiv.org/abs/2605.06077)
+- [Wasserstein Gradient Flows and Forward-Only Diffusion Are Not Enough for Multimodal Sampling](https://openreview.net/forum?id=7sdrh3QFdg) · [arXiv:2610.02081](https://arxiv.org/abs/2610.02081)
 
 ### Interpretability and explanation
 
@@ -174,13 +175,13 @@ Every paper is listed under its group.
 
 - [A New Perspective on XAI: Scientific Theory Building for Auditable Artefacts](https://openreview.net/forum?id=eNm9pRKOii)
 - [Chain-of-Thought Is Not Explainability](https://openreview.net/forum?id=JHXwv04ufz)
-- [Chain-of-Thought Oversight Should Not Treat Faithfulness as Monitorability](https://openreview.net/forum?id=DLek3EUyds)
-- [Comparing Explanations is not Enough, Explain the Change: New Standards are Needed to Explain Behavioral Shifts in Large Language Models](https://openreview.net/forum?id=y0jWumzUxx)
+- [Chain-of-Thought Oversight Should Not Treat Faithfulness as Monitorability](https://openreview.net/forum?id=DLek3EUyds) · [arXiv:2611.01620](https://arxiv.org/abs/2611.01620) (on arXiv as "Chain-of-Thought Oversight Requires Separate Evidence for Faithfulness and Monitorability")
+- [Comparing Explanations is not Enough, Explain the Change: New Standards are Needed to Explain Behavioral Shifts in Large Language Models](https://openreview.net/forum?id=y0jWumzUxx) · [arXiv:2602.02304](https://arxiv.org/abs/2602.02304)
 - [Concept-Based Mechanistic Interpretability Needs a Concrete Evaluation Paradigm](https://openreview.net/forum?id=fAXSAH3loo)
-- [Explainability matters: The effect of liability rules on the healthcare sector](https://openreview.net/forum?id=yYJYksvTw5)
+- [Explainability matters: The effect of liability rules on the healthcare sector](https://openreview.net/forum?id=yYJYksvTw5) · [arXiv:2509.17334](https://arxiv.org/abs/2509.17334)
 - [Introspection Tools Help LLMs Understand and Control Themselves](https://openreview.net/forum?id=GgN3oK68Eu)
-- [Mechanistic Interpretability Needs Philosophy](https://openreview.net/forum?id=t48eq86yVj) (spotlight)
-- [Stop Using Plausibility as the Criterion for Explainable AI](https://openreview.net/forum?id=GEJEVd3MY5) (spotlight)
+- [Mechanistic Interpretability Needs Philosophy](https://openreview.net/forum?id=t48eq86yVj) (spotlight) · [arXiv:2506.18852](https://arxiv.org/abs/2506.18852)
+- [Stop Using Plausibility as the Criterion for Explainable AI](https://openreview.net/forum?id=GEJEVd3MY5) (spotlight) · [arXiv:2303.17707](https://arxiv.org/abs/2303.17707)
 - [The Dead Salmons of AI Interpretability: The Need for a Statistical Inference Perspective](https://openreview.net/forum?id=w0wOa4UDHv) (oral)
 
 ### Agents, reinforcement learning, reasoning and test-time computation
@@ -201,10 +202,10 @@ Every paper is listed under its group.
 
 **Papers**
 
-- [Beyond One-Size-Fits-All: Diagnosis-Driven Online Reinforcement Learning with Offline Priors](https://openreview.net/forum?id=XZmIeAgd6e)
-- [Beyond Training Time, Test-Time Coordination is Essential for Cooperative MARL](https://openreview.net/forum?id=HIJXWUeWXw)
+- [Beyond One-Size-Fits-All: Diagnosis-Driven Online Reinforcement Learning with Offline Priors](https://openreview.net/forum?id=XZmIeAgd6e) · [arXiv:2606.25527](https://arxiv.org/abs/2606.25527)
+- [Beyond Training Time, Test-Time Coordination is Essential for Cooperative MARL](https://openreview.net/forum?id=HIJXWUeWXw) · [arXiv:2610.17409](https://arxiv.org/abs/2610.17409)
 - [Federation Is the Way Forward for AI Agents](https://openreview.net/forum?id=YSfv4DhSjj)
-- [From Static Policies to Adaptive Priors in Offline Reinforcement Learning](https://openreview.net/forum?id=Gp3C4kngKi)
+- [From Static Policies to Adaptive Priors in Offline Reinforcement Learning](https://openreview.net/forum?id=Gp3C4kngKi) · [arXiv:2609.35880](https://arxiv.org/abs/2609.35880)
 - [Human–AI Collaboration Requires a High-Order Dynamic Abstraction Substrate](https://openreview.net/forum?id=tnqLi1toph)
 - [Inferential Theory of Learning as a Framework for Test-Time Computation in Foundation Models](https://openreview.net/forum?id=zuBABOLynT)
 - [LLM Routing Through the Lens of Recommendation: A Roadmap for Efficient AI Orchestration](https://openreview.net/forum?id=1YnNgAjGkV)
@@ -212,9 +213,9 @@ Every paper is listed under its group.
 - [Memory is Not Search: Towards Proactive, Lifelong Memory in AI](https://openreview.net/forum?id=MyPa2RvJUN)
 - [Reinforcement Learning Agents Are Swimmers](https://openreview.net/forum?id=aL3MYGqI5m) (spotlight)
 - [Robust Reasoning Requires Internal Time, Not Scale Alone](https://openreview.net/forum?id=vMxjno89df)
-- [Sampling Is Not Curiosity: Why LLM Agents Should Investigate](https://openreview.net/forum?id=Pl9Sb8eh7O) (spotlight)
+- [Sampling Is Not Curiosity: Why LLM Agents Should Investigate](https://openreview.net/forum?id=Pl9Sb8eh7O) (spotlight) · [arXiv:2611.10501](https://arxiv.org/abs/2611.10501)
 - [Self-Evolving Agents Should Build Internal and External Models of the World](https://openreview.net/forum?id=7rbDYy6sQn)
-- [The Road to Generalizable Neuro-Symbolic Learning Should be Paved with Foundation Models](https://openreview.net/forum?id=7TUyXMSfhp)
+- [The Road to Generalizable Neuro-Symbolic Learning Should be Paved with Foundation Models](https://openreview.net/forum?id=7TUyXMSfhp) · [arXiv:2505.24874](https://arxiv.org/abs/2505.24874)
 - [Treat Domain-Specific Languages as Design Variables in LLM Agents](https://openreview.net/forum?id=QjRcgONOvF)
 - [Why Transformer-Based Language Models Need Explicit Mechanisms of Cognitive Control](https://openreview.net/forum?id=2jo7yvaZN4)
 
@@ -237,14 +238,14 @@ Every paper is listed under its group.
 **Papers**
 
 - [A Safe LLM and a Safe Harness Do Not Make a Safe Agent](https://openreview.net/forum?id=FawL8cvevn)
-- [AI Agents Push Humans Out of the Loop](https://openreview.net/forum?id=Cx5Oy2il67)
+- [AI Agents Push Humans Out of the Loop](https://openreview.net/forum?id=Cx5Oy2il67) · [arXiv:2608.23642](https://arxiv.org/abs/2608.23642)
 - [AI Alignment Can Build Moral Autonomy](https://openreview.net/forum?id=htzFr3tI5z)
 - [AI Development Should Prioritize Cognitive Security](https://openreview.net/forum?id=WJ6PzoECZO)
-- [AI Governance Should Prioritize Control and Knowledge Boundaries Over Limiting Intelligence](https://openreview.net/forum?id=tJJOzoeeQH)
+- [AI Governance Should Prioritize Control and Knowledge Boundaries Over Limiting Intelligence](https://openreview.net/forum?id=tJJOzoeeQH) · [arXiv:2611.12941](https://arxiv.org/abs/2611.12941)
 - [AI Safety Evaluations Need More Human-AI Experiments](https://openreview.net/forum?id=PJWEhF0jaH)
 - [AIs with Secret Loyalties are a Serious but Addressable Threat](https://openreview.net/forum?id=UixLs1nFsP) (spotlight)
-- [Adversarial Risk in the Generative AI Era Necessitates Dropping the Small Epsilon Ball](https://openreview.net/forum?id=A2YHwLrLMG)
-- [Agent Security is a Systems Problem](https://openreview.net/forum?id=8gDb2bnWWf) (oral)
+- [Adversarial Risk in the Generative AI Era Necessitates Dropping the Small Epsilon Ball](https://openreview.net/forum?id=A2YHwLrLMG) · [arXiv:2611.14594](https://arxiv.org/abs/2611.14594)
+- [Agent Security is a Systems Problem](https://openreview.net/forum?id=8gDb2bnWWf) (oral) · [arXiv:2605.18991](https://arxiv.org/abs/2605.18991)
 - [Alignment Needs 'Cognitive Control': On The Role of Regularization in LLM Alignment](https://openreview.net/forum?id=3HB7ng0haX)
 - [Claude Coke: Prevent Automated Crime by Agents](https://openreview.net/forum?id=dy8ITXgyTV)
 - [LLM-enabled Applications Require Systematic Threat Monitoring](https://openreview.net/forum?id=U6QZxi674V)
@@ -253,7 +254,7 @@ Every paper is listed under its group.
 - [Scheming Is a Symptom: Alignment Research Should Probe Reflexive Fragility](https://openreview.net/forum?id=H6iOdH8Ump)
 - [The Agentic Oversight Tax: Human Supervision of AI Agents Has a Cost that Must be Accounted For](https://openreview.net/forum?id=7Y4hAbPn1J)
 - [Think about how AIs think about themselves](https://openreview.net/forum?id=zhiBScUBHH) (spotlight)
-- [When Helpfulness Becomes Sycophancy: Sycophancy is a Boundary Failure Between Social Alignment and Epistemic Integrity in Large Language Models](https://openreview.net/forum?id=QL2bHhQ3h7)
+- [When Helpfulness Becomes Sycophancy: Sycophancy is a Boundary Failure Between Social Alignment and Epistemic Integrity in Large Language Models](https://openreview.net/forum?id=QL2bHhQ3h7) · [arXiv:2605.05403](https://arxiv.org/abs/2605.05403)
 
 ### Governance, privacy, fairness, economics and society
 
@@ -282,17 +283,17 @@ Every paper is listed under its group.
 - [Fair Representations Cannot Hold What They Promise](https://openreview.net/forum?id=lmeLparD9S) (oral)
 - [From Claims to Context: Holistic Information Verification Requires Contextual Signals](https://openreview.net/forum?id=qsJgIZN26n)
 - [From Infrastructure to Interface, the AI Value Chain Drives LLM Homogenization](https://openreview.net/forum?id=ka2of9qEBW)
-- [Life-Logging Video Streams Make the Privacy–Utility Trade-off Inevitable](https://openreview.net/forum?id=nKQfPHaJIf)
+- [Life-Logging Video Streams Make the Privacy–Utility Trade-off Inevitable](https://openreview.net/forum?id=nKQfPHaJIf) · [arXiv:2605.10404](https://arxiv.org/abs/2605.10404)
 - [LLM Privacy Requires a Lifecycle-Wide Approach](https://openreview.net/forum?id=PfhroPusVX)
 - [Participatory ML for Social Harm Should be Constructed, Validated and Reasoned Through First-Person Accounts](https://openreview.net/forum?id=qNNUEJ1Ioe)
 - [Reconciling Open Access with Owner Control in AI Model Distribution Deserves More Research Effort](https://openreview.net/forum?id=JRVTQLVokf) (spotlight)
 - [Risks Create a Jagged Frontier of LLM Productivity Gains Across Computer Occupations](https://openreview.net/forum?id=x1uym9PA9I)
-- [Superplatforms Are Strategically Compelled to Counteract AI Agents](https://openreview.net/forum?id=IeXpXu7doj)
+- [Superplatforms Are Strategically Compelled to Counteract AI Agents](https://openreview.net/forum?id=IeXpXu7doj) · [arXiv:2505.17861](https://arxiv.org/abs/2505.17861)
 - [Sustainability in the Loop: AI Model Development Should Be Multi-Objective](https://openreview.net/forum?id=52nPzFExfk)
-- [Trustworthy AI Must Account for Interactions](https://openreview.net/forum?id=GgBCKP1QOb)
+- [Trustworthy AI Must Account for Interactions](https://openreview.net/forum?id=GgBCKP1QOb) · [arXiv:2504.07170](https://arxiv.org/abs/2504.07170)
 - [Video Generation Research Needs a Legally Sustainable Data Infrastructure](https://openreview.net/forum?id=y0DsznrnXQ)
-- [Watermarking Should Be Treated as a Monitoring Primitive](https://openreview.net/forum?id=uNtSWQW0z5)
-- [Watermarking Without Standards Is Not AI Governance](https://openreview.net/forum?id=c4ObiaN38X)
+- [Watermarking Should Be Treated as a Monitoring Primitive](https://openreview.net/forum?id=uNtSWQW0z5) · [arXiv:2605.13095](https://arxiv.org/abs/2605.13095)
+- [Watermarking Without Standards Is Not AI Governance](https://openreview.net/forum?id=c4ObiaN38X) · [arXiv:2505.23814](https://arxiv.org/abs/2505.23814)
 
 ### Science, health, robotics and domain applications
 
@@ -311,21 +312,21 @@ Every paper is listed under its group.
 **Papers**
 
 - [AI for Drug Discovery Models Often Do Not Learn as Expected and How to Diagnose These Failure Modes](https://openreview.net/forum?id=pwdkgwxCZU)
-- [Agentic AI Scientists Are Not Built For Autonomous Scientific Discovery](https://openreview.net/forum?id=gwehHE2dU8)
+- [Agentic AI Scientists Are Not Built For Autonomous Scientific Discovery](https://openreview.net/forum?id=gwehHE2dU8) · [arXiv:2605.08956](https://arxiv.org/abs/2605.08956)
 - [Alignment Is Not Enough for Safe Medical LLM Evaluation](https://openreview.net/forum?id=Tju86JH3mo)
-- [Autonomous Driving Research Requires a Community-Driven Data Paradigm](https://openreview.net/forum?id=HavgE17TFU)
+- [Autonomous Driving Research Requires a Community-Driven Data Paradigm](https://openreview.net/forum?id=HavgE17TFU) · [arXiv:2610.08825](https://arxiv.org/abs/2610.08825)
 - [Bigger Isn't Better: Why the Indiscriminate Scaling of Foundation Models Can't Solve Biology](https://openreview.net/forum?id=1SNf7AVj6d)
 - [Don't Deploy Fine-Tuned Genomic Foundation Models Without Privacy Evaluation: Reconstruction Vulnerability Is Unpredictable Without Empirical Measurement](https://openreview.net/forum?id=ZXIGYkvoga)
 - [Embodied AI Cannot Scale Without Open-Source Distributed Geometric Optimization Backends for Life-Scale Egocentric Data](https://openreview.net/forum?id=QD4xn09i0b)
 - [Embracing Evolution: A Call for Body-Control Co-Design in Embodied Humanoid Robot](https://openreview.net/forum?id=ZHES5sAMwo)
-- [Looking Under the Streetlight: Evaluation in Generative Molecular Dynamics](https://openreview.net/forum?id=6iB0w2UeaM)
+- [Looking Under the Streetlight: Evaluation in Generative Molecular Dynamics](https://openreview.net/forum?id=6iB0w2UeaM) · [arXiv:2610.12518](https://arxiv.org/abs/2610.12518)
 - [Machine Learning Models for Reaction Transition States Deserve Better](https://openreview.net/forum?id=bqmaBhk8KB)
 - [Mental Health AI Must Move Beyond Diagnostic Prediction and Chat-Based Support: Toward Perspective-Aware, Multisensory Co-Experience](https://openreview.net/forum?id=KrjqjWYl47)
 - [Multimodal Foundation Agents Should Use Brain Data as Privileged Supervision](https://openreview.net/forum?id=JK1yUpvQxe)
-- [Next-Generation Game Engines Should Be Built on Interactive Generative Video](https://openreview.net/forum?id=VxQbci6P05)
-- [No One Knows the State-of-the-Art in Geospatial Foundation Models](https://openreview.net/forum?id=U9fAHB63gc)
+- [Next-Generation Game Engines Should Be Built on Interactive Generative Video](https://openreview.net/forum?id=VxQbci6P05) · [arXiv:2503.17359](https://arxiv.org/abs/2503.17359)
+- [No One Knows the State-of-the-Art in Geospatial Foundation Models](https://openreview.net/forum?id=U9fAHB63gc) · [arXiv:2605.12678](https://arxiv.org/abs/2605.12678)
 - [Rethink Action Chunking in VLA Through Human Motor Control](https://openreview.net/forum?id=5qqjBkZMmL)
-- [Robot Demonstration Videos Should Include Transparency Disclosures](https://openreview.net/forum?id=XJkRFttnNg)
+- [Robot Demonstration Videos Should Include Transparency Disclosures](https://openreview.net/forum?id=XJkRFttnNg) · [arXiv:2611.18982](https://arxiv.org/abs/2611.18982)
 - [Sport Is The Next Grand Challenge For Artificial Intelligence: Toward A Science Of Human Physical Skill](https://openreview.net/forum?id=0Cbx3dqagk)
 - [Stop Quantum Machine Learning; do AI-for-Quantum instead](https://openreview.net/forum?id=e80kgYrU8n)
 
@@ -347,8 +348,8 @@ Every paper is listed under its group.
 
 **Papers**
 
-- [Adopt Constraints Over Fixed Penalties in Deep Learning](https://openreview.net/forum?id=Iv14FAc2CU)
-- [Better Language Models Require Better Domain-Specific Inductive Biases](https://openreview.net/forum?id=E7jxq4ttP2) (spotlight)
+- [Adopt Constraints Over Fixed Penalties in Deep Learning](https://openreview.net/forum?id=Iv14FAc2CU) · [arXiv:2505.20628](https://arxiv.org/abs/2505.20628)
+- [Better Language Models Require Better Domain-Specific Inductive Biases](https://openreview.net/forum?id=E7jxq4ttP2) (spotlight) · [arXiv:2611.03756](https://arxiv.org/abs/2611.03756) (on arXiv as "Language Models Can Benefit from Domain-Specific Inductive Biases")
 - [Long-Context Language Models Require Extreme Sparsity in Context Dimension](https://openreview.net/forum?id=1Zx0QQnAfD)
 - [Neurosymbolic AI is a strong technical foundation for trustworthy, deployable AI by design](https://openreview.net/forum?id=oqZudlhgoi)
 - [RoPE Is Not a Proper Relative Position Embedding](https://openreview.net/forum?id=HKQWXNPs9b)
@@ -356,7 +357,7 @@ Every paper is listed under its group.
 - [The Heel of RLVR: Benchmark Glory Should Not Outpace Honest Measurement](https://openreview.net/forum?id=JJqOCYcSuY)
 - [The Post-Training Dilemma: Why We Should Rethink the Sequential SFT-RL Paradigm](https://openreview.net/forum?id=cFJUO84S9g)
 - [Vision-Language Models Should Commit to a Cézannian Specification](https://openreview.net/forum?id=GLEL7ntAeg)
-- [We Should Distinguish Unlearning From Untraining](https://openreview.net/forum?id=U9dDSCabjP) (oral)
+- [We Should Distinguish Unlearning From Untraining](https://openreview.net/forum?id=U9dDSCabjP) (oral) · [arXiv:2604.07962](https://arxiv.org/abs/2604.07962)
 
 ## Outlier papers
 
